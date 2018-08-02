@@ -1,0 +1,16 @@
+#!groovy
+properties([
+        [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/sscs-cor-backend'],
+        pipelineTriggers([[$class: 'GitHubPushTrigger']])
+])
+
+@Library("Infrastructure")
+
+def type = "java"
+def product = "sscs-cor"
+def component = "backend"
+
+withPipeline(type, product, component) {
+    enableSlackNotifications('#sscs-tech')
+}
+
