@@ -2,7 +2,7 @@ FROM openjdk:8-jre
 
 COPY build/bootScripts/ /opt/app/bin/
 
-COPY build/libs/.jar /opt/app/lib/
+COPY build/libs/sscs-cor-backend.jar /opt/app/lib/
 
 WORKDIR /opt/app
 
