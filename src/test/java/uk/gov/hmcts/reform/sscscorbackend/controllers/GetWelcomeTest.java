@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,6 +24,6 @@ public class GetWelcomeTest {
     public void should_welcome_upon_root_request_with_200_response_code() throws Exception {
         MvcResult response = mockMvc.perform(get("/")).andExpect(status().isOk()).andReturn();
 
-        assertThat(response.getResponse().getContentAsString()).startsWith("Welcome");
+        assertThat(response.getResponse().getContentAsString(), startsWith("Root"));
     }
 }
