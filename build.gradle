@@ -123,7 +123,8 @@ def versions = [
   reformLogging: '3.0.1',
   springBoot: springBoot.class.package.implementationVersion,
   springHystrix: '2.0.0.RELEASE',
-  springfoxSwagger: '2.9.2'
+  springfoxSwagger: '2.9.2',
+  junit: '4.12'
 ]
 
 dependencies {
@@ -141,6 +142,7 @@ dependencies {
   // compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix-dashboard', version: versions.springHystrix
 
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
+  testCompile group: 'junit', name: 'junit', version: versions.junit
 
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath
@@ -148,7 +150,8 @@ dependencies {
   functionalTestCompile sourceSets.main.runtimeClasspath
 
   smokeTestCompile sourceSets.main.runtimeClasspath
-  smokeTestCompile group: 'junit', name: 'junit', version: '4.12'
+  smokeTestCompile group: 'junit', name: 'junit', version: versions.junit
+  smokeTestCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.0'
 
 }
 

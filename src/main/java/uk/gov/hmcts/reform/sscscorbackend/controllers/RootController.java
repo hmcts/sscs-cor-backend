@@ -21,8 +21,8 @@ public class RootController {
      *
      * @return Welcome message from the service.
      */
-    @GetMapping
+    @GetMapping(value = "/")
     public ResponseEntity<String> welcome() {
-        return ok("Welcome to ");
+        return ok("Root");
     }
 }
