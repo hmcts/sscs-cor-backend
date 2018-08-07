@@ -21,16 +21,23 @@ public class QuestionControllerTest {
     public int applicationPort;
     @Value("${coh.url}")
     public String cohUrl;
+    @Value("${idam.s2s-auth.url}")
+    public String tokenGeneratorUrl;
+    private TokenGeneratorStub tokenGeneratorStub;
 
     @Before
     public void setUp() {
         cohStub = new CohStub(cohUrl);
+        tokenGeneratorStub = new TokenGeneratorStub(tokenGeneratorUrl);
     }
 
     @After
     public void shutdownCoh() {
         if (cohStub != null) {
             cohStub.shutdown();
+        }
+        if (tokenGeneratorStub != null) {
+            tokenGeneratorStub.shutdown();
         }
     }
 

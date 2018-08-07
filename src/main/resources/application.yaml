@@ -12,4 +12,10 @@ spring:
     name: Spring Boot Template
 
 coh:
-  url: ${COH_URL:http://localhost:8080}
+  url: ${COH_URL:http://localhost:8081}
+
+idam:
+  s2s-auth:
+    totp_secret: ${IDAM.S2S-AUTH.TOTP_SECRET:AAAAAAAAAAAAAAAC}
+    microservice: ${IDAM.S2S-AUTH.MICROSERVICE:sscs}
+    url: ${IDAM.S2S-AUTH:http://localhost:4502}

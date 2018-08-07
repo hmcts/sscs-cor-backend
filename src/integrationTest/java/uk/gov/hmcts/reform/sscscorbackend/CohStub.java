@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscscorbackend;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.matching.RegexPattern;
 
 public class CohStub {
 
@@ -29,6 +30,7 @@ public class CohStub {
 
     public void stubGetQuestion(String hearingId, String questionId, String questionHeader) {
         wireMock.stubFor(get(urlEqualTo("/continuous-online-hearings/" + hearingId + "/questions/" + questionId))
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
                 .willReturn(okJson(getQuestionJson.replace("{question_header}", questionHeader)))
         );
     }
