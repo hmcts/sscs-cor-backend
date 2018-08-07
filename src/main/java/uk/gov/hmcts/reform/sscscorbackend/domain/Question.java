@@ -16,10 +16,12 @@ public class Question {
         this.questionHeaderText = questionHeaderText;
     }
 
+    @JsonProperty(value = "online_hearing_id")
     public String getOnlineHearingId() {
         return onlineHearingId;
     }
 
+    @JsonProperty(value = "question_id")
     public String getQuestionId() {
         return questionId;
     }

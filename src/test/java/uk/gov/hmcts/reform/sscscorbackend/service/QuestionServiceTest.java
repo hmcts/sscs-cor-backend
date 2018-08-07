@@ -30,6 +30,5 @@ public class QuestionServiceTest {
                 new QuestionService(cohClient).getQuestion(someHearingId, someQuestionId);
 
         assertThat(question, is(expectedQuestion));
-
     }
 }
