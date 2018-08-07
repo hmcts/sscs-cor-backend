@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 
 public class Question {
 
@@ -16,16 +17,19 @@ public class Question {
         this.questionHeaderText = questionHeaderText;
     }
 
+    @ApiModelProperty(example = "ID_1", required = true)
     @JsonProperty(value = "online_hearing_id")
     public String getOnlineHearingId() {
         return onlineHearingId;
     }
 
+    @ApiModelProperty(example = "ID_1", required = true)
     @JsonProperty(value = "question_id")
     public String getQuestionId() {
         return questionId;
     }
 
+    @ApiModelProperty(example = "A question header", required = true)
     @JsonProperty(value = "question_header_text")
     public String getQuestionHeaderText() {
         return questionHeaderText;
