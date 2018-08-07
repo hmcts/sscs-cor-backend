@@ -11,8 +11,11 @@ import uk.gov.hmcts.reform.sscscorbackend.service.QuestionService;
 @RestController
 @RequestMapping("/continuous-online-hearings/{onlineHearingId}")
 public class QuestionController {
-    @Autowired
-    QuestionService questionService;
+    private final QuestionService questionService;
+
+    public QuestionController(@Autowired QuestionService questionService) {
+        this.questionService = questionService;
+    }
 
     @RequestMapping(value = "questions/{questionId}")
     public ResponseEntity<Question> getQuestion(@PathVariable String onlineHearingId, @PathVariable String questionId) {

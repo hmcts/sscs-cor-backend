@@ -6,8 +6,12 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
 
 @Service
 public class QuestionService {
-    @Autowired
-    private CohClient cohClient;
+    private final CohClient cohClient;
+
+    public QuestionService(@Autowired CohClient cohClient) {
+        this.cohClient = cohClient;
+    }
+
     public Question getQuestion(String onlineHearingId, String questionId) {
         return cohClient.getQuestion(onlineHearingId, questionId);
     }

@@ -146,10 +146,12 @@ dependencies {
 
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
   testCompile group: 'junit', name: 'junit', version: versions.junit
-  testCompile "com.github.tomakehurst:wiremock:2.18.0"
 
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath
+
+  integrationTestCompile "com.github.tomakehurst:wiremock:2.18.0"
+  integrationTestCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.0'
 
   functionalTestCompile sourceSets.main.runtimeClasspath
 
