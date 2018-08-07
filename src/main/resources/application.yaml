@@ -10,3 +10,6 @@ management:
 spring:
   application:
     name: Spring Boot Template
+
+coh:
+  url: ${COH_URL:http://localhost:8080}
