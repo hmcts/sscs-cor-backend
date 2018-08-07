@@ -23,7 +23,7 @@ public class QuestionServiceTest {
 
     @Test
     public void callsQuestionService() {
-        Question expectedQuestion = new Question();
+        Question expectedQuestion = new Question(someHearingId, someQuestionId, "some header");
         when(cohClient.getQuestion(someHearingId, someQuestionId)).thenReturn(expectedQuestion);
 
         Question question =

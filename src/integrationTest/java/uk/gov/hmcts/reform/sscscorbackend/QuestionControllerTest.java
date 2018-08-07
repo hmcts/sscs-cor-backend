@@ -60,7 +60,7 @@ public class QuestionControllerTest {
         private final String expected;
 
         public QuestionHeaderMatcher(String headerText) {
-            this.expected = "\"question_header_text\": \"" + headerText + "\"";
+            this.expected = "\"question_header_text\":\"" + headerText + "\"";
         }
 
         @Override

@@ -27,7 +27,7 @@ public class QuestionControllerTest {
 
     @Test
     public void callsQuestionService() {
-        Question expectedQuestion = new Question();
+        Question expectedQuestion = new Question(someHearingId, someQuestionId, "someHeader");
         when(questionService.getQuestion(someHearingId, someQuestionId)).thenReturn(expectedQuestion);
 
         ResponseEntity<Question> question =
