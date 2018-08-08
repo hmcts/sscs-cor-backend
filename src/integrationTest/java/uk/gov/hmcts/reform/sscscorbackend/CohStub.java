@@ -14,7 +14,7 @@ public class CohStub {
             "  },\n" +
             "  \"deadline_expiry_date\": \"string\",\n" +
             "  \"owner_reference\": \"string\",\n" +
-            "  \"question_body_text\": \"Question body\",\n" +
+            "  \"question_body_text\": \"{question_body}\",\n" +
             "  \"question_header_text\": \"{question_header}\",\n" +
             "  \"question_id\": \"string\",\n" +
             "  \"question_ordinal\": \"string\",\n" +
@@ -28,11 +28,16 @@ public class CohStub {
         wireMock.start();
     }
 
-    public void stubGetQuestion(String hearingId, String questionId, String questionHeader) {
+    public void stubGetQuestion(String hearingId, String questionId, String questionHeader, String questionBody) {
         wireMock.stubFor(get(urlEqualTo("/continuous-online-hearings/" + hearingId + "/questions/" + questionId))
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
-                .willReturn(okJson(getQuestionJson.replace("{question_header}", questionHeader)))
+                .willReturn(okJson(buildGetQuestionBody(questionHeader, questionBody)))
         );
+    }
+
+    private String buildGetQuestionBody(String questionHeader, String questionBody) {
+        return getQuestionJson.replace("{question_header}", questionHeader)
+                .replace("{question_body}", questionBody);
     }
 
     public void shutdown() {
