@@ -13,7 +13,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class QuestionControllerTest {
 
-    private static final String QUESTION_HEADER = "Question Header";
+    private static final String QUESTION_HEADER = "Question header";
+    private static final String QUESTION_BODY = "Question body";
 
     private CohStub cohStub;
     private TokenGeneratorStub tokenGeneratorStub;
@@ -43,7 +44,7 @@ public class QuestionControllerTest {
 
     @Test
     public void getSampleQuestion() {
-        cohStub.stubGetQuestion("1", "1", QUESTION_HEADER);
+        cohStub.stubGetQuestion("1", "1", QUESTION_HEADER, QUESTION_BODY);
 
         RestAssured.baseURI = "http://localhost:" + applicationPort;
         RestAssured.given()
@@ -51,7 +52,7 @@ public class QuestionControllerTest {
                 .get("/continuous-online-hearings/1/questions/1")
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .body(new QuestionHeaderMatcher(QUESTION_HEADER));
+                .body(new QuestionMatcher(QUESTION_HEADER, QUESTION_BODY));
     }
 
     @Test
