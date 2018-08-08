@@ -19,6 +19,6 @@ public class TokenGeneratorStub {
     }
 
     public void shutdown() {
-        wireMock.shutdown();
+        wireMock.stop();
     }
 }

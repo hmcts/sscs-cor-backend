@@ -33,6 +33,11 @@ public class QuestionController {
             @ApiParam(value = "id of the question", example = "ID_1") @PathVariable String questionId) {
         Question question = questionService.getQuestion(onlineHearingId, questionId);
 
-        return ResponseEntity.ok(question);
+        if (question != null) {
+            return ResponseEntity.ok(question);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+
     }
 }
