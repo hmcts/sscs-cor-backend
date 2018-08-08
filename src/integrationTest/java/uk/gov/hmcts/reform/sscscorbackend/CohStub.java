@@ -36,6 +36,12 @@ public class CohStub {
     }
 
     public void shutdown() {
-        wireMock.shutdown();
+        wireMock.stop();
+    }
+
+    public void stubCannotFindQuestion(String hearingId, String questionId) {
+        wireMock.stubFor(get(urlEqualTo("/continuous-online-hearings/" + hearingId + "/questions/" + questionId))
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .willReturn(notFound()));
     }
 }

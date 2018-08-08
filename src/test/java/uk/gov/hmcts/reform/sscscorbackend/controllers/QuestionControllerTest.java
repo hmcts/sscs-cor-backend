@@ -26,7 +26,7 @@ public class QuestionControllerTest {
     }
 
     @Test
-    public void callsQuestionService() {
+    public void getsAquestionBack() {
         Question expectedQuestion = new Question(someHearingId, someQuestionId, "someHeader");
         when(questionService.getQuestion(someHearingId, someQuestionId)).thenReturn(expectedQuestion);
 
@@ -35,5 +35,15 @@ public class QuestionControllerTest {
 
         assertThat(question.getStatusCode(), is(HttpStatus.OK));
         assertThat(question.getBody(), is(expectedQuestion));
+    }
+
+    @Test
+    public void cannotFindQuestion() {
+        when(questionService.getQuestion(someHearingId, someQuestionId)).thenReturn(null);
+
+        ResponseEntity<Question> question =
+                new QuestionController(questionService).getQuestion(someHearingId, someQuestionId);
+
+        assertThat(question.getStatusCode(), is(HttpStatus.NOT_FOUND));
     }
 }
