@@ -1,7 +1,7 @@
 version: '2.1'
 
 services:
-  :
+  sscs-cor-backend:
     build:
       context: .
       args:
@@ -9,7 +9,7 @@ services:
         - https_proxy
         - no_proxy
     image: docker.artifactory.reform.hmcts.net/reform/
-    container_name: 
+    container_name: sscs-cor-backend
     environment:
       # these environment variables are used by java-logging library
       - ROOT_APPENDER
@@ -24,4 +24,4 @@ services:
       - LOGBACK_REQUIRE_ALERT_LEVEL=false
       - LOGBACK_REQUIRE_ERROR_CODE=false
     ports:
-      - $SERVER_PORT:$SERVER_PORT
+      - 8090:8090
