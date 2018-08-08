@@ -27,3 +27,11 @@ variable "common_tags" {
   type = "map"
 }
 
+variable "idam_s2s_auth_microservice"{
+  default = "sscs"
+}
+
+variable "infrastructure_env" {
+  default     = "test"
+  description = "Infrastructure environment to point to"
+}

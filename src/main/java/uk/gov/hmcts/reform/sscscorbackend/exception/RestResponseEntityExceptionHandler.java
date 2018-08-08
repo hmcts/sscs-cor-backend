@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscscorbackend.exception;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
         return handleExceptionInternal(
                 ex,
-                "An error has occurred",
+                "An error has occurred\n\n" + ExceptionUtils.getStackTrace(ex),
                 new HttpHeaders(),
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 request
