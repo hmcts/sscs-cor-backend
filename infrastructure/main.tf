@@ -25,7 +25,8 @@ locals {
   s2sCnpUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
   cohUrl = "http://coh-cor-${local.local_env}.service.${local.local_ase}.internal"
 
-  vaultName = "sscs-${local.local_env}"
+  //vaultName = "sscs-${local.local_env}"
+  vaultName = "sscs-aat"
 }
 
 module "sscs-core-backend" {
