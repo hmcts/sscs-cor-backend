@@ -11,9 +11,6 @@ def product = "sscs-cor"
 def component = "backend"
 
 withPipeline(type, product, component) {
-    before('buildinfra:prod') {
-        input "Would you like to continue to buildinfra:prod?"
-    }
     enableSlackNotifications('#sscs-tech')
 }
 
