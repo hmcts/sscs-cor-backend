@@ -1,19 +1,17 @@
 provider "azurerm" {}
 
+provider "vault" {
+  address = "https://vault.reform.hmcts.net:6200"
+}
+
 # Make sure the resource group exists
 resource "azurerm_resource_group" "rg" {
   name     = "${var.product}-${var.component}-${var.env}"
   location = "${var.location_app}"
 }
 
-data "azurerm_key_vault" "sscs_vault" {
-  name = "${local.vaultName}"
-  resource_group_name = "${local.vaultName}"
-}
-
-data "azurerm_key_vault_secret" "sscs_s2s_secret" {
-  name = "sscs-s2s-secret"
-  vault_uri = "${data.azurerm_key_vault.sscs_vault.vault_uri}"
+data "vault_generic_secret" "sscs_s2s_secret" {
+  path = "secret/${var.infrastructure_env}/ccidam/service-auth-provider/api/microservice-keys/sscs"
 }
 
 locals {
@@ -24,9 +22,6 @@ locals {
 
   s2sCnpUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
   cohUrl = "http://coh-cor-${local.local_env}.service.${local.local_ase}.internal"
-
-  //vaultName = "sscs-${local.local_env}"
-  vaultName = "sscs-aat"
 }
 
 module "sscs-core-backend" {
@@ -46,7 +41,7 @@ module "sscs-core-backend" {
 
     IDAM.S2S-AUTH = "${local.s2sCnpUrl}"
     IDAM.S2S-AUTH.MICROSERVICE = "${var.idam_s2s_auth_microservice}"
-    IDAM.S2S-AUTH.TOTP_SECRET = "${data.azurerm_key_vault_secret.sscs_s2s_secret.value}"
+    IDAM.S2S-AUTH.TOTP_SECRET = "${data.vault_generic_secret.sscs_s2s_secret.data["value"]}"
 
     COH_URL = "${local.cohUrl}"
   }
