@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohAnswer;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
+import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseData;
+import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseDetails;
+import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
@@ -81,6 +84,15 @@ public class DataFixtures {
 
     public static Panel somePanel() {
         return new Panel("aJudge", "medicalPerson", "qualifiedPerson");
+    }
+
+    public static CcdEvent someCcdEvent(String caseId, Panel panel) {
+        CaseData caseData = new CaseData(null, panel);
+
+        CaseDetails caseDetails = new CaseDetails(caseId, caseData);
+        CcdEvent ccdEvent = new CcdEvent(caseDetails);
+
+        return ccdEvent;
     }
 
 

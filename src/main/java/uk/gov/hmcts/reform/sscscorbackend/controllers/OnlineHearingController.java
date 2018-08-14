@@ -13,13 +13,17 @@ import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 
 @RestController
 public class OnlineHearingController {
-    @Autowired
     OnlineHearingService onlineHearingService;
+
+    public OnlineHearingController(@Autowired OnlineHearingService onlineHearingService) {
+        this.onlineHearingService = onlineHearingService;
+    }
 
     @RequestMapping(value = "/notify/onlineappeal", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> catchEvent(@RequestBody CcdEvent request) {
         if (request == null
             || request.getCaseDetails() == null
+            || request.getCaseDetails().getCaseId() == null
             || request.getCaseDetails().getCaseData() == null
             || request.getCaseDetails().getCaseData().getOnlinePanel() == null) {
             //throw a bad request error

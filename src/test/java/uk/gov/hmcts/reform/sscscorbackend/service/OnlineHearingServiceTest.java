@@ -54,6 +54,17 @@ public class OnlineHearingServiceTest {
         assertThat(medicalMemberName, is(panelRequestList.get(1).getName()));
 
         assertThat(disabilityQualifiedMemberName, is(panelRequestList.get(2).getName()));
+    }
 
+    @Test
+    public void testConvertPanelNull() {
+        Panel ccdPanel = null;
+
+        OnlineHearingService onlineHearingService =
+                new OnlineHearingService(cohClient);
+
+        List<PanelRequest> panelRequestList = onlineHearingService.convertPanel(ccdPanel);
+
+        assertThat(panelRequestList.size(), is(0));
     }
 }
