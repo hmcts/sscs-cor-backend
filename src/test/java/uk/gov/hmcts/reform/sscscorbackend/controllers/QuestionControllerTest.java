@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someQuestion;
 
@@ -10,27 +11,35 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.sscscorbackend.domain.Answer;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
 import uk.gov.hmcts.reform.sscscorbackend.service.QuestionService;
 
 public class QuestionControllerTest {
 
     private QuestionService questionService;
+    private Question expectedQuestion;
+    private String onlineHearingId;
+    private String questionId;
+    private QuestionController underTest;
 
     @Before
     public void setUp() {
+        expectedQuestion = someQuestion();
+        onlineHearingId = expectedQuestion.getOnlineHearingId();
+        questionId = expectedQuestion.getQuestionId();
+
         questionService = mock(QuestionService.class);
+
+        underTest = new QuestionController(questionService);
     }
 
     @Test
-    public void getsAquestionBack() {
-        Question expectedQuestion = someQuestion();
-        when(questionService.getQuestion(
-                expectedQuestion.getOnlineHearingId(), expectedQuestion.getQuestionId())
-        ).thenReturn(expectedQuestion);
+    public void getsAQuestionBack() {
+        when(questionService.getQuestion(onlineHearingId, questionId)).thenReturn(expectedQuestion);
 
-        ResponseEntity<Question> question = new QuestionController(questionService)
-                .getQuestion(expectedQuestion.getOnlineHearingId(), expectedQuestion.getQuestionId());
+        ResponseEntity<Question> question = underTest
+                .getQuestion(onlineHearingId, questionId);
 
         assertThat(question.getStatusCode(), is(HttpStatus.OK));
         assertThat(question.getBody(), is(expectedQuestion));
@@ -42,9 +51,17 @@ public class QuestionControllerTest {
         String unknownHearingId = "unknown";
         when(questionService.getQuestion(unknownHearingId, unknownQuestionId)).thenReturn(null);
 
-        ResponseEntity<Question> question =
-                new QuestionController(questionService).getQuestion(unknownHearingId, unknownQuestionId);
+        ResponseEntity<Question> question = underTest.getQuestion(unknownHearingId, unknownQuestionId);
 
         assertThat(question.getStatusCode(), is(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    public void updateAnswer() {
+        String newAnswer = "new answer";
+        ResponseEntity response = underTest.updateAnswer(onlineHearingId, questionId, new Answer(newAnswer));
+
+        assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT));
+        verify(questionService).updateAnswer(onlineHearingId, questionId, newAnswer);
     }
 }
