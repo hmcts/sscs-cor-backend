@@ -1,32 +1,17 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
 import static java.util.Collections.singletonList;
-import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohAnswer;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseData;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseDetails;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
-
-
-import java.util.ArrayList;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohAnswer;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestion;
-import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
-import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
-import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
-
 
 
 public class DataFixtures {
