@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCcdEvent;
 
@@ -10,8 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseData;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
@@ -42,7 +40,7 @@ public class OnlineHearingControllerTest {
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchEvent(ccdEvent);
 
         assertThat(stringResponseEntity.getStatusCode(), is(HttpStatus.OK));
-        assertThat(stringResponseEntity.getBody() , is(hearingId));
+        assertThat(stringResponseEntity.getBody(), is(hearingId));
     }
 
     @Test

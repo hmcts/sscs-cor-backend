@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+
 
 
 public class CreateOnlineHearingRequestTest {
