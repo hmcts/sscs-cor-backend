@@ -20,7 +20,7 @@ public class CreateOnlineHearingRequest {
     String caseId;
 
     @JsonProperty(value = "jurisdiction")
-    String jurisdiction = "SSCS";
+    String jurisdiction = "sscs";
 
     @JsonProperty(value = "panel")
     List<PanelRequest> panel;

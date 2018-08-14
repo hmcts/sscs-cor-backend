@@ -19,6 +19,15 @@ import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHear
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
 
 
+import java.util.ArrayList;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohAnswer;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestion;
+import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
+import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
+import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
+import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
+
+
 
 public class DataFixtures {
     private DataFixtures() {}
@@ -94,6 +103,5 @@ public class DataFixtures {
 
         return ccdEvent;
     }
-
 
 }
