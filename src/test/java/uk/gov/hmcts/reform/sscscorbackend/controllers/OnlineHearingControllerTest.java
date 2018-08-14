@@ -10,8 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseData;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
