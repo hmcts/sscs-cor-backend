@@ -7,6 +7,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
+import java.util.ArrayList;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohAnswer;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestion;
+import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
+import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
+import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
+import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
+
+
 
 public class DataFixtures {
     private DataFixtures() {}
@@ -52,4 +61,27 @@ public class DataFixtures {
                         new CohQuestionReference("someOtherQuestionId", 1, "second round question", someCohAnswers())))
         ));
     }
+
+    public static CreateOnlineHearingRequest someRequest() {
+        List<PanelRequest> panel = new ArrayList<>();
+
+        PanelRequest panelRequestJ = new PanelRequest("judge",
+                "aJudge", "judge");
+        panel.add(panelRequestJ);
+
+        PanelRequest panelRequestM = new PanelRequest("medical_member",
+                "medicalPerson", "medical_member");
+        panel.add(panelRequestM);
+        PanelRequest panelRequestQ = new PanelRequest("disability_qualified_member",
+                "qualifiedPerson", "disability_qualified_member");
+        panel.add(panelRequestQ);
+
+        return new CreateOnlineHearingRequest("aCaseId", panel);
+    }
+
+    public static Panel somePanel() {
+        return new Panel("aJudge", "medicalPerson", "qualifiedPerson");
+    }
+
+
 }
