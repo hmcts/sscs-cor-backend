@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static java.util.stream.Collectors.joining;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.matching.RegexPattern;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
+import java.util.Arrays;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CohStub {
 
@@ -33,6 +36,34 @@ public class CohStub {
             "    }\n" +
             "  }\n" +
             "]";
+
+    private static final String getQuestionRoundsJson = "{\n" +
+            "    \"previous_question_round\": 1,\n" +
+            "    \"current_question_round\": 1,\n" +
+            "    \"next_question_round\": 2,\n" +
+            "    \"max_number_of_question_rounds\": 0,\n" +
+            "    \"question_rounds\": [\n" +
+            "        {\n" +
+            "            \"question_round_number\": \"1\",\n" +
+            "            \"question_references\": {question_references}\n" +
+            "        }\n" +
+            "    ]\n" +
+            "}";
+
+    private static final String questionReferenceJson = "{\n" +
+            "                    \"question_round\": \"1\",\n" +
+            "                    \"question_ordinal\": \"{question_ordinal}\",\n" +
+            "                    \"question_header_text\": \"{question_header}\",\n" +
+            "                    \"question_body_text\": \"some question\",\n" +
+            "                    \"owner_reference\": \"string\",\n" +
+            "                    \"question_id\": \"f51114c0-fe98-40ad-86e0-299c4614ee85\",\n" +
+            "                    \"deadline_expiry_date\": \"2018-08-23T23:59:59Z\",\n" +
+            "                    \"current_question_state\": {\n" +
+            "                        \"state_name\": \"question_issued\",\n" +
+            "                        \"state_desc\": \"Question Issued\",\n" +
+            "                        \"state_datetime\": \"2018-08-16T08:20:29Z\"\n" +
+            "                    }\n" +
+            "                }";
 
     private final WireMockServer wireMock;
 
@@ -109,5 +140,24 @@ public class CohStub {
                 .withRequestBody(equalToJson("{\"answer_state\":\"answer_drafted\", \"answer_text\":\"" + newAnswer + "\"}"))
                 .willReturn(created())
         );
+    }
+
+    public void stubGetAllQuestionRounds(String hearingId, String... questionTitles) {
+        String body = buildGetAllQuestionsRoundsBody(questionTitles);
+        wireMock.stubFor(get("/continuous-online-hearings/" + hearingId + "/questionrounds")
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .willReturn(okJson(body)));
+    }
+
+    private String buildGetAllQuestionsRoundsBody(String[] questionTitles) {
+        final AtomicInteger index = new AtomicInteger(1);
+        String questionReferences = Arrays.stream(questionTitles)
+                .map(questionTitle -> questionReferenceJson
+                        .replace("{question_ordinal}", "" + index.getAndIncrement())
+                        .replace("{question_header}", questionTitle)
+                )
+                .collect(joining(", ", "[", "]"));
+
+        return getQuestionRoundsJson.replace("{question_references}", questionReferences);
     }
 }

@@ -1,20 +1,19 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohAnswer;
-import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohQuestion;
+import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohAnswer;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestion;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohUpdateAnswer;
-import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
+import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 
 public class QuestionServiceTest {
     private CohClient cohClient;
@@ -32,6 +31,52 @@ public class QuestionServiceTest {
         questionId = cohQuestion.getQuestionId();
         cohAnswer = someCohAnswer();
         underTest = new QuestionService(cohClient);
+    }
+
+    @Test
+    public void getsAListOfQuestionsWhenThereIsOnlyOneRoundOfQuestions() {
+        CohQuestionRounds cohQuestionRounds = someCohQuestionRoundsWithSingleRoundOfQuestions();
+        String questionHeaderText = cohQuestionRounds.getCohQuestionRound().get(0)
+                .getQuestionReferences().get(0)
+                .getQuestionHeaderText();
+        QuestionSummary questionSummary = new QuestionSummary(questionHeaderText);
+        when(cohClient.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
+        List<QuestionSummary> questions = questionRound.getQuestions();
+
+        assertThat(questions, contains(questionSummary));
+    }
+
+    @Test
+    public void getsAListOfQuestionsWhenThereIsMultipleRoundsOfQuestions() {
+        CohQuestionRounds cohQuestionRounds = someCohQuestionRoundsMultipleRoundsOfQuestions();
+        String questionHeaderText = cohQuestionRounds.getCohQuestionRound().get(1)
+                .getQuestionReferences().get(0)
+                .getQuestionHeaderText();
+        QuestionSummary questionSummary = new QuestionSummary(questionHeaderText);
+        when(cohClient.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
+        List<QuestionSummary> questions = questionRound.getQuestions();
+
+        assertThat(questions, contains(questionSummary));
+    }
+
+    @Test
+    public void getsAListOfQuestionsInTheCorrectOrderWhenTheyAreReturnedInTheIncorrectOrder() {
+        CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(new CohQuestionRound(
+                asList(new CohQuestionReference(2, "second question"), new CohQuestionReference(1, "first question")))
+        ));
+        String firstQuestionTitle = cohQuestionRounds.getCohQuestionRound().get(0)
+                .getQuestionReferences().get(1)
+                .getQuestionHeaderText();
+        String secondQuestionTitle = cohQuestionRounds.getCohQuestionRound().get(0)
+                .getQuestionReferences().get(0)
+                .getQuestionHeaderText();
+        when(cohClient.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
+        List<QuestionSummary> questions = questionRound.getQuestions();
+
+        assertThat(questions, contains(new QuestionSummary(firstQuestionTitle), new QuestionSummary(secondQuestionTitle)));
     }
 
     @Test
