@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -7,13 +9,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohAnswer;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionRounds;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohUpdateAnswer;
+import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @FeignClient(name = "Coh", url = "${coh.url}", decode404 = true)
 public interface CohClient {
