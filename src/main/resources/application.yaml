@@ -6,7 +6,7 @@ spring:
     name: SSCS-COR-Backend
 
 coh:
-  url: ${COH_URL:http://localhost:8080}
+  url: ${COH_URL:http://localhost:8081}
 
 idam:
   s2s-auth:
