@@ -1,15 +1,16 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import uk.gov.hmcts.reform.sscscorbackend.domain.Answer;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
 import uk.gov.hmcts.reform.sscscorbackend.service.QuestionService;
 
@@ -38,6 +39,18 @@ public class QuestionController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
 
+    @ApiOperation(value = "Answer a question",
+            notes = "Answers a question"
+    )
+    @ApiResponses(value = {@ApiResponse(code = 204, message = "Answer saved") })
+    @RequestMapping(method = RequestMethod.PUT, value = "questions/{questionId}", consumes = APPLICATION_JSON_VALUE)
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public ResponseEntity<Void> updateAnswer(@PathVariable String onlineHearingId,
+                                       @PathVariable String questionId,
+                                       @RequestBody Answer newAnswer) {
+        questionService.updateAnswer(onlineHearingId, questionId, newAnswer.getAnswer());
+        return ResponseEntity.noContent().build();
     }
 }

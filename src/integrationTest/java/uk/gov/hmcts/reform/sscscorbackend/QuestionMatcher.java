@@ -9,9 +9,10 @@ public class QuestionMatcher extends TypeSafeMatcher<String> {
 
     private final List<String> expected = new ArrayList<>();
 
-    public QuestionMatcher(String headerText, String bodyText) {
+    public QuestionMatcher(String headerText, String bodyText, String answerText) {
         expected.add("\"question_header_text\":\"" + headerText + "\"");
         expected.add("\"question_body_text\":\"" + bodyText + "\"");
+        expected.add("\"answer\":\"" + answerText + "\"");
     }
 
     @Override
