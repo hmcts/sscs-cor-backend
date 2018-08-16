@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscscorbackend;
 import static org.apache.http.client.methods.RequestBuilder.*;
 import static org.apache.http.conn.ssl.SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
