@@ -26,7 +26,9 @@ public class OnlineHearingService {
                         panelRequest);
 
         //assume need to create it
-        return cohClient.createOnlineHearing(createOnlineHearingRequest);
+        return cohClient.createOnlineHearing("anything",
+                "anything",
+                createOnlineHearingRequest);
 
     }
 
