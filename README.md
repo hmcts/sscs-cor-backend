@@ -81,6 +81,22 @@ docker image rm <image-id>
 
 There is no need to remove postgres and java or similar core images.
 
+## Functional tests
+
+Can be run in your ide or with
+
+```bash
+  ./gradlew functional
+``` 
+
+These tests will always run against COH on aat but you can set the url for sscs-backend-cor with the TEST_URL
+environment variable.
+
+If you are running this test locally you will need to set the USE_COH_PROXY environment variable to true.
+
+If you are running this test locally and the sscs-backend-cor is remote i.e. in preview or AAT environment then you need
+to set the USE_BACKEND_PROXY environment variable to true.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
