@@ -1,14 +1,24 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohAnswer;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestion;
-import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
+import static java.util.Collections.singletonList;
+
+import java.util.Arrays;
+import java.util.List;
+import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 
 public class DataFixtures {
     private DataFixtures() {}
 
+    public static QuestionRound someQuestionRound() {
+        return new QuestionRound(someQuestionSummaries());
+    }
+
+    public static List<QuestionSummary> someQuestionSummaries() {
+        return singletonList(new QuestionSummary("someQuestionHeader"));
+    }
+
     public static Question someQuestion() {
-        return new Question("someHearingId", "someQuestionId", "someHeader", "someBody", "someAnswer");
+        return new Question("someHearingId", "someQuestionId", "someQuestionHeader", "someBody", "someAnswer");
     }
 
     public static CohQuestion someCohQuestion() {
@@ -17,5 +27,16 @@ public class DataFixtures {
 
     public static CohAnswer someCohAnswer() {
         return new CohAnswer("answerId", "Some answer");
+    }
+
+    public static CohQuestionRounds someCohQuestionRoundsWithSingleRoundOfQuestions() {
+        return new CohQuestionRounds(1, singletonList(new CohQuestionRound(singletonList(new CohQuestionReference(1, "first question")))));
+    }
+
+    public static CohQuestionRounds someCohQuestionRoundsMultipleRoundsOfQuestions() {
+        return new CohQuestionRounds(2, Arrays.asList(
+                new CohQuestionRound(singletonList(new CohQuestionReference(1, "first round question"))),
+                new CohQuestionRound(singletonList(new CohQuestionReference(1, "second round question")))
+        ));
     }
 }

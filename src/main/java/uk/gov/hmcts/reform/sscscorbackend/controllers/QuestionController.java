@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Answer;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
+import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionRound;
 import uk.gov.hmcts.reform.sscscorbackend.service.QuestionService;
 
 @RestController
@@ -21,6 +22,16 @@ public class QuestionController {
 
     public QuestionController(@Autowired QuestionService questionService) {
         this.questionService = questionService;
+    }
+
+    @ApiOperation(value = "Get a list question",
+            notes = "Returns a list of the questions for the current round"
+    )
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<QuestionRound> getQuestionList(
+            @ApiParam(value = "id of the hearing", example = "ID_1") @PathVariable String onlineHearingId) {
+        QuestionRound questions = questionService.getQuestions(onlineHearingId);
+        return ResponseEntity.ok(questions);
     }
 
     @ApiOperation(value = "Get a question",

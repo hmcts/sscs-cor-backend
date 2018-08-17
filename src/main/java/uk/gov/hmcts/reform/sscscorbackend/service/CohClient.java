@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohAnswer;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestion;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionRounds;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohUpdateAnswer;
 
 @FeignClient(name = "Coh", url = "${coh.url}", decode404 = true)
@@ -34,4 +35,7 @@ public interface CohClient {
                       @PathVariable("questionId") String questionId,
                       @PathVariable("answerId") String answerId,
                       @RequestBody CohUpdateAnswer newAnswer);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings/{onlineHearingId}/questionrounds")
+    CohQuestionRounds getQuestionRounds(@PathVariable("onlineHearingId") String onlineHearingId);
 }
