@@ -36,10 +36,11 @@ public class QuestionServiceTest {
     @Test
     public void getsAListOfQuestionsWhenThereIsOnlyOneRoundOfQuestions() {
         CohQuestionRounds cohQuestionRounds = someCohQuestionRoundsWithSingleRoundOfQuestions();
-        String questionHeaderText = cohQuestionRounds.getCohQuestionRound().get(0)
-                .getQuestionReferences().get(0)
-                .getQuestionHeaderText();
-        QuestionSummary questionSummary = new QuestionSummary(questionHeaderText);
+        CohQuestionReference cohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
+                .getQuestionReferences().get(0);
+        String id = cohQuestionReference.getQuestionId();
+        String questionHeaderText = cohQuestionReference.getQuestionHeaderText();
+        QuestionSummary questionSummary = new QuestionSummary(id, questionHeaderText);
         when(cohClient.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
         List<QuestionSummary> questions = questionRound.getQuestions();
@@ -50,10 +51,11 @@ public class QuestionServiceTest {
     @Test
     public void getsAListOfQuestionsWhenThereIsMultipleRoundsOfQuestions() {
         CohQuestionRounds cohQuestionRounds = someCohQuestionRoundsMultipleRoundsOfQuestions();
-        String questionHeaderText = cohQuestionRounds.getCohQuestionRound().get(1)
-                .getQuestionReferences().get(0)
-                .getQuestionHeaderText();
-        QuestionSummary questionSummary = new QuestionSummary(questionHeaderText);
+        CohQuestionReference cohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(1)
+                .getQuestionReferences().get(0);
+        String id = cohQuestionReference.getQuestionId();
+        String questionHeaderText = cohQuestionReference.getQuestionHeaderText();
+        QuestionSummary questionSummary = new QuestionSummary(id, questionHeaderText);
         when(cohClient.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
         List<QuestionSummary> questions = questionRound.getQuestions();
@@ -64,19 +66,25 @@ public class QuestionServiceTest {
     @Test
     public void getsAListOfQuestionsInTheCorrectOrderWhenTheyAreReturnedInTheIncorrectOrder() {
         CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(new CohQuestionRound(
-                asList(new CohQuestionReference(2, "second question"), new CohQuestionReference(1, "first question")))
+                asList(new CohQuestionReference("questionId2", 2, "second question"), new CohQuestionReference("questionId1", 1, "first question")))
         ));
-        String firstQuestionTitle = cohQuestionRounds.getCohQuestionRound().get(0)
-                .getQuestionReferences().get(1)
-                .getQuestionHeaderText();
-        String secondQuestionTitle = cohQuestionRounds.getCohQuestionRound().get(0)
-                .getQuestionReferences().get(0)
-                .getQuestionHeaderText();
+        CohQuestionReference firstcohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
+                .getQuestionReferences().get(1);
+        String firstQuestionId = firstcohQuestionReference.getQuestionId();
+        String firstQuestionTitle = firstcohQuestionReference.getQuestionHeaderText();
+        CohQuestionReference secondCohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
+                .getQuestionReferences().get(0);
+        String secondQuestionId = secondCohQuestionReference.getQuestionId();
+        String secondQuestionTitle = secondCohQuestionReference.getQuestionHeaderText();
         when(cohClient.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
         List<QuestionSummary> questions = questionRound.getQuestions();
 
-        assertThat(questions, contains(new QuestionSummary(firstQuestionTitle), new QuestionSummary(secondQuestionTitle)));
+        assertThat(questions, contains(
+                new QuestionSummary(firstQuestionId, firstQuestionTitle),
+                new QuestionSummary(secondQuestionId, secondQuestionTitle)
+                )
+        );
     }
 
     @Test
