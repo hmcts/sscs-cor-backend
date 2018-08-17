@@ -34,8 +34,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 public class CreateAHearing {
 
-    //private String cohBaseUrl = "http://coh-cor-aat.service.core-compute-aat.internal";
-    private String cohBaseUrl = "http://localhost:8080";
+    private String cohBaseUrl = "http://coh-cor-aat.service.core-compute-aat.internal";
     private HttpClient cohClient;
     private CloseableHttpClient client;
 
