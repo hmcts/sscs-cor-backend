@@ -27,14 +27,6 @@ import org.junit.Before;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
-/*
- This test will always run against COH on aat but you can set the url for sscs-backend-cor with the TEST_URL environment
- variable.
-
- If you are running this test locally you will need to set the USE_COH_PROXY environment variable to true.
- If you are running this test locally and the sscs-backend-cor is remote i.e. in preview or AAT environment then you
- need to set the USE_BACKEND_PROXY environment variable to true.
- */
 public abstract class BaseFunctionTest {
     protected final String baseUrl = System.getenv("TEST_URL");
     protected CloseableHttpClient client;
