@@ -48,7 +48,10 @@ public class QuestionService {
         CohQuestionRound currentQuestionRound = questionRounds.getCohQuestionRound().get(currentQuestionRoundNumber - 1);
         List<QuestionSummary> questions = currentQuestionRound.getQuestionReferences().stream()
                 .sorted(Comparator.comparing(CohQuestionReference::getQuestionOrdinal))
-                .map(cohQuestionReference -> new QuestionSummary(cohQuestionReference.getQuestionHeaderText()))
+                .map(cohQuestionReference -> new QuestionSummary(
+                        cohQuestionReference.getQuestionId(),
+                        cohQuestionReference.getQuestionHeaderText())
+                )
                 .collect(toList());
 
         return new QuestionRound(questions);

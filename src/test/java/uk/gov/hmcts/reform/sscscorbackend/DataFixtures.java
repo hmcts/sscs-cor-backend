@@ -14,7 +14,7 @@ public class DataFixtures {
     }
 
     public static List<QuestionSummary> someQuestionSummaries() {
-        return singletonList(new QuestionSummary("someQuestionHeader"));
+        return singletonList(new QuestionSummary("someQuestionId", "someQuestionHeader"));
     }
 
     public static Question someQuestion() {
@@ -30,13 +30,13 @@ public class DataFixtures {
     }
 
     public static CohQuestionRounds someCohQuestionRoundsWithSingleRoundOfQuestions() {
-        return new CohQuestionRounds(1, singletonList(new CohQuestionRound(singletonList(new CohQuestionReference(1, "first question")))));
+        return new CohQuestionRounds(1, singletonList(new CohQuestionRound(singletonList(new CohQuestionReference("someQuestionId", 1, "first question")))));
     }
 
     public static CohQuestionRounds someCohQuestionRoundsMultipleRoundsOfQuestions() {
         return new CohQuestionRounds(2, Arrays.asList(
-                new CohQuestionRound(singletonList(new CohQuestionReference(1, "first round question"))),
-                new CohQuestionRound(singletonList(new CohQuestionReference(1, "second round question")))
+                new CohQuestionRound(singletonList(new CohQuestionReference("someQuestionId", 1, "first round question"))),
+                new CohQuestionRound(singletonList(new CohQuestionReference("someOtherQuestionId", 1, "second round question")))
         ));
     }
 }
