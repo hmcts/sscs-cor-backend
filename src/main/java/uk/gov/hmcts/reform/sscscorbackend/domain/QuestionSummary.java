@@ -9,10 +9,18 @@ import java.util.Objects;
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class QuestionSummary {
+    private final String id;
     private final String questionHeaderText;
 
-    public QuestionSummary(String questionHeaderText) {
+    public QuestionSummary(String id, String questionHeaderText) {
+        this.id = id;
         this.questionHeaderText = questionHeaderText;
+    }
+
+    @ApiModelProperty(example = "question-Id", required = true)
+    @JsonProperty(value = "question_id")
+    public String getId() {
+        return id;
     }
 
     @ApiModelProperty(example = "A question header", required = true)

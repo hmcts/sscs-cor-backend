@@ -19,13 +19,14 @@ public class GetListOfQuestions extends BaseFunctionTest {
     @Test
     public void getAListOfQuestionTitles() throws IOException {
         String hearingId = createHearing();
-        createQuestion(hearingId);
+        String questionId = createQuestion(hearingId);
 
         JSONObject questionRound = getQuestions(hearingId);
         JSONArray questions = questionRound.getJSONArray("questions");
 
         assertThat(questions.length(), is(1));
         assertThat(questions.getJSONObject(0).getString("question_header_text"), is("question header"));
+        assertThat(questions.getJSONObject(0).getString("question_id"), is(questionId));
     }
 
     private JSONObject getQuestions(String hearingId) throws IOException {

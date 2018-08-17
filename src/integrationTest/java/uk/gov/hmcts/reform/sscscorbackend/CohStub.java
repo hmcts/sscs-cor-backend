@@ -9,6 +9,7 @@ import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionSummary;
 
 public class CohStub {
 
@@ -56,7 +57,7 @@ public class CohStub {
             "                    \"question_header_text\": \"{question_header}\",\n" +
             "                    \"question_body_text\": \"some question\",\n" +
             "                    \"owner_reference\": \"string\",\n" +
-            "                    \"question_id\": \"f51114c0-fe98-40ad-86e0-299c4614ee85\",\n" +
+            "                    \"question_id\": \"{question_id}\",\n" +
             "                    \"deadline_expiry_date\": \"2018-08-23T23:59:59Z\",\n" +
             "                    \"current_question_state\": {\n" +
             "                        \"state_name\": \"question_issued\",\n" +
@@ -142,19 +143,20 @@ public class CohStub {
         );
     }
 
-    public void stubGetAllQuestionRounds(String hearingId, String... questionTitles) {
-        String body = buildGetAllQuestionsRoundsBody(questionTitles);
+    public void stubGetAllQuestionRounds(String hearingId, QuestionSummary... questionSummaries) {
+        String body = buildGetAllQuestionsRoundsBody(questionSummaries);
         wireMock.stubFor(get("/continuous-online-hearings/" + hearingId + "/questionrounds")
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
                 .willReturn(okJson(body)));
     }
 
-    private String buildGetAllQuestionsRoundsBody(String[] questionTitles) {
+    private String buildGetAllQuestionsRoundsBody(QuestionSummary... questionSummaries) {
         final AtomicInteger index = new AtomicInteger(1);
-        String questionReferences = Arrays.stream(questionTitles)
-                .map(questionTitle -> questionReferenceJson
+        String questionReferences = Arrays.stream(questionSummaries)
+                .map(questionSummarie -> questionReferenceJson
                         .replace("{question_ordinal}", "" + index.getAndIncrement())
-                        .replace("{question_header}", questionTitle)
+                        .replace("{question_header}", questionSummarie.getQuestionHeaderText())
+                        .replace("{question_id}", questionSummarie.getId())
                 )
                 .collect(joining(", ", "[", "]"));
 
