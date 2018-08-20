@@ -9,6 +9,7 @@ import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState;
 import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionSummary;
 
 public class CohStub {
@@ -52,19 +53,46 @@ public class CohStub {
             "}";
 
     private static final String questionReferenceJson = "{\n" +
-            "                    \"question_round\": \"1\",\n" +
-            "                    \"question_ordinal\": \"{question_ordinal}\",\n" +
-            "                    \"question_header_text\": \"{question_header}\",\n" +
-            "                    \"question_body_text\": \"some question\",\n" +
-            "                    \"owner_reference\": \"string\",\n" +
-            "                    \"question_id\": \"{question_id}\",\n" +
-            "                    \"deadline_expiry_date\": \"2018-08-23T23:59:59Z\",\n" +
-            "                    \"current_question_state\": {\n" +
-            "                        \"state_name\": \"question_issued\",\n" +
-            "                        \"state_desc\": \"Question Issued\",\n" +
-            "                        \"state_datetime\": \"2018-08-16T08:20:29Z\"\n" +
-            "                    }\n" +
-            "                }";
+            "          \"answers\": [\n" +
+            "            {\n" +
+            "              \"answer_id\": \"string\",\n" +
+            "              \"answer_text\": \"string\",\n" +
+            "              \"current_answer_state\": {\n" +
+            "                \"state_datetime\": \"string\",\n" +
+            "                \"state_desc\": \"string\",\n" +
+            "                \"state_name\": \"{answer_state}\"\n" +
+            "              },\n" +
+            "              \"history\": [\n" +
+            "                {\n" +
+            "                  \"state_datetime\": \"string\",\n" +
+            "                  \"state_desc\": \"string\",\n" +
+            "                  \"state_name\": \"string\"\n" +
+            "                }\n" +
+            "              ],\n" +
+            "              \"uri\": \"string\"\n" +
+            "            }\n" +
+            "          ],\n" +
+            "          \"current_question_state\": {\n" +
+            "            \"state_datetime\": \"string\",\n" +
+            "            \"state_desc\": \"string\",\n" +
+            "            \"state_name\": \"question_issued\"\n" +
+            "          },\n" +
+            "          \"deadline_expiry_date\": \"string\",\n" +
+            "          \"history\": [\n" +
+            "            {\n" +
+            "              \"state_datetime\": \"string\",\n" +
+            "              \"state_desc\": \"string\",\n" +
+            "              \"state_name\": \"string\"\n" +
+            "            }\n" +
+            "          ],\n" +
+            "          \"owner_reference\": \"string\",\n" +
+            "          \"question_body_text\": \"string\",\n" +
+            "          \"question_header_text\": \"{question_header}\",\n" +
+            "          \"question_id\": \"{question_id}\",\n" +
+            "          \"question_ordinal\": \"{question_ordinal}\",\n" +
+            "          \"question_round\": \"1\",\n" +
+            "          \"uri\": \"string\"\n" +
+            "        }";
 
     private final WireMockServer wireMock;
 
@@ -153,13 +181,21 @@ public class CohStub {
     private String buildGetAllQuestionsRoundsBody(QuestionSummary... questionSummaries) {
         final AtomicInteger index = new AtomicInteger(1);
         String questionReferences = Arrays.stream(questionSummaries)
-                .map(questionSummarie -> questionReferenceJson
+                .map(questionSummary -> questionReferenceJson
                         .replace("{question_ordinal}", "" + index.getAndIncrement())
-                        .replace("{question_header}", questionSummarie.getQuestionHeaderText())
-                        .replace("{question_id}", questionSummarie.getId())
+                        .replace("{question_header}", questionSummary.getQuestionHeaderText())
+                        .replace("{question_id}", questionSummary.getId())
+                        .replace("{answer_state}", getAnswerState(questionSummary.getAnswerState()))
                 )
                 .collect(joining(", ", "[", "]"));
 
         return getQuestionRoundsJson.replace("{question_references}", questionReferences);
+    }
+
+    private String getAnswerState(AnswerState answerState) {
+        if (answerState.equals(AnswerState.unanswered)) {
+            throw new IllegalArgumentException("Setup cannot handle unanswered questions");
+        }
+        return answerState.getCohAnswerState();
     }
 }

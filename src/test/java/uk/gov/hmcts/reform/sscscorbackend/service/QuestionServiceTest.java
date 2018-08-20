@@ -9,6 +9,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
+import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
+import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.unanswered;
 
 import java.util.List;
 import org.junit.Before;
@@ -40,8 +42,29 @@ public class QuestionServiceTest {
                 .getQuestionReferences().get(0);
         String id = cohQuestionReference.getQuestionId();
         String questionHeaderText = cohQuestionReference.getQuestionHeaderText();
-        QuestionSummary questionSummary = new QuestionSummary(id, questionHeaderText);
+        QuestionSummary questionSummary = new QuestionSummary(id, questionHeaderText, draft);
         when(cohClient.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
+        List<QuestionSummary> questions = questionRound.getQuestions();
+
+        assertThat(questions, contains(questionSummary));
+    }
+
+    @Test
+    public void getsAListOfQuestionsWithUnansweredStatesWhenTheQuestionHasNotBeenAnswered() {
+        CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(
+                new CohQuestionRound(singletonList(
+                        new CohQuestionReference("someQuestionId", 1, "first question", null)
+                ))
+        ));
+        CohQuestionReference cohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
+                .getQuestionReferences().get(0);
+        String id = cohQuestionReference.getQuestionId();
+        String questionHeaderText = cohQuestionReference.getQuestionHeaderText();
+        QuestionSummary questionSummary = new QuestionSummary(id, questionHeaderText, unanswered);
+
+        when(cohClient.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
         List<QuestionSummary> questions = questionRound.getQuestions();
 
@@ -55,7 +78,7 @@ public class QuestionServiceTest {
                 .getQuestionReferences().get(0);
         String id = cohQuestionReference.getQuestionId();
         String questionHeaderText = cohQuestionReference.getQuestionHeaderText();
-        QuestionSummary questionSummary = new QuestionSummary(id, questionHeaderText);
+        QuestionSummary questionSummary = new QuestionSummary(id, questionHeaderText, draft);
         when(cohClient.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
         List<QuestionSummary> questions = questionRound.getQuestions();
@@ -66,12 +89,13 @@ public class QuestionServiceTest {
     @Test
     public void getsAListOfQuestionsInTheCorrectOrderWhenTheyAreReturnedInTheIncorrectOrder() {
         CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(new CohQuestionRound(
-                asList(new CohQuestionReference("questionId2", 2, "second question"), new CohQuestionReference("questionId1", 1, "first question")))
+                asList(new CohQuestionReference("questionId2", 2, "second question", someCohAnswers()),
+                        new CohQuestionReference("questionId1", 1, "first question", someCohAnswers())))
         ));
-        CohQuestionReference firstcohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
+        CohQuestionReference firstCohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
                 .getQuestionReferences().get(1);
-        String firstQuestionId = firstcohQuestionReference.getQuestionId();
-        String firstQuestionTitle = firstcohQuestionReference.getQuestionHeaderText();
+        String firstQuestionId = firstCohQuestionReference.getQuestionId();
+        String firstQuestionTitle = firstCohQuestionReference.getQuestionHeaderText();
         CohQuestionReference secondCohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
                 .getQuestionReferences().get(0);
         String secondQuestionId = secondCohQuestionReference.getQuestionId();
@@ -81,8 +105,8 @@ public class QuestionServiceTest {
         List<QuestionSummary> questions = questionRound.getQuestions();
 
         assertThat(questions, contains(
-                new QuestionSummary(firstQuestionId, firstQuestionTitle),
-                new QuestionSummary(secondQuestionId, secondQuestionTitle)
+                new QuestionSummary(firstQuestionId, firstQuestionTitle, draft),
+                new QuestionSummary(secondQuestionId, secondQuestionTitle, draft)
                 )
         );
     }
@@ -131,7 +155,7 @@ public class QuestionServiceTest {
         String newAnswer = "new answer";
         String answerId = "some-id";
         when(cohClient.getAnswers(onlineHearingId, questionId)).thenReturn(
-                singletonList(new CohAnswer(answerId, "original answer"))
+                singletonList(new CohAnswer(answerId, "original answer", someCohState("answer_drafted")))
         );
         underTest.updateAnswer(onlineHearingId, questionId, newAnswer);
 
