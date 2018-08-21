@@ -95,4 +95,12 @@ public class DataFixtures {
         return ccdEvent;
     }
 
+
+    public static CohOnlineHearings someCohOnlineHearingId() {
+        return new CohOnlineHearings(singletonList(new CohOnlineHearing("someOnlineHearingId")));
+    }
+
+    public static OnlineHearing someOnlineHearing() {
+        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference");
+    }
 }

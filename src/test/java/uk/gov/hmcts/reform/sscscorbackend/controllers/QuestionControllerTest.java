@@ -3,19 +3,15 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someQuestion;
-import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someQuestionRound;
-import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someQuestionSummaries;
+import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.sscscorbackend.domain.Answer;
-import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
-import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionRound;
-import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionSummary;
+import uk.gov.hmcts.reform.sscscorbackend.domain.*;
+import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.QuestionService;
 
 public class QuestionControllerTest {
@@ -27,6 +23,7 @@ public class QuestionControllerTest {
     private QuestionController underTest;
     private List<QuestionSummary> expectedQuestions;
     private QuestionRound questionRound;
+    private OnlineHearingService onlineHearingService;
 
     @Before
     public void setUp() {
@@ -37,8 +34,21 @@ public class QuestionControllerTest {
         questionRound = someQuestionRound();
 
         questionService = mock(QuestionService.class);
+        onlineHearingService = mock(OnlineHearingService.class);
 
-        underTest = new QuestionController(questionService);
+        underTest = new QuestionController(questionService, onlineHearingService);
+    }
+
+    @Test
+    public void getsAnOnlineHearing() {
+        String someEmailAddress = "someEmailAddress";
+        OnlineHearing expectedOnlineHearing = someOnlineHearing();
+        when(onlineHearingService.getOnlineHearing(someEmailAddress)).thenReturn(expectedOnlineHearing);
+
+        ResponseEntity<OnlineHearing> onlineHearingResponse = underTest.getOnlineHearing(someEmailAddress);
+
+        assertThat(onlineHearingResponse.getStatusCode(), is(HttpStatus.OK));
+        assertThat(onlineHearingResponse.getBody(), is(expectedOnlineHearing));
     }
 
     @Test

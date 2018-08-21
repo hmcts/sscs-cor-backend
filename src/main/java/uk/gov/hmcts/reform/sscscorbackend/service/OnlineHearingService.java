@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
+import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
@@ -55,5 +57,11 @@ public class OnlineHearingService {
             }
         }
         return panel;
+    }
+
+    public OnlineHearing getOnlineHearing(String emailAddress) {
+        CohOnlineHearings onlineHearing = cohClient.getOnlineHearing(emailAddress);//need to work out caseId from CCD
+
+        return new OnlineHearing(onlineHearing.getOnlineHearings().get(0).getOnlineHearingId(), null, null);
     }
 }

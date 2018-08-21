@@ -11,23 +11,39 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Answer;
+import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
 import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionRound;
+import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.QuestionService;
 
 @RestController
-@RequestMapping("/continuous-online-hearings/{onlineHearingId}")
+@RequestMapping("/continuous-online-hearings")
 public class QuestionController {
     private final QuestionService questionService;
+    private final OnlineHearingService onlineHearingService;
 
-    public QuestionController(@Autowired QuestionService questionService) {
+    public QuestionController(@Autowired QuestionService questionService, @Autowired OnlineHearingService onlineHearingService) {
         this.questionService = questionService;
+        this.onlineHearingService = onlineHearingService;
+    }
+
+    @ApiOperation(value = "Get an online hearing",
+            notes = "Returns an online hearing for the email address. If the email has more than one case it " +
+                    "will be the one that is for a PIP appeal with an online panel. This is expected to be called " +
+                    "after a user had logged in and will result in a redirect to the question list page."
+    )
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<OnlineHearing> getOnlineHearing(
+            @ApiParam(value = "email address of the appellant", example = "foo@bar.com") @RequestParam("email") String emailAddress) {
+        OnlineHearing onlineHearing = onlineHearingService.getOnlineHearing(emailAddress);
+        return ResponseEntity.ok(onlineHearing);
     }
 
     @ApiOperation(value = "Get a list of questions",
             notes = "Returns a list of the questions for the current round"
     )
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, value = "{onlineHearingId}")
     public ResponseEntity<QuestionRound> getQuestionList(
             @ApiParam(value = "id of the hearing", example = "ID_1") @PathVariable String onlineHearingId) {
         QuestionRound questions = questionService.getQuestions(onlineHearingId);
@@ -39,7 +55,7 @@ public class QuestionController {
             response = Question.class
     )
     @ApiResponses(value = {@ApiResponse(code = 404, message = "Question not found") })
-    @RequestMapping(method = RequestMethod.GET, value = "questions/{questionId}")
+    @RequestMapping(method = RequestMethod.GET, value = "{onlineHearingId}/questions/{questionId}")
     public ResponseEntity<Question> getQuestion(
             @ApiParam(value = "id of the hearing", example = "ID_1") @PathVariable String onlineHearingId,
             @ApiParam(value = "id of the question", example = "ID_1") @PathVariable String questionId) {
@@ -56,7 +72,7 @@ public class QuestionController {
             notes = "Answers a question"
     )
     @ApiResponses(value = {@ApiResponse(code = 204, message = "Answer saved") })
-    @RequestMapping(method = RequestMethod.PUT, value = "questions/{questionId}", consumes = APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.PUT, value = "{onlineHearingId}/questions/{questionId}", consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> updateAnswer(@PathVariable String onlineHearingId,
                                        @PathVariable String questionId,

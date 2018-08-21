@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.matching.RegexPattern;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -96,6 +99,33 @@ public class CohStub {
             "          \"question_round\": \"1\",\n" +
             "          \"uri\": \"string\"\n" +
             "        }";
+
+    private static final String onlineHearingJson = "{\n" +
+            "    \"online_hearings\": [\n" +
+            "        {\n" +
+            "            \"online_hearing_id\": \"{online_hearing_id}\",\n" +
+            "            \"case_id\": \"chrisg-4\",\n" +
+            "            \"start_date\": \"2018-08-15T12:57:07Z\",\n" +
+            "            \"panel\": [\n" +
+            "                {\n" +
+            "                    \"name\": \"John Dead\"\n" +
+            "                }\n" +
+            "            ],\n" +
+            "            \"current_state\": {\n" +
+            "                \"state_name\": \"continuous_online_hearing_started\",\n" +
+            "                \"state_desc\": \"Continuous Online Hearing Started\",\n" +
+            "                \"state_datetime\": \"2018-08-20T16:17:06Z\"\n" +
+            "            },\n" +
+            "            \"history\": [\n" +
+            "                {\n" +
+            "                    \"state_name\": \"continuous_online_hearing_started\",\n" +
+            "                    \"state_desc\": \"Continuous Online Hearing Started\",\n" +
+            "                    \"state_datetime\": \"2018-08-20T16:17:06Z\"\n" +
+            "                }\n" +
+            "            ]\n" +
+            "        }\n" +
+            "    ]\n" +
+            "}";
 
     private static final String postHearingJson = "{\n" +
             "\"online_hearing_id\": \"{onlineHearingId}\"\n" +
@@ -225,4 +255,11 @@ public class CohStub {
                 .willReturn(status(409)));
     }
 
+
+    public void stubGetOnlineHearing(String caseId, String onlineHearingId) throws UnsupportedEncodingException {
+        String body = onlineHearingJson.replace("{online_hearing_id}", onlineHearingId);
+        wireMock.stubFor(get("/continuous-online-hearings?case_id=" + URLEncoder.encode(caseId, UTF_8.name()))
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .willReturn(okJson(body)));
+    }
 }

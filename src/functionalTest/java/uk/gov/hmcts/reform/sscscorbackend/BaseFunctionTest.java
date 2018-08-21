@@ -45,5 +45,4 @@ public abstract class BaseFunctionTest {
         }
         return httpClientBuilder.build();
     }
-
 }

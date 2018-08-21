@@ -44,4 +44,7 @@ public interface CohClient {
 
     @RequestMapping(method = RequestMethod.POST, value = "/continuous-online-hearings")
     String createOnlineHearing(CreateOnlineHearingRequest createOnlineHearingRequest);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings?case_id={caseId}")
+    CohOnlineHearings getOnlineHearing(@PathVariable("caseId") String caseId);
 }

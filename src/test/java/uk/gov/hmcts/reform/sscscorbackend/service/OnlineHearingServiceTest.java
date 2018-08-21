@@ -4,21 +4,27 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohOnlineHearingId;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.somePanel;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someRequest;
 
 import java.util.List;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
+import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
 
 public class OnlineHearingServiceTest {
     private CohClient cohClient;
+    private OnlineHearingService underTest;
 
     @Before
     public void setUp() {
         cohClient = mock(CohClient.class);
+        underTest = new OnlineHearingService(cohClient);
     }
 
     @Test
@@ -66,5 +72,17 @@ public class OnlineHearingServiceTest {
         List<PanelRequest> panelRequestList = onlineHearingService.convertPanel(ccdPanel);
 
         assertThat(panelRequestList.size(), is(0));
+    }
+
+    @Test
+    public void getsAnOnlineHearing() {
+        String someEmailAddress = "someEmailAddress";
+        CohOnlineHearings cohOnlineHearings = someCohOnlineHearingId();
+        when(cohClient.getOnlineHearing(someEmailAddress)).thenReturn(cohOnlineHearings);
+
+        OnlineHearing onlineHearing = underTest.getOnlineHearing(someEmailAddress);
+
+        String expectedOnlineHearingId = cohOnlineHearings.getOnlineHearings().get(0).getOnlineHearingId();
+        Assert.assertThat(onlineHearing.getOnlineHearingId(), is(expectedOnlineHearingId));
     }
 }
