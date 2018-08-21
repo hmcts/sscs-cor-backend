@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Comparator;
@@ -48,12 +50,25 @@ public class QuestionService {
         CohQuestionRound currentQuestionRound = questionRounds.getCohQuestionRound().get(currentQuestionRoundNumber - 1);
         List<QuestionSummary> questions = currentQuestionRound.getQuestionReferences().stream()
                 .sorted(Comparator.comparing(CohQuestionReference::getQuestionOrdinal))
-                .map(cohQuestionReference -> new QuestionSummary(
-                        cohQuestionReference.getQuestionId(),
-                        cohQuestionReference.getQuestionHeaderText())
+                .map(cohQuestionReference -> createQuestionSummary(cohQuestionReference)
                 )
                 .collect(toList());
 
         return new QuestionRound(questions);
+    }
+
+    private QuestionSummary createQuestionSummary(CohQuestionReference cohQuestionReference) {
+        List<CohAnswer> answers = cohQuestionReference.getAnswers();
+
+        AnswerState answerState = ofNullable(answers).orElse(emptyList()).stream()
+                .findFirst()
+                .map(cohAnswer -> cohAnswer.getCurrentAnswerState().getStateName())
+                .map(AnswerState::of)
+                .orElse(AnswerState.unanswered);
+
+        return new QuestionSummary(
+                cohQuestionReference.getQuestionId(),
+                cohQuestionReference.getQuestionHeaderText(),
+                answerState);
     }
 }

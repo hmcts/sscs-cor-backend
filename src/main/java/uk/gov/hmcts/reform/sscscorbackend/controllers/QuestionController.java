@@ -24,7 +24,7 @@ public class QuestionController {
         this.questionService = questionService;
     }
 
-    @ApiOperation(value = "Get a list question",
+    @ApiOperation(value = "Get a list of questions",
             notes = "Returns a list of the questions for the current round"
     )
     @RequestMapping(method = RequestMethod.GET)

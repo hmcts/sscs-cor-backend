@@ -11,10 +11,12 @@ import java.util.Objects;
 public class QuestionSummary {
     private final String id;
     private final String questionHeaderText;
+    private final AnswerState answerState;
 
-    public QuestionSummary(String id, String questionHeaderText) {
+    public QuestionSummary(String id, String questionHeaderText, AnswerState answerState) {
         this.id = id;
         this.questionHeaderText = questionHeaderText;
+        this.answerState = answerState;
     }
 
     @ApiModelProperty(example = "question-Id", required = true)
@@ -27,6 +29,12 @@ public class QuestionSummary {
     @JsonProperty(value = "question_header_text")
     public String getQuestionHeaderText() {
         return questionHeaderText;
+    }
+
+    @ApiModelProperty(required = true)
+    @JsonProperty(value = "answer_state")
+    public AnswerState getAnswerState() {
+        return answerState;
     }
 
     @Override
@@ -49,7 +57,9 @@ public class QuestionSummary {
     @Override
     public String toString() {
         return "QuestionSummary{" +
-                "questionHeaderText='" + questionHeaderText + '\'' +
+                "id='" + id + '\'' +
+                ", questionHeaderText='" + questionHeaderText + '\'' +
+                ", answerState=" + answerState +
                 '}';
     }
 }
