@@ -24,7 +24,7 @@ public class OnlineHearingServiceTest {
     @Test
     public void createOnlineHearing() {
         String hearingId = "hearingId";
-        when(cohClient.createOnlineHearing("anything", "anything", someRequest())).thenReturn("hearingId");
+        when(cohClient.createOnlineHearing(someRequest())).thenReturn("hearingId");
 
         String createdHearingId = new OnlineHearingService(cohClient).createOnlineHearing(someRequest().getCaseId(), somePanel());
 

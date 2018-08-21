@@ -1,14 +1,16 @@
 package uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CaseData {
-    @JsonProperty(value = "onlineHearingId")
     String onlineHearingId;
 
-    @JsonProperty(value = "onlinePanel")
     Panel onlinePanel;
 
+    @JsonCreator
     public CaseData(@JsonProperty(value = "onlineHearingId") String onlineHearingId,
                     @JsonProperty(value = "onlinePanel") Panel onlinePanel) {
         this.onlineHearingId = onlineHearingId;

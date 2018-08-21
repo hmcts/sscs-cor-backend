@@ -1,13 +1,18 @@
 package uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateOnlineHearingRequest {
 
+    @JsonCreator
     public CreateOnlineHearingRequest(
             @JsonProperty(value = "case_id")String caseId,
             @JsonProperty(value = "panel") List<PanelRequest> panel) {
@@ -16,13 +21,11 @@ public class CreateOnlineHearingRequest {
         this.startDate = LocalDateTime.now();
     }
 
-    @JsonProperty(value = "case_id")
     String caseId;
 
     @JsonProperty(value = "jurisdiction")
     String jurisdiction = "SSCS";
 
-    @JsonProperty(value = "panel")
     List<PanelRequest> panel;
 
     @JsonProperty(value = "start_date")

@@ -47,7 +47,5 @@ public interface CohClient {
     CohQuestionRounds getQuestionRounds(@PathVariable("onlineHearingId") String onlineHearingId);
 
     @RequestMapping(method = RequestMethod.POST, value = "/continuous-online-hearings")
-    String createOnlineHearing(@RequestHeader(AUTHORIZATION) String authorisation,
-                               @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
-                               CreateOnlineHearingRequest createOnlineHearingRequest);
+    String createOnlineHearing(CreateOnlineHearingRequest createOnlineHearingRequest);
 }

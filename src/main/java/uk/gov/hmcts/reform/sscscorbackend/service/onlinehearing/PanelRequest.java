@@ -1,9 +1,13 @@
 package uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PanelRequest {
 
+    @JsonCreator
     public PanelRequest(@JsonProperty(value = "identity_token") String identityToken,
                         @JsonProperty(value = "name") String name,
                         @JsonProperty(value = "role") String role) {
@@ -12,14 +16,11 @@ public class PanelRequest {
         this.role = role;
     }
 
-    @JsonProperty(value = "identity_token")
-    String identityToken;
+    private String identityToken;
 
-    @JsonProperty(value = "name")
-    String name;
+    private String name;
 
-    @JsonProperty(value = "role")
-    String role;
+    private String role;
 
     public String getIdentityToken() {
         return identityToken;

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,6 @@ public class CreateOnlineHearingRequestTest {
                 new CreateOnlineHearingRequest(caseId,
                         panel);
 
-        assertThat("Case id should match", createOnlineHearingRequest.equals(new CreateOnlineHearingRequest(caseId, null)));
+        assertThat("Caseid should match", createOnlineHearingRequest, is(new CreateOnlineHearingRequest(caseId, null)));
     }
 }
