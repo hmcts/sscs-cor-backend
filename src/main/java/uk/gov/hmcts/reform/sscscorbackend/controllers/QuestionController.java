@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,11 +34,14 @@ public class QuestionController {
                     "will be the one that is for a PIP appeal with an online panel. This is expected to be called " +
                     "after a user had logged in and will result in a redirect to the question list page."
     )
+    @ApiResponses(value = {@ApiResponse(code = 404, message = "No online hearing found for email address") })
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<OnlineHearing> getOnlineHearing(
             @ApiParam(value = "email address of the appellant", example = "foo@bar.com") @RequestParam("email") String emailAddress) {
-        OnlineHearing onlineHearing = onlineHearingService.getOnlineHearing(emailAddress);
-        return ResponseEntity.ok(onlineHearing);
+        Optional<OnlineHearing> onlineHearing = onlineHearingService.getOnlineHearing(emailAddress);
+
+        return onlineHearing.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @ApiOperation(value = "Get a list of questions",

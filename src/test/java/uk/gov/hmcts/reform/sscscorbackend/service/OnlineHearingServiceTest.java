@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -8,23 +10,37 @@ import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohOnlineHeari
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.somePanel;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someRequest;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
+import uk.gov.hmcts.reform.sscscorbackend.service.ccd.CcdClient;
+import uk.gov.hmcts.reform.sscscorbackend.service.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
 
 public class OnlineHearingServiceTest {
     private CohClient cohClient;
+    private CcdClient ccdClient;
+
     private OnlineHearingService underTest;
+
+    private String someEmailAddress;
+    private Long someCaseId;
+
 
     @Before
     public void setUp() {
         cohClient = mock(CohClient.class);
-        underTest = new OnlineHearingService(cohClient);
+        ccdClient = mock(CcdClient.class);
+        underTest = new OnlineHearingService(cohClient, ccdClient);
+
+        someEmailAddress = "someEmailAddress";
+        someCaseId = 1234321L;
     }
 
     @Test
@@ -32,7 +48,7 @@ public class OnlineHearingServiceTest {
         String hearingId = "hearingId";
         when(cohClient.createOnlineHearing(someRequest())).thenReturn("hearingId");
 
-        String createdHearingId = new OnlineHearingService(cohClient).createOnlineHearing(someRequest().getCaseId(), somePanel());
+        String createdHearingId = new OnlineHearingService(cohClient, ccdClient).createOnlineHearing(someRequest().getCaseId(), somePanel());
 
         assertThat(createdHearingId, is(hearingId));
     }
@@ -48,7 +64,7 @@ public class OnlineHearingServiceTest {
                 disabilityQualifiedMemberName);
 
         OnlineHearingService onlineHearingService =
-                new OnlineHearingService(cohClient);
+                new OnlineHearingService(cohClient, ccdClient);
 
         List<PanelRequest> panelRequestList = onlineHearingService.convertPanel(ccdPanel);
 
@@ -67,7 +83,7 @@ public class OnlineHearingServiceTest {
         Panel ccdPanel = null;
 
         OnlineHearingService onlineHearingService =
-                new OnlineHearingService(cohClient);
+                new OnlineHearingService(cohClient, ccdClient);
 
         List<PanelRequest> panelRequestList = onlineHearingService.convertPanel(ccdPanel);
 
@@ -76,13 +92,27 @@ public class OnlineHearingServiceTest {
 
     @Test
     public void getsAnOnlineHearing() {
-        String someEmailAddress = "someEmailAddress";
         CohOnlineHearings cohOnlineHearings = someCohOnlineHearingId();
-        when(cohClient.getOnlineHearing(someEmailAddress)).thenReturn(cohOnlineHearings);
+        when(ccdClient.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
+                .thenReturn(singletonList(CaseDetails.builder().id(someCaseId).build()));
+        when(cohClient.getOnlineHearing(someCaseId)).thenReturn(cohOnlineHearings);
 
-        OnlineHearing onlineHearing = underTest.getOnlineHearing(someEmailAddress);
+        Optional<OnlineHearing> onlineHearing = underTest.getOnlineHearing(someEmailAddress);
 
+        Assert.assertThat(onlineHearing.isPresent(), is(true));
         String expectedOnlineHearingId = cohOnlineHearings.getOnlineHearings().get(0).getOnlineHearingId();
-        Assert.assertThat(onlineHearing.getOnlineHearingId(), is(expectedOnlineHearingId));
+        Assert.assertThat(onlineHearing.get().getOnlineHearingId(), is(expectedOnlineHearingId));
+    }
+
+    @Test
+    public void noOnlineHearingIfNotFoundInCOh() {
+        when(ccdClient.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
+                .thenReturn(singletonList(CaseDetails.builder().id(someCaseId).build()));
+
+        CohOnlineHearings emptyCohOnlineHearings = new CohOnlineHearings(Collections.emptyList());
+        when(cohClient.getOnlineHearing(someCaseId)).thenReturn(emptyCohOnlineHearings);
+
+        Optional<OnlineHearing> onlineHearing = underTest.getOnlineHearing(someEmailAddress);
+        Assert.assertThat(onlineHearing.isPresent(), is(false));
     }
 }

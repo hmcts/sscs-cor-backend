@@ -27,7 +27,12 @@ public class ServiceTokenGeneratorConfiguration {
 
     @Bean
     public RequestInterceptor getRequestInterceptor(AuthTokenGenerator authTokenGenerator) {
-        return template -> template.header("ServiceAuthorization", authTokenGenerator.generate())
-                .header(HttpHeaders.AUTHORIZATION, "oauth2Token");
+        return template -> {
+            //todo need to change this
+            if (template.url().contains("/continuous-online-hearings")) {
+                template.header("ServiceAuthorization", authTokenGenerator.generate())
+                        .header(HttpHeaders.AUTHORIZATION, "oauth2Token");
+            }
+        };
     }
 }

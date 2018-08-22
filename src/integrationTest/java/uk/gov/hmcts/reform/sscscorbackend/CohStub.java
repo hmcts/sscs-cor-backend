@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
 
@@ -256,9 +255,9 @@ public class CohStub {
     }
 
 
-    public void stubGetOnlineHearing(String caseId, String onlineHearingId) throws UnsupportedEncodingException {
+    public void stubGetOnlineHearing(Long caseId, String onlineHearingId) throws UnsupportedEncodingException {
         String body = onlineHearingJson.replace("{online_hearing_id}", onlineHearingId);
-        wireMock.stubFor(get("/continuous-online-hearings?case_id=" + URLEncoder.encode(caseId, UTF_8.name()))
+        wireMock.stubFor(get("/continuous-online-hearings?case_id=" + caseId)
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
                 .willReturn(okJson(body)));
     }

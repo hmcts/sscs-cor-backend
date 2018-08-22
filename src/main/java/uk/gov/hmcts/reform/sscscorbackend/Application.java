@@ -10,7 +10,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableCircuitBreaker
 @EnableFeignClients(basePackages =
         {
-                "uk.gov.hmcts.reform.sscscorbackend.service"
+                "uk.gov.hmcts.reform.sscscorbackend.service",
+                "uk.gov.hmcts.reform.ccd.client"
         })
 //@EnableHystrixDashboard
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class

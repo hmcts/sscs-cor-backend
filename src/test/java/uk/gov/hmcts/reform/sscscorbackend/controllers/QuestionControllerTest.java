@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -43,12 +44,22 @@ public class QuestionControllerTest {
     public void getsAnOnlineHearing() {
         String someEmailAddress = "someEmailAddress";
         OnlineHearing expectedOnlineHearing = someOnlineHearing();
-        when(onlineHearingService.getOnlineHearing(someEmailAddress)).thenReturn(expectedOnlineHearing);
+        when(onlineHearingService.getOnlineHearing(someEmailAddress)).thenReturn(Optional.of(expectedOnlineHearing));
 
         ResponseEntity<OnlineHearing> onlineHearingResponse = underTest.getOnlineHearing(someEmailAddress);
 
         assertThat(onlineHearingResponse.getStatusCode(), is(HttpStatus.OK));
         assertThat(onlineHearingResponse.getBody(), is(expectedOnlineHearing));
+    }
+
+    @Test
+    public void cannotFindOnlineHearing() {
+        String someEmailAddress = "someEmailAddress";
+        when(onlineHearingService.getOnlineHearing(someEmailAddress)).thenReturn(Optional.empty());
+
+        ResponseEntity<OnlineHearing> onlineHearingResponse = underTest.getOnlineHearing(someEmailAddress);
+
+        assertThat(onlineHearingResponse.getStatusCode(), is(HttpStatus.NOT_FOUND));
     }
 
     @Test

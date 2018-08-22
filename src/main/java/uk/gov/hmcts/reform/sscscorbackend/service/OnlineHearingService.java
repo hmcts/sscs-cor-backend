@@ -2,13 +2,17 @@ package uk.gov.hmcts.reform.sscscorbackend.service;
 
 import static uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRoleCoh.*;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
+import uk.gov.hmcts.reform.sscscorbackend.service.ccd.CcdClient;
+import uk.gov.hmcts.reform.sscscorbackend.service.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
 
@@ -16,9 +20,11 @@ import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
 @Service
 public class OnlineHearingService {
     private final CohClient cohClient;
+    private final CcdClient ccdClient;
 
-    public OnlineHearingService(@Autowired CohClient cohClient) {
+    public OnlineHearingService(@Autowired CohClient cohClient, @Autowired CcdClient ccdClient) {
         this.cohClient = cohClient;
+        this.ccdClient = ccdClient;
     }
 
     public String createOnlineHearing(String caseId, Panel panel) {
@@ -59,9 +65,17 @@ public class OnlineHearingService {
         return panel;
     }
 
-    public OnlineHearing getOnlineHearing(String emailAddress) {
-        CohOnlineHearings onlineHearing = cohClient.getOnlineHearing(emailAddress);//need to work out caseId from CCD
+    public Optional<OnlineHearing> getOnlineHearing(String emailAddress) {
+        List<CaseDetails> cases = ccdClient.findCaseBy(
+                ImmutableMap.of("case.subscriptions.appellantSubscription.email", emailAddress)
+        );
 
-        return new OnlineHearing(onlineHearing.getOnlineHearings().get(0).getOnlineHearingId(), null, null);
+        Long caseId = cases.get(0).getId();
+
+        CohOnlineHearings cohOnlineHearings = cohClient.getOnlineHearing(caseId);
+
+        return cohOnlineHearings.getOnlineHearings().stream()
+                .findFirst()
+                .map(onlineHearing -> new OnlineHearing(onlineHearing.getOnlineHearingId(), null, null));
     }
 }
