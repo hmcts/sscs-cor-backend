@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CaseData {
-    String onlineHearingId;
+    private String onlineHearingId;
 
-    Panel onlinePanel;
+    private Panel onlinePanel;
 
     @JsonCreator
     public CaseData(@JsonProperty(value = "onlineHearingId") String onlineHearingId,

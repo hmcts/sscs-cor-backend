@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CcdEvent {
     @JsonProperty(value = "case_details")
-    CaseDetails caseDetails;
+    private CaseDetails caseDetails;
 
     public CcdEvent(@JsonProperty(value = "case_details") CaseDetails caseDetails) {
         this.caseDetails = caseDetails;

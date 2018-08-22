@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.sscscorbackend;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
+import static uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRoleCoh.DISABILITY_QUALIFIED_MEMBER;
+import static uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRoleCoh.JUDGE;
+import static uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRoleCoh.MEDICAL_MEMBER;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,15 +64,15 @@ public class DataFixtures {
     public static CreateOnlineHearingRequest someRequest() {
         List<PanelRequest> panel = new ArrayList<>();
 
-        PanelRequest panelRequestJ = new PanelRequest("judge",
-                "aJudge", "judge");
+        PanelRequest panelRequestJ = new PanelRequest(JUDGE,
+                "aJudge", JUDGE);
         panel.add(panelRequestJ);
 
-        PanelRequest panelRequestM = new PanelRequest("medical_member",
-                "medicalPerson", "medical_member");
+        PanelRequest panelRequestM = new PanelRequest(MEDICAL_MEMBER,
+                "medicalPerson", MEDICAL_MEMBER);
         panel.add(panelRequestM);
-        PanelRequest panelRequestQ = new PanelRequest("disability_qualified_member",
-                "qualifiedPerson", "disability_qualified_member");
+        PanelRequest panelRequestQ = new PanelRequest(DISABILITY_QUALIFIED_MEMBER,
+                "qualifiedPerson", DISABILITY_QUALIFIED_MEMBER);
         panel.add(panelRequestQ);
 
         return new CreateOnlineHearingRequest("aCaseId", panel);

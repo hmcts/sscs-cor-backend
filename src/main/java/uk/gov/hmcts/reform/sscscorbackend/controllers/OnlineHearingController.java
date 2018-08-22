@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 
 @RestController
 public class OnlineHearingController {
-    OnlineHearingService onlineHearingService;
+    private OnlineHearingService onlineHearingService;
 
     public OnlineHearingController(@Autowired OnlineHearingService onlineHearingService) {
         this.onlineHearingService = onlineHearingService;

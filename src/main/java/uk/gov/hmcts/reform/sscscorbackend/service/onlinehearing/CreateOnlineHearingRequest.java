@@ -21,18 +21,18 @@ public class CreateOnlineHearingRequest {
         this.startDate = LocalDateTime.now();
     }
 
-    String caseId;
+    private String caseId;
 
     @JsonProperty(value = "jurisdiction")
-    String jurisdiction = "SSCS";
+    private String jurisdiction = "SSCS";
 
-    List<PanelRequest> panel;
+    private List<PanelRequest> panel;
 
     @JsonProperty(value = "start_date")
-    LocalDateTime startDate;
+    private LocalDateTime startDate;
 
     @JsonProperty(value = "state")
-    String state = "continuous_online_hearing_started";
+    private String state = "continuous_online_hearing_started";
 
     public String getCaseId() {
         return caseId;

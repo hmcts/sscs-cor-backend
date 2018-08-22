@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CaseDetails {
     @JsonProperty(value = "id")
-    String caseId;
+    private String caseId;
 
     @JsonProperty(value = "case_data")
-    CaseData caseData;
+    private CaseData caseData;
 
     public CaseDetails(@JsonProperty(value = "id") String caseId,
                        @JsonProperty(value = "case_data") CaseData caseData) {

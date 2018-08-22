@@ -15,13 +15,13 @@ public class Panel {
     }
 
     @JsonProperty(value = "assignedTo")
-    String assignedTo;
+    private String assignedTo;
 
     @JsonProperty(value = "medicalMember")
-    String medicalMember;
+    private String medicalMember;
 
     @JsonProperty(value = "disabilityQualifiedMember")
-    String disabilityQualifiedMember;
+    private String disabilityQualifiedMember;
 
     public String getAssignedTo() {
         return assignedTo;
