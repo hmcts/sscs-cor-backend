@@ -10,9 +10,12 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.CohAnswer;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionRounds;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohUpdateAnswer;
+import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
+
 
 @FeignClient(name = "Coh", url = "${coh.url}", decode404 = true)
 public interface CohClient {
+
     @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings/{onlineHearingId}/questions/{questionId}")
     CohQuestion getQuestion(@PathVariable("onlineHearingId") String onlineHearingId, @PathVariable("questionId") String questionId);
 
@@ -38,4 +41,7 @@ public interface CohClient {
 
     @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings/{onlineHearingId}/questionrounds")
     CohQuestionRounds getQuestionRounds(@PathVariable("onlineHearingId") String onlineHearingId);
+
+    @RequestMapping(method = RequestMethod.POST, value = "/continuous-online-hearings")
+    String createOnlineHearing(CreateOnlineHearingRequest createOnlineHearingRequest);
 }

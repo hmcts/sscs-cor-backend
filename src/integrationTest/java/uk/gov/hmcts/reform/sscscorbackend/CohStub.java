@@ -94,6 +94,11 @@ public class CohStub {
             "          \"uri\": \"string\"\n" +
             "        }";
 
+    private static final String postHearingJson = "{\n" +
+            "\"online_hearing_id\": \"{onlineHearingId}\"\n" +
+            "}";
+
+
     private final WireMockServer wireMock;
 
     public CohStub(String url) {
@@ -198,4 +203,18 @@ public class CohStub {
         }
         return answerState.getCohAnswerState();
     }
+
+    public void stubPostOnlineHearing(String onlineHearingId) {
+        wireMock.stubFor(post(urlEqualTo("/continuous-online-hearings"))
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .willReturn(okJson(postHearingJson.replace("{onlineHearingId}", onlineHearingId))));
+    }
+
+    //TODO need to handle this exception
+    public void stubDuplicateCase() {
+        wireMock.stubFor(post(urlEqualTo("/continuous-online-hearings"))
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .willReturn(status(409)));
+    }
+
 }

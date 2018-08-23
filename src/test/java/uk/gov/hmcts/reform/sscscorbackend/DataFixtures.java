@@ -2,11 +2,19 @@ package uk.gov.hmcts.reform.sscscorbackend;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
+import static uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRoleCoh.DISABILITY_QUALIFIED_MEMBER;
+import static uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRoleCoh.JUDGE;
+import static uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRoleCoh.MEDICAL_MEMBER;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
+import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.*;
+import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.*;
+import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
+
 
 public class DataFixtures {
     private DataFixtures() {}
@@ -52,4 +60,35 @@ public class DataFixtures {
                         new CohQuestionReference("someOtherQuestionId", 1, "second round question", someCohAnswers())))
         ));
     }
+
+    public static CreateOnlineHearingRequest someRequest() {
+        List<PanelRequest> panel = new ArrayList<>();
+
+        PanelRequest panelRequestJ = new PanelRequest(JUDGE,
+                "aJudge", JUDGE);
+        panel.add(panelRequestJ);
+
+        PanelRequest panelRequestM = new PanelRequest(MEDICAL_MEMBER,
+                "medicalPerson", MEDICAL_MEMBER);
+        panel.add(panelRequestM);
+        PanelRequest panelRequestQ = new PanelRequest(DISABILITY_QUALIFIED_MEMBER,
+                "qualifiedPerson", DISABILITY_QUALIFIED_MEMBER);
+        panel.add(panelRequestQ);
+
+        return new CreateOnlineHearingRequest("aCaseId", panel);
+    }
+
+    public static Panel somePanel() {
+        return new Panel("aJudge", "medicalPerson", "qualifiedPerson");
+    }
+
+    public static CcdEvent someCcdEvent(String caseId, Panel panel) {
+        CaseData caseData = new CaseData(null, panel);
+
+        CaseDetails caseDetails = new CaseDetails(caseId, caseData);
+        CcdEvent ccdEvent = new CcdEvent(caseDetails);
+
+        return ccdEvent;
+    }
+
 }
