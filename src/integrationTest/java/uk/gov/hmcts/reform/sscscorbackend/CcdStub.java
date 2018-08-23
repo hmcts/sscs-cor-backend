@@ -16,6 +16,9 @@ public class CcdStub {
             "  \"id\": \"{caseId}\",\n" +
             "  \"case_data\": {\n" +
             "      \"caseReference\": \"{caseReference}\",\n" +
+            "      \"onlinePanel\": {\n" +
+            "        \"assignedTo\": \"someJudge\"\n" +
+            "      },\n" +
             "      \"appeal\": {\n" +
             "        \"appellant\": {\n" +
             "          \"name\": {\n" +

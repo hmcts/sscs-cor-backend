@@ -31,6 +31,7 @@ public class SscsCaseData {
     @JsonProperty("generatedDOB")
     private String generatedDob;
     private String evidencePresent;
+    private OnlinePanel onlinePanel;
 
     @JsonCreator
     public SscsCaseData(@JsonProperty("caseReference") String caseReference,
@@ -49,7 +50,8 @@ public class SscsCaseData {
                         @JsonProperty("generatedEmail") String generatedEmail,
                         @JsonProperty("generatedMobile") String generatedMobile,
                         @JsonProperty("generatedDOB") String generatedDob,
-                        @JsonProperty("evidencePresent") String evidencePresent) {
+                        @JsonProperty("evidencePresent") String evidencePresent,
+                        @JsonProperty("onlinePanel") OnlinePanel onlineOnlinePanel) {
         this.caseReference = caseReference;
         this.caseCreated = caseCreated;
         this.region = region;
@@ -67,5 +69,6 @@ public class SscsCaseData {
         this.generatedMobile = generatedMobile;
         this.generatedDob = generatedDob;
         this.evidencePresent = evidencePresent;
+        this.onlinePanel = onlineOnlinePanel;
     }
 }

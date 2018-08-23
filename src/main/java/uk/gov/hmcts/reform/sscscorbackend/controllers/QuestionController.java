@@ -34,14 +34,21 @@ public class QuestionController {
                     "will be the one that is for a PIP appeal with an online panel. This is expected to be called " +
                     "after a user had logged in and will result in a redirect to the question list page."
     )
-    @ApiResponses(value = {@ApiResponse(code = 404, message = "No online hearing found for email address") })
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No online hearing found for email address"),
+            @ApiResponse(code = 422, message = "Multiple online hearings found for email address")
+    })
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<OnlineHearing> getOnlineHearing(
             @ApiParam(value = "email address of the appellant", example = "foo@bar.com") @RequestParam("email") String emailAddress) {
-        Optional<OnlineHearing> onlineHearing = onlineHearingService.getOnlineHearing(emailAddress);
+        try {
+            Optional<OnlineHearing> onlineHearing = onlineHearingService.getOnlineHearing(emailAddress);
+            return onlineHearing.map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (IllegalStateException exc) {
+            return ResponseEntity.unprocessableEntity().build();
+        }
 
-        return onlineHearing.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
     }
 
     @ApiOperation(value = "Get a list of questions",

@@ -32,7 +32,6 @@ public class CcdClient {
                 "Benefit", // todo needs to go into a property
                 new ImmutableMap.Builder<String, String>()
                         .putAll(searchCriteria)
-                        // .put("jurisdiction", "SSCS")
                         .build()
         );
 

@@ -35,7 +35,7 @@ locals {
   s2sCnpUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
   cohUrl = "http://coh-cor-${local.local_env}.service.${local.local_ase}.internal"
   ccdApi    = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
-  idam_url = "todo fix_me"
+  idam_url = "https://preprod-idamapi.reform.hmcts.net"
 }
 
 module "sscs-core-backend" {

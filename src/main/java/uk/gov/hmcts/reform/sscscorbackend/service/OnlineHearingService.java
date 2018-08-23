@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,8 +74,15 @@ public class OnlineHearingService {
         );
 
         return cases.stream()
-                .findFirst()
+                .filter(caseDetails -> caseDetails.getData().getOnlinePanel() != null)
+                .reduce(checkThereIsOnlyOneCase())
                 .flatMap(getHearingFromCoh());
+    }
+
+    private BinaryOperator<CaseDetails> checkThereIsOnlyOneCase() {
+        return (a, b) -> {
+            throw new IllegalStateException("Multiple appeals with online hearings found.");
+        };
     }
 
     private Function<CaseDetails, Optional<OnlineHearing>> getHearingFromCoh() {

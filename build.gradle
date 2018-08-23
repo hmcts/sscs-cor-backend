@@ -205,7 +205,9 @@ sonarqube {
         property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
-        property "sonar.exclusions", "**/SscsCorBackendException.java"
+        property "sonar.exclusions", "**/SscsCorBackendException.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscscorbackend/service/ccd/domain/**," +
+                "src/main/java/uk/gov/hmcts/reform/sscscorbackend/domain/**"
     }
 }
 

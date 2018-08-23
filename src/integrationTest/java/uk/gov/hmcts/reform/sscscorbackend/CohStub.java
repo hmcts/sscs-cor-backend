@@ -254,7 +254,6 @@ public class CohStub {
                 .willReturn(status(409)));
     }
 
-
     public void stubGetOnlineHearing(Long caseId, String onlineHearingId) throws UnsupportedEncodingException {
         String body = onlineHearingJson.replace("{online_hearing_id}", onlineHearingId);
         wireMock.stubFor(get("/continuous-online-hearings?case_id=" + caseId)

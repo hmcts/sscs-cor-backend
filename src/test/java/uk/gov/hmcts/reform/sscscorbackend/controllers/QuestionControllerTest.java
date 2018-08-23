@@ -63,6 +63,17 @@ public class QuestionControllerTest {
     }
 
     @Test
+    public void foundMultipleHearings() {
+        String someEmailAddress = "someEmailAddress";
+        when(onlineHearingService.getOnlineHearing(someEmailAddress))
+                .thenThrow(new IllegalStateException("Found multiple hearings"));
+
+        ResponseEntity<OnlineHearing> onlineHearingResponse = underTest.getOnlineHearing(someEmailAddress);
+
+        assertThat(onlineHearingResponse.getStatusCode(), is(HttpStatus.UNPROCESSABLE_ENTITY));
+    }
+
+    @Test
     public void getsAListOfQuestions() {
         when(questionService.getQuestions(onlineHearingId)).thenReturn(questionRound);
 
