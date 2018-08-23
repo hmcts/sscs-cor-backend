@@ -4,9 +4,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.util.stream.Collectors.joining;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.matching.RegexPattern;
-import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -17,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionReference;
 
-public class CohStub {
+public class CohStub extends BaseStub {
 
     private static final String getQuestionJson = "{\n" +
             "  \"current_question_state\": {\n" +
@@ -130,22 +128,8 @@ public class CohStub {
             "\"online_hearing_id\": \"{onlineHearingId}\"\n" +
             "}";
 
-
-    private final WireMockServer wireMock;
-
     public CohStub(String url) {
-        wireMock = new WireMockServer(Integer.valueOf(url.split(":")[2]));
-        wireMock.start();
-    }
-
-    public void printAllRequests() {
-        if (System.getenv("PRINT_REQUESTS") != null) {
-            wireMock.findAll(RequestPatternBuilder.allRequests()).forEach(request -> {
-                System.out.println("*********************************************************");
-                System.out.println(request);
-                System.out.println("*********************************************************");
-            });
-        }
+        super(url);
     }
 
     public void stubGetQuestion(String hearingId, String questionId, String questionHeader, String questionBody) {
@@ -174,10 +158,6 @@ public class CohStub {
     private String buildGetAnswerBody(String answer, CharSequence answerId) {
         return getAnswersJson.replace("{answer_text}", answer)
                 .replace("{answer_id}", answerId);
-    }
-
-    public void shutdown() {
-        wireMock.stop();
     }
 
     public void stubCannotFindQuestion(String hearingId, String questionId) {

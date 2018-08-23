@@ -5,12 +5,10 @@ import static java.net.URLEncoder.encode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.matching.RegexPattern;
-import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import java.io.UnsupportedEncodingException;
 
-public class CcdStub {
+public class CcdStub extends BaseStub {
 
     private static final String caseDetailsJson = "[{\n" +
             "  \"id\": \"{caseId}\",\n" +
@@ -30,25 +28,8 @@ public class CcdStub {
             "  }\n" +
             "}]";
 
-    private final WireMockServer wireMock;
-
     public CcdStub(String url) {
-        wireMock = new WireMockServer(Integer.valueOf(url.split(":")[2]));
-        wireMock.start();
-    }
-
-    public void printAllRequests() {
-        if (System.getenv("PRINT_REQUESTS") != null) {
-            wireMock.findAll(RequestPatternBuilder.allRequests()).forEach(request -> {
-                System.out.println("**********************CCD**********************");
-                System.out.println(request);
-                System.out.println("**********************CCD**********************");
-            });
-        }
-    }
-
-    public void shutdown() {
-        wireMock.stop();
+        super(url);
     }
 
     public void stubSearchCaseWithEmailAddress(String email, Long caseId, String caseReference, String firstName, String lastName) throws JsonProcessingException, UnsupportedEncodingException {

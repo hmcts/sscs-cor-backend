@@ -4,50 +4,18 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import uk.gov.hmcts.reform.sscscorbackend.service.idam.Authorize;
 import uk.gov.hmcts.reform.sscscorbackend.service.idam.UserDetails;
 
-// todo split this into s2s and idam stub
-public class TokenGeneratorStub {
-    private final WireMockServer wireMock;
+public class IdamStub extends BaseStub {
 
-    public TokenGeneratorStub(String url, String idamRedirectUrl, String clientId, String clientSecret) throws JsonProcessingException, UnsupportedEncodingException {
-        wireMock = new WireMockServer(Integer.valueOf(url.split(":")[2]));
-        wireMock.start();
+    public IdamStub(String url, String idamRedirectUrl, String clientId, String clientSecret) throws JsonProcessingException, UnsupportedEncodingException {
+        super(url);
 
-        stubHealth();
-        stubLease();
         stubGetIdamTokens(idamRedirectUrl, clientId, clientSecret);
-    }
-
-    public void printAllRequests() {
-        if (System.getenv("PRINT_REQUESTS") != null) {
-            wireMock.findAll(RequestPatternBuilder.allRequests()).forEach(request -> {
-                System.out.println("**********************IDAM**********************");
-                System.out.println(request);
-                System.out.println("**********************IDAM**********************");
-            });
-        }
-    }
-
-    public void shutdown() {
-        wireMock.stop();
-    }
-
-    private void stubHealth() {
-        wireMock.stubFor(get(urlEqualTo("/health"))
-                .willReturn(okJson("{\"status\": \"UP\"}")));
-    }
-
-    private void stubLease() {
-        wireMock.stubFor(post(urlEqualTo("/lease"))
-                .willReturn(ok("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzc2NzIiwiZXhwIjoxNTMzNjY5MTgyfQ.Tr6nlcxFptSp9qPcgImowv5yDivPeX32nLwumDAEJgAEt4U_RHYx1gUJyK7GqRe1o1eE-tCNbaNMW5OIbbENdg")
-                        .withHeader("Content-Type", "text/plain;charset=UTF-8")));
     }
 
     private void stubGetIdamTokens(String idamRedirectUrl, String clientId, String clientSecret) throws JsonProcessingException, UnsupportedEncodingException {
@@ -80,7 +48,4 @@ public class TokenGeneratorStub {
         );
     }
 
-    public static void main(String[] args) throws Exception {
-        new TokenGeneratorStub("http://localhost:4502", "https://localhost:9000/poc", "clientId", "clientSecret");
-    }
 }

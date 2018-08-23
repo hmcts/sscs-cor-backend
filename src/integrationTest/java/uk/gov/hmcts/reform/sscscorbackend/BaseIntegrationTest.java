@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -34,33 +36,24 @@ public abstract class BaseIntegrationTest {
     protected CohStub cohStub;
     protected TokenGeneratorStub tokenGeneratorStub;
     protected CcdStub ccdStub;
-    protected TokenGeneratorStub idamStub;
+    protected IdamStub idamStub;
+
+    private List<BaseStub> stubs = new ArrayList<>();
 
     @Before
     public void setUp() throws Exception {
         cohStub = new CohStub(cohUrl);
-        tokenGeneratorStub = new TokenGeneratorStub(tokenGeneratorUrl, idamRedirectUrl, clientId, clientSecret);
+        stubs.add(cohStub);
+        tokenGeneratorStub = new TokenGeneratorStub(tokenGeneratorUrl);
+        stubs.add(tokenGeneratorStub);
         ccdStub = new CcdStub(ccdUrl);
-        idamStub = new TokenGeneratorStub(idamUrl, idamRedirectUrl, clientId, clientSecret);
+        stubs.add(ccdStub);
+        idamStub = new IdamStub(idamUrl, idamRedirectUrl, clientId, clientSecret);
+        stubs.add(idamStub);
     }
 
     @After
     public void shutdownCoh() {
-        if (cohStub != null) {
-            cohStub.printAllRequests();
-            cohStub.shutdown();
-        }
-        if (tokenGeneratorStub != null) {
-            tokenGeneratorStub.printAllRequests();
-            tokenGeneratorStub.shutdown();
-        }
-        if (ccdStub != null) {
-            ccdStub.printAllRequests();
-            ccdStub.shutdown();
-        }
-        if (idamStub != null) {
-            idamStub.printAllRequests();
-            idamStub.shutdown();
-        }
+        stubs.forEach(BaseStub::shutdown);
     }
 }
