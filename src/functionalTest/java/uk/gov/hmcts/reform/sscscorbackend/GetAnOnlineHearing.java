@@ -9,9 +9,11 @@ import java.util.UUID;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
+@Ignore //todo re-enable this
 public class GetAnOnlineHearing extends BaseFunctionTest {
     @Test
     public void getAnOnlineHearing() throws IOException {
