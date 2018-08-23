@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.sscscorbackend.Application;
 public class SwaggerConfiguration {
 
     @Bean
-
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .useDefaultResponseMessages(false)
