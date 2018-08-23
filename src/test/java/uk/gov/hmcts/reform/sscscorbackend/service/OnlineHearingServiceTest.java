@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
@@ -48,7 +49,7 @@ public class OnlineHearingServiceTest {
         String hearingId = "hearingId";
         when(cohClient.createOnlineHearing(someRequest())).thenReturn("hearingId");
 
-        String createdHearingId = new OnlineHearingService(cohClient, ccdClient).createOnlineHearing(someRequest().getCaseId(), somePanel());
+        String createdHearingId = underTest.createOnlineHearing(someRequest().getCaseId(), somePanel());
 
         assertThat(createdHearingId, is(hearingId));
     }
@@ -63,10 +64,7 @@ public class OnlineHearingServiceTest {
                 medicalMemberName,
                 disabilityQualifiedMemberName);
 
-        OnlineHearingService onlineHearingService =
-                new OnlineHearingService(cohClient, ccdClient);
-
-        List<PanelRequest> panelRequestList = onlineHearingService.convertPanel(ccdPanel);
+        List<PanelRequest> panelRequestList = underTest.convertPanel(ccdPanel);
 
         assertThat(panelRequestList.size(), is(3));
 
@@ -82,10 +80,7 @@ public class OnlineHearingServiceTest {
     public void testConvertPanelNull() {
         Panel ccdPanel = null;
 
-        OnlineHearingService onlineHearingService =
-                new OnlineHearingService(cohClient, ccdClient);
-
-        List<PanelRequest> panelRequestList = onlineHearingService.convertPanel(ccdPanel);
+        List<PanelRequest> panelRequestList = underTest.convertPanel(ccdPanel);
 
         assertThat(panelRequestList.size(), is(0));
     }
@@ -105,12 +100,21 @@ public class OnlineHearingServiceTest {
     }
 
     @Test
-    public void noOnlineHearingIfNotFoundInCOh() {
+    public void noOnlineHearingIfNotFoundInCcd() {
         when(ccdClient.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
                 .thenReturn(singletonList(CaseDetails.builder().id(someCaseId).build()));
 
         CohOnlineHearings emptyCohOnlineHearings = new CohOnlineHearings(Collections.emptyList());
         when(cohClient.getOnlineHearing(someCaseId)).thenReturn(emptyCohOnlineHearings);
+
+        Optional<OnlineHearing> onlineHearing = underTest.getOnlineHearing(someEmailAddress);
+        Assert.assertThat(onlineHearing.isPresent(), is(false));
+    }
+
+    @Test
+    public void noOnlineHearingIfNotFoundInCOh() {
+        when(ccdClient.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
+                .thenReturn(emptyList());
 
         Optional<OnlineHearing> onlineHearing = underTest.getOnlineHearing(someEmailAddress);
         Assert.assertThat(onlineHearing.isPresent(), is(false));

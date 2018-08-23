@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
@@ -70,12 +71,18 @@ public class OnlineHearingService {
                 ImmutableMap.of("case.subscriptions.appellantSubscription.email", emailAddress)
         );
 
-        Long caseId = cases.get(0).getId();
-
-        CohOnlineHearings cohOnlineHearings = cohClient.getOnlineHearing(caseId);
-
-        return cohOnlineHearings.getOnlineHearings().stream()
+        return cases.stream()
                 .findFirst()
-                .map(onlineHearing -> new OnlineHearing(onlineHearing.getOnlineHearingId(), null, null));
+                .flatMap(getHearingFromCoh());
+    }
+
+    private Function<CaseDetails, Optional<OnlineHearing>> getHearingFromCoh() {
+        return firstCase -> {
+            CohOnlineHearings cohOnlineHearings = cohClient.getOnlineHearing(firstCase.getId());
+
+            return cohOnlineHearings.getOnlineHearings().stream()
+                    .findFirst()
+                    .map(onlineHearing -> new OnlineHearing(onlineHearing.getOnlineHearingId(), null, null));
+        };
     }
 }
