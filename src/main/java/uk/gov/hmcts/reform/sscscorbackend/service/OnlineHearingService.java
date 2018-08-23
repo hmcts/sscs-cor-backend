@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
 import uk.gov.hmcts.reform.sscscorbackend.service.ccd.CcdClient;
 import uk.gov.hmcts.reform.sscscorbackend.service.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscscorbackend.service.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
 
@@ -82,7 +83,16 @@ public class OnlineHearingService {
 
             return cohOnlineHearings.getOnlineHearings().stream()
                     .findFirst()
-                    .map(onlineHearing -> new OnlineHearing(onlineHearing.getOnlineHearingId(), null, null));
+                    .map(onlineHearing -> {
+                        Name name = firstCase.getData().getAppeal().getAppellant().getName();
+                        String nameString = name.getFirstName() + " " + name.getLastName();
+
+                        return new OnlineHearing(
+                                onlineHearing.getOnlineHearingId(),
+                                nameString,
+                                firstCase.getData().getCaseReference()
+                        );
+                    });
         };
     }
 }

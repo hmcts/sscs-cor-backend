@@ -3,17 +3,30 @@ package uk.gov.hmcts.reform.sscscorbackend;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.net.URLEncoder.encode;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.singletonList;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.matching.RegexPattern;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import java.io.UnsupportedEncodingException;
-import uk.gov.hmcts.reform.sscscorbackend.service.ccd.domain.CaseDetails;
 
 public class CcdStub {
+
+    private static final String caseDetailsJson = "[{\n" +
+            "  \"id\": \"{caseId}\",\n" +
+            "  \"case_data\": {\n" +
+            "      \"caseReference\": \"{caseReference}\",\n" +
+            "      \"appeal\": {\n" +
+            "        \"appellant\": {\n" +
+            "          \"name\": {\n" +
+            "            \"firstName\": \"{firstName}\",\n" +
+            "            \"lastName\": \"{lastName}\"\n" +
+            "          }\n" +
+            "        }\n" +
+            "      }\n" +
+            "  }\n" +
+            "}]";
+
     private final WireMockServer wireMock;
 
     public CcdStub(String url) {
@@ -35,9 +48,8 @@ public class CcdStub {
         wireMock.stop();
     }
 
-    public void stubSearchCaseWithEmailAddress(String email, Long caseId) throws JsonProcessingException, UnsupportedEncodingException {
-        CaseDetails caseDetails = CaseDetails.builder().id(caseId).build();
-        String caseDetailsJson = new ObjectMapper().writeValueAsString(singletonList(caseDetails));
+    public void stubSearchCaseWithEmailAddress(String email, Long caseId, String caseReference, String firstName, String lastName) throws JsonProcessingException, UnsupportedEncodingException {
+        String caseDetailsJson = createCaseDetails(caseId, caseReference, firstName, lastName);
 
         wireMock.stubFor(get(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases?" +
                         "case.subscriptions.appellantSubscription.email=" + encode(email, UTF_8.name())
@@ -45,5 +57,12 @@ public class CcdStub {
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
                 .willReturn(okJson(caseDetailsJson))
         );
+    }
+
+    private String createCaseDetails(Long caseId, String caseReference, String firstName, String lastName) {
+        return caseDetailsJson.replace("{caseId}", caseId.toString())
+                .replace("{caseReference}", caseReference)
+                .replace("{firstName}", firstName)
+                .replace("{lastName}", lastName);
     }
 }

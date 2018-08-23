@@ -14,7 +14,10 @@ public class OnlineHearingTest extends BaseIntegrationTest {
         String email = "foo@bar.com";
         String expectedOnlineHearingId = "someOnlineHearingId";
         Long caseId = 1234321L;
-        ccdStub.stubSearchCaseWithEmailAddress(email, caseId);
+        String expectedCaseReference = "someCaseReference";
+        String firstName = "firstName";
+        String lastName = "lastName";
+        ccdStub.stubSearchCaseWithEmailAddress(email, caseId, expectedCaseReference, firstName, lastName);
         cohStub.stubGetOnlineHearing(caseId, expectedOnlineHearingId);
 
         RestAssured.baseURI = "http://localhost:" + applicationPort;
@@ -23,6 +26,8 @@ public class OnlineHearingTest extends BaseIntegrationTest {
                 .get("/continuous-online-hearings?email=" + email)
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("online_hearing_id", equalTo(expectedOnlineHearingId));
+                .body("online_hearing_id", equalTo(expectedOnlineHearingId))
+                .body("case_reference", equalTo(expectedCaseReference))
+                .body("appellant_name", equalTo(firstName + " " + lastName));
     }
 }
