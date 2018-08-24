@@ -4,6 +4,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,13 +49,24 @@ public class QuestionService {
 
         int currentQuestionRoundNumber = questionRounds.getCurrentQuestionRound();
         CohQuestionRound currentQuestionRound = questionRounds.getCohQuestionRound().get(currentQuestionRoundNumber - 1);
+        LocalDateTime deadlineExpiryDate = getQuestionRoundDeadlineExpiryDate(currentQuestionRound);
         List<QuestionSummary> questions = currentQuestionRound.getQuestionReferences().stream()
                 .sorted(Comparator.comparing(CohQuestionReference::getQuestionOrdinal))
-                .map(cohQuestionReference -> createQuestionSummary(cohQuestionReference)
-                )
+                .map(cohQuestionReference -> createQuestionSummary(cohQuestionReference))
                 .collect(toList());
 
-        return new QuestionRound(questions);
+        return new QuestionRound(questions, deadlineExpiryDate);
+    }
+
+    private LocalDateTime getQuestionRoundDeadlineExpiryDate(CohQuestionRound questionRound) {
+        List<CohQuestionReference> questionRefsForRound = questionRound.getQuestionReferences();
+        if (questionRefsForRound != null && !questionRefsForRound.isEmpty()) {
+            return questionRound.getQuestionReferences().get(0).getDeadlineExpiryDate();
+        } else {
+            throw new IllegalStateException(
+                "Cannot get questions required by date as question round has been published with no questions in it"
+            );
+        }
     }
 
     private QuestionSummary createQuestionSummary(CohQuestionReference cohQuestionReference) {

@@ -6,11 +6,13 @@ import static java.util.stream.Collectors.joining;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.matching.RegexPattern;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
+
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState;
-import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionSummary;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionReference;
 
 public class CohStub {
 
@@ -77,7 +79,7 @@ public class CohStub {
             "            \"state_desc\": \"string\",\n" +
             "            \"state_name\": \"question_issued\"\n" +
             "          },\n" +
-            "          \"deadline_expiry_date\": \"string\",\n" +
+            "          \"deadline_expiry_date\": \"{deadline_expiry_date}\",\n" +
             "          \"history\": [\n" +
             "            {\n" +
             "              \"state_datetime\": \"string\",\n" +
@@ -176,21 +178,22 @@ public class CohStub {
         );
     }
 
-    public void stubGetAllQuestionRounds(String hearingId, QuestionSummary... questionSummaries) {
-        String body = buildGetAllQuestionsRoundsBody(questionSummaries);
+    public void stubGetAllQuestionRounds(String hearingId, CohQuestionReference... questionReferences) {
+        String body = buildGetAllQuestionsRoundsBody(questionReferences);
         wireMock.stubFor(get("/continuous-online-hearings/" + hearingId + "/questionrounds")
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
                 .willReturn(okJson(body)));
     }
 
-    private String buildGetAllQuestionsRoundsBody(QuestionSummary... questionSummaries) {
+    private String buildGetAllQuestionsRoundsBody(CohQuestionReference... startQuestionReferences) {
         final AtomicInteger index = new AtomicInteger(1);
-        String questionReferences = Arrays.stream(questionSummaries)
+        String questionReferences = Arrays.stream(startQuestionReferences)
                 .map(questionSummary -> questionReferenceJson
                         .replace("{question_ordinal}", "" + index.getAndIncrement())
                         .replace("{question_header}", questionSummary.getQuestionHeaderText())
-                        .replace("{question_id}", questionSummary.getId())
-                        .replace("{answer_state}", getAnswerState(questionSummary.getAnswerState()))
+                        .replace("{question_id}", questionSummary.getQuestionId())
+                        .replace("{answer_state}", questionSummary.getAnswers().get(0).getCurrentAnswerState().getStateName())
+                        .replace("{deadline_expiry_date}", questionSummary.getDeadlineExpiryDate().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 )
                 .collect(joining(", ", "[", "]"));
 
