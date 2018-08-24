@@ -81,4 +81,20 @@ public class QuestionControllerTest {
         assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT));
         verify(questionService).updateAnswer(onlineHearingId, questionId, newAnswer);
     }
+
+    @Test
+    public void submitsAnswer() {
+        when(questionService.submitAnswer(onlineHearingId, questionId)).thenReturn(true);
+        ResponseEntity response = underTest.submitAnswer(onlineHearingId, questionId);
+
+        assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT));
+    }
+
+    @Test
+    public void cannotFindAnswerToSubmit() {
+        when(questionService.submitAnswer(onlineHearingId, questionId)).thenReturn(false);
+        ResponseEntity response = underTest.submitAnswer(onlineHearingId, questionId);
+
+        assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND));
+    }
 }

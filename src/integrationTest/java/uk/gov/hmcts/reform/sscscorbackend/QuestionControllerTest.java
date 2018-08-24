@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.submitted;
 
 import io.restassured.RestAssured;
 import java.util.UUID;
@@ -83,5 +84,22 @@ public class QuestionControllerTest extends BaseIntegrationTest {
                 .get("/continuous-online-hearings/" + hearingId + "/questions/" + questionId)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    public void submitAnAnswerToAQuestion() {
+        String hearingId = "1";
+        String questionId = "1";;
+        String answerId = UUID.randomUUID().toString();
+        String answer = "answer";
+        cohStub.stubGetAnswer(hearingId, questionId, answer, answerId);
+        cohStub.stubUpdateAnswer(hearingId, questionId, answer, answerId, submitted);
+
+        RestAssured.baseURI = "http://localhost:" + applicationPort;
+        RestAssured.given()
+                .when()
+                .post("/continuous-online-hearings/" + hearingId + "/questions/" + questionId)
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 }

@@ -9,8 +9,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
-import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
-import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.unanswered;
+import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.*;
 
 import java.util.List;
 import org.junit.Before;
@@ -155,10 +154,36 @@ public class QuestionServiceTest {
         String newAnswer = "new answer";
         String answerId = "some-id";
         when(cohClient.getAnswers(onlineHearingId, questionId)).thenReturn(
-                singletonList(new CohAnswer(answerId, "original answer", someCohState("answer_drafted")))
+                singletonList(new CohAnswer(answerId, "original answer", someCohState("answer_draQuestionService.javafted")))
         );
         underTest.updateAnswer(onlineHearingId, questionId, newAnswer);
 
         verify(cohClient).updateAnswer(onlineHearingId, questionId, answerId, new CohUpdateAnswer("answer_drafted", newAnswer));
+    }
+
+    @Test
+    public void submitAnswer() {
+        String answerId = "some-id";
+        String answer = "answer";
+        when(cohClient.getAnswers(onlineHearingId, questionId)).thenReturn(
+                singletonList(new CohAnswer(answerId, answer, someCohState("answer_drafted")))
+        );
+
+        boolean hasBeenSubmitted = underTest.submitAnswer(onlineHearingId, questionId);
+
+        assertThat(hasBeenSubmitted, is(true));
+        verify(cohClient).updateAnswer(onlineHearingId, questionId, answerId, new CohUpdateAnswer(submitted.getCohAnswerState(), answer));
+    }
+
+    @Test
+    public void cannotSubmitAnswerThatHasNotAlreadyBeenAnswered() {
+        String answerId = "some-id";
+        String answer = "answer";
+        when(cohClient.getAnswers(onlineHearingId, questionId)).thenReturn(emptyList());
+
+        boolean hasBeenSubmitted = underTest.submitAnswer(onlineHearingId, questionId);
+
+        assertThat(hasBeenSubmitted, is(false));
+        verify(cohClient, never()).updateAnswer(any(), any(), any(), any());
     }
 }

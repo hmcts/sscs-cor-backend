@@ -34,13 +34,27 @@ public class QuestionService {
 
     public void updateAnswer(String onlineHearingId, String questionId, String newAnswer) {
         List<CohAnswer> answers = cohClient.getAnswers(onlineHearingId, questionId);
-        CohUpdateAnswer updatedAnswer = new CohUpdateAnswer("answer_drafted", newAnswer);
+        CohUpdateAnswer updatedAnswer = new CohUpdateAnswer(AnswerState.draft.getCohAnswerState(), newAnswer);
         if (answers == null || answers.isEmpty()) {
             cohClient.createAnswer(onlineHearingId, questionId, updatedAnswer);
         } else {
             String answerId = answers.get(0).getAnswerId();
             cohClient.updateAnswer(onlineHearingId, questionId, answerId, updatedAnswer);
         }
+    }
+
+    public boolean submitAnswer(String onlineHearingId, String questionId) {
+        List<CohAnswer> answers = cohClient.getAnswers(onlineHearingId, questionId);
+
+        return answers.stream().findFirst()
+                .map(answer -> {
+                    CohUpdateAnswer updatedAnswer = new CohUpdateAnswer(AnswerState.submitted.getCohAnswerState(), answer.getAnswerText());
+                    String answerId = answers.get(0).getAnswerId();
+                    cohClient.updateAnswer(onlineHearingId, questionId, answerId, updatedAnswer);
+
+                    return true;
+                })
+                .orElse(false);
     }
 
     public QuestionRound getQuestions(String onlineHearingId) {
@@ -69,6 +83,7 @@ public class QuestionService {
         return new QuestionSummary(
                 cohQuestionReference.getQuestionId(),
                 cohQuestionReference.getQuestionHeaderText(),
-                answerState);
+                answerState
+        );
     }
 }
