@@ -48,5 +48,4 @@ public class GetAQuestion extends BaseFunctionTest {
 
         return new JSONObject(responseBody);
     }
-
 }
