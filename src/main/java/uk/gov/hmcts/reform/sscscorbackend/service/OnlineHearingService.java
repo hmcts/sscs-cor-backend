@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
 import uk.gov.hmcts.reform.sscscorbackend.service.ccd.CcdClient;
+import uk.gov.hmcts.reform.sscscorbackend.service.ccd.CcdRequestDeatils;
 import uk.gov.hmcts.reform.sscscorbackend.service.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
@@ -24,10 +25,15 @@ import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
 public class OnlineHearingService {
     private final CohClient cohClient;
     private final CcdClient ccdClient;
+    private CcdRequestDeatils ccdRequestDeatils;
 
-    public OnlineHearingService(@Autowired CohClient cohClient, @Autowired CcdClient ccdClient) {
+    public OnlineHearingService(@Autowired CohClient cohClient,
+                                @Autowired CcdClient ccdClient,
+                                @Autowired CcdRequestDeatils ccdRequestDeatils
+    ) {
         this.cohClient = cohClient;
         this.ccdClient = ccdClient;
+        this.ccdRequestDeatils = ccdRequestDeatils;
     }
 
     public String createOnlineHearing(String caseId, Panel panel) {
@@ -70,6 +76,7 @@ public class OnlineHearingService {
 
     public Optional<OnlineHearing> getOnlineHearing(String emailAddress) {
         List<CaseDetails> cases = ccdClient.findCaseBy(
+                ccdRequestDeatils,
                 ImmutableMap.of("case.subscriptions.appellantSubscription.email", emailAddress)
         );
 

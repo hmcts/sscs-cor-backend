@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
 import uk.gov.hmcts.reform.sscscorbackend.service.ccd.CcdClient;
+import uk.gov.hmcts.reform.sscscorbackend.service.ccd.CcdRequestDeatils;
 import uk.gov.hmcts.reform.sscscorbackend.service.ccd.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
 
@@ -28,13 +29,15 @@ public class OnlineHearingServiceTest {
 
     private String someEmailAddress;
     private Long someCaseId;
+    private CcdRequestDeatils ccdRequestDeatils;
 
 
     @Before
     public void setUp() {
         cohClient = mock(CohClient.class);
         ccdClient = mock(CcdClient.class);
-        underTest = new OnlineHearingService(cohClient, ccdClient);
+        ccdRequestDeatils = CcdRequestDeatils.builder().build();
+        underTest = new OnlineHearingService(cohClient, ccdClient, ccdRequestDeatils);
 
         someEmailAddress = "someEmailAddress";
         someCaseId = 1234321L;
@@ -88,7 +91,7 @@ public class OnlineHearingServiceTest {
         String lastName = "lastName";
 
         CaseDetails caseDetails = createCaseDetails(someCaseId, expectedCaseReference, firstName, lastName);
-        when(ccdClient.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
+        when(ccdClient.findCaseBy(ccdRequestDeatils, singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
                 .thenReturn(Arrays.asList(
                         createNonOnlineHearingCaseDetails(22222L, "otherCaseRef", "otherFirstName", "otherLastName"),
                         caseDetails));
@@ -109,7 +112,7 @@ public class OnlineHearingServiceTest {
     public void exceptionWhenGettingAHearingIfThereIsMoreThanOneCaseWithAnOnlinePanel() {
         CaseDetails caseDetails1 = createCaseDetails(someCaseId, "someCaseReference", "firstName", "lastName");
         CaseDetails caseDetails2 = createCaseDetails(22222L, "otherRef", "otherFirstName", "otherLatName");
-        when(ccdClient.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
+        when(ccdClient.findCaseBy(ccdRequestDeatils, singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
                 .thenReturn(Arrays.asList(
                         caseDetails1,
                         caseDetails2));
@@ -119,7 +122,7 @@ public class OnlineHearingServiceTest {
 
     @Test
     public void noOnlineHearingIfNotFoundInCcd() {
-        when(ccdClient.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
+        when(ccdClient.findCaseBy(ccdRequestDeatils, singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
                 .thenReturn(singletonList(createCaseDetails(someCaseId, "caseref", "firstname", "lastname")));
 
         CohOnlineHearings emptyCohOnlineHearings = new CohOnlineHearings(Collections.emptyList());
@@ -131,7 +134,7 @@ public class OnlineHearingServiceTest {
 
     @Test
     public void noOnlineHearingIfNotFoundInCOh() {
-        when(ccdClient.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
+        when(ccdClient.findCaseBy(ccdRequestDeatils, singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
                 .thenReturn(emptyList());
 
         Optional<OnlineHearing> onlineHearing = underTest.getOnlineHearing(someEmailAddress);
