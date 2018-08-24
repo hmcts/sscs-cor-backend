@@ -8,6 +8,11 @@ import io.swagger.annotations.ApiModelProperty;
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Answer {
+
+    @ApiModelProperty(notes = "Answer state can be either 'draft' or 'submitted' defaults to 'draft' if not set")
+    @JsonProperty(value = "answer_state")
+    private AnswerState answerState = AnswerState.draft;
+
     @ApiModelProperty(example = "this is an answer to a question", required = true)
     @JsonProperty(value = "answer")
     private String answer;
@@ -16,8 +21,13 @@ public class Answer {
     private Answer() {
     }
 
-    public Answer(String answer) {
+    public Answer(AnswerState answerState, String answer) {
+        this.answerState = answerState;
         this.answer = answer;
+    }
+
+    public AnswerState getAnswerState() {
+        return answerState;
     }
 
     public String getAnswer() {

@@ -84,4 +84,23 @@ public class QuestionControllerTest extends BaseIntegrationTest {
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value());
     }
+
+    @Test
+    public void submitAnswerForQuestion() {
+        String hearingId = "1";
+        String questionId = "1";
+        String newAnswer = "new answer";
+        String answerId = UUID.randomUUID().toString();
+        cohStub.stubGetAnswer(hearingId, questionId, "old answer", answerId);
+        cohStub.stubUpdateAnswer(hearingId, questionId, newAnswer, answerId, "answer_submitted");
+
+        RestAssured.baseURI = "http://localhost:" + applicationPort;
+        RestAssured.given()
+                .body("{\"answer\":\"" + newAnswer + "\", \"answer_state\":\"submitted\"}")
+                .when()
+                .contentType(APPLICATION_JSON_VALUE)
+                .put("/continuous-online-hearings/" + hearingId + "/questions/" + questionId)
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
 }

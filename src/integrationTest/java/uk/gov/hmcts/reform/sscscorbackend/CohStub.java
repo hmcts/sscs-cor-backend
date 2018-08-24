@@ -169,9 +169,13 @@ public class CohStub {
     }
 
     public void stubUpdateAnswer(String hearingId, String questionId, String newAnswer, String answerId) {
+        stubUpdateAnswer(hearingId, questionId, newAnswer, answerId, "answer_drafted");
+    }
+
+    public void stubUpdateAnswer(String hearingId, String questionId, String newAnswer, String answerId, String answerState) {
         wireMock.stubFor(put("/continuous-online-hearings/" + hearingId + "/questions/" + questionId + "/answers/" + answerId)
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
-                .withRequestBody(equalToJson("{\"answer_state\":\"answer_drafted\", \"answer_text\":\"" + newAnswer + "\"}"))
+                .withRequestBody(equalToJson("{\"answer_state\":\"" + answerState + "\", \"answer_text\":\"" + newAnswer + "\"}"))
                 .willReturn(created())
         );
     }

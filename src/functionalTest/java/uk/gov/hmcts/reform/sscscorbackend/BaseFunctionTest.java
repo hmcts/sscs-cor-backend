@@ -79,7 +79,7 @@ public abstract class BaseFunctionTest {
 
     protected void answerQuestion(String hearingId, String questionId, String answer) throws IOException {
         HttpResponse getQuestionResponse = client.execute(put(baseUrl + "/continuous-online-hearings/" + hearingId + "/questions/" + questionId)
-                .setEntity(new StringEntity("{\"answer\":\"" + answer + "\"}", APPLICATION_JSON))
+                .setEntity(new StringEntity("{\"answer\":\"" + answer + "\", \"answer_state\":\"draft\"}", APPLICATION_JSON))
                 .build());
 
         assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
