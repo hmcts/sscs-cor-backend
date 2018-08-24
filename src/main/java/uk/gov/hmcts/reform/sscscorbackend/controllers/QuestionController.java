@@ -61,7 +61,7 @@ public class QuestionController {
     public ResponseEntity<Void> updateAnswer(@PathVariable String onlineHearingId,
                                        @PathVariable String questionId,
                                        @RequestBody Answer newAnswer) {
-        questionService.updateAnswer(onlineHearingId, questionId, newAnswer.getAnswer());
+        questionService.updateAnswer(onlineHearingId, questionId, newAnswer);
         return ResponseEntity.noContent().build();
     }
 }

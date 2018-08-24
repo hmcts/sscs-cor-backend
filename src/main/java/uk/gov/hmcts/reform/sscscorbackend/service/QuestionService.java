@@ -32,9 +32,9 @@ public class QuestionService {
         return null;
     }
 
-    public void updateAnswer(String onlineHearingId, String questionId, String newAnswer) {
+    public void updateAnswer(String onlineHearingId, String questionId, Answer newAnswer) {
         List<CohAnswer> answers = cohClient.getAnswers(onlineHearingId, questionId);
-        CohUpdateAnswer updatedAnswer = new CohUpdateAnswer("answer_drafted", newAnswer);
+        CohUpdateAnswer updatedAnswer = new CohUpdateAnswer(newAnswer.getAnswerState().getCohAnswerState(), newAnswer.getAnswer());
         if (answers == null || answers.isEmpty()) {
             cohClient.createAnswer(onlineHearingId, questionId, updatedAnswer);
         } else {

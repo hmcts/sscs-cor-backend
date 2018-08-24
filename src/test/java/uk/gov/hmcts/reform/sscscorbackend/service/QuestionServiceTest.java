@@ -144,21 +144,23 @@ public class QuestionServiceTest {
     @Test
     public void updateAnswerWhenQuestionHasNotAlreadyBeenAnswered() {
         String newAnswer = "new answer";
+        AnswerState answerState = AnswerState.draft;
         when(cohClient.getAnswers(onlineHearingId, questionId)).thenReturn(emptyList());
-        underTest.updateAnswer(onlineHearingId, questionId, newAnswer);
+        underTest.updateAnswer(onlineHearingId, questionId, new Answer(answerState, newAnswer));
 
-        verify(cohClient).createAnswer(onlineHearingId, questionId, new CohUpdateAnswer("answer_drafted", newAnswer));
+        verify(cohClient).createAnswer(onlineHearingId, questionId, new CohUpdateAnswer(answerState.getCohAnswerState(), newAnswer));
     }
 
     @Test
     public void updateAnswerWhenQuestionHasAlreadyBeenAnswered() {
         String newAnswer = "new answer";
         String answerId = "some-id";
+        AnswerState answerState = AnswerState.submitted;
         when(cohClient.getAnswers(onlineHearingId, questionId)).thenReturn(
-                singletonList(new CohAnswer(answerId, "original answer", someCohState("answer_drafted")))
+                singletonList(new CohAnswer(answerId, "original answer", someCohState(answerState.getCohAnswerState())))
         );
-        underTest.updateAnswer(onlineHearingId, questionId, newAnswer);
+        underTest.updateAnswer(onlineHearingId, questionId, new Answer(answerState, newAnswer));
 
-        verify(cohClient).updateAnswer(onlineHearingId, questionId, answerId, new CohUpdateAnswer("answer_drafted", newAnswer));
+        verify(cohClient).updateAnswer(onlineHearingId, questionId, answerId, new CohUpdateAnswer(answerState.getCohAnswerState(), newAnswer));
     }
 }

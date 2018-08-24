@@ -5,17 +5,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someQuestion;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someQuestionRound;
-import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someQuestionSummaries;
 
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Answer;
+import uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
 import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionRound;
-import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionSummary;
 import uk.gov.hmcts.reform.sscscorbackend.service.QuestionService;
 
 public class QuestionControllerTest {
@@ -25,7 +23,6 @@ public class QuestionControllerTest {
     private String onlineHearingId;
     private String questionId;
     private QuestionController underTest;
-    private List<QuestionSummary> expectedQuestions;
     private QuestionRound questionRound;
 
     @Before
@@ -33,7 +30,6 @@ public class QuestionControllerTest {
         expectedQuestion = someQuestion();
         onlineHearingId = expectedQuestion.getOnlineHearingId();
         questionId = expectedQuestion.getQuestionId();
-        expectedQuestions = someQuestionSummaries();
         questionRound = someQuestionRound();
 
         questionService = mock(QuestionService.class);
@@ -75,8 +71,8 @@ public class QuestionControllerTest {
 
     @Test
     public void updateAnswer() {
-        String newAnswer = "new answer";
-        ResponseEntity response = underTest.updateAnswer(onlineHearingId, questionId, new Answer(newAnswer));
+        Answer newAnswer = new Answer(AnswerState.draft, "new answer");
+        ResponseEntity response = underTest.updateAnswer(onlineHearingId, questionId, newAnswer);
 
         assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT));
         verify(questionService).updateAnswer(onlineHearingId, questionId, newAnswer);
