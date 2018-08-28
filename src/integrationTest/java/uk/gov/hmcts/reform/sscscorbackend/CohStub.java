@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscscorbackend;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.util.stream.Collectors.joining;
+import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.matching.RegexPattern;
@@ -171,9 +172,13 @@ public class CohStub {
     }
 
     public void stubUpdateAnswer(String hearingId, String questionId, String newAnswer, String answerId) {
+        stubUpdateAnswer(hearingId, questionId, newAnswer, answerId, draft);
+    }
+
+    public void stubUpdateAnswer(String hearingId, String questionId, String newAnswer, String answerId, AnswerState answerState) {
         wireMock.stubFor(put("/continuous-online-hearings/" + hearingId + "/questions/" + questionId + "/answers/" + answerId)
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
-                .withRequestBody(equalToJson("{\"answer_state\":\"answer_drafted\", \"answer_text\":\"" + newAnswer + "\"}"))
+                .withRequestBody(equalToJson("{\"answer_state\":\"" + answerState.getCohAnswerState() + "\", \"answer_text\":\"" + newAnswer + "\"}"))
                 .willReturn(created())
         );
     }

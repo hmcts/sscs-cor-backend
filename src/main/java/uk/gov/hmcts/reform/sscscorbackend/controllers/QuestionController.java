@@ -64,4 +64,23 @@ public class QuestionController {
         questionService.updateAnswer(onlineHearingId, questionId, newAnswer.getAnswer());
         return ResponseEntity.noContent().build();
     }
+
+    @ApiOperation(value = "Submit an answer to a question",
+            notes = "The question must be answered first then it can be submitted"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Answer saved"),
+            @ApiResponse(code = 404, message = "Question has not already been answered")
+    })
+    @RequestMapping(method = RequestMethod.POST, value = "questions/{questionId}")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public ResponseEntity<Void> submitAnswer(@PathVariable String onlineHearingId,
+                                             @PathVariable String questionId) {
+        boolean answerSubmitted = questionService.submitAnswer(onlineHearingId, questionId);
+        if (answerSubmitted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
