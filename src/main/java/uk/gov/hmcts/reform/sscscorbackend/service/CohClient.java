@@ -6,14 +6,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohAnswer;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestion;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionRounds;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohUpdateAnswer;
+import uk.gov.hmcts.reform.sscscorbackend.config.CohRequestConfiguration;
+import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 
 
-@FeignClient(name = "Coh", url = "${coh.url}", decode404 = true)
+@FeignClient(
+        name = "Coh",
+        url = "${coh.url}",
+        decode404 = true,
+        configuration = CohRequestConfiguration.class
+)
 public interface CohClient {
 
     @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings/{onlineHearingId}/questions/{questionId}")
@@ -44,4 +47,8 @@ public interface CohClient {
 
     @RequestMapping(method = RequestMethod.POST, value = "/continuous-online-hearings")
     String createOnlineHearing(CreateOnlineHearingRequest createOnlineHearingRequest);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings?case_id={caseId}",
+            consumes = "application/json")
+    CohOnlineHearings getOnlineHearing(@PathVariable("caseId") Long caseId);
 }

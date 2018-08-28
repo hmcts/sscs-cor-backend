@@ -4,10 +4,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.util.stream.Collectors.joining;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.matching.RegexPattern;
-import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
-
+import java.io.UnsupportedEncodingException;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.UUID;
@@ -15,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionReference;
 
-public class CohStub {
+public class CohStub extends BaseStub {
 
     private static final String getQuestionJson = "{\n" +
             "  \"current_question_state\": {\n" +
@@ -97,26 +95,39 @@ public class CohStub {
             "          \"uri\": \"string\"\n" +
             "        }";
 
+    private static final String onlineHearingJson = "{\n" +
+            "    \"online_hearings\": [\n" +
+            "        {\n" +
+            "            \"online_hearing_id\": \"{online_hearing_id}\",\n" +
+            "            \"case_id\": \"chrisg-4\",\n" +
+            "            \"start_date\": \"2018-08-15T12:57:07Z\",\n" +
+            "            \"panel\": [\n" +
+            "                {\n" +
+            "                    \"name\": \"John Dead\"\n" +
+            "                }\n" +
+            "            ],\n" +
+            "            \"current_state\": {\n" +
+            "                \"state_name\": \"continuous_online_hearing_started\",\n" +
+            "                \"state_desc\": \"Continuous Online Hearing Started\",\n" +
+            "                \"state_datetime\": \"2018-08-20T16:17:06Z\"\n" +
+            "            },\n" +
+            "            \"history\": [\n" +
+            "                {\n" +
+            "                    \"state_name\": \"continuous_online_hearing_started\",\n" +
+            "                    \"state_desc\": \"Continuous Online Hearing Started\",\n" +
+            "                    \"state_datetime\": \"2018-08-20T16:17:06Z\"\n" +
+            "                }\n" +
+            "            ]\n" +
+            "        }\n" +
+            "    ]\n" +
+            "}";
+
     private static final String postHearingJson = "{\n" +
             "\"online_hearing_id\": \"{onlineHearingId}\"\n" +
             "}";
 
-
-    private final WireMockServer wireMock;
-
     public CohStub(String url) {
-        wireMock = new WireMockServer(Integer.valueOf(url.split(":")[2]));
-        wireMock.start();
-    }
-
-    public void printAllRequests() {
-        if (System.getenv("PRINT_REQUESTS") != null) {
-            wireMock.findAll(RequestPatternBuilder.allRequests()).forEach(request -> {
-                System.out.println("*********************************************************");
-                System.out.println(request);
-                System.out.println("*********************************************************");
-            });
-        }
+        super(url);
     }
 
     public void stubGetQuestion(String hearingId, String questionId, String questionHeader, String questionBody) {
@@ -145,10 +156,6 @@ public class CohStub {
     private String buildGetAnswerBody(String answer, CharSequence answerId) {
         return getAnswersJson.replace("{answer_text}", answer)
                 .replace("{answer_id}", answerId);
-    }
-
-    public void shutdown() {
-        wireMock.stop();
     }
 
     public void stubCannotFindQuestion(String hearingId, String questionId) {
@@ -225,4 +232,10 @@ public class CohStub {
                 .willReturn(status(409)));
     }
 
+    public void stubGetOnlineHearing(Long caseId, String onlineHearingId) throws UnsupportedEncodingException {
+        String body = onlineHearingJson.replace("{online_hearing_id}", onlineHearingId);
+        wireMock.stubFor(get("/continuous-online-hearings?case_id=" + caseId)
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .willReturn(okJson(body)));
+    }
 }

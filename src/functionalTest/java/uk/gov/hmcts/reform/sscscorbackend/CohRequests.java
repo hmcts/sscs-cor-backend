@@ -26,8 +26,12 @@ public class CohRequests {
     }
 
     public String createHearing() throws IOException {
+        return createHearing(UUID.randomUUID().toString());
+    }
+
+    public String createHearing(String caseId) throws IOException {
         String hearingId = makePostRequest(cohClient, cohBaseUrl + "/continuous-online-hearings", "{\n" +
-                "  \"case_id\": \"" + UUID.randomUUID().toString() + "\",\n" +
+                "  \"case_id\": \"" + caseId + "\",\n" +
                 "  \"jurisdiction\": \"SSCS\",\n" +
                 "  \"panel\": [\n" +
                 "    {\n" +
