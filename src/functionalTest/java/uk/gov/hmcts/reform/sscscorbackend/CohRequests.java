@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
+import static org.apache.http.client.methods.RequestBuilder.get;
 import static org.apache.http.client.methods.RequestBuilder.post;
 import static org.apache.http.client.methods.RequestBuilder.put;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
@@ -8,6 +9,7 @@ import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.function.Supplier;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.entity.StringEntity;
@@ -60,10 +62,40 @@ public class CohRequests {
         return questionId;
     }
 
-    public void issueQuestionRound(String hearingId) throws IOException {
+    public void issueQuestionRound(String hearingId) throws IOException, InterruptedException {
         makePutRequest(cohClient, cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/questionrounds/1",
                 "{\"state_name\": \"question_issue_pending\"}"
         );
+
+        waitUntil(roundIssued(hearingId), 10L);
+    }
+
+    private Supplier<Boolean> roundIssued(String hearingId) {
+        return () -> {
+            try {
+                String roundState = makeGetRequest(
+                        cohClient,
+                        cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/questionrounds/1",
+                        "question_round_state.state_name"
+                ).getJSONObject("question_round_state").getString("state_name");
+                return roundState.equals("question_issued");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
+    private static void waitUntil(Supplier<Boolean> condition, long timeoutInSeconds) throws InterruptedException {
+        long timeout = timeoutInSeconds * 1000L * 1000000L;
+        long startTime = System.nanoTime();
+        while (true) {
+            if (condition.get()) {
+                break;
+            } else if (System.nanoTime() - startTime >= timeout) {
+                throw new RuntimeException("Question round has not been issues in 10 seconds.");
+            }
+            Thread.sleep(100L);
+        }
     }
 
     private static String makePostRequest(HttpClient client, String uri, String body, String responseValue) throws IOException {
@@ -89,4 +121,14 @@ public class CohRequests {
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
     }
 
+    private static JSONObject makeGetRequest(HttpClient client, String uri, String responseValue) throws IOException {
+        HttpResponse httpResponse = client.execute(get(uri)
+                .setHeader(HttpHeaders.AUTHORIZATION, "someValue")
+                .setHeader("ServiceAuthorization", "someValue")
+                .build());
+
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+        String responseBody = EntityUtils.toString(httpResponse.getEntity());
+        return new JSONObject(responseBody);
+    }
 }

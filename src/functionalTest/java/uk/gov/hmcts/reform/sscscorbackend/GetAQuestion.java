@@ -25,8 +25,6 @@ public class GetAQuestion extends BaseFunctionTest {
         assertThat(questionBodyText, is("question text"));
         assertThat(answer, is(nullValue()));
 
-        Thread.sleep(5000L);
-
         String expectedAnswer = "an answer";
         sscsCorBackendRequests.answerQuestion(hearingId, questionId, expectedAnswer);
 
