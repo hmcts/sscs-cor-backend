@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers;
 
+import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import io.swagger.annotations.ApiOperation;
@@ -7,6 +8,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.Optional;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +17,16 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.Answer;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
 import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionRound;
+import uk.gov.hmcts.reform.sscscorbackend.exception.RestResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.QuestionService;
 
 @RestController
 @RequestMapping("/continuous-online-hearings")
 public class QuestionController {
+
+    private static final Logger LOG = getLogger(QuestionController.class);
+
     private final QuestionService questionService;
     private final OnlineHearingService onlineHearingService;
 
@@ -46,6 +52,7 @@ public class QuestionController {
             return onlineHearing.map(ResponseEntity::ok)
                     .orElse(ResponseEntity.notFound().build());
         } catch (IllegalStateException exc) {
+            LOG.warn("Found multiple online hearings for [" + emailAddress + "]");
             return ResponseEntity.unprocessableEntity().build();
         }
 

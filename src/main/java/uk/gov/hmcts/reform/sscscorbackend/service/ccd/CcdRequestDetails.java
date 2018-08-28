@@ -7,7 +7,7 @@ import lombok.Value;
 @Value
 @Builder
 @EqualsAndHashCode
-public class CcdRequestDeatils {
+public class CcdRequestDetails {
     private String jurisdictionId;
     private String caseTypeId;
 }

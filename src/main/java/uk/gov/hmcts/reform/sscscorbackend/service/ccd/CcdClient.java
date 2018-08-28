@@ -22,14 +22,14 @@ public class CcdClient {
         this.idamService = idamService;
     }
 
-    public List<CaseDetails> findCaseBy(CcdRequestDeatils ccdRequestDeatils, Map<String, String> searchCriteria) {
+    public List<CaseDetails> findCaseBy(CcdRequestDetails ccdRequestDetails, Map<String, String> searchCriteria) {
         IdamTokens idamTokens = idamService.getIdamTokens();
         List<uk.gov.hmcts.reform.ccd.client.model.CaseDetails> caseDetailsList = coreCaseDataApi.searchForCaseworker(
                 idamTokens.getIdamOauth2Token(),
                 idamTokens.getServiceAuthorization(),
                 idamTokens.getUserId(),
-                ccdRequestDeatils.getJurisdictionId(),
-                ccdRequestDeatils.getCaseTypeId(),
+                ccdRequestDetails.getJurisdictionId(),
+                ccdRequestDetails.getCaseTypeId(),
                 new ImmutableMap.Builder<String, String>()
                         .putAll(searchCriteria)
                         .build()
