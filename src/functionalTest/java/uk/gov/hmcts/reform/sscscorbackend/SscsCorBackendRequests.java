@@ -61,4 +61,15 @@ public class SscsCorBackendRequests {
 
         assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
     }
+
+    public JSONObject getOnlineHearing(String emailAddress) throws IOException {
+        HttpResponse getOnlineHearingResponse = client.execute(get(baseUrl + "/continuous-online-hearings?email=" + emailAddress)
+                .build());
+
+        assertThat(getOnlineHearingResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+
+        String responseBody = EntityUtils.toString(getOnlineHearingResponse.getEntity());
+
+        return new JSONObject(responseBody);
+    }
 }

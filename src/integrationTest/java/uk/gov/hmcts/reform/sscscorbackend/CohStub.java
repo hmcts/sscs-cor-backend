@@ -6,8 +6,6 @@ import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
 
 import com.github.tomakehurst.wiremock.matching.RegexPattern;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.UUID;

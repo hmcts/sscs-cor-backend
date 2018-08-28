@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.Answer;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
 import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionRound;
-import uk.gov.hmcts.reform.sscscorbackend.exception.RestResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.QuestionService;
 
@@ -106,7 +105,7 @@ public class QuestionController {
             @ApiResponse(code = 204, message = "Answer saved"),
             @ApiResponse(code = 404, message = "Question has not already been answered")
     })
-    @RequestMapping(method = RequestMethod.POST, value = "questions/{questionId}")
+    @RequestMapping(method = RequestMethod.POST, value = "{onlineHearingId}/questions/{questionId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> submitAnswer(@PathVariable String onlineHearingId,
                                              @PathVariable String questionId) {
