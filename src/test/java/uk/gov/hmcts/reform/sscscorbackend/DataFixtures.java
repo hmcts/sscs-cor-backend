@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRole
 import static uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRoleCoh.JUDGE;
 import static uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRoleCoh.MEDICAL_MEMBER;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,7 +21,7 @@ public class DataFixtures {
     private DataFixtures() {}
 
     public static QuestionRound someQuestionRound() {
-        return new QuestionRound(someQuestionSummaries());
+        return new QuestionRound(someQuestionSummaries(), LocalDateTime.now().plusDays(7));
     }
 
     public static List<QuestionSummary> someQuestionSummaries() {
@@ -39,8 +40,8 @@ public class DataFixtures {
         return new CohAnswer("answerId", "Some answer", someCohState("answer_drafted"));
     }
 
-    public static List<CohAnswer> someCohAnswers() {
-        return Collections.singletonList(new CohAnswer("answerId", "Some answer", someCohState("answer_drafted")));
+    public static List<CohAnswer> someCohAnswers(String state) {
+        return Collections.singletonList(new CohAnswer("answerId", "Some answer", someCohState(state)));
     }
 
     public static CohState someCohState(String state) {
@@ -48,16 +49,19 @@ public class DataFixtures {
     }
 
     public static CohQuestionRounds someCohQuestionRoundsWithSingleRoundOfQuestions() {
-        return new CohQuestionRounds(1, singletonList(new CohQuestionRound(singletonList(
-                new CohQuestionReference("someQuestionId", 1, "first question", someCohAnswers())))));
+        List<CohQuestionReference> cohQuestionReferenceList = Arrays.asList(
+                new CohQuestionReference("someQuestionId1", 1, "first question", LocalDateTime.now().plusDays(7), someCohAnswers("answer_drafted")),
+                new CohQuestionReference("someQuestionId2", 2, "second question", LocalDateTime.now().plusDays(10), someCohAnswers("answer_drafted"))
+        );
+        return new CohQuestionRounds(1, singletonList(new CohQuestionRound(cohQuestionReferenceList)));
     }
 
     public static CohQuestionRounds someCohQuestionRoundsMultipleRoundsOfQuestions() {
         return new CohQuestionRounds(2, Arrays.asList(
                 new CohQuestionRound(singletonList(
-                        new CohQuestionReference("someQuestionId", 1, "first round question", someCohAnswers()))),
+                        new CohQuestionReference("someQuestionId", 1, "first round question", LocalDateTime.now().plusDays(7), someCohAnswers("answer_drafted")))),
                 new CohQuestionRound(singletonList(
-                        new CohQuestionReference("someOtherQuestionId", 1, "second round question", someCohAnswers())))
+                        new CohQuestionReference("someOtherQuestionId", 1, "second round question", LocalDateTime.now().plusDays(7), someCohAnswers("answer_drafted"))))
         ));
     }
 

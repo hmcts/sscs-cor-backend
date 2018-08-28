@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
@@ -12,6 +13,7 @@ import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.unanswered;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,23 +40,42 @@ public class QuestionServiceTest {
     @Test
     public void getsAListOfQuestionsWhenThereIsOnlyOneRoundOfQuestions() {
         CohQuestionRounds cohQuestionRounds = someCohQuestionRoundsWithSingleRoundOfQuestions();
-        CohQuestionReference cohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
+        CohQuestionReference cohQuestionReference1 = cohQuestionRounds.getCohQuestionRound().get(0)
                 .getQuestionReferences().get(0);
-        String id = cohQuestionReference.getQuestionId();
-        String questionHeaderText = cohQuestionReference.getQuestionHeaderText();
-        QuestionSummary questionSummary = new QuestionSummary(id, questionHeaderText, draft);
+        CohQuestionReference cohQuestionReference2 = cohQuestionRounds.getCohQuestionRound().get(0)
+                .getQuestionReferences().get(1);
+        QuestionSummary question1Summary = new QuestionSummary(cohQuestionReference1.getQuestionId(),
+                cohQuestionReference1.getQuestionHeaderText(), draft);
+        QuestionSummary question2Summary = new QuestionSummary(cohQuestionReference2.getQuestionId(),
+                cohQuestionReference2.getQuestionHeaderText(), draft);
         when(cohClient.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
         List<QuestionSummary> questions = questionRound.getQuestions();
 
-        assertThat(questions, contains(questionSummary));
+        assertThat(questions.get(0), is(question1Summary));
+        assertThat(questions.get(1), is(question2Summary));
+    }
+
+    @Test
+    public void getsAListOfQuestionsWithDeadlineExpiryDateFromFirstQuestion() {
+        CohQuestionRounds cohQuestionRounds = someCohQuestionRoundsWithSingleRoundOfQuestions();
+        CohQuestionReference cohQuestion1Reference = cohQuestionRounds.getCohQuestionRound().get(0)
+                .getQuestionReferences().get(0);
+        CohQuestionReference cohQuestion2Reference = cohQuestionRounds.getCohQuestionRound().get(0)
+                .getQuestionReferences().get(1);
+        LocalDateTime question2DeadlineExpiryDate = cohQuestion2Reference.getDeadlineExpiryDate();
+        when(cohClient.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
+
+        assertThat(questionRound.getDeadlineExpiryDate(), is(cohQuestion1Reference.getDeadlineExpiryDate()));
+        assertThat(questionRound.getDeadlineExpiryDate(), not(cohQuestion2Reference.getDeadlineExpiryDate()));
     }
 
     @Test
     public void getsAListOfQuestionsWithUnansweredStatesWhenTheQuestionHasNotBeenAnswered() {
         CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(
                 new CohQuestionRound(singletonList(
-                        new CohQuestionReference("someQuestionId", 1, "first question", null)
+                        new CohQuestionReference("someQuestionId", 1, "first question", LocalDateTime.now().plusDays(7), null)
                 ))
         ));
         CohQuestionReference cohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
@@ -89,8 +110,8 @@ public class QuestionServiceTest {
     @Test
     public void getsAListOfQuestionsInTheCorrectOrderWhenTheyAreReturnedInTheIncorrectOrder() {
         CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(new CohQuestionRound(
-                asList(new CohQuestionReference("questionId2", 2, "second question", someCohAnswers()),
-                        new CohQuestionReference("questionId1", 1, "first question", someCohAnswers())))
+                asList(new CohQuestionReference("questionId2", 2, "second question", LocalDateTime.now().plusDays(7), someCohAnswers("answer_drafted")),
+                        new CohQuestionReference("questionId1", 1, "first question", LocalDateTime.now().plusDays(7), someCohAnswers("answer_drafted"))))
         ));
         CohQuestionReference firstCohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
                 .getQuestionReferences().get(1);
