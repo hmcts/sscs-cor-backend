@@ -8,11 +8,9 @@ import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.submitted;
 import java.io.IOException;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore //Until we can issue questions on COH again
-public class GetAQuestion extends BaseFunctionTest {
+public class GetAQuestionTest extends BaseFunctionTest {
 
     @Test
     public void getsAndAnswersAQuestion() throws IOException, InterruptedException {
