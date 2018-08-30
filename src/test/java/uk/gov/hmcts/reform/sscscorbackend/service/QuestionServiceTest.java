@@ -19,7 +19,7 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 
 public class QuestionServiceTest {
-    private CohClient cohClient;
+    private CohService cohService;
     private CohQuestion cohQuestion;
     private String onlineHearingId;
     private String questionId;
@@ -28,12 +28,12 @@ public class QuestionServiceTest {
 
     @Before
     public void setUp() {
-        cohClient = mock(CohClient.class);
+        cohService = mock(CohService.class);
         cohQuestion = someCohQuestion();
         onlineHearingId = cohQuestion.getOnlineHearingId();
         questionId = cohQuestion.getQuestionId();
         cohAnswer = someCohAnswer();
-        underTest = new QuestionService(cohClient);
+        underTest = new QuestionService(cohService);
     }
 
     @Test
@@ -47,7 +47,7 @@ public class QuestionServiceTest {
                 cohQuestionReference1.getQuestionHeaderText(), draft);
         QuestionSummary question2Summary = new QuestionSummary(cohQuestionReference2.getQuestionId(),
                 cohQuestionReference2.getQuestionHeaderText(), draft);
-        when(cohClient.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+        when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
         List<QuestionSummary> questions = questionRound.getQuestions();
 
@@ -63,7 +63,7 @@ public class QuestionServiceTest {
         CohQuestionReference cohQuestion2Reference = cohQuestionRounds.getCohQuestionRound().get(0)
                 .getQuestionReferences().get(1);
         LocalDateTime question2DeadlineExpiryDate = cohQuestion2Reference.getDeadlineExpiryDate();
-        when(cohClient.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+        when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
 
         assertThat(questionRound.getDeadlineExpiryDate(), is(cohQuestion1Reference.getDeadlineExpiryDate()));
@@ -83,7 +83,7 @@ public class QuestionServiceTest {
         String questionHeaderText = cohQuestionReference.getQuestionHeaderText();
         QuestionSummary questionSummary = new QuestionSummary(id, questionHeaderText, unanswered);
 
-        when(cohClient.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+        when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
 
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
         List<QuestionSummary> questions = questionRound.getQuestions();
@@ -99,7 +99,7 @@ public class QuestionServiceTest {
         String id = cohQuestionReference.getQuestionId();
         String questionHeaderText = cohQuestionReference.getQuestionHeaderText();
         QuestionSummary questionSummary = new QuestionSummary(id, questionHeaderText, draft);
-        when(cohClient.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+        when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
         List<QuestionSummary> questions = questionRound.getQuestions();
 
@@ -120,7 +120,7 @@ public class QuestionServiceTest {
                 .getQuestionReferences().get(0);
         String secondQuestionId = secondCohQuestionReference.getQuestionId();
         String secondQuestionTitle = secondCohQuestionReference.getQuestionHeaderText();
-        when(cohClient.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+        when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
         List<QuestionSummary> questions = questionRound.getQuestions();
 
@@ -133,8 +133,8 @@ public class QuestionServiceTest {
 
     @Test
     public void getsAQuestionWithAnAnswer() {
-        when(cohClient.getQuestion(onlineHearingId, questionId)).thenReturn(cohQuestion);
-        when(cohClient.getAnswers(onlineHearingId, questionId)).thenReturn(singletonList(cohAnswer));
+        when(cohService.getQuestion(onlineHearingId, questionId)).thenReturn(cohQuestion);
+        when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(singletonList(cohAnswer));
 
         Question question = underTest.getQuestion(onlineHearingId, questionId);
 
@@ -143,8 +143,8 @@ public class QuestionServiceTest {
 
     @Test
     public void getsAQuestionWithoutAnAnswer() {
-        when(cohClient.getQuestion(onlineHearingId, questionId)).thenReturn(cohQuestion);
-        when(cohClient.getAnswers(onlineHearingId, questionId)).thenReturn(emptyList());
+        when(cohService.getQuestion(onlineHearingId, questionId)).thenReturn(cohQuestion);
+        when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(emptyList());
 
         Question question = underTest.getQuestion(onlineHearingId, questionId);
 
@@ -153,58 +153,58 @@ public class QuestionServiceTest {
 
     @Test
     public void doesNotFindQuestion() {
-        when(cohClient.getQuestion(onlineHearingId, questionId)).thenReturn(null);
+        when(cohService.getQuestion(onlineHearingId, questionId)).thenReturn(null);
 
         Question question = underTest.getQuestion(onlineHearingId, questionId);
 
         assertThat(question, is(nullValue()));
-        verify(cohClient, never()).getAnswers(onlineHearingId, questionId);
+        verify(cohService, never()).getAnswers(onlineHearingId, questionId);
     }
 
     @Test
     public void updateAnswerWhenQuestionHasNotAlreadyBeenAnswered() {
         String newAnswer = "new answer";
-        when(cohClient.getAnswers(onlineHearingId, questionId)).thenReturn(emptyList());
+        when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(emptyList());
         underTest.updateAnswer(onlineHearingId, questionId, newAnswer);
 
-        verify(cohClient).createAnswer(onlineHearingId, questionId, new CohUpdateAnswer("answer_drafted", newAnswer));
+        verify(cohService).createAnswer(onlineHearingId, questionId, new CohUpdateAnswer("answer_drafted", newAnswer));
     }
 
     @Test
     public void updateAnswerWhenQuestionHasAlreadyBeenAnswered() {
         String newAnswer = "new answer";
         String answerId = "some-id";
-        when(cohClient.getAnswers(onlineHearingId, questionId)).thenReturn(
+        when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(
                 singletonList(new CohAnswer(answerId, "original answer", someCohState("answer_draQuestionService.javafted")))
         );
         underTest.updateAnswer(onlineHearingId, questionId, newAnswer);
 
-        verify(cohClient).updateAnswer(onlineHearingId, questionId, answerId, new CohUpdateAnswer("answer_drafted", newAnswer));
+        verify(cohService).updateAnswer(onlineHearingId, questionId, answerId, new CohUpdateAnswer("answer_drafted", newAnswer));
     }
 
     @Test
     public void submitAnswer() {
         String answerId = "some-id";
         String answer = "answer";
-        when(cohClient.getAnswers(onlineHearingId, questionId)).thenReturn(
+        when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(
                 singletonList(new CohAnswer(answerId, answer, someCohState("answer_drafted")))
         );
 
         boolean hasBeenSubmitted = underTest.submitAnswer(onlineHearingId, questionId);
 
         assertThat(hasBeenSubmitted, is(true));
-        verify(cohClient).updateAnswer(onlineHearingId, questionId, answerId, new CohUpdateAnswer(submitted.getCohAnswerState(), answer));
+        verify(cohService).updateAnswer(onlineHearingId, questionId, answerId, new CohUpdateAnswer(submitted.getCohAnswerState(), answer));
     }
 
     @Test
     public void cannotSubmitAnswerThatHasNotAlreadyBeenAnswered() {
         String answerId = "some-id";
         String answer = "answer";
-        when(cohClient.getAnswers(onlineHearingId, questionId)).thenReturn(emptyList());
+        when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(emptyList());
 
         boolean hasBeenSubmitted = underTest.submitAnswer(onlineHearingId, questionId);
 
         assertThat(hasBeenSubmitted, is(false));
-        verify(cohClient, never()).updateAnswer(any(), any(), any(), any());
+        verify(cohService, never()).updateAnswer(any(), any(), any(), any());
     }
 }

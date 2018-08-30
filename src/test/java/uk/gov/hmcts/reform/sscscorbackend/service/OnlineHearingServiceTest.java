@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.ccd.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
 
 public class OnlineHearingServiceTest {
-    private CohClient cohClient;
+    private CohService cohService;
     private CcdClient ccdClient;
 
     private OnlineHearingService underTest;
@@ -34,10 +34,10 @@ public class OnlineHearingServiceTest {
 
     @Before
     public void setUp() {
-        cohClient = mock(CohClient.class);
+        cohService = mock(CohService.class);
         ccdClient = mock(CcdClient.class);
         ccdRequestDetails = CcdRequestDetails.builder().build();
-        underTest = new OnlineHearingService(cohClient, ccdClient, ccdRequestDetails);
+        underTest = new OnlineHearingService(cohService, ccdClient, ccdRequestDetails);
 
         someEmailAddress = "someEmailAddress";
         someCaseId = 1234321L;
@@ -46,7 +46,7 @@ public class OnlineHearingServiceTest {
     @Test
     public void createOnlineHearing() {
         String hearingId = "hearingId";
-        when(cohClient.createOnlineHearing(someRequest())).thenReturn("hearingId");
+        when(cohService.createOnlineHearing(someRequest())).thenReturn("hearingId");
 
         String createdHearingId = underTest.createOnlineHearing(someRequest().getCaseId(), somePanel());
 
@@ -97,7 +97,7 @@ public class OnlineHearingServiceTest {
                         caseDetails));
 
         CohOnlineHearings cohOnlineHearings = someCohOnlineHearingId();
-        when(cohClient.getOnlineHearing(someCaseId)).thenReturn(cohOnlineHearings);
+        when(cohService.getOnlineHearing(someCaseId)).thenReturn(cohOnlineHearings);
 
         Optional<OnlineHearing> onlineHearing = underTest.getOnlineHearing(someEmailAddress);
 
@@ -126,7 +126,7 @@ public class OnlineHearingServiceTest {
                 .thenReturn(singletonList(createCaseDetails(someCaseId, "caseref", "firstname", "lastname")));
 
         CohOnlineHearings emptyCohOnlineHearings = new CohOnlineHearings(Collections.emptyList());
-        when(cohClient.getOnlineHearing(someCaseId)).thenReturn(emptyCohOnlineHearings);
+        when(cohService.getOnlineHearing(someCaseId)).thenReturn(emptyCohOnlineHearings);
 
         Optional<OnlineHearing> onlineHearing = underTest.getOnlineHearing(someEmailAddress);
         assertThat(onlineHearing.isPresent(), is(false));

@@ -13,16 +13,16 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 
 @Service
 public class QuestionService {
-    private final CohClient cohClient;
+    private final CohService cohService;
 
-    public QuestionService(@Autowired CohClient cohClient) {
-        this.cohClient = cohClient;
+    public QuestionService(@Autowired CohService cohService) {
+        this.cohService = cohService;
     }
 
     public Question getQuestion(String onlineHearingId, String questionId) {
-        CohQuestion question = cohClient.getQuestion(onlineHearingId, questionId);
+        CohQuestion question = cohService.getQuestion(onlineHearingId, questionId);
         if (question != null) {
-            List<CohAnswer> answer = cohClient.getAnswers(onlineHearingId, questionId);
+            List<CohAnswer> answer = cohService.getAnswers(onlineHearingId, questionId);
             if (answer != null && answer.size() > 0) {
                 return Question.from(question, answer.get(0));
             } else {
@@ -34,24 +34,24 @@ public class QuestionService {
     }
 
     public void updateAnswer(String onlineHearingId, String questionId, String newAnswer) {
-        List<CohAnswer> answers = cohClient.getAnswers(onlineHearingId, questionId);
+        List<CohAnswer> answers = cohService.getAnswers(onlineHearingId, questionId);
         CohUpdateAnswer updatedAnswer = new CohUpdateAnswer(AnswerState.draft.getCohAnswerState(), newAnswer);
         if (answers == null || answers.isEmpty()) {
-            cohClient.createAnswer(onlineHearingId, questionId, updatedAnswer);
+            cohService.createAnswer(onlineHearingId, questionId, updatedAnswer);
         } else {
             String answerId = answers.get(0).getAnswerId();
-            cohClient.updateAnswer(onlineHearingId, questionId, answerId, updatedAnswer);
+            cohService.updateAnswer(onlineHearingId, questionId, answerId, updatedAnswer);
         }
     }
 
     public boolean submitAnswer(String onlineHearingId, String questionId) {
-        List<CohAnswer> answers = cohClient.getAnswers(onlineHearingId, questionId);
+        List<CohAnswer> answers = cohService.getAnswers(onlineHearingId, questionId);
 
         return answers.stream().findFirst()
                 .map(answer -> {
                     CohUpdateAnswer updatedAnswer = new CohUpdateAnswer(AnswerState.submitted.getCohAnswerState(), answer.getAnswerText());
                     String answerId = answers.get(0).getAnswerId();
-                    cohClient.updateAnswer(onlineHearingId, questionId, answerId, updatedAnswer);
+                    cohService.updateAnswer(onlineHearingId, questionId, answerId, updatedAnswer);
 
                     return true;
                 })
@@ -59,14 +59,14 @@ public class QuestionService {
     }
 
     public QuestionRound getQuestions(String onlineHearingId) {
-        CohQuestionRounds questionRounds = cohClient.getQuestionRounds(onlineHearingId);
+        CohQuestionRounds questionRounds = cohService.getQuestionRounds(onlineHearingId);
 
         int currentQuestionRoundNumber = questionRounds.getCurrentQuestionRound();
         CohQuestionRound currentQuestionRound = questionRounds.getCohQuestionRound().get(currentQuestionRoundNumber - 1);
         LocalDateTime deadlineExpiryDate = getQuestionRoundDeadlineExpiryDate(currentQuestionRound);
         List<QuestionSummary> questions = currentQuestionRound.getQuestionReferences().stream()
                 .sorted(Comparator.comparing(CohQuestionReference::getQuestionOrdinal))
-                .map(cohQuestionReference -> createQuestionSummary(cohQuestionReference))
+                .map(this::createQuestionSummary)
                 .collect(toList());
 
         return new QuestionRound(questions, deadlineExpiryDate);

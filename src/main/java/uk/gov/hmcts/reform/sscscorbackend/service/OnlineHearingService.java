@@ -23,15 +23,15 @@ import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
 
 @Service
 public class OnlineHearingService {
-    private final CohClient cohClient;
+    private final CohService cohClient;
     private final CcdClient ccdClient;
     private CcdRequestDetails ccdRequestDetails;
 
-    public OnlineHearingService(@Autowired CohClient cohClient,
+    public OnlineHearingService(@Autowired CohService cohService,
                                 @Autowired CcdClient ccdClient,
                                 @Autowired CcdRequestDetails ccdRequestDetails
     ) {
-        this.cohClient = cohClient;
+        this.cohClient = cohService;
         this.ccdClient = ccdClient;
         this.ccdRequestDetails = ccdRequestDetails;
     }
