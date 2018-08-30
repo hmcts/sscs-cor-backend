@@ -6,10 +6,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
-import uk.gov.hmcts.reform.sscscorbackend.service.ccd.CcdRequestDetails;
+import uk.gov.hmcts.reform.sscs.ccd.CcdRequestDetails;
 //import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard;
 
 @SpringBootApplication
@@ -18,10 +19,12 @@ import uk.gov.hmcts.reform.sscscorbackend.service.ccd.CcdRequestDetails;
         {
                 "uk.gov.hmcts.reform.sscscorbackend.service",
                 "uk.gov.hmcts.reform.ccd.client",
+                "uk.gov.hmcts.reform.sscs.idam",
                 "uk.gov.hmcts.reform.authorisation"
         })
 //@EnableHystrixDashboard
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
+@ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
 public class Application {
 
     public static void main(final String[] args) {

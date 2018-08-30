@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.ccd.CcdClient;
+import uk.gov.hmcts.reform.sscs.ccd.CcdRequestDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
-import uk.gov.hmcts.reform.sscscorbackend.service.ccd.CcdClient;
-import uk.gov.hmcts.reform.sscscorbackend.service.ccd.CcdRequestDetails;
-import uk.gov.hmcts.reform.sscscorbackend.service.ccd.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
 
 public class OnlineHearingServiceTest {
@@ -90,7 +90,7 @@ public class OnlineHearingServiceTest {
         String firstName = "firstName";
         String lastName = "lastName";
 
-        CaseDetails caseDetails = createCaseDetails(someCaseId, expectedCaseReference, firstName, lastName);
+        SscsCaseDetails caseDetails = createCaseDetails(someCaseId, expectedCaseReference, firstName, lastName);
         when(ccdClient.findCaseBy(ccdRequestDetails, singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
                 .thenReturn(Arrays.asList(
                         createNonOnlineHearingCaseDetails(22222L, "otherCaseRef", "otherFirstName", "otherLastName"),
@@ -110,8 +110,8 @@ public class OnlineHearingServiceTest {
 
     @Test(expected = IllegalStateException.class)
     public void exceptionWhenGettingAHearingIfThereIsMoreThanOneCaseWithAnOnlinePanel() {
-        CaseDetails caseDetails1 = createCaseDetails(someCaseId, "someCaseReference", "firstName", "lastName");
-        CaseDetails caseDetails2 = createCaseDetails(22222L, "otherRef", "otherFirstName", "otherLatName");
+        SscsCaseDetails caseDetails1 = createCaseDetails(someCaseId, "someCaseReference", "firstName", "lastName");
+        SscsCaseDetails caseDetails2 = createCaseDetails(22222L, "otherRef", "otherFirstName", "otherLatName");
         when(ccdClient.findCaseBy(ccdRequestDetails, singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
                 .thenReturn(Arrays.asList(
                         caseDetails1,
@@ -141,8 +141,8 @@ public class OnlineHearingServiceTest {
         assertThat(onlineHearing.isPresent(), is(false));
     }
 
-    private CaseDetails createCaseDetails(Long caseId, String expectedCaseReference, String firstName, String lastName) {
-        return CaseDetails.builder()
+    private SscsCaseDetails createCaseDetails(Long caseId, String expectedCaseReference, String firstName, String lastName) {
+        return SscsCaseDetails.builder()
                 .id(caseId)
                 .data(SscsCaseData.builder()
                         .caseReference(expectedCaseReference)
@@ -160,8 +160,8 @@ public class OnlineHearingServiceTest {
                 ).build();
     }
 
-    private CaseDetails createNonOnlineHearingCaseDetails(Long caseId, String expectedCaseReference, String firstName, String lastName) {
-        return CaseDetails.builder()
+    private SscsCaseDetails createNonOnlineHearingCaseDetails(Long caseId, String expectedCaseReference, String firstName, String lastName) {
+        return SscsCaseDetails.builder()
                 .id(caseId)
                 .data(SscsCaseData.builder()
                         .caseReference(expectedCaseReference)

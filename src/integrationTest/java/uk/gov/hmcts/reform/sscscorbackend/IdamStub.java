@@ -7,8 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import uk.gov.hmcts.reform.sscscorbackend.service.idam.Authorize;
-import uk.gov.hmcts.reform.sscscorbackend.service.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.idam.Authorize;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
 public class IdamStub extends BaseStub {
 
