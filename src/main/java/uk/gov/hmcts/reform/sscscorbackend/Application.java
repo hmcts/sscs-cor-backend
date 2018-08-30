@@ -6,6 +6,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
+import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
 import uk.gov.hmcts.reform.sscscorbackend.service.ccd.CcdRequestDetails;
 //import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard;
 
@@ -14,7 +17,8 @@ import uk.gov.hmcts.reform.sscscorbackend.service.ccd.CcdRequestDetails;
 @EnableFeignClients(basePackages =
         {
                 "uk.gov.hmcts.reform.sscscorbackend.service",
-                "uk.gov.hmcts.reform.ccd.client"
+                "uk.gov.hmcts.reform.ccd.client",
+                "uk.gov.hmcts.reform.authorisation"
         })
 //@EnableHystrixDashboard
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
@@ -31,5 +35,14 @@ public class Application {
                 .caseTypeId(coreCaseDataCaseTypeId)
                 .jurisdictionId(coreCaseDataJurisdictionId)
                 .build();
+    }
+
+    @Bean
+    public AuthTokenGenerator serviceAuthTokenGenerator(
+            @Value("${idam.s2s-auth.totp_secret}") final String secret,
+            @Value("${idam.s2s-auth.microservice}") final String microService,
+            final ServiceAuthorisationApi serviceAuthorisationApi
+    ) {
+        return AuthTokenGeneratorFactory.createDefaultGenerator(secret, microService, serviceAuthorisationApi);
     }
 }
