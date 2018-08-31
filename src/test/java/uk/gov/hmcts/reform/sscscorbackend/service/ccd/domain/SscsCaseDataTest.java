@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 //adding for now to get coverage up. Hopefully when this moves out of this repo this will not be needed.
 public final class SscsCaseDataTest {

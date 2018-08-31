@@ -10,13 +10,13 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.CcdClient;
+import uk.gov.hmcts.reform.sscs.ccd.CcdRequestDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
-import uk.gov.hmcts.reform.sscscorbackend.service.ccd.CcdClient;
-import uk.gov.hmcts.reform.sscscorbackend.service.ccd.CcdRequestDetails;
-import uk.gov.hmcts.reform.sscscorbackend.service.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscscorbackend.service.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
 
@@ -75,7 +75,7 @@ public class OnlineHearingService {
     }
 
     public Optional<OnlineHearing> getOnlineHearing(String emailAddress) {
-        List<CaseDetails> cases = ccdClient.findCaseBy(
+        List<SscsCaseDetails> cases = ccdClient.findCaseBy(
                 ccdRequestDetails,
                 ImmutableMap.of("case.subscriptions.appellantSubscription.email", emailAddress)
         );
@@ -86,13 +86,13 @@ public class OnlineHearingService {
                 .flatMap(getHearingFromCoh());
     }
 
-    private BinaryOperator<CaseDetails> checkThereIsOnlyOneCase() {
+    private BinaryOperator<SscsCaseDetails> checkThereIsOnlyOneCase() {
         return (a, b) -> {
             throw new IllegalStateException("Multiple appeals with online hearings found.");
         };
     }
 
-    private Function<CaseDetails, Optional<OnlineHearing>> getHearingFromCoh() {
+    private Function<SscsCaseDetails, Optional<OnlineHearing>> getHearingFromCoh() {
         return firstCase -> {
             CohOnlineHearings cohOnlineHearings = cohClient.getOnlineHearing(firstCase.getId());
 
