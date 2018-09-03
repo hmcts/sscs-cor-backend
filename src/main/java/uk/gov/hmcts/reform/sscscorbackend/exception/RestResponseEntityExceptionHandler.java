@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscscorbackend.exception;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
