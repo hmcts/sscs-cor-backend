@@ -24,7 +24,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
         return handleExceptionInternal(
                 ex,
-                "An error has occurred\n\n" + ExceptionUtils.getStackTrace(ex),
+                "An error has occurred",
                 new HttpHeaders(),
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 request
