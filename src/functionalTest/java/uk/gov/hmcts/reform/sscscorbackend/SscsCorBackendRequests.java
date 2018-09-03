@@ -72,4 +72,17 @@ public class SscsCorBackendRequests {
 
         return new JSONObject(responseBody);
     }
+
+    public String createCase(String emailAddress) throws IOException {
+        HttpResponse createCaseResponse = client.execute(post(baseUrl + "/case?email=" + emailAddress)
+                .setHeader("Content-Length", "0")
+                .build());
+
+        assertThat(createCaseResponse.getStatusLine().getStatusCode(), is(HttpStatus.CREATED.value()));
+
+        String responseBody = EntityUtils.toString(createCaseResponse.getEntity());
+        JSONObject jsonObject = new JSONObject(responseBody);
+        return jsonObject.getString("id");
+
+    }
 }

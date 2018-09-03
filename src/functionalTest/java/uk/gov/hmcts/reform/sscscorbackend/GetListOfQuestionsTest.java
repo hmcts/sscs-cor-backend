@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-public class GetListOfQuestions extends BaseFunctionTest {
+public class GetListOfQuestionsTest extends BaseFunctionTest {
     @Test
     public void getAListOfQuestionTitles() throws IOException {
         String hearingId = cohRequests.createHearing();
