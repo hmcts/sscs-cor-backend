@@ -23,7 +23,7 @@ public class CreateCaseControllerTest {
     private CcdRequestDetails ccdRequestDetails;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         ccdClient = mock(CcdClient.class);
         ccdRequestDetails = CcdRequestDetails.builder().build();
     }

@@ -2,10 +2,13 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -48,7 +51,7 @@ public class CreateCaseController {
             @ApiParam(value = "email address of the appellant must be unique in CCD", example = "foo@bar.com", required = true)
             @RequestParam("email")String email,
             @ApiParam(value = "mobile number of appellant. Optional if not set will not subscribe for sms.")
-            @RequestParam(value = "mobile", required = false)String mobile
+            @RequestParam(value = "mobile", required = false) String mobile
     ) throws URISyntaxException {
         SscsCaseDetails caseDetails = ccdClient.createCase(ccdRequestDetails, createSscsCase(email, mobile));
 
@@ -59,31 +62,33 @@ public class CreateCaseController {
     }
 
     private SscsCaseData createSscsCase(String email, String mobile) {
-        return SscsCaseData.builder()
-                .onlinePanel(OnlinePanel.builder()
-                        .assignedTo("someJudge")
-                        .disabilityQualifiedMember("disabilityQualifiedMember")
-                        .medicalMember("medicalMember")
-                        .build())
-                .caseReference("CR" + UUID.randomUUID().toString())
-                .subscriptions(Subscriptions.builder()
-                        .appellantSubscription(Subscription.builder()
-                                .email(email)
-                                .mobile(mobile)
-                                .subscribeEmail("yes")
-                                .subscribeSms((mobile != null) ? "yes" : "no")
-                                .build())
-                        .build())
-                .appeal(Appeal.builder()
-                        .appellant(Appellant.builder()
-                                .name(Name.builder().title("Mr").firstName("test").lastName("testing").build())
-                                .contact(Contact.builder()
-                                        .email(email)
-                                        .phone(mobile)
-                                        .build())
-                                .build())
-                        .build())
-                .build();
-    }
+        File src = new File(getClass().getClassLoader().getResource("json/ccd_case.json").getFile());
+        SscsCaseData sscsCaseData;
+        try {
+            sscsCaseData = new ObjectMapper().readValue(src, SscsCaseData.class);
 
+            sscsCaseData = sscsCaseData.toBuilder()
+                    .onlinePanel(OnlinePanel.builder()
+                            .assignedTo("someJudge")
+                            .disabilityQualifiedMember("disabilityQualifiedMember")
+                            .medicalMember("medicalMember")
+                            .build())
+                    .caseReference("CR" + UUID.randomUUID().toString())
+                    .subscriptions(
+                            Subscriptions.builder()
+                                    .appellantSubscription(
+                                            Subscription.builder()
+                                                    .email(email)
+                                                    .mobile(mobile)
+                                                    .subscribeEmail("yes")
+                                                    .subscribeSms((mobile != null) ? "yes" : "no")
+                                                    .build()
+                                    ).build()
+                    ).build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return sscsCaseData;
+    }
 }
