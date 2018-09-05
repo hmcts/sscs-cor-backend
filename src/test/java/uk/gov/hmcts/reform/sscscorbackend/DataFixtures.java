@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.sscscorbackend;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
-import static uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRoleCoh.DISABILITY_QUALIFIED_MEMBER;
-import static uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRoleCoh.JUDGE;
-import static uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRoleCoh.MEDICAL_MEMBER;
+import static uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRoleCoh.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,8 +10,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.*;
-import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.*;
+import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseData;
+import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseDetails;
+import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
+import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
+import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
 
 
@@ -29,7 +30,7 @@ public class DataFixtures {
     }
 
     public static Question someQuestion() {
-        return new Question("someHearingId", "someQuestionId", "someQuestionHeader", "someBody", "someAnswer");
+        return new Question("someHearingId", "someQuestionId", "someQuestionHeader", "someBody", "someAnswer", draft, "2018-08-08T09:12:12Z");
     }
 
     public static CohQuestion someCohQuestion() {
@@ -45,7 +46,7 @@ public class DataFixtures {
     }
 
     public static CohState someCohState(String state) {
-        return new CohState(state);
+        return new CohState(state, "2018-08-08T09:12:12Z");
     }
 
     public static CohQuestionRounds someCohQuestionRoundsWithSingleRoundOfQuestions() {

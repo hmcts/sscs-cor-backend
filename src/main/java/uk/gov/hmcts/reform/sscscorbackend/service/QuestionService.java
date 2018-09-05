@@ -22,14 +22,22 @@ public class QuestionService {
     public Question getQuestion(String onlineHearingId, String questionId) {
         CohQuestion question = cohService.getQuestion(onlineHearingId, questionId);
         if (question != null) {
-            List<CohAnswer> answer = cohService.getAnswers(onlineHearingId, questionId);
-            if (answer != null && answer.size() > 0) {
-                return Question.from(question, answer.get(0));
+            List<CohAnswer> answers = cohService.getAnswers(onlineHearingId, questionId);
+            if (answers != null && answers.size() > 0) {
+                return new Question(question.getOnlineHearingId(),
+                        question.getQuestionId(),
+                        question.getQuestionHeaderText(),
+                        question.getQuestionBodyText(),
+                        answers.get(0).getAnswerText(),
+                        getAnswerState(answers),
+                        answers.get(0).getCurrentAnswerState().getStateDateTime());
             } else {
-                return Question.from(question);
+                return new Question(question.getOnlineHearingId(),
+                        question.getQuestionId(),
+                        question.getQuestionHeaderText(),
+                        question.getQuestionBodyText());
             }
         }
-
         return null;
     }
 
@@ -86,16 +94,20 @@ public class QuestionService {
     private QuestionSummary createQuestionSummary(CohQuestionReference cohQuestionReference) {
         List<CohAnswer> answers = cohQuestionReference.getAnswers();
 
-        AnswerState answerState = ofNullable(answers).orElse(emptyList()).stream()
-                .findFirst()
-                .map(cohAnswer -> cohAnswer.getCurrentAnswerState().getStateName())
-                .map(AnswerState::of)
-                .orElse(AnswerState.unanswered);
+        AnswerState answerState = getAnswerState(answers);
 
         return new QuestionSummary(
                 cohQuestionReference.getQuestionId(),
                 cohQuestionReference.getQuestionHeaderText(),
                 answerState
         );
+    }
+
+    private AnswerState getAnswerState(List<CohAnswer> answers) {
+        return ofNullable(answers).orElse(emptyList()).stream()
+                    .findFirst()
+                    .map(cohAnswer -> cohAnswer.getCurrentAnswerState().getStateName())
+                    .map(AnswerState::of)
+                    .orElse(AnswerState.unanswered);
     }
 }

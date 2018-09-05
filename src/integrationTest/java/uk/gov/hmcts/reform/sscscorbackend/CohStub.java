@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.stream.Collectors.joining;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
 
 import com.github.tomakehurst.wiremock.matching.RegexPattern;
 import java.io.UnsupportedEncodingException;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.UUID;
@@ -34,8 +36,8 @@ public class CohStub extends BaseStub {
             "    \"answer_id\": \"{answer_id}\",\n" +
             "    \"answer_text\": \"{answer_text}\",\n" +
             "    \"current_answer_state\": {\n" +
-            "      \"state_datetime\": \"string\",\n" +
-            "      \"state_name\": \"string\"\n" +
+            "      \"state_datetime\": \"{answer_datetime}\",\n" +
+            "      \"state_name\": \"{answer_state}\"\n" +
             "    }\n" +
             "  }\n" +
             "]";
@@ -138,13 +140,13 @@ public class CohStub extends BaseStub {
     }
 
     public void stubGetAnswer(String hearingId, String questionId, String answer) {
-        stubGetAnswer(hearingId, questionId, answer, UUID.randomUUID().toString());
+        stubGetAnswer(hearingId, questionId, answer, UUID.randomUUID().toString(), "draft", ZonedDateTime.now());
     }
 
-    public void stubGetAnswer(String hearingId, String questionId, String answer, String answerId) {
+    public void stubGetAnswer(String hearingId, String questionId, String answer, String answerId, String answerState, ZonedDateTime answerDate) {
         wireMock.stubFor(get(urlEqualTo("/continuous-online-hearings/" + hearingId + "/questions/" + questionId + "/answers"))
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
-                .willReturn(okJson(buildGetAnswerBody(answer, answerId)))
+                .willReturn(okJson(buildGetAnswerBody(answer, answerId, answerState, answerDate)))
         );
     }
 
@@ -153,9 +155,11 @@ public class CohStub extends BaseStub {
                 .replace("{question_body}", questionBody);
     }
 
-    private String buildGetAnswerBody(String answer, CharSequence answerId) {
+    private String buildGetAnswerBody(String answer, String answerId, String answerState, ZonedDateTime answerDate) {
         return getAnswersJson.replace("{answer_text}", answer)
-                .replace("{answer_id}", answerId);
+                .replace("{answer_id}", answerId)
+                .replace("{answer_state}", answerState)
+                .replace("{answer_datetime}", answerDate.format(ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")));
     }
 
     public void stubCannotFindQuestion(String hearingId, String questionId) {

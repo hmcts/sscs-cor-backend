@@ -138,7 +138,14 @@ public class QuestionServiceTest {
 
         Question question = underTest.getQuestion(onlineHearingId, questionId);
 
-        assertThat(question, is(Question.from(cohQuestion, cohAnswer)));
+        assertThat(question, is(new Question(cohQuestion.getOnlineHearingId(),
+                cohQuestion.getQuestionId(),
+                cohQuestion.getQuestionHeaderText(),
+                cohQuestion.getQuestionBodyText(),
+                cohAnswer.getAnswerText(),
+                AnswerState.of(cohAnswer.getCurrentAnswerState().getStateName()),
+                cohAnswer.getCurrentAnswerState().getStateDateTime()))
+        );
     }
 
     @Test
@@ -148,7 +155,14 @@ public class QuestionServiceTest {
 
         Question question = underTest.getQuestion(onlineHearingId, questionId);
 
-        assertThat(question, is(Question.from(cohQuestion)));
+        assertThat(question, is(new Question(cohQuestion.getOnlineHearingId(),
+                cohQuestion.getQuestionId(),
+                cohQuestion.getQuestionHeaderText(),
+                cohQuestion.getQuestionBodyText(),
+                null,
+                AnswerState.unanswered,
+                null))
+        );
     }
 
     @Test

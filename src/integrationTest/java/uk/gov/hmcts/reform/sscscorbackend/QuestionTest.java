@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.submitted;
 
 import io.restassured.RestAssured;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,13 +19,15 @@ public class QuestionTest extends BaseIntegrationTest {
     private static final String QUESTION_HEADER = "Question header";
     private static final String QUESTION_BODY = "Question body";
     private static final String ANSWER_TEXT = "Answer text";
+    private static final String ANSWER_STATUS = "draft";
 
     @Test
     public void getQuestion() {
         String hearingId = "1";
         String questionId = "1";
         cohStub.stubGetQuestion(hearingId, questionId, QUESTION_HEADER, QUESTION_BODY);
-        cohStub.stubGetAnswer(hearingId, questionId, ANSWER_TEXT);
+        ZonedDateTime answerDate = ZonedDateTime.now();
+        cohStub.stubGetAnswer(hearingId, questionId, ANSWER_TEXT, UUID.randomUUID().toString(), "answer_drafted", answerDate);
 
         RestAssured.baseURI = "http://localhost:" + applicationPort;
         RestAssured.given()
@@ -32,7 +35,7 @@ public class QuestionTest extends BaseIntegrationTest {
                 .get("/continuous-online-hearings/" + hearingId + "/questions/" + questionId)
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .body(new QuestionMatcher(QUESTION_HEADER, QUESTION_BODY, ANSWER_TEXT));
+                .body(new QuestionMatcher(QUESTION_HEADER, QUESTION_BODY, ANSWER_TEXT, answerDate));
     }
 
     @Test
@@ -59,7 +62,7 @@ public class QuestionTest extends BaseIntegrationTest {
         String questionId = "1";
         String newAnswer = "new answer";
         String answerId = UUID.randomUUID().toString();
-        cohStub.stubGetAnswer(hearingId, questionId, "old answer", answerId);
+        cohStub.stubGetAnswer(hearingId, questionId, "old answer", answerId, "answer_drafted", ZonedDateTime.now());
         cohStub.stubUpdateAnswer(hearingId, questionId, newAnswer, answerId);
 
         RestAssured.baseURI = "http://localhost:" + applicationPort;
@@ -92,7 +95,7 @@ public class QuestionTest extends BaseIntegrationTest {
         String questionId = "1";;
         String answerId = UUID.randomUUID().toString();
         String answer = "answer";
-        cohStub.stubGetAnswer(hearingId, questionId, answer, answerId);
+        cohStub.stubGetAnswer(hearingId, questionId, answer, answerId, "answer_drafted", ZonedDateTime.now());
         cohStub.stubUpdateAnswer(hearingId, questionId, answer, answerId, submitted);
 
         RestAssured.baseURI = "http://localhost:" + applicationPort;
