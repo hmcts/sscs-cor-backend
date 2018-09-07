@@ -52,8 +52,6 @@ module "sscs-core-backend" {
   common_tags         = "${var.common_tags}"
 
   app_settings = {
-    LOGBACK_REQUIRE_ALERT_LEVEL = false
-    LOGBACK_REQUIRE_ERROR_CODE  = false
 
     IDAM.S2S-AUTH = "${local.s2sCnpUrl}"
     IDAM.S2S-AUTH.MICROSERVICE = "${var.idam_s2s_auth_microservice}"
