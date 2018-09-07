@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers;
 
+import static java.util.stream.Collectors.joining;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,8 +8,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -62,10 +65,11 @@ public class CreateCaseController {
     }
 
     private SscsCaseData createSscsCase(String email, String mobile) {
-        File src = new File(getClass().getClassLoader().getResource("json/ccd_case.json").getFile());
+        InputStream caseStream = getClass().getClassLoader().getResourceAsStream("json/ccd_case.json");
+        String caseAsString = new BufferedReader(new InputStreamReader(caseStream)).lines().collect(joining("\n"));
         SscsCaseData sscsCaseData;
         try {
-            sscsCaseData = new ObjectMapper().readValue(src, SscsCaseData.class);
+            sscsCaseData = new ObjectMapper().readValue(caseAsString, SscsCaseData.class);
 
             sscsCaseData = sscsCaseData.toBuilder()
                     .onlinePanel(OnlinePanel.builder()
