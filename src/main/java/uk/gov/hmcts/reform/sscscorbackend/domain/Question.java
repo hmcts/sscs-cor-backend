@@ -15,6 +15,8 @@ public class Question {
     private final String questionHeaderText;
     private final String questionBodyText;
     private final String answer;
+    private final AnswerState answerState;
+    private final String answerDate;
 
     public Question(String onlineHearingId,
                     String questionId,
@@ -25,18 +27,24 @@ public class Question {
         this.questionHeaderText = questionHeaderText;
         this.questionBodyText = questionBodyText;
         this.answer = null;
+        this.answerState = AnswerState.unanswered;
+        this.answerDate = null;
     }
 
     public Question(String onlineHearingId,
                     String questionId,
                     String questionHeaderText,
                     String questionBodyText,
-                    String answer) {
+                    String answer,
+                    AnswerState answerState,
+                    String answerDate) {
         this.onlineHearingId = onlineHearingId;
         this.questionId = questionId;
         this.questionHeaderText = questionHeaderText;
         this.questionBodyText = questionBodyText;
         this.answer = answer;
+        this.answerState = answerState;
+        this.answerDate = answerDate;
     }
 
     @ApiModelProperty(example = "ID_1", required = true)
@@ -69,19 +77,16 @@ public class Question {
         return answer;
     }
 
-    public static Question from(CohQuestion question) {
-        return new Question(question.getOnlineHearingId(),
-                question.getQuestionId(),
-                question.getQuestionHeaderText(),
-                question.getQuestionBodyText());
+    @ApiModelProperty(required = true)
+    @JsonProperty(value = "answer_state")
+    public AnswerState getAnswerState() {
+        return answerState;
     }
 
-    public static Question from(CohQuestion question, CohAnswer answer) {
-        return new Question(question.getOnlineHearingId(),
-                question.getQuestionId(),
-                question.getQuestionHeaderText(),
-                question.getQuestionBodyText(),
-                answer.getAnswerText());
+    @ApiModelProperty(required = true)
+    @JsonProperty(value = "answer_date")
+    public String getAnswerDate() {
+        return answerDate;
     }
 
     @Override
@@ -93,16 +98,18 @@ public class Question {
             return false;
         }
         Question question = (Question) o;
-        return Objects.equals(onlineHearingId, question.onlineHearingId)
-                && Objects.equals(questionId, question.questionId)
-                && Objects.equals(questionHeaderText, question.questionHeaderText)
-                && Objects.equals(questionBodyText, question.questionBodyText)
-                && Objects.equals(answer, question.answer);
+        return Objects.equals(onlineHearingId, question.onlineHearingId) &&
+                Objects.equals(questionId, question.questionId) &&
+                Objects.equals(questionHeaderText, question.questionHeaderText) &&
+                Objects.equals(questionBodyText, question.questionBodyText) &&
+                Objects.equals(answer, question.answer) &&
+                answerState == question.answerState &&
+                Objects.equals(answerDate, question.answerDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(onlineHearingId, questionId, questionHeaderText, questionBodyText, answer);
+        return Objects.hash(onlineHearingId, questionId, questionHeaderText, questionBodyText, answer, answerState, answerDate);
     }
 
     @Override
@@ -112,7 +119,9 @@ public class Question {
                 ", questionId='" + questionId + '\'' +
                 ", questionHeaderText='" + questionHeaderText + '\'' +
                 ", questionBodyText='" + questionBodyText + '\'' +
-                ", answer=" + answer +
+                ", answer='" + answer + '\'' +
+                ", answerState=" + answerState +
+                ", answerDate='" + answerDate + '\'' +
                 '}';
     }
 }
