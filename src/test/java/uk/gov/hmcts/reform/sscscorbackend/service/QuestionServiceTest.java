@@ -1,18 +1,17 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
+import static java.time.LocalDateTime.now;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,7 +61,6 @@ public class QuestionServiceTest {
                 .getQuestionReferences().get(0);
         CohQuestionReference cohQuestion2Reference = cohQuestionRounds.getCohQuestionRound().get(0)
                 .getQuestionReferences().get(1);
-        LocalDateTime question2DeadlineExpiryDate = cohQuestion2Reference.getDeadlineExpiryDate();
         when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
 
@@ -74,7 +72,7 @@ public class QuestionServiceTest {
     public void getsAListOfQuestionsWithUnansweredStatesWhenTheQuestionHasNotBeenAnswered() {
         CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(
                 new CohQuestionRound(singletonList(
-                        new CohQuestionReference("someQuestionId", 1, "first question", LocalDateTime.now().plusDays(7), null)
+                        new CohQuestionReference("someQuestionId", 1, "first question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), null)
                 ))
         ));
         CohQuestionReference cohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
@@ -109,8 +107,8 @@ public class QuestionServiceTest {
     @Test
     public void getsAListOfQuestionsInTheCorrectOrderWhenTheyAreReturnedInTheIncorrectOrder() {
         CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(new CohQuestionRound(
-                asList(new CohQuestionReference("questionId2", 2, "second question", LocalDateTime.now().plusDays(7), someCohAnswers("answer_drafted")),
-                        new CohQuestionReference("questionId1", 1, "first question", LocalDateTime.now().plusDays(7), someCohAnswers("answer_drafted"))))
+                asList(new CohQuestionReference("questionId2", 2, "second question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted")),
+                        new CohQuestionReference("questionId1", 1, "first question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))))
         ));
         CohQuestionReference firstCohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
                 .getQuestionReferences().get(1);
@@ -212,8 +210,6 @@ public class QuestionServiceTest {
 
     @Test
     public void cannotSubmitAnswerThatHasNotAlreadyBeenAnswered() {
-        String answerId = "some-id";
-        String answer = "answer";
         when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(emptyList());
 
         boolean hasBeenSubmitted = underTest.submitAnswer(onlineHearingId, questionId);

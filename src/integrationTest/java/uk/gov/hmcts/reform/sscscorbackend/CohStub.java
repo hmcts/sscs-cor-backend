@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
 import com.github.tomakehurst.wiremock.matching.RegexPattern;
 import java.io.UnsupportedEncodingException;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -209,7 +208,7 @@ public class CohStub extends BaseStub {
                         .replace("{question_header}", questionSummary.getQuestionHeaderText())
                         .replace("{question_id}", questionSummary.getQuestionId())
                         .replace("{answer_state}", questionSummary.getAnswers().get(0).getCurrentAnswerState().getStateName())
-                        .replace("{deadline_expiry_date}", questionSummary.getDeadlineExpiryDate().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                        .replace("{deadline_expiry_date}", questionSummary.getDeadlineExpiryDate())
                 )
                 .collect(joining(", ", "[", "]"));
 
