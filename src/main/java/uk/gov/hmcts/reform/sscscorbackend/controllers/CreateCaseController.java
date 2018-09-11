@@ -16,7 +16,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
@@ -77,7 +77,7 @@ public class CreateCaseController {
                             .disabilityQualifiedMember("disabilityQualifiedMember")
                             .medicalMember("medicalMember")
                             .build())
-                    .caseReference("CR" + UUID.randomUUID().toString())
+                    .caseReference("SC285/17/" + new Random().nextInt(90000) + 10000)
                     .subscriptions(
                             Subscriptions.builder()
                                     .appellantSubscription(
