@@ -1,14 +1,11 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
-import static org.apache.http.client.methods.RequestBuilder.get;
-import static org.apache.http.client.methods.RequestBuilder.post;
-import static org.apache.http.client.methods.RequestBuilder.put;
+import static org.apache.http.client.methods.RequestBuilder.*;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
-import java.util.UUID;
 import java.util.function.Supplier;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -28,7 +25,7 @@ public class CohRequests {
     }
 
     public String createHearing() throws IOException {
-        return createHearing(UUID.randomUUID().toString());
+        return createHearing(new CcdIdGenerator().generateUid());
     }
 
     public String createHearing(String caseId) throws IOException {
