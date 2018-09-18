@@ -13,29 +13,32 @@ import java.util.Collections;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.ccd.CcdClient;
-import uk.gov.hmcts.reform.sscs.ccd.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 
 public class OnlineHearingServiceTest {
     private CohService cohService;
-    private CcdClient ccdClient;
+    private CcdService ccdService;
 
     private OnlineHearingService underTest;
 
     private String someEmailAddress;
     private Long someCaseId;
-    private CcdRequestDetails ccdRequestDetails;
-
+    private IdamTokens idamTokens;
 
     @Before
     public void setUp() {
         cohService = mock(CohService.class);
-        ccdClient = mock(CcdClient.class);
-        ccdRequestDetails = CcdRequestDetails.builder().build();
-        underTest = new OnlineHearingService(cohService, ccdClient, ccdRequestDetails);
+        ccdService = mock(CcdService.class);
+        IdamService idamService = mock(IdamService.class);
+        idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+
+        underTest = new OnlineHearingService(cohService, ccdService, idamService);
 
         someEmailAddress = "someEmailAddress";
         someCaseId = 1234321L;
@@ -58,7 +61,7 @@ public class OnlineHearingServiceTest {
         String lastName = "lastName";
 
         SscsCaseDetails caseDetails = createCaseDetails(someCaseId, expectedCaseReference, firstName, lastName);
-        when(ccdClient.findCaseBy(ccdRequestDetails, singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
+        when(ccdService.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress), idamTokens))
                 .thenReturn(Arrays.asList(
                         createNonOnlineHearingCaseDetails(22222L, "otherCaseRef", "otherFirstName", "otherLastName"),
                         caseDetails));
@@ -79,7 +82,7 @@ public class OnlineHearingServiceTest {
     public void exceptionWhenGettingAHearingIfThereIsMoreThanOneCaseWithAnOnlinePanel() {
         SscsCaseDetails caseDetails1 = createCaseDetails(someCaseId, "someCaseReference", "firstName", "lastName");
         SscsCaseDetails caseDetails2 = createCaseDetails(22222L, "otherRef", "otherFirstName", "otherLatName");
-        when(ccdClient.findCaseBy(ccdRequestDetails, singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
+        when(ccdService.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress), idamTokens))
                 .thenReturn(Arrays.asList(
                         caseDetails1,
                         caseDetails2));
@@ -89,7 +92,7 @@ public class OnlineHearingServiceTest {
 
     @Test
     public void noOnlineHearingIfNotFoundInCcd() {
-        when(ccdClient.findCaseBy(ccdRequestDetails, singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
+        when(ccdService.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress), idamTokens))
                 .thenReturn(singletonList(createCaseDetails(someCaseId, "caseref", "firstname", "lastname")));
 
         CohOnlineHearings emptyCohOnlineHearings = new CohOnlineHearings(Collections.emptyList());
@@ -101,7 +104,7 @@ public class OnlineHearingServiceTest {
 
     @Test
     public void noOnlineHearingIfNotFoundInCOh() {
-        when(ccdClient.findCaseBy(ccdRequestDetails, singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress)))
+        when(ccdService.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress), idamTokens))
                 .thenReturn(emptyList());
 
         Optional<OnlineHearing> onlineHearing = underTest.getOnlineHearing(someEmailAddress);

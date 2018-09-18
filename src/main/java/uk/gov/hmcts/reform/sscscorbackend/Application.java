@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
-import uk.gov.hmcts.reform.sscs.ccd.CcdRequestDetails;
+import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 
 @SpringBootApplication
 @EnableCircuitBreaker

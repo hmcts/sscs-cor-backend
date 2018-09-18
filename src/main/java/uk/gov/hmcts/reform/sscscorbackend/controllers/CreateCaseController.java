@@ -25,21 +25,24 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.logging.exception.AlertLevel;
-import uk.gov.hmcts.reform.sscs.ccd.CcdClient;
-import uk.gov.hmcts.reform.sscs.ccd.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscscorbackend.exception.SscsCorBackendException;
 
 @RestController
 @ConditionalOnProperty("create_ccd_endpoint")
 public class CreateCaseController {
 
-    private final CcdClient ccdClient;
-    private final CcdRequestDetails ccdRequestDetails;
+    private final CcdService ccdService;
+    private final IdamService idamService;
 
-    public CreateCaseController(@Autowired CcdClient ccdClient, @Autowired CcdRequestDetails ccdRequestDetails) {
-        this.ccdClient = ccdClient;
-        this.ccdRequestDetails = ccdRequestDetails;
+    public CreateCaseController(
+            @Autowired CcdService ccdService,
+            @Autowired IdamService idamService
+    ) {
+        this.ccdService = ccdService;
+        this.idamService = idamService;
     }
 
     @ApiOperation(value = "Create a case",
@@ -58,7 +61,10 @@ public class CreateCaseController {
             @ApiParam(value = "mobile number of appellant. Optional if not set will not subscribe for sms.")
             @RequestParam(value = "mobile", required = false) String mobile
     ) throws URISyntaxException {
-        SscsCaseDetails caseDetails = ccdClient.createCase(ccdRequestDetails, createSscsCase(email, mobile));
+        SscsCaseDetails caseDetails = ccdService.createCase(
+                createSscsCase(email, mobile),
+                idamService.getIdamTokens()
+        );
 
         HashMap<String, String> body = new HashMap<>();
         body.put("id", caseDetails.getId().toString());

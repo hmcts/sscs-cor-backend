@@ -7,10 +7,10 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.CcdClient;
-import uk.gov.hmcts.reform.sscs.ccd.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
@@ -19,16 +19,16 @@ import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHear
 @Service
 public class OnlineHearingService {
     private final CohService cohClient;
-    private final CcdClient ccdClient;
-    private CcdRequestDetails ccdRequestDetails;
+    private final CcdService ccdService;
+    private final IdamService idamService;
 
     public OnlineHearingService(@Autowired CohService cohService,
-                                @Autowired CcdClient ccdClient,
-                                @Autowired CcdRequestDetails ccdRequestDetails
+                                @Autowired CcdService ccdService,
+                                @Autowired IdamService idamService
     ) {
         this.cohClient = cohService;
-        this.ccdClient = ccdClient;
-        this.ccdRequestDetails = ccdRequestDetails;
+        this.ccdService = ccdService;
+        this.idamService = idamService;
     }
 
     public String createOnlineHearing(String caseId) {
@@ -41,9 +41,9 @@ public class OnlineHearingService {
     }
 
     public Optional<OnlineHearing> getOnlineHearing(String emailAddress) {
-        List<SscsCaseDetails> cases = ccdClient.findCaseBy(
-                ccdRequestDetails,
-                ImmutableMap.of("case.subscriptions.appellantSubscription.email", emailAddress)
+        List<SscsCaseDetails> cases = ccdService.findCaseBy(
+                ImmutableMap.of("case.subscriptions.appellantSubscription.email", emailAddress),
+                idamService.getIdamTokens()
         );
 
         return cases.stream()
