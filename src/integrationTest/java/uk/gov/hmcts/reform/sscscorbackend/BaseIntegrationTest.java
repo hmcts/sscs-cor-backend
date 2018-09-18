@@ -18,7 +18,7 @@ public abstract class BaseIntegrationTest {
     private String cohUrl;
     @Value("${idam.s2s-auth.url}")
     private String tokenGeneratorUrl;
-    @Value("${idam.oauth2.url}")
+    @Value("${idam.url}")
     private String idamUrl;
     @Value("${core_case_data.api.url}")
     private String ccdUrl;
