@@ -46,4 +46,8 @@ public class CohService {
     public CohOnlineHearings getOnlineHearing(Long caseId) {
         return cohClient.getOnlineHearing(OAUTH2_TOKEN, authTokenGenerator.generate(), caseId);
     }
+
+    public void extendQuestionRoundDeadline(String onlineHearingId) {
+        cohClient.extendQuestionRoundDeadline(oauthToken, authTokenGenerator.generate(), onlineHearingId);
+    }
 }

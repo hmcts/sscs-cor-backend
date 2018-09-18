@@ -79,6 +79,10 @@ public class QuestionService {
         return new QuestionRound(questions, deadlineExpiryDate);
     }
 
+    public void extendQuestionRoundDeadline(String onlineHearingId) {
+        cohService.extendQuestionRoundDeadline(onlineHearingId);
+    }
+
     private String getQuestionRoundDeadlineExpiryDate(CohQuestionRound questionRound) {
         List<CohQuestionReference> questionRefsForRound = questionRound.getQuestionReferences();
         if (questionRefsForRound != null && !questionRefsForRound.isEmpty()) {
