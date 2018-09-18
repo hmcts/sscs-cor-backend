@@ -105,4 +105,17 @@ public class QuestionTest extends BaseIntegrationTest {
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
     }
+
+    @Test
+    public void extendQuestionRoundDeadline() {
+        String hearingId = "1";
+        cohStub.stubExtendQuestionRoundDeadline(hearingId);
+
+        RestAssured.baseURI = "http://localhost:" + applicationPort;
+        RestAssured.given()
+                .when()
+                .put("/continuous-online-hearings/" + hearingId + "/questions/deadlineExpiryDate")
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
 }
