@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHear
 @Service
 public class CohService {
 
-    private final String oauthToken = "oauth2Token";
+    private static final String OAUTH2_TOKEN = "oauth2Token";
     private final AuthTokenGenerator authTokenGenerator;
     private final CohClient cohClient;
 
@@ -20,30 +20,30 @@ public class CohService {
     }
 
     public CohQuestion getQuestion(String onlineHearingId, String questionId) {
-        return cohClient.getQuestion(oauthToken, authTokenGenerator.generate(), onlineHearingId, questionId);
+        return cohClient.getQuestion(OAUTH2_TOKEN, authTokenGenerator.generate(), onlineHearingId, questionId);
     }
 
     public List<CohAnswer> getAnswers(String onlineHearingId, String questionId) {
-        return cohClient.getAnswers(oauthToken, authTokenGenerator.generate(), onlineHearingId, questionId);
+        return cohClient.getAnswers(OAUTH2_TOKEN, authTokenGenerator.generate(), onlineHearingId, questionId);
     }
 
     public void createAnswer(String onlineHearingId, String questionId, CohUpdateAnswer newAnswer) {
-        cohClient.createAnswer(oauthToken, authTokenGenerator.generate(), onlineHearingId, questionId, newAnswer);
+        cohClient.createAnswer(OAUTH2_TOKEN, authTokenGenerator.generate(), onlineHearingId, questionId, newAnswer);
     }
 
     public void updateAnswer(String onlineHearingId, String questionId, String answerId, CohUpdateAnswer newAnswer) {
-        cohClient.updateAnswer(oauthToken, authTokenGenerator.generate(), onlineHearingId, questionId, answerId, newAnswer);
+        cohClient.updateAnswer(OAUTH2_TOKEN, authTokenGenerator.generate(), onlineHearingId, questionId, answerId, newAnswer);
     }
 
     public CohQuestionRounds getQuestionRounds(String onlineHearingId) {
-        return cohClient.getQuestionRounds(oauthToken, authTokenGenerator.generate(), onlineHearingId);
+        return cohClient.getQuestionRounds(OAUTH2_TOKEN, authTokenGenerator.generate(), onlineHearingId);
     }
 
     public String createOnlineHearing(CreateOnlineHearingRequest createOnlineHearingRequest) {
-        return cohClient.createOnlineHearing(oauthToken, authTokenGenerator.generate(), createOnlineHearingRequest);
+        return cohClient.createOnlineHearing(OAUTH2_TOKEN, authTokenGenerator.generate(), createOnlineHearingRequest);
     }
 
     public CohOnlineHearings getOnlineHearing(Long caseId) {
-        return cohClient.getOnlineHearing(oauthToken, authTokenGenerator.generate(), caseId);
+        return cohClient.getOnlineHearing(OAUTH2_TOKEN, authTokenGenerator.generate(), caseId);
     }
 }

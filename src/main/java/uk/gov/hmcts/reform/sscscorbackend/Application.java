@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
 import uk.gov.hmcts.reform.sscs.ccd.CcdRequestDetails;
-//import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard;
 
 @SpringBootApplication
 @EnableCircuitBreaker
@@ -22,7 +21,6 @@ import uk.gov.hmcts.reform.sscs.ccd.CcdRequestDetails;
                 "uk.gov.hmcts.reform.sscs.idam",
                 "uk.gov.hmcts.reform.authorisation"
         })
-//@EnableHystrixDashboard
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 @ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
 public class Application {
