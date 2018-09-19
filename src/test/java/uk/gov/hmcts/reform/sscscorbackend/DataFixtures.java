@@ -4,9 +4,7 @@ import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
-import static uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRoleCoh.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -14,9 +12,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseData;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
-import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
 
 
 public class DataFixtures {
@@ -68,28 +64,11 @@ public class DataFixtures {
     }
 
     public static CreateOnlineHearingRequest someRequest() {
-        List<PanelRequest> panel = new ArrayList<>();
-
-        PanelRequest panelRequestJ = new PanelRequest(JUDGE,
-                "aJudge", JUDGE);
-        panel.add(panelRequestJ);
-
-        PanelRequest panelRequestM = new PanelRequest(MEDICAL_MEMBER,
-                "medicalPerson", MEDICAL_MEMBER);
-        panel.add(panelRequestM);
-        PanelRequest panelRequestQ = new PanelRequest(DISABILITY_QUALIFIED_MEMBER,
-                "qualifiedPerson", DISABILITY_QUALIFIED_MEMBER);
-        panel.add(panelRequestQ);
-
-        return new CreateOnlineHearingRequest("aCaseId", panel);
+        return new CreateOnlineHearingRequest("aCaseId");
     }
 
-    public static Panel somePanel() {
-        return new Panel("aJudge", "medicalPerson", "qualifiedPerson");
-    }
-
-    public static CcdEvent someCcdEvent(String caseId, Panel panel) {
-        CaseData caseData = new CaseData(null, panel);
+    public static CcdEvent someCcdEvent(String caseId) {
+        CaseData caseData = new CaseData(null);
 
         CaseDetails caseDetails = new CaseDetails(caseId, caseData);
         CcdEvent ccdEvent = new CcdEvent(caseDetails);

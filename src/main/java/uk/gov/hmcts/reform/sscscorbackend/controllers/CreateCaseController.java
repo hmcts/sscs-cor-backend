@@ -24,9 +24,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.logging.exception.AlertLevel;
 import uk.gov.hmcts.reform.sscs.ccd.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscscorbackend.exception.SscsCorBackendException;
 
 @RestController
 @ConditionalOnProperty("create_ccd_endpoint")
@@ -90,7 +92,7 @@ public class CreateCaseController {
                                     ).build()
                     ).build();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new SscsCorBackendException(AlertLevel.P4, e);
         }
 
         return sscsCaseData;

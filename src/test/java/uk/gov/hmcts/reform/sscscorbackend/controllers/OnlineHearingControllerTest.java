@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 
 
@@ -29,11 +28,10 @@ public class OnlineHearingControllerTest {
         String hearingId = "somehearingid";
 
         String caseId = "caseId";
-        Panel panel = new Panel("judge", "medical", "disability");
 
-        CcdEvent ccdEvent = someCcdEvent(caseId, panel);
+        CcdEvent ccdEvent = someCcdEvent(caseId);
 
-        when(onlineHearingService.createOnlineHearing(caseId, panel)).thenReturn(hearingId);
+        when(onlineHearingService.createOnlineHearing(caseId)).thenReturn(hearingId);
 
         OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService);
 
@@ -48,29 +46,10 @@ public class OnlineHearingControllerTest {
         String hearingId = "somehearingid";
 
         String caseId = null;
-        Panel panel = new Panel("judge", "medical", "disability");
 
-        CcdEvent ccdEvent = someCcdEvent(caseId, panel);
+        CcdEvent ccdEvent = someCcdEvent(caseId);
 
-        when(onlineHearingService.createOnlineHearing(caseId, panel)).thenReturn(hearingId);
-
-        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService);
-
-        ResponseEntity<String> stringResponseEntity = onlineHearingController.catchEvent(ccdEvent);
-
-        assertThat(stringResponseEntity.getStatusCode(), is(HttpStatus.BAD_REQUEST));
-    }
-
-    @Test
-    public void testNullPanel() {
-        String hearingId = "somehearingid";
-
-        String caseId = "caseId";
-        Panel panel = null;
-
-        CcdEvent ccdEvent = someCcdEvent(caseId, panel);
-
-        when(onlineHearingService.createOnlineHearing(caseId, panel)).thenReturn(hearingId);
+        when(onlineHearingService.createOnlineHearing(caseId)).thenReturn(hearingId);
 
         OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService);
 
