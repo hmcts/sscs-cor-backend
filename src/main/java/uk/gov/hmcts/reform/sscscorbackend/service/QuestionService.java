@@ -22,7 +22,7 @@ public class QuestionService {
         CohQuestion question = cohService.getQuestion(onlineHearingId, questionId);
         if (question != null) {
             List<CohAnswer> answers = cohService.getAnswers(onlineHearingId, questionId);
-            if (answers != null && answers.size() > 0) {
+            if (answers != null && !answers.isEmpty()) {
                 return new Question(question.getOnlineHearingId(),
                         question.getQuestionId(),
                         question.getQuestionHeaderText(),

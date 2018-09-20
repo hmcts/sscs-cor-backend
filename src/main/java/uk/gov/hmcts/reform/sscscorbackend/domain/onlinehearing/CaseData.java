@@ -8,17 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class CaseData {
     private String onlineHearingId;
 
-    private Panel onlinePanel;
-
     @JsonCreator
-    public CaseData(@JsonProperty(value = "onlineHearingId") String onlineHearingId,
-                    @JsonProperty(value = "onlinePanel") Panel onlinePanel) {
+    public CaseData(@JsonProperty(value = "onlineHearingId") String onlineHearingId) {
         this.onlineHearingId = onlineHearingId;
-        this.onlinePanel = onlinePanel;
-    }
-
-    public Panel getOnlinePanel() {
-        return onlinePanel;
     }
 
     public String getOnlineHearingId() {

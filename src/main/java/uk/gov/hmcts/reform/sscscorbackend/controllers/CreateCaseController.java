@@ -16,7 +16,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +24,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.logging.exception.AlertLevel;
 import uk.gov.hmcts.reform.sscs.ccd.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscscorbackend.exception.SscsCorBackendException;
 
 @RestController
 @ConditionalOnProperty("create_ccd_endpoint")
@@ -77,7 +79,7 @@ public class CreateCaseController {
                             .disabilityQualifiedMember("disabilityQualifiedMember")
                             .medicalMember("medicalMember")
                             .build())
-                    .caseReference("CR" + UUID.randomUUID().toString())
+                    .caseReference("SC285/17/" + new Random().nextInt(90000) + 10000)
                     .subscriptions(
                             Subscriptions.builder()
                                     .appellantSubscription(
@@ -90,7 +92,7 @@ public class CreateCaseController {
                                     ).build()
                     ).build();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new SscsCorBackendException(AlertLevel.P4, e);
         }
 
         return sscsCaseData;

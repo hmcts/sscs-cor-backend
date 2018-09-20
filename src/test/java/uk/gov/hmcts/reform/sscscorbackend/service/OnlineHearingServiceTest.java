@@ -5,11 +5,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
+import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohOnlineHearingId;
+import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someRequest;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,8 +18,6 @@ import uk.gov.hmcts.reform.sscs.ccd.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.Panel;
-import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.PanelRequest;
 
 public class OnlineHearingServiceTest {
     private CohService cohService;
@@ -48,40 +46,9 @@ public class OnlineHearingServiceTest {
         String hearingId = "hearingId";
         when(cohService.createOnlineHearing(someRequest())).thenReturn("hearingId");
 
-        String createdHearingId = underTest.createOnlineHearing(someRequest().getCaseId(), somePanel());
+        String createdHearingId = underTest.createOnlineHearing(someRequest().getCaseId());
 
         assertThat(createdHearingId, is(hearingId));
-    }
-
-    @Test
-    public void testConvertPanel() {
-        String judgeName = "Judge Paul Baker";
-        String medicalMemberName = "Doctor Janet Wren";
-        String disabilityQualifiedMemberName = "Miss Emily Smith";
-
-        Panel ccdPanel = new Panel(judgeName,
-                medicalMemberName,
-                disabilityQualifiedMemberName);
-
-        List<PanelRequest> panelRequestList = underTest.convertPanel(ccdPanel);
-
-        assertThat(panelRequestList.size(), is(3));
-
-        //assumes the order for now
-        assertThat(judgeName, is(panelRequestList.get(0).getName()));
-
-        assertThat(medicalMemberName, is(panelRequestList.get(1).getName()));
-
-        assertThat(disabilityQualifiedMemberName, is(panelRequestList.get(2).getName()));
-    }
-
-    @Test
-    public void testConvertPanelNull() {
-        Panel ccdPanel = null;
-
-        List<PanelRequest> panelRequestList = underTest.convertPanel(ccdPanel);
-
-        assertThat(panelRequestList.size(), is(0));
     }
 
     @Test
