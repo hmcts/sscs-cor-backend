@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 public class ExtendQuestionRoundDeadlineTest extends BaseFunctionTest {
     @Test
-    public void getAListOfQuestionTitles() throws IOException, InterruptedException {
+    public void extendsTheQuestionRoundDeadlineDate() throws IOException, InterruptedException {
         String hearingId = cohRequests.createHearing();
         cohRequests.createQuestion(hearingId);
         cohRequests.issueQuestionRound(hearingId);

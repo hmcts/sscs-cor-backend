@@ -6,7 +6,6 @@ import static java.util.stream.Collectors.joining;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
 
 import com.github.tomakehurst.wiremock.matching.RegexPattern;
-import java.io.UnsupportedEncodingException;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.UUID;
@@ -235,7 +234,7 @@ public class CohStub extends BaseStub {
                 .willReturn(status(409)));
     }
 
-    public void stubGetOnlineHearing(Long caseId, String onlineHearingId) throws UnsupportedEncodingException {
+    public void stubGetOnlineHearing(Long caseId, String onlineHearingId) {
         String body = onlineHearingJson.replace("{online_hearing_id}", onlineHearingId);
         wireMock.stubFor(get("/continuous-online-hearings?case_id=" + caseId)
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
@@ -245,8 +244,6 @@ public class CohStub extends BaseStub {
     public void stubExtendQuestionRoundDeadline(String hearingId) {
         wireMock.stubFor(put(urlEqualTo("/continuous-online-hearings/" + hearingId + "/questions-deadline-extension"))
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
-                .withHeader("Content-Length", equalTo("0"))
-                .withRequestBody(equalTo(""))
-                .willReturn(status(200)));
+                .willReturn(ok("{}")));
     }
 }

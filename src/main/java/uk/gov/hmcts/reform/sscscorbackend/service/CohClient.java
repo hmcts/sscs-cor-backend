@@ -74,5 +74,6 @@ public interface CohClient {
     void extendQuestionRoundDeadline(@RequestHeader(AUTHORIZATION) String oauthToken,
                                      @RequestHeader(SERVICE_AUTHORIZATION) String generate,
                                      @PathVariable("onlineHearingId") String onlineHearingId,
-                                     String content);
+                                     @RequestBody String content
+    );
 }
