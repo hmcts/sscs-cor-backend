@@ -129,4 +129,14 @@ public class QuestionControllerTest {
 
         assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND));
     }
+
+    @Test
+    public void canExtendDeadline() {
+        when(questionService.extendQuestionRoundDeadline(onlineHearingId)).thenReturn(questionRound);
+
+        ResponseEntity<QuestionRound> response = underTest.extendQuestionRoundDeadline(onlineHearingId);
+
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        assertThat(response.getBody(), is(questionRound));
+    }
 }

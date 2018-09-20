@@ -47,4 +47,8 @@ public class CcdIdGenerator {
         }
         return sumToSingleDigit(k / 10) + (k % 10);
     }
+
+    public static void main(String[] args) {
+        System.out.println(new CcdIdGenerator().generateUid());
+    }
 }

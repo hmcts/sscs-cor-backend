@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
-import static org.apache.http.client.methods.RequestBuilder.get;
-import static org.apache.http.client.methods.RequestBuilder.post;
-import static org.apache.http.client.methods.RequestBuilder.put;
+import static org.apache.http.client.methods.RequestBuilder.*;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -83,6 +81,16 @@ public class SscsCorBackendRequests {
         String responseBody = EntityUtils.toString(createCaseResponse.getEntity());
         JSONObject jsonObject = new JSONObject(responseBody);
         return jsonObject.getString("id");
+    }
 
+    public JSONObject extendQuestionRoundDeadline(String hearingId) throws IOException {
+        HttpResponse getQuestionResponse = client.execute(patch(baseUrl + "/continuous-online-hearings/" + hearingId)
+                .build());
+
+        assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+
+        String responseBody = EntityUtils.toString(getQuestionResponse.getEntity());
+
+        return new JSONObject(responseBody);
     }
 }

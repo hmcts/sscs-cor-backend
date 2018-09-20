@@ -245,6 +245,8 @@ public class CohStub extends BaseStub {
     public void stubExtendQuestionRoundDeadline(String hearingId) {
         wireMock.stubFor(put(urlEqualTo("/continuous-online-hearings/" + hearingId + "/questions-deadline-extension"))
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .withHeader("Content-Length", equalTo("0"))
+                .withRequestBody(equalTo(""))
                 .willReturn(status(200)));
     }
 }

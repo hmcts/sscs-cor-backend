@@ -1,6 +1,10 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
+import static java.time.LocalDateTime.now;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohAnswers;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.submitted;
 
 import io.restassured.RestAssured;
@@ -11,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionReference;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -110,12 +115,18 @@ public class QuestionTest extends BaseIntegrationTest {
     public void extendQuestionRoundDeadline() {
         String hearingId = "1";
         cohStub.stubExtendQuestionRoundDeadline(hearingId);
+        String deadlineExpiryDate = now().plusDays(7).format(ISO_LOCAL_DATE_TIME);
+        CohQuestionReference questionSummary = new CohQuestionReference(
+                "first-id", 1, "first question", deadlineExpiryDate, someCohAnswers("answer_drafted")
+        );
+        cohStub.stubGetAllQuestionRounds(hearingId, questionSummary);
 
         RestAssured.baseURI = "http://localhost:" + applicationPort;
         RestAssured.given()
                 .when()
-                .put("/continuous-online-hearings/" + hearingId + "/questions/deadlineExpiryDate")
+                .patch("/continuous-online-hearings/" + hearingId)
                 .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+                .statusCode(HttpStatus.OK.value())
+                .body("deadline_expiry_date", equalTo(deadlineExpiryDate));
     }
 }
