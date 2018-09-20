@@ -69,8 +69,10 @@ public interface CohClient {
                                        @PathVariable("caseId") Long caseId);
 
     @RequestMapping(method = RequestMethod.PUT,
-            value = "/continuous-online-hearings/{onlineHearingId}/questions-deadline-extension")
+            value = "/continuous-online-hearings/{onlineHearingId}/questions-deadline-extension"
+    )
     void extendQuestionRoundDeadline(@RequestHeader(AUTHORIZATION) String oauthToken,
                                      @RequestHeader(SERVICE_AUTHORIZATION) String generate,
-                                     @PathVariable("onlineHearingId") String onlineHearingId);
+                                     @PathVariable("onlineHearingId") String onlineHearingId,
+                                     String content);
 }

@@ -16,9 +16,8 @@ import org.junit.Before;
 
 public abstract class BaseFunctionTest {
     private final String baseUrl = System.getenv("TEST_URL");
-    private CloseableHttpClient client;
-    // private final String baseUrl = "http://sscs-cor-backend-aat-staging.service.core-compute-aat.internal";
     private String cohBaseUrl = "http://coh-cor-aat.service.core-compute-aat.internal";
+    private CloseableHttpClient client;
     private HttpClient cohClient;
 
     protected SscsCorBackendRequests sscsCorBackendRequests;
