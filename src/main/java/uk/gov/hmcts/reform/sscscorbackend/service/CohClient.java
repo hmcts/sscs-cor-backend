@@ -76,4 +76,10 @@ public interface CohClient {
                                      @PathVariable("onlineHearingId") String onlineHearingId,
                                      @RequestBody String content
     );
+
+    @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings/{onlineHearingId}/decisions")
+    CohDecision getDecision(
+            @RequestHeader(AUTHORIZATION) String authorisation,
+            @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
+            @PathVariable("onlineHearingId") String onlineHearingId);
 }

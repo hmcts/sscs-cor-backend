@@ -82,6 +82,6 @@ public class DataFixtures {
     }
 
     public static OnlineHearing someOnlineHearing() {
-        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference");
+        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", null);
     }
 }
