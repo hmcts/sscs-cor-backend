@@ -77,7 +77,8 @@ public interface CohClient {
                                      @RequestBody String content
     );
 
-    @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings/{onlineHearingId}/decisions")
+    @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings/{onlineHearingId}/decisions",
+            consumes = "application/json")
     CohDecision getDecision(
             @RequestHeader(AUTHORIZATION) String authorisation,
             @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
