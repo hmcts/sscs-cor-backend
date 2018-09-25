@@ -53,11 +53,11 @@ public class OnlineHearingService {
     }
 
     private Decision getDecision(String onlineHearingId) {
-        CohDecision decision = cohClient.getDecision(onlineHearingId);
-        if (decision != null) {
-            return new Decision(onlineHearingId, decision.getDecisionAward(),
-                    decision.getDecisionHeader(), decision.getDecisionReason(),
-                    decision.getDecisionText());
+        Optional<CohDecision> decision = cohClient.getDecision(onlineHearingId);
+        if (decision.isPresent()) {
+            return new Decision(onlineHearingId, decision.get().getDecisionAward(),
+                    decision.get().getDecisionHeader(), decision.get().getDecisionReason(),
+                    decision.get().getDecisionText());
         }
         return null;
     }

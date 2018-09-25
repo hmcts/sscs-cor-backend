@@ -12,6 +12,7 @@ public class GetAnOnlineHearingTest extends BaseFunctionTest {
     @Test
     public void getAnOnlineHearing() throws IOException {
         String emailAddress = "someEmail" + UUID.randomUUID().toString() + "@example.com";
+        System.out.println("emailAddress " + emailAddress);
         String caseId = sscsCorBackendRequests.createCase(emailAddress);
         String expectedOnlineHearingId = cohRequests.createHearing(caseId);
 
