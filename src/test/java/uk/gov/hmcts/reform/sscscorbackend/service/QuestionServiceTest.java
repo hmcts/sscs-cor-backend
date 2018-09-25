@@ -217,4 +217,17 @@ public class QuestionServiceTest {
         assertThat(hasBeenSubmitted, is(false));
         verify(cohService, never()).updateAnswer(any(), any(), any(), any());
     }
+
+    @Test
+    public void extendsQuestionRoundDeadLine() {
+        CohQuestionRounds cohQuestionRounds = someCohQuestionRoundsWithSingleRoundOfQuestions();
+        when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+
+        QuestionRound questionRound = underTest.extendQuestionRoundDeadline(onlineHearingId);
+
+        String deadlineExpiryDate = cohQuestionRounds.getCohQuestionRound().get(0).getQuestionReferences()
+                .get(0).getDeadlineExpiryDate();
+
+        assertThat(questionRound.getDeadlineExpiryDate(), is(deadlineExpiryDate));
+    }
 }
