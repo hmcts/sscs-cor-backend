@@ -267,6 +267,10 @@ public class CohStub extends BaseStub {
     public void stubGetDecisionNotFound(String hearingId) {
         wireMock.stubFor(get("/continuous-online-hearings/" + hearingId + "/decisions")
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
-                .willReturn(notFound()));
+                .willReturn(notFound()
+                        .withBody("Unable to find decision")
+                        .withHeader("Content-Type", "text/plain;charset=UTF-8")
+                )
+        );
     }
 }
