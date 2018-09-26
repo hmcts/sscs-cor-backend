@@ -17,7 +17,7 @@ public class GetAnOnlineHearingTest extends BaseFunctionTest {
     @Test
     public void getAnOnlineHearing() throws IOException {
         int randomNumber = (int) (Math.random() * 10000000);
-        String emailAddress = "test" + String.valueOf(randomNumber) + "@hmcts.net";
+        String emailAddress = "test" + randomNumber + "@hmcts.net";
         System.out.println("emailAddress " + emailAddress);
         String caseId = sscsCorBackendRequests.createCase(emailAddress);
         String expectedOnlineHearingId = cohRequests.createHearing(caseId);
@@ -33,7 +33,7 @@ public class GetAnOnlineHearingTest extends BaseFunctionTest {
     @Test
     public void getAnOnlineHearingWithDecision() throws IOException, InterruptedException {
         int randomNumber = (int) (Math.random() * 10000000);
-        String emailAddress = "test" + String.valueOf(randomNumber) + "@hmcts.net";
+        String emailAddress = "test" + randomNumber + "@hmcts.net";
         System.out.println("emailAddress " + emailAddress);
         String caseId = sscsCorBackendRequests.createCase(emailAddress);
         String expectedOnlineHearingId = cohRequests.createHearing(caseId);

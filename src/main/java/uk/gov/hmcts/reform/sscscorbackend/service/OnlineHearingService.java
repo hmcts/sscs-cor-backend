@@ -54,12 +54,10 @@ public class OnlineHearingService {
 
     private Decision getDecision(String onlineHearingId) {
         Optional<CohDecision> decision = cohClient.getDecision(onlineHearingId);
-        if (decision.isPresent()) {
-            return new Decision(onlineHearingId, decision.get().getDecisionAward(),
-                    decision.get().getDecisionHeader(), decision.get().getDecisionReason(),
-                    decision.get().getDecisionText(), decision.get().getCurrentDecisionState().getStateName());
-        }
-        return null;
+        return decision.map(d -> new Decision(onlineHearingId, d.getDecisionAward(),
+                    d.getDecisionHeader(), d.getDecisionReason(),
+                    d.getDecisionText(), d.getCurrentDecisionState().getStateName()))
+                .orElse(null);
     }
 
     private BinaryOperator<SscsCaseDetails> checkThereIsOnlyOneCase() {
