@@ -32,12 +32,6 @@ public class Decision {
         this.decisionState = decisionState;
     }
 
-    @ApiModelProperty(example = "someOnlineHearingId", required = true)
-    @JsonProperty(value = "online_hearing_id")
-    public String getOnlineHearingId() {
-        return onlineHearingId;
-    }
-
     @ApiModelProperty(example = "FINAL", required = true)
     @JsonProperty(value = "decision_award")
     public String getDecisionAward() {
