@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.submitted;
 import io.restassured.RestAssured;
 import java.time.ZonedDateTime;
 import java.util.UUID;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -112,7 +111,6 @@ public class QuestionTest extends BaseIntegrationTest {
                 .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
-    @Ignore // Ignore until we work out why this is failing. There is a functional tests that covers this.
     @Test
     public void extendQuestionRoundDeadline() {
         String hearingId = "1";
@@ -130,5 +128,18 @@ public class QuestionTest extends BaseIntegrationTest {
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("deadline_expiry_date", equalTo(deadlineExpiryDate));
+    }
+
+    @Test
+    public void extendQuestionRoundDeadlineFails() throws InterruptedException {
+        String hearingId = "1";
+        cohStub.stubCannotExtendQuestionRoundDeadline(hearingId);
+
+        RestAssured.baseURI = "http://localhost:" + applicationPort;
+        RestAssured.given()
+                .when()
+                .patch("/continuous-online-hearings/" + hearingId)
+                .then()
+                .statusCode(HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 }

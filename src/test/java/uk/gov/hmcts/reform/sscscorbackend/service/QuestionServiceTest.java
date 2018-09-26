@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.*;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
@@ -229,14 +230,25 @@ public class QuestionServiceTest {
     @Test
     public void extendsQuestionRoundDeadLine() {
         CohQuestionRounds cohQuestionRounds = someCohQuestionRoundsWithSingleRoundOfQuestions();
+        when(cohService.extendQuestionRoundDeadline(onlineHearingId)).thenReturn(true);
         when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
 
-        QuestionRound questionRound = underTest.extendQuestionRoundDeadline(onlineHearingId);
+        Optional<QuestionRound> extendedQuestionRound = underTest.extendQuestionRoundDeadline(onlineHearingId);
 
         String deadlineExpiryDate = cohQuestionRounds.getCohQuestionRound().get(0).getQuestionReferences()
                 .get(0).getDeadlineExpiryDate();
 
-        assertThat(questionRound.getDeadlineExpiryDate(), is(deadlineExpiryDate));
+        assertThat(extendedQuestionRound.isPresent(), is(true));
+        assertThat(extendedQuestionRound.get().getDeadlineExpiryDate(), is(deadlineExpiryDate));
+    }
+
+    @Test
+    public void cannotExtendQuestionRoundDeadLine() {
+        when(cohService.extendQuestionRoundDeadline(onlineHearingId)).thenReturn(false);
+
+        Optional<QuestionRound> extendedQuestionRound = underTest.extendQuestionRoundDeadline(onlineHearingId);
+
+        assertThat(extendedQuestionRound.isPresent(), is(false));
     }
 
     @Test

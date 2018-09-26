@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
+import feign.FeignException;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
@@ -51,8 +53,16 @@ public class CohService {
 
     // Empty body sets Content-Length: 0 header which we need to get through our proxy. Cannot get feigns @Headers
     // annotation to work.
-    public void extendQuestionRoundDeadline(String onlineHearingId) {
-        cohClient.extendQuestionRoundDeadline(OAUTH2_TOKEN, authTokenGenerator.generate(), onlineHearingId, "{}");
+    public boolean extendQuestionRoundDeadline(String onlineHearingId) {
+        try {
+            cohClient.extendQuestionRoundDeadline(OAUTH2_TOKEN, authTokenGenerator.generate(), onlineHearingId, "{}");
+            return true;
+        } catch (FeignException exc) {
+            if (exc.status() == HttpStatus.FAILED_DEPENDENCY.value()) {
+                return false;
+            }
+            throw exc;
+        }
     }
 
     public Optional<CohDecision> getDecision(String onlineHearingId) {
