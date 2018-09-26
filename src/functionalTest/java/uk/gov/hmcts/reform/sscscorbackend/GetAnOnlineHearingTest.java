@@ -9,10 +9,10 @@ import org.json.JSONObject;
 import org.junit.Test;
 
 public class GetAnOnlineHearingTest extends BaseFunctionTest {
-    private final String DECISION_AWARD = "FINAL";
-    private final String DECISION_HEADER = "The decision";
-    private final String DECISION_REASON = "Decision reason";
-    private final String DECISION_TEXT = "The decision text";
+    private final String decisionAward = "FINAL";
+    private final String decisionHeader = "The decision";
+    private final String decisionReason = "Decision reason";
+    private final String decisionText = "The decision text";
 
     @Test
     public void getAnOnlineHearing() throws IOException {
@@ -40,20 +40,20 @@ public class GetAnOnlineHearingTest extends BaseFunctionTest {
         String questionId = cohRequests.createQuestion(expectedOnlineHearingId);
         cohRequests.issueQuestionRound(expectedOnlineHearingId);
         String answerId = cohRequests.createAnswer(expectedOnlineHearingId, questionId, "Valid answer");
-        String decisionId = cohRequests.createDecision(expectedOnlineHearingId, DECISION_AWARD,
-                DECISION_HEADER, DECISION_REASON, DECISION_TEXT);
-        cohRequests.issueDecision(expectedOnlineHearingId, DECISION_AWARD,
-                DECISION_HEADER, DECISION_REASON, DECISION_TEXT);
+        String decisionId = cohRequests.createDecision(expectedOnlineHearingId, decisionAward,
+                decisionHeader, decisionReason, decisionText);
+        cohRequests.issueDecision(expectedOnlineHearingId, decisionAward,
+                decisionHeader, decisionReason, decisionText);
 
         JSONObject onlineHearing = sscsCorBackendRequests.getOnlineHearing(emailAddress);
         String onlineHearingId = onlineHearing.getString("online_hearing_id");
         JSONObject decision = onlineHearing.getJSONObject("decision");
 
         assertThat(onlineHearingId, is(expectedOnlineHearingId));
-        assertThat(decision.getString("decision_award"), is(DECISION_AWARD));
-        assertThat(decision.getString("decision_header"), is(DECISION_HEADER));
-        assertThat(decision.getString("decision_reason"), is(DECISION_REASON));
-        assertThat(decision.getString("decision_text"), is(DECISION_TEXT));
+        assertThat(decision.getString("decision_award"), is(decisionAward));
+        assertThat(decision.getString("decision_header"), is(decisionHeader));
+        assertThat(decision.getString("decision_reason"), is(decisionReason));
+        assertThat(decision.getString("decision_text"), is(decisionText));
         // TODO: change this to check for "decision_issued" once it's possible to issue decisions
         assertThat(decision.getString("decision_state"), is("decision_issue_pending"));
     }

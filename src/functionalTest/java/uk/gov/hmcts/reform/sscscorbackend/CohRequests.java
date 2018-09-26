@@ -103,7 +103,7 @@ public class CohRequests {
                         "}"
         );
         // TODO: re-enable this once it's possible to issue decisions
-//        waitUntil(decisionIssued(hearingId), 10L, "Decision has not been issues in 10 seconds.");
+        // waitUntil(decisionIssued(hearingId), 10L, "Decision has not been issues in 10 seconds.");
     }
 
     private Supplier<Boolean> roundIssued(String hearingId) {
