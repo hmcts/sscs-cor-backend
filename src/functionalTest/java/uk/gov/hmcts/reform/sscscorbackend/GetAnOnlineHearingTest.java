@@ -54,7 +54,6 @@ public class GetAnOnlineHearingTest extends BaseFunctionTest {
         assertThat(decision.getString("decision_header"), is(decisionHeader));
         assertThat(decision.getString("decision_reason"), is(decisionReason));
         assertThat(decision.getString("decision_text"), is(decisionText));
-        // TODO: change this to check for "decision_issued" once it's possible to issue decisions
-        assertThat(decision.getString("decision_state"), is("decision_issue_pending"));
+        assertThat(decision.getString("decision_state"), is("decision_issued"));
     }
 }
