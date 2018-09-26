@@ -64,7 +64,46 @@ public class CohRequests {
                 "{\"state_name\": \"question_issue_pending\"}"
         );
 
-        waitUntil(roundIssued(hearingId), 10L);
+        waitUntil(roundIssued(hearingId), 10L, "Question round has not been issues in 10 seconds.");
+    }
+
+    public String createAnswer(String hearingId, String questionId, String answerText) throws IOException {
+        String url = cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/questions/" + questionId + "/answers";
+        String answerId = makePostRequest(cohClient, url, "{\n" +
+                "  \"answer_state\": \"answer_submitted\",\n" +
+                "  \"answer_text\": \"" + answerText + "\"\n" +
+                "}", "answer_id");
+        System.out.println("Answer id " + answerId);
+        return answerId;
+    }
+
+    public String createDecision(String hearingId, String decisionAward, String decisionHeader,
+                                 String decisionReason, String decisionText) throws IOException {
+        String url = cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/decisions";
+        String decisionId = makePostRequest(cohClient, url, "{\n" +
+                "  \"decision_award\": \"" + decisionAward + "\",\n" +
+                "  \"decision_header\": \"" + decisionHeader + "\",\n" +
+                "  \"decision_reason\": \"" + decisionReason + "\",\n" +
+                "  \"decision_text\": \"" + decisionText + "\"\n" +
+                "}", "decision_id");
+        System.out.println("Decision id " + decisionId);
+        return decisionId;
+    }
+
+    public void issueDecision(String hearingId, String decisionAward, String decisionHeader,
+                              String decisionReason, String decisionText) throws IOException, InterruptedException {
+        String url = cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/decisions";
+        makePutRequest(cohClient, url,
+                "{\n" +
+                        "  \"decision_award\": \"" + decisionAward + "\",\n" +
+                        "  \"decision_header\": \"" + decisionHeader + "\",\n" +
+                        "  \"decision_reason\": \"" + decisionReason + "\",\n" +
+                        "  \"decision_text\": \"" + decisionText + "\",\n" +
+                        "  \"decision_state\": \"decision_issue_pending\"\n" +
+                        "}"
+        );
+
+        waitUntil(decisionIssued(hearingId), 10L, "Decision has not been issues in 10 seconds.");
     }
 
     private Supplier<Boolean> roundIssued(String hearingId) {
@@ -82,14 +121,29 @@ public class CohRequests {
         };
     }
 
-    private static void waitUntil(Supplier<Boolean> condition, long timeoutInSeconds) throws InterruptedException {
+    private Supplier<Boolean> decisionIssued(String hearingId) {
+        return () -> {
+            try {
+                String decisionState = makeGetRequest(
+                        cohClient,
+                        cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/decisions",
+                        "decision_state.state_name"
+                ).getJSONObject("decision_state").getString("state_name");
+                return decisionState.equals("decision_issued");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
+    private static void waitUntil(Supplier<Boolean> condition, long timeoutInSeconds, String timeoutMessage) throws InterruptedException {
         long timeout = timeoutInSeconds * 1000L * 1000000L;
         long startTime = System.nanoTime();
         while (true) {
             if (condition.get()) {
                 break;
             } else if (System.nanoTime() - startTime >= timeout) {
-                throw new RuntimeException("Question round has not been issues in 10 seconds.");
+                throw new RuntimeException(timeoutMessage);
             }
             Thread.sleep(100L);
         }
@@ -122,6 +176,7 @@ public class CohRequests {
         HttpResponse httpResponse = client.execute(get(uri)
                 .setHeader(HttpHeaders.AUTHORIZATION, "someValue")
                 .setHeader("ServiceAuthorization", "someValue")
+                .setHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                 .build());
 
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));

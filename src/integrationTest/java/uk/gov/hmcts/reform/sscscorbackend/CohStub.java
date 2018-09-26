@@ -6,6 +6,10 @@ import static java.util.stream.Collectors.joining;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
 
 import com.github.tomakehurst.wiremock.matching.RegexPattern;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.UUID;
@@ -126,6 +130,7 @@ public class CohStub extends BaseStub {
             "\"online_hearing_id\": \"{onlineHearingId}\"\n" +
             "}";
 
+
     public CohStub(String url) {
         super(url);
     }
@@ -221,6 +226,12 @@ public class CohStub extends BaseStub {
         return answerState.getCohAnswerState();
     }
 
+    private String getDecisionsBody(String hearingId) {
+        InputStream decisionStream = getClass().getClassLoader().getResourceAsStream("json/get_decision.json");
+        String decisionAsString = new BufferedReader(new InputStreamReader(decisionStream)).lines().collect(joining("\n"));
+        return decisionAsString.replace("{online_hearing_id}", hearingId);
+    }
+
     public void stubPostOnlineHearing(String onlineHearingId) {
         wireMock.stubFor(post(urlEqualTo("/continuous-online-hearings"))
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
@@ -245,5 +256,21 @@ public class CohStub extends BaseStub {
         wireMock.stubFor(put(urlEqualTo("/continuous-online-hearings/" + hearingId + "/questions-deadline-extension"))
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
                 .willReturn(ok("{}")));
+    }
+
+    public void stubGetDecisions(String hearingId) {
+        wireMock.stubFor(get("/continuous-online-hearings/" + hearingId + "/decisions")
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .willReturn(okJson(getDecisionsBody(hearingId))));
+    }
+
+    public void stubGetDecisionNotFound(String hearingId) {
+        wireMock.stubFor(get("/continuous-online-hearings/" + hearingId + "/decisions")
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .willReturn(notFound()
+                        .withBody("Unable to find decision")
+                        .withHeader("Content-Type", "text/plain;charset=UTF-8")
+                )
+        );
     }
 }

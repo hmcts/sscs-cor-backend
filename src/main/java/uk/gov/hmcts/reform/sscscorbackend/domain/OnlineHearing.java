@@ -1,19 +1,23 @@
 package uk.gov.hmcts.reform.sscscorbackend.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OnlineHearing {
     private String onlineHearingId;
     private String appellantName;
     private String caseReference;
+    private Decision decision;
 
-    public OnlineHearing(String onlineHearingId, String appellantName, String caseReference) {
+    public OnlineHearing(String onlineHearingId, String appellantName, String caseReference, Decision decision) {
         this.onlineHearingId = onlineHearingId;
         this.appellantName = appellantName;
         this.caseReference = caseReference;
+        this.decision = decision;
     }
 
     @ApiModelProperty(example = "ID_1", required = true)
@@ -32,5 +36,10 @@ public class OnlineHearing {
     @JsonProperty(value = "case_reference")
     public String getCaseReference() {
         return caseReference;
+    }
+
+    @JsonProperty(value = "decision")
+    public Decision getDecision() {
+        return decision;
     }
 }

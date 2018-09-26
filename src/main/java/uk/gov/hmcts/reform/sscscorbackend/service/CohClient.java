@@ -4,6 +4,8 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi.SERVICE_AUTHORIZATION;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
@@ -76,4 +78,11 @@ public interface CohClient {
                                      @PathVariable("onlineHearingId") String onlineHearingId,
                                      @RequestBody String content
     );
+
+    @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings/{onlineHearingId}/decisions",
+            consumes = "application/json")
+    Optional<CohDecision> getDecision(
+            @RequestHeader(AUTHORIZATION) String authorisation,
+            @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
+            @PathVariable("onlineHearingId") String onlineHearingId);
 }

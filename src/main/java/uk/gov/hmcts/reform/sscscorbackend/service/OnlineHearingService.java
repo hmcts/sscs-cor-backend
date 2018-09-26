@@ -11,10 +11,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohDecision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
+import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
-
 
 @Service
 public class OnlineHearingService {
@@ -37,7 +38,6 @@ public class OnlineHearingService {
 
         //assume need to create it
         return cohClient.createOnlineHearing(createOnlineHearingRequest);
-
     }
 
     public Optional<OnlineHearing> getOnlineHearing(String emailAddress) {
@@ -50,6 +50,14 @@ public class OnlineHearingService {
                 .filter(caseDetails -> caseDetails.getData().getOnlinePanel() != null)
                 .reduce(checkThereIsOnlyOneCase())
                 .flatMap(getHearingFromCoh());
+    }
+
+    private Decision getDecision(String onlineHearingId) {
+        Optional<CohDecision> decision = cohClient.getDecision(onlineHearingId);
+        return decision.map(d -> new Decision(onlineHearingId, d.getDecisionAward(),
+                    d.getDecisionHeader(), d.getDecisionReason(),
+                    d.getDecisionText(), d.getCurrentDecisionState().getStateName()))
+                .orElse(null);
     }
 
     private BinaryOperator<SscsCaseDetails> checkThereIsOnlyOneCase() {
@@ -71,7 +79,8 @@ public class OnlineHearingService {
                         return new OnlineHearing(
                                 onlineHearing.getOnlineHearingId(),
                                 nameString,
-                                firstCase.getData().getCaseReference()
+                                firstCase.getData().getCaseReference(),
+                                getDecision(onlineHearing.getOnlineHearingId())
                         );
                     });
         };

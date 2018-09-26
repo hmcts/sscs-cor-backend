@@ -53,6 +53,18 @@ public class QuestionControllerTest {
     }
 
     @Test
+    public void getsAnOnlineHearingWithDecision() {
+        String someEmailAddress = "someEmailAddress";
+        OnlineHearing expectedOnlineHearing = someOnlineHearingWithDecision();
+        when(onlineHearingService.getOnlineHearing(someEmailAddress)).thenReturn(Optional.of(expectedOnlineHearing));
+
+        ResponseEntity<OnlineHearing> onlineHearingResponse = underTest.getOnlineHearing(someEmailAddress);
+
+        assertThat(onlineHearingResponse.getStatusCode(), is(HttpStatus.OK));
+        assertThat(onlineHearingResponse.getBody(), is(expectedOnlineHearing));
+    }
+
+    @Test
     public void cannotFindOnlineHearing() {
         String someEmailAddress = "someEmailAddress";
         when(onlineHearingService.getOnlineHearing(someEmailAddress)).thenReturn(Optional.empty());

@@ -80,6 +80,7 @@ public class SscsCorBackendRequests {
 
         String responseBody = EntityUtils.toString(createCaseResponse.getEntity());
         JSONObject jsonObject = new JSONObject(responseBody);
+        System.out.println("Case id " + jsonObject.getString("id"));
         return jsonObject.getString("id");
     }
 
