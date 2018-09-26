@@ -47,12 +47,14 @@ public class GetAnOnlineHearingTest extends BaseFunctionTest {
 
         JSONObject onlineHearing = sscsCorBackendRequests.getOnlineHearing(emailAddress);
         String onlineHearingId = onlineHearing.getString("online_hearing_id");
-        String decisionAward = onlineHearing.getJSONObject("decision").getString("decision_award");
+        JSONObject decision = onlineHearing.getJSONObject("decision");
 
         assertThat(onlineHearingId, is(expectedOnlineHearingId));
-        assertThat(onlineHearing.getJSONObject("decision").getString("decision_award"), is(DECISION_AWARD));
-        assertThat(onlineHearing.getJSONObject("decision").getString("decision_header"), is(DECISION_HEADER));
-        assertThat(onlineHearing.getJSONObject("decision").getString("decision_reason"), is(DECISION_REASON));
-        assertThat(onlineHearing.getJSONObject("decision").getString("decision_text"), is(DECISION_TEXT));
+        assertThat(decision.getString("decision_award"), is(DECISION_AWARD));
+        assertThat(decision.getString("decision_header"), is(DECISION_HEADER));
+        assertThat(decision.getString("decision_reason"), is(DECISION_REASON));
+        assertThat(decision.getString("decision_text"), is(DECISION_TEXT));
+        // TODO: change this to check for "decision_issued" once it's possible to issue decisions
+        assertThat(decision.getString("decision_state"), is("decision_issue_pending"));
     }
 }

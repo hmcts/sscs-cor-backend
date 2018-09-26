@@ -57,7 +57,7 @@ public class OnlineHearingService {
         if (decision.isPresent()) {
             return new Decision(onlineHearingId, decision.get().getDecisionAward(),
                     decision.get().getDecisionHeader(), decision.get().getDecisionReason(),
-                    decision.get().getDecisionText());
+                    decision.get().getDecisionText(), decision.get().getCurrentDecisionState().getStateName());
         }
         return null;
     }
