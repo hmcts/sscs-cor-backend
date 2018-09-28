@@ -12,6 +12,7 @@ public class Question {
 
     private final String onlineHearingId;
     private final String questionId;
+    private final int questionOrdinal;
     private final String questionHeaderText;
     private final String questionBodyText;
     private final String answer;
@@ -20,10 +21,12 @@ public class Question {
 
     public Question(String onlineHearingId,
                     String questionId,
+                    int questionOrdinal,
                     String questionHeaderText,
                     String questionBodyText) {
         this.onlineHearingId = onlineHearingId;
         this.questionId = questionId;
+        this.questionOrdinal = questionOrdinal;
         this.questionHeaderText = questionHeaderText;
         this.questionBodyText = questionBodyText;
         this.answer = null;
@@ -33,6 +36,7 @@ public class Question {
 
     public Question(String onlineHearingId,
                     String questionId,
+                    int questionOrdinal,
                     String questionHeaderText,
                     String questionBodyText,
                     String answer,
@@ -40,6 +44,7 @@ public class Question {
                     String answerDate) {
         this.onlineHearingId = onlineHearingId;
         this.questionId = questionId;
+        this.questionOrdinal = questionOrdinal;
         this.questionHeaderText = questionHeaderText;
         this.questionBodyText = questionBodyText;
         this.answer = answer;
@@ -57,6 +62,12 @@ public class Question {
     @JsonProperty(value = "question_id")
     public String getQuestionId() {
         return questionId;
+    }
+
+    @ApiModelProperty(example = "1", required = true)
+    @JsonProperty(value = "question_ordinal")
+    public int getQuestionOrdinal() {
+        return questionOrdinal;
     }
 
     @ApiModelProperty(example = "A question header", required = true)
@@ -100,6 +111,7 @@ public class Question {
         Question question = (Question) o;
         return Objects.equals(onlineHearingId, question.onlineHearingId) &&
                 Objects.equals(questionId, question.questionId) &&
+                Objects.equals(questionOrdinal, question.questionOrdinal) &&
                 Objects.equals(questionHeaderText, question.questionHeaderText) &&
                 Objects.equals(questionBodyText, question.questionBodyText) &&
                 Objects.equals(answer, question.answer) &&
@@ -109,7 +121,8 @@ public class Question {
 
     @Override
     public int hashCode() {
-        return Objects.hash(onlineHearingId, questionId, questionHeaderText, questionBodyText, answer, answerState, answerDate);
+        return Objects.hash(onlineHearingId, questionId, questionOrdinal,
+                questionHeaderText, questionBodyText, answer, answerState, answerDate);
     }
 
     @Override
@@ -117,6 +130,7 @@ public class Question {
         return "Question{" +
                 "onlineHearingId='" + onlineHearingId + '\'' +
                 ", questionId='" + questionId + '\'' +
+                ", questionOrdinal='" + questionOrdinal + '\'' +
                 ", questionHeaderText='" + questionHeaderText + '\'' +
                 ", questionBodyText='" + questionBodyText + '\'' +
                 ", answer='" + answer + '\'' +

@@ -23,15 +23,15 @@ public class DataFixtures {
     }
 
     public static List<QuestionSummary> someQuestionSummaries() {
-        return singletonList(new QuestionSummary("someQuestionId", "someQuestionHeader", draft));
+        return singletonList(new QuestionSummary("someQuestionId", 1, "someQuestionHeader", draft));
     }
 
     public static Question someQuestion() {
-        return new Question("someHearingId", "someQuestionId", "someQuestionHeader", "someBody", "someAnswer", draft, "2018-08-08T09:12:12Z");
+        return new Question("someHearingId", "someQuestionId", 1, "someQuestionHeader", "someBody", "someAnswer", draft, "2018-08-08T09:12:12Z");
     }
 
     public static CohQuestion someCohQuestion() {
-        return new CohQuestion("someHearingId", "someQuestionId", "someHeader", "someBody");
+        return new CohQuestion("someHearingId", "someQuestionId", 1, "someHeader", "someBody");
     }
 
     public static CohAnswer someCohAnswer() {
