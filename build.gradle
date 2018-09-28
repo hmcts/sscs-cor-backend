@@ -181,7 +181,7 @@ dependencies {
   functionalTestCompile group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
   functionalTestCompile group: 'junit', name: 'junit', version: versions.junit
   functionalTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
-  functionalTestCompile group: 'org.json', name: 'json', version: '20180130'
+  functionalTestCompile group: 'org.json', name: 'json', version: '20180813'
 
   smokeTestCompile sourceSets.main.runtimeClasspath
   smokeTestCompile group: 'junit', name: 'junit', version: versions.junit
