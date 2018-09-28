@@ -173,7 +173,7 @@ dependencies {
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath
 
-  integrationTestCompile "com.github.tomakehurst:wiremock:2.18.0"
+  integrationTestCompile "com.github.tomakehurst:wiremock:2.19.0"
   integrationTestCompile group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
   integrationTestCompile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '4.1.1'
 
