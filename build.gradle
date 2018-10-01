@@ -143,6 +143,8 @@ def versions = [
 ]
 
 dependencies {
+  implementation 'commons-collections:commons-collections:3.2.1'
+
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: versions.springBoot
@@ -163,12 +165,6 @@ dependencies {
   compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.3.0'
 
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '0.0.34'
-
-  constraints {
-    implementation('commons-collections:commons-collections:3.2.2') {
-      because 'version 3.2.1 has a vulnerability'
-    }
-  }
 
   // Removed for now as we have an issue with some of its dependencies
   // compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix-dashboard', version: versions.springHystrix
