@@ -45,6 +45,7 @@ sourceSets {
   }
 }
 
+
 tasks.withType(JavaCompile) {
   options.compilerArgs << "-Xlint:unchecked" << "-Werror"
 }
@@ -143,8 +144,6 @@ def versions = [
 ]
 
 dependencies {
-  implementation 'commons-collections:commons-collections:3.2.1'
-
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: versions.springBoot
