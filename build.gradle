@@ -164,7 +164,7 @@ dependencies {
 
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '0.0.34'
 
-  compile group: 'org.apache.commons', name: 'commons-collections4', version: '3.2.2'
+  compile group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
 
   // Removed for now as we have an issue with some of its dependencies
   // compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix-dashboard', version: versions.springHystrix
