@@ -45,6 +45,18 @@ sourceSets {
   }
 }
 
+configurations {
+  compileClasspath {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+      if (details.requested.group == 'commons-collections') {
+        details.useVersion '3.2.2'
+        details.because '3.2.1 has vulnerability'
+      }
+
+    }
+  }
+}
+
 
 tasks.withType(JavaCompile) {
   options.compilerArgs << "-Xlint:unchecked" << "-Werror"
