@@ -25,6 +25,7 @@ public class QuestionService {
             if (answers != null && !answers.isEmpty()) {
                 return new Question(question.getOnlineHearingId(),
                         question.getQuestionId(),
+                        question.getQuestionOrdinal(),
                         question.getQuestionHeaderText(),
                         question.getQuestionBodyText(),
                         answers.get(0).getAnswerText(),
@@ -33,6 +34,7 @@ public class QuestionService {
             } else {
                 return new Question(question.getOnlineHearingId(),
                         question.getQuestionId(),
+                        question.getQuestionOrdinal(),
                         question.getQuestionHeaderText(),
                         question.getQuestionBodyText());
             }
@@ -103,6 +105,7 @@ public class QuestionService {
 
         return new QuestionSummary(
                 cohQuestionReference.getQuestionId(),
+                cohQuestionReference.getQuestionOrdinal(),
                 cohQuestionReference.getQuestionHeaderText(),
                 answerState
         );

@@ -29,7 +29,7 @@ public class CohStub extends BaseStub {
             "  \"question_body_text\": \"{question_body}\",\n" +
             "  \"question_header_text\": \"{question_header}\",\n" +
             "  \"question_id\": \"string\",\n" +
-            "  \"question_ordinal\": \"string\",\n" +
+            "  \"question_ordinal\": \"1\",\n" +
             "  \"question_round\": \"string\"\n" +
             "}";
 
