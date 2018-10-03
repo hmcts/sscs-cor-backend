@@ -106,6 +106,13 @@ public class CohRequests {
         waitUntil(decisionIssued(hearingId), 10L, "Decision has not been issues in 10 seconds.");
     }
 
+    public int getDeadlineExtensionCount(String hearingId) throws IOException {
+        String url = cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/questionrounds";
+        int deadlineExtensionCount = makeGetRequest(cohClient, url, null).getJSONArray("question_rounds")
+                .getJSONObject(0).getInt("deadline_extension_count");
+        return deadlineExtensionCount;
+    }
+
     private Supplier<Boolean> roundIssued(String hearingId) {
         return () -> {
             try {
@@ -183,4 +190,6 @@ public class CohRequests {
         String responseBody = EntityUtils.toString(httpResponse.getEntity());
         return new JSONObject(responseBody);
     }
+
+
 }

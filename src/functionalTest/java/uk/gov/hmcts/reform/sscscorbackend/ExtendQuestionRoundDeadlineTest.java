@@ -22,5 +22,9 @@ public class ExtendQuestionRoundDeadlineTest extends BaseFunctionTest {
         String deadlineExpiryDate = questionRound.getString("deadline_expiry_date");
 
         assertThat(deadlineExpiryDate, is(notNullValue()));
+
+        int deadlineExtensionCount = cohRequests.getDeadlineExtensionCount(hearingId);
+
+        assertThat(deadlineExtensionCount, is(1));
     }
 }
