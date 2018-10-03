@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionRounds;
 
 @RunWith(SpringRunner.class)
 public class ExtendQuestionRoundDeadlineTest extends BaseFunctionTest {

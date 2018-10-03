@@ -14,7 +14,6 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionRounds;
 
 public class CohRequests {
     private String cohBaseUrl;
@@ -107,10 +106,10 @@ public class CohRequests {
         waitUntil(decisionIssued(hearingId), 10L, "Decision has not been issues in 10 seconds.");
     }
 
-    public int getDeadlineExtensionCount(String hearingId) throws IOException{
+    public int getDeadlineExtensionCount(String hearingId) throws IOException {
         String url = cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/questionrounds";
-        int deadlineExtensionCount = makeGetRequest(cohClient, url, null).getJSONArray("question_rounds").
-                getJSONObject(0).getInt("deadline_extension_count");
+        int deadlineExtensionCount = makeGetRequest(cohClient, url, null).getJSONArray("question_rounds")
+                .getJSONObject(0).getInt("deadline_extension_count");
         return deadlineExtensionCount;
     }
 
