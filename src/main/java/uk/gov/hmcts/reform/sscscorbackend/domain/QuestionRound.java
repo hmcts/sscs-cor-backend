@@ -30,5 +30,7 @@ public class QuestionRound {
     }
 
     @JsonProperty(value = "deadline_extension_count")
-    public int getDeadlineExtensionCount() { return deadlineExtensionCount; }
+    public int getDeadlineExtensionCount() {
+        return deadlineExtensionCount;
+    }
 }

@@ -17,5 +17,7 @@ public class CohQuestionRound {
         return questionReferences;
     }
 
-    public int getDeadlineExtensionCount() { return deadlineExtensionCount; }
+    public int getDeadlineExtensionCount() {
+        return deadlineExtensionCount;
+    }
 }
