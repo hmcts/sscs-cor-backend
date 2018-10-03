@@ -75,7 +75,7 @@ public class QuestionServiceTest {
         CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(
                 new CohQuestionRound(singletonList(
                         new CohQuestionReference("someQuestionId", 1, "first question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), null)
-                ))
+                ), 0)
         ));
         CohQuestionReference cohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
                 .getQuestionReferences().get(0);
@@ -112,7 +112,7 @@ public class QuestionServiceTest {
     public void getsAListOfQuestionsInTheCorrectOrderWhenTheyAreReturnedInTheIncorrectOrder() {
         CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(new CohQuestionRound(
                 asList(new CohQuestionReference("questionId2", 2, "second question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted")),
-                        new CohQuestionReference("questionId1", 1, "first question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))))
+                        new CohQuestionReference("questionId1", 1, "first question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))), 0)
         ));
         CohQuestionReference firstCohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
                 .getQuestionReferences().get(1);
@@ -237,5 +237,12 @@ public class QuestionServiceTest {
                 .get(0).getDeadlineExpiryDate();
 
         assertThat(questionRound.getDeadlineExpiryDate(), is(deadlineExpiryDate));
+    }
+
+    @Test
+    public void checkRoundHasDefaultExtensionCount() {
+        CohQuestionRounds cohQuestionRounds = someCohQuestionRoundsWithSingleRoundOfQuestions();
+
+        assertThat(cohQuestionRounds.getCohQuestionRound().get(0).getDeadlineExtensionCount(), is(0));
     }
 }

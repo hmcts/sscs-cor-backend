@@ -73,12 +73,13 @@ public class QuestionService {
         int currentQuestionRoundNumber = questionRounds.getCurrentQuestionRound();
         CohQuestionRound currentQuestionRound = questionRounds.getCohQuestionRound().get(currentQuestionRoundNumber - 1);
         String deadlineExpiryDate = getQuestionRoundDeadlineExpiryDate(currentQuestionRound);
+        int deadlineExtensionCount = currentQuestionRound.getDeadlineExtensionCount();
         List<QuestionSummary> questions = currentQuestionRound.getQuestionReferences().stream()
                 .sorted(Comparator.comparing(CohQuestionReference::getQuestionOrdinal))
                 .map(this::createQuestionSummary)
                 .collect(toList());
 
-        return new QuestionRound(questions, deadlineExpiryDate);
+        return new QuestionRound(questions, deadlineExpiryDate, deadlineExtensionCount);
     }
 
     public QuestionRound extendQuestionRoundDeadline(String onlineHearingId) {

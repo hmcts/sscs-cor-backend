@@ -10,10 +10,13 @@ import java.util.List;
 public class QuestionRound {
     private List<QuestionSummary> questions;
     private final String deadlineExpiryDate;
+    private int deadlineExtensionCount = 0;
 
-    public QuestionRound(List<QuestionSummary> questions, String deadlineExpiryDate) {
+    public QuestionRound(List<QuestionSummary> questions, String deadlineExpiryDate,
+                         int deadlineExtensionCount) {
         this.questions = questions;
         this.deadlineExpiryDate = deadlineExpiryDate;
+        this.deadlineExtensionCount = deadlineExtensionCount;
     }
 
     @JsonProperty(value = "questions")
@@ -25,4 +28,7 @@ public class QuestionRound {
     public String getDeadlineExpiryDate() {
         return deadlineExpiryDate;
     }
+
+    @JsonProperty(value = "deadline_extension_count")
+    public int getDeadlineExtensionCount() { return deadlineExtensionCount; }
 }

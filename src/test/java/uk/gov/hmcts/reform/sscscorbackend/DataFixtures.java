@@ -19,7 +19,7 @@ public class DataFixtures {
     private DataFixtures() {}
 
     public static QuestionRound someQuestionRound() {
-        return new QuestionRound(someQuestionSummaries(), now().plusDays(7).format(ISO_LOCAL_DATE_TIME));
+        return new QuestionRound(someQuestionSummaries(), now().plusDays(7).format(ISO_LOCAL_DATE_TIME), 0);
     }
 
     public static List<QuestionSummary> someQuestionSummaries() {
@@ -51,15 +51,15 @@ public class DataFixtures {
                 new CohQuestionReference("someQuestionId1", 1, "first question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted")),
                 new CohQuestionReference("someQuestionId2", 2, "second question", now().plusDays(10).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))
         );
-        return new CohQuestionRounds(1, singletonList(new CohQuestionRound(cohQuestionReferenceList)));
+        return new CohQuestionRounds(1, singletonList(new CohQuestionRound(cohQuestionReferenceList, 0)));
     }
 
     public static CohQuestionRounds someCohQuestionRoundsMultipleRoundsOfQuestions() {
         return new CohQuestionRounds(2, Arrays.asList(
                 new CohQuestionRound(singletonList(
-                        new CohQuestionReference("someQuestionId", 1, "first round question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted")))),
+                        new CohQuestionReference("someQuestionId", 1, "first round question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))), 0),
                 new CohQuestionRound(singletonList(
-                        new CohQuestionReference("someOtherQuestionId", 1, "second round question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))))
+                        new CohQuestionReference("someOtherQuestionId", 1, "second round question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))), 0)
         ));
     }
 

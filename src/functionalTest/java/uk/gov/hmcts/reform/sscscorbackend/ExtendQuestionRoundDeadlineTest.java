@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionRounds;
 
 @RunWith(SpringRunner.class)
 public class ExtendQuestionRoundDeadlineTest extends BaseFunctionTest {
@@ -22,5 +23,9 @@ public class ExtendQuestionRoundDeadlineTest extends BaseFunctionTest {
         String deadlineExpiryDate = questionRound.getString("deadline_expiry_date");
 
         assertThat(deadlineExpiryDate, is(notNullValue()));
+
+        int deadlineExtensionCount = cohRequests.getDeadlineExtensionCount(hearingId);
+
+        assertThat(deadlineExtensionCount, is(1));
     }
 }
