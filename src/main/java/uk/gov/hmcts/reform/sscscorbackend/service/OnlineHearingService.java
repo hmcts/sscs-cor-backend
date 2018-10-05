@@ -68,7 +68,8 @@ public class OnlineHearingService {
         Optional<CohDecision> decision = cohClient.getDecision(onlineHearingId);
         return decision.map(d -> new Decision(onlineHearingId, d.getDecisionAward(),
                     d.getDecisionHeader(), d.getDecisionReason(),
-                    d.getDecisionText(), d.getCurrentDecisionState().getStateName()))
+                    d.getDecisionText(), d.getCurrentDecisionState().getStateName(),
+                    d.getCurrentDecisionState().getStateDateTime()))
                 .orElse(null);
     }
 

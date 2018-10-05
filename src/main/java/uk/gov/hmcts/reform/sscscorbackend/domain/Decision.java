@@ -17,28 +17,31 @@ public class Decision {
     private final String decisionReason;
     private final String decisionText;
     private final String decisionState;
+    private final String decisionStateDateTime;
 
     public Decision(String onlineHearingId,
                     String decisionAward,
                     String decisionHeader,
                     String decisionReason,
                     String decisionText,
-                    String decisionState) {
+                    String decisionState,
+                    String decisionStateDateTime) {
         this.onlineHearingId = onlineHearingId;
         this.decisionAward = decisionAward;
         this.decisionHeader = decisionHeader;
         this.decisionReason = decisionReason;
         this.decisionText = decisionText;
         this.decisionState = decisionState;
+        this.decisionStateDateTime = decisionStateDateTime;
     }
 
-    @ApiModelProperty(example = "FINAL", required = true)
+    @ApiModelProperty(example = "appeal-upheld", required = true)
     @JsonProperty(value = "decision_award")
     public String getDecisionAward() {
         return decisionAward;
     }
 
-    @ApiModelProperty(example = "Decision header", required = true)
+    @ApiModelProperty(example = "appeal-upheld", required = true)
     @JsonProperty(value = "decision_header")
     public String getDecisionHeader() {
         return decisionHeader;
@@ -62,6 +65,12 @@ public class Decision {
         return decisionState;
     }
 
+    @ApiModelProperty(example = "2018-10-05T09:36:33Z", required = true)
+    @JsonProperty(value = "decision_state_datetime")
+    public String getDecisionStateDateTime() {
+        return decisionStateDateTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -76,7 +85,8 @@ public class Decision {
                 Objects.equals(decisionHeader, decision.decisionHeader) &&
                 Objects.equals(decisionReason, decision.decisionReason) &&
                 Objects.equals(decisionText, decision.decisionText) &&
-                Objects.equals(decisionState, decision.decisionState);
+                Objects.equals(decisionState, decision.decisionState) &&
+                Objects.equals(decisionStateDateTime, decision.decisionStateDateTime);
     }
 
     @Override
@@ -93,6 +103,7 @@ public class Decision {
                 ", decisionReason='" + decisionReason + '\'' +
                 ", decisionText='" + decisionText + '\'' +
                 ", decisionState='" + decisionState + '\'' +
+                ", decisionStateDateTime='" + decisionStateDateTime + '\'' +
                 '}';
     }
 }

@@ -16,8 +16,8 @@
     }
   ],
   "decision_state": {
-    "state_datetime": "string",
-    "state_desc": "string",
+    "state_datetime": "2018-10-05T09:36:33Z",
+    "state_desc": "Decision Issued",
     "state_name": "decision_issued"
   },
   "decision_text": "Some text about the decision",

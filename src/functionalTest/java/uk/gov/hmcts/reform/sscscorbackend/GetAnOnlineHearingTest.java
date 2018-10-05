@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+
 import org.json.JSONObject;
 import org.junit.Test;
 
@@ -13,12 +15,17 @@ public class GetAnOnlineHearingTest extends BaseFunctionTest {
     private final String decisionHeader = "The decision";
     private final String decisionReason = "Decision reason";
     private final String decisionText = "The decision text";
-
-    @Test
-    public void getAnOnlineHearing() throws IOException {
+    
+    private String createRandomEmail() {
         int randomNumber = (int) (Math.random() * 10000000);
         String emailAddress = "test" + randomNumber + "@hmcts.net";
         System.out.println("emailAddress " + emailAddress);
+        return emailAddress;
+    }
+
+    @Test
+    public void getAnOnlineHearing() throws IOException {
+        String emailAddress = createRandomEmail();
         String caseId = sscsCorBackendRequests.createCase(emailAddress);
         String expectedOnlineHearingId = cohRequests.createHearing(caseId);
 
@@ -32,15 +39,13 @@ public class GetAnOnlineHearingTest extends BaseFunctionTest {
 
     @Test
     public void getAnOnlineHearingWithDecision() throws IOException, InterruptedException {
-        int randomNumber = (int) (Math.random() * 10000000);
-        String emailAddress = "test" + randomNumber + "@hmcts.net";
-        System.out.println("emailAddress " + emailAddress);
+        String emailAddress = createRandomEmail();
         String caseId = sscsCorBackendRequests.createCase(emailAddress);
         String expectedOnlineHearingId = cohRequests.createHearing(caseId);
         String questionId = cohRequests.createQuestion(expectedOnlineHearingId);
         cohRequests.issueQuestionRound(expectedOnlineHearingId);
-        String answerId = cohRequests.createAnswer(expectedOnlineHearingId, questionId, "Valid answer");
-        String decisionId = cohRequests.createDecision(expectedOnlineHearingId, decisionAward,
+        cohRequests.createAnswer(expectedOnlineHearingId, questionId, "Valid answer");
+        cohRequests.createDecision(expectedOnlineHearingId, decisionAward,
                 decisionHeader, decisionReason, decisionText);
         cohRequests.issueDecision(expectedOnlineHearingId, decisionAward,
                 decisionHeader, decisionReason, decisionText);
@@ -55,5 +60,6 @@ public class GetAnOnlineHearingTest extends BaseFunctionTest {
         assertThat(decision.getString("decision_reason"), is(decisionReason));
         assertThat(decision.getString("decision_text"), is(decisionText));
         assertThat(decision.getString("decision_state"), is("decision_issued"));
+        assertThat(decision.getString("decision_state_datetime"), is(notNullValue()));
     }
 }
