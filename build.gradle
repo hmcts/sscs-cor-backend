@@ -155,14 +155,14 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: versions.reformLogging
   compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: versions.springHystrix
   compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.0.1.RELEASE'
-  compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '1.0.0'
+  compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '1.0.4'
 
   compile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '4.1.1'
-  compileOnly 'org.projectlombok:lombok:1.16.20'
+  compileOnly 'org.projectlombok:lombok:1.18.2'
   compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
-  compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.3.0'
+  compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.4.0'
 
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '0.0.34'
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '0.0.44'
 
   // Removed for now as we have an issue with some of its dependencies
   // compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix-dashboard', version: versions.springHystrix
@@ -173,15 +173,15 @@ dependencies {
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath
 
-  integrationTestCompile "com.github.tomakehurst:wiremock:2.18.0"
+  integrationTestCompile "com.github.tomakehurst:wiremock:2.19.0"
   integrationTestCompile group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
-  integrationTestCompile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '4.1.1'
+  integrationTestCompile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '4.2.0'
 
   functionalTestCompile sourceSets.main.runtimeClasspath
   functionalTestCompile group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
   functionalTestCompile group: 'junit', name: 'junit', version: versions.junit
   functionalTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
-  functionalTestCompile group: 'org.json', name: 'json', version: '20180130'
+  functionalTestCompile group: 'org.json', name: 'json', version: '20180813'
 
   smokeTestCompile sourceSets.main.runtimeClasspath
   smokeTestCompile group: 'junit', name: 'junit', version: versions.junit
