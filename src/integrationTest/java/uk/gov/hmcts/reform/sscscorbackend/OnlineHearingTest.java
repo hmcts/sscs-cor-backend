@@ -55,6 +55,7 @@ public class OnlineHearingTest extends BaseIntegrationTest {
                 .body("decision.decision_header", equalTo("Tribunal's final decision"))
                 .body("decision.decision_reason", equalTo("The decision reason"))
                 .body("decision.decision_text", equalTo("Some text about the decision"))
-                .body("decision.decision_state", equalTo("decision_issued"));
+                .body("decision.decision_state", equalTo("decision_issued"))
+                .body("decision.decision_state_datetime", equalTo("2018-10-05T09:36:33Z"));
     }
 }

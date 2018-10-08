@@ -86,7 +86,7 @@ public class DataFixtures {
     }
 
     public static OnlineHearing someOnlineHearingWithDecision() {
-        Decision decision = new Decision("someOnlineHearingId", "decisionAward", "decisionHeader", "decisionReason", "decisionText", "decision_issued");
+        Decision decision = new Decision("someOnlineHearingId", "decisionAward", "decisionHeader", "decisionReason", "decisionText", "decision_issued", now().format(ISO_LOCAL_DATE_TIME));
         return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", decision);
     }
 }

@@ -64,7 +64,7 @@ public class CohRequests {
                 "{\"state_name\": \"question_issue_pending\"}"
         );
 
-        waitUntil(roundIssued(hearingId), 10L, "Question round has not been issues in 10 seconds.");
+        waitUntil(roundIssued(hearingId), 30L, "Question round has not been issued in 30 seconds.");
     }
 
     public String createAnswer(String hearingId, String questionId, String answerText) throws IOException {
@@ -103,7 +103,7 @@ public class CohRequests {
                         "}"
         );
 
-        waitUntil(decisionIssued(hearingId), 10L, "Decision has not been issues in 10 seconds.");
+        waitUntil(decisionIssued(hearingId), 30L, "Decision has not been issued in 30 seconds.");
     }
 
     public int getDeadlineExtensionCount(String hearingId) throws IOException {
