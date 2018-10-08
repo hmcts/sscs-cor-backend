@@ -1,10 +1,14 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -15,10 +19,14 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.CohDecision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
+import uk.gov.hmcts.reform.sscscorbackend.exception.RestResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 
 @Service
 public class OnlineHearingService {
+
+    private static final Logger LOG = getLogger(RestResponseEntityExceptionHandler.class);
+
     private final CohService cohClient;
     private final CcdService ccdService;
     private final IdamService idamService;
@@ -46,8 +54,12 @@ public class OnlineHearingService {
                 idamService.getIdamTokens()
         );
 
+        final AtomicInteger counter = new AtomicInteger(1);
         return cases.stream()
                 .filter(caseDetails -> caseDetails.getData().getOnlinePanel() != null)
+                .peek(caseDetails -> {
+                    LOG.info(counter.getAndIncrement() + ") case id: " + caseDetails.getId());
+                })
                 .reduce(checkThereIsOnlyOneCase())
                 .flatMap(getHearingFromCoh());
     }
