@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
@@ -82,10 +83,13 @@ public class QuestionService {
         return new QuestionRound(questions, deadlineExpiryDate, deadlineExtensionCount);
     }
 
-    public QuestionRound extendQuestionRoundDeadline(String onlineHearingId) {
-        cohService.extendQuestionRoundDeadline(onlineHearingId);
-
-        return getQuestions(onlineHearingId);
+    public Optional<QuestionRound> extendQuestionRoundDeadline(String onlineHearingId) {
+        boolean haveExtendedRound = cohService.extendQuestionRoundDeadline(onlineHearingId);
+        if (haveExtendedRound) {
+            return Optional.of(getQuestions(onlineHearingId));
+        } else {
+            return Optional.empty();
+        }
     }
 
     private String getQuestionRoundDeadlineExpiryDate(CohQuestionRound questionRound) {

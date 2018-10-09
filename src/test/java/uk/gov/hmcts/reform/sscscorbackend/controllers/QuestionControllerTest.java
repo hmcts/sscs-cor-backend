@@ -144,11 +144,20 @@ public class QuestionControllerTest {
 
     @Test
     public void canExtendDeadline() {
-        when(questionService.extendQuestionRoundDeadline(onlineHearingId)).thenReturn(questionRound);
+        when(questionService.extendQuestionRoundDeadline(onlineHearingId)).thenReturn(Optional.of(questionRound));
 
         ResponseEntity<QuestionRound> response = underTest.extendQuestionRoundDeadline(onlineHearingId);
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
         assertThat(response.getBody(), is(questionRound));
+    }
+
+    @Test
+    public void cannotExtendDeadline() {
+        when(questionService.extendQuestionRoundDeadline(onlineHearingId)).thenReturn(Optional.empty());
+
+        ResponseEntity<QuestionRound> response = underTest.extendQuestionRoundDeadline(onlineHearingId);
+
+        assertThat(response.getStatusCode(), is(HttpStatus.UNPROCESSABLE_ENTITY));
     }
 }

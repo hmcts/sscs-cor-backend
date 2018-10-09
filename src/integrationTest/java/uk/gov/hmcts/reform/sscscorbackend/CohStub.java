@@ -256,6 +256,24 @@ public class CohStub extends BaseStub {
         wireMock.stubFor(put(urlEqualTo("/continuous-online-hearings/" + hearingId + "/questions-deadline-extension"))
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
                 .willReturn(ok("{}")));
+        delayForWiremockToWork();
+    }
+
+    public void stubCannotExtendQuestionRoundDeadline(String hearingId) {
+        wireMock.stubFor(put(urlEqualTo("/continuous-online-hearings/" + hearingId + "/questions-deadline-extension"))
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .willReturn(status(424)));
+        delayForWiremockToWork();
+    }
+
+    // This is a hack due to this issue https://github.com/tomakehurst/wiremock/issues/97. Tests were failing due to
+    // a ConnectionResetException. Maybe we can rework how we start the stubs to fx this.
+    private void delayForWiremockToWork() {
+        try {
+            Thread.sleep(5000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void stubGetDecisions(String hearingId) {

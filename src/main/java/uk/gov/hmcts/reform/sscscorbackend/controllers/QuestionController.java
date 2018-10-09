@@ -116,13 +116,14 @@ public class QuestionController {
             notes = "Extend by 7 days the date the questions in the current round have to be answered by."
     )
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Round extended")
+            @ApiResponse(code = 200, message = "Round extended"),
+            @ApiResponse(code = 422, message = "Round cannot be extended extended")
     })
     @RequestMapping(method = RequestMethod.PATCH, value = "{onlineHearingId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public ResponseEntity<QuestionRound> extendQuestionRoundDeadline(@PathVariable String onlineHearingId) {
-        QuestionRound questionRound = questionService.extendQuestionRoundDeadline(onlineHearingId);
-
-        return ResponseEntity.ok(questionRound);
+        return questionService.extendQuestionRoundDeadline(onlineHearingId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.unprocessableEntity().build());
     }
 }
