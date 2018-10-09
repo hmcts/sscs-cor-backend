@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHear
 public class OnlineHearingService {
 
     private static final Logger LOG = getLogger(RestResponseEntityExceptionHandler.class);
+    private static final String HEARING_TYPE_ONLINE_RESOLUTION = "cor";
 
     private final CohService cohClient;
     private final CcdService ccdService;
@@ -58,7 +59,10 @@ public class OnlineHearingService {
 
         final AtomicInteger counter = new AtomicInteger(1);
         return cases.stream()
-                .filter(caseDetails -> caseDetails.getData().getOnlinePanel() != null)
+                .filter(caseDetails -> caseDetails.getData() != null &&
+                        caseDetails.getData().getAppeal() != null &&
+                        HEARING_TYPE_ONLINE_RESOLUTION.equalsIgnoreCase(caseDetails.getData().getAppeal().getHearingType())
+                )
                 .peek(caseDetails -> {
                     LOG.info(counter.getAndIncrement() + ") case id: " + caseDetails.getId());
                 })

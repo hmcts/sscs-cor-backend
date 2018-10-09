@@ -31,6 +31,7 @@
     "benefitType": {
       "code": "PIP"
     },
+    "hearingType": "cor",
     "hearingOptions": {
       "wantsToAttend": "Yes",
       "wantsSupport": "Yes",

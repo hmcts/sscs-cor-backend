@@ -44,13 +44,14 @@ public class OnlineHearingControllerTest extends BaseIntegrationTest {
             "  \"case_details\": {\n" +
             "    \"id\": \"string\",\n" +
             "    \"case_data\": {\n" +
-                "    \"onlineHearingId\": \"string\",\n" +
-                "    \"onlinePanel\": {\n" +
-                    "    \"assignedTo\": \"string\",\n" +
-                    "    \"medicalMember\": \"string\",\n" +
-                    "    \"disabilityQualifiedMember\": \"string\"\n" +
-                    "  }\n" +
-                "  }\n" +
+            "        \"onlineHearingId\": \"string\",\n" +
+            "        \"hearingType\": \"cor\",\n" +
+            "        \"onlinePanel\": {\n" +
+            "            \"assignedTo\": \"string\",\n" +
+            "            \"medicalMember\": \"string\",\n" +
+            "            \"disabilityQualifiedMember\": \"string\"\n" +
+            "        }\n" +
+            "      }\n" +
             "  }\n" +
             "}";
     private static final String postOnlineHearingNoPanelJson = "{\n" +
