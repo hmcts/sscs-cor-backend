@@ -14,11 +14,9 @@ public class GetAQuestionTest extends BaseFunctionTest {
 
     @Test
     public void getsAndAnswersAQuestion() throws IOException, InterruptedException {
-        String hearingId = cohRequests.createHearing();
-        String questionId = cohRequests.createQuestion(hearingId);
-        cohRequests.issueQuestionRound(hearingId);
+        OnlineHearing onlineHearing = createHearingWithQuestion(false);
 
-        JSONObject jsonObject = sscsCorBackendRequests.getQuestion(hearingId, questionId);
+        JSONObject jsonObject = sscsCorBackendRequests.getQuestion(onlineHearing.getHearingId(), onlineHearing.getQuestionId());
         String questionBodyText = jsonObject.getString("question_body_text");
         String answer = jsonObject.optString("answer", null);
 
@@ -26,16 +24,16 @@ public class GetAQuestionTest extends BaseFunctionTest {
         assertThat(answer, is(nullValue()));
 
         String expectedAnswer = "an answer";
-        sscsCorBackendRequests.answerQuestion(hearingId, questionId, expectedAnswer);
+        sscsCorBackendRequests.answerQuestion(onlineHearing.getHearingId(), onlineHearing.getQuestionId(), expectedAnswer);
 
-        jsonObject = sscsCorBackendRequests.getQuestion(hearingId, questionId);
+        jsonObject = sscsCorBackendRequests.getQuestion(onlineHearing.getHearingId(), onlineHearing.getQuestionId());
         answer = jsonObject.optString("answer", expectedAnswer);
 
         assertThat(answer, is(expectedAnswer));
 
-        sscsCorBackendRequests.submitAnswer(hearingId, questionId);
+        sscsCorBackendRequests.submitAnswer(onlineHearing.getHearingId(), onlineHearing.getQuestionId());
 
-        JSONObject questionRound = sscsCorBackendRequests.getQuestions(hearingId);
+        JSONObject questionRound = sscsCorBackendRequests.getQuestions(onlineHearing.getHearingId());
         JSONArray questions = questionRound.getJSONArray("questions");
         assertThat(questions.getJSONObject(0).getString("answer_state"), is(submitted.name()));
     }

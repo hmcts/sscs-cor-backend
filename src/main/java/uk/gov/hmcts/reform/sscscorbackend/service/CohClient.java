@@ -85,4 +85,13 @@ public interface CohClient {
             @RequestHeader(AUTHORIZATION) String authorisation,
             @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
             @PathVariable("onlineHearingId") String onlineHearingId);
+
+    @RequestMapping(
+            method = RequestMethod.POST,
+            value = "/continuous-online-hearings/{onlineHearingId}/decisionreplies"
+    )
+    void addDecisionReply(@RequestHeader(AUTHORIZATION) String authorisation,
+                      @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
+                      @PathVariable("onlineHearingId") String onlineHearingId,
+                      @RequestBody CohDecisionReply decisionReply);
 }

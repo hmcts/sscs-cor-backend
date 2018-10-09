@@ -291,4 +291,20 @@ public class CohStub extends BaseStub {
                 )
         );
     }
+
+    public void stubPostDecisionReply(String hearingId, String reply, String reason) {
+        // COH won't accept an empty reason, therefore it is set to the reply if it's empty
+        if (reason.isEmpty()) {
+            reason = reply;
+        }
+        wireMock.stubFor(post("/continuous-online-hearings/" + hearingId + "/decisionreplies")
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .withRequestBody(equalToJson("{\"decision_reply\":\"" + reply + "\", \"decision_reply_reason\":\"" + reason + "\"}"))
+                .willReturn(status(201)
+                    .withBody("{\n" +
+                            "  \"decision_reply_id\": \"123\"\n" +
+                            "}")
+                )
+        );
+    }
 }

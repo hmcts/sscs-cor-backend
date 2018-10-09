@@ -16,9 +16,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohDecision;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohDecisionReply;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
+import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
 import uk.gov.hmcts.reform.sscscorbackend.exception.RestResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 
@@ -62,6 +64,11 @@ public class OnlineHearingService {
                 })
                 .reduce(checkThereIsOnlyOneCase())
                 .flatMap(getHearingFromCoh());
+    }
+
+    public void addDecisionReply(String onlineHearingId, TribunalViewResponse tribunalViewResponse) {
+        CohDecisionReply cohDecisionReply = new CohDecisionReply(tribunalViewResponse.getReply(), tribunalViewResponse.getReason());
+        cohClient.addDecisionReply(onlineHearingId, cohDecisionReply);
     }
 
     private Decision getDecision(String onlineHearingId) {

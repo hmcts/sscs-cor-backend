@@ -13,15 +13,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 public class GetListOfQuestionsTest extends BaseFunctionTest {
     @Test
-    public void getAListOfQuestionTitles() throws IOException {
-        String hearingId = cohRequests.createHearing();
-        String questionId = cohRequests.createQuestion(hearingId);
+    public void getAListOfQuestionTitles() throws IOException, InterruptedException {
+        OnlineHearing onlineHearing = createHearingWithQuestion(false);
 
-        JSONObject questionRound = sscsCorBackendRequests.getQuestions(hearingId);
+        JSONObject questionRound = sscsCorBackendRequests.getQuestions(onlineHearing.getHearingId());
         JSONArray questions = questionRound.getJSONArray("questions");
 
         assertThat(questions.length(), is(1));
         assertThat(questions.getJSONObject(0).getString("question_header_text"), is("question header"));
-        assertThat(questions.getJSONObject(0).getString("question_id"), is(questionId));
+        assertThat(questions.getJSONObject(0).getString("question_id"), is(onlineHearing.getQuestionId()));
     }
 }
