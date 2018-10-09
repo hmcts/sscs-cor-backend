@@ -18,6 +18,7 @@ public class CcdStub extends BaseStub {
             "        \"assignedTo\": \"someJudge\"\n" +
             "      },\n" +
             "      \"appeal\": {\n" +
+            "        \"hearingType\": \"cor\",\n" +
             "        \"appellant\": {\n" +
             "          \"name\": {\n" +
             "            \"firstName\": \"{firstName}\",\n" +
