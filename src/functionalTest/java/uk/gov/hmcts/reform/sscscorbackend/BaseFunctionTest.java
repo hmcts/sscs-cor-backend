@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscscorbackend;
 
 import static org.apache.http.conn.ssl.SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
 
+import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -20,6 +21,11 @@ public abstract class BaseFunctionTest {
     private CloseableHttpClient client;
     private HttpClient cohClient;
 
+    protected final String decisionAward = "appeal-upheld";
+    protected final String decisionHeader = "appeal-upheld";
+    protected final String decisionReason = "Decision reason";
+    protected final String decisionText = "Decision reason";
+
     protected SscsCorBackendRequests sscsCorBackendRequests;
     protected CohRequests cohRequests;
 
@@ -36,6 +42,30 @@ public abstract class BaseFunctionTest {
         String emailAddress = "test" + randomNumber + "@hmcts.net";
         System.out.println("emailAddress " + emailAddress);
         return emailAddress;
+    }
+
+    protected OnlineHearing createHearingWithQuestion(boolean ccdCaseRequired) throws IOException, InterruptedException {
+        String hearingId;
+        String emailAddress = null;
+        if (ccdCaseRequired) {
+            emailAddress = createRandomEmail();
+            String caseId = sscsCorBackendRequests.createCase(emailAddress);
+            hearingId = cohRequests.createHearing(caseId);
+        } else {
+            hearingId = cohRequests.createHearing();
+        }
+        String questionId = cohRequests.createQuestion(hearingId);
+        cohRequests.issueQuestionRound(hearingId);
+        return new OnlineHearing(emailAddress, hearingId, questionId);
+    }
+
+    protected void answerQuestion(String hearingId, String questionId) throws IOException {
+        cohRequests.createAnswer(hearingId, questionId, "Valid answer");
+    }
+
+    protected void createAndIssueDecision(String hearingId) throws IOException, InterruptedException {
+        cohRequests.createDecision(hearingId, decisionAward, decisionHeader, decisionReason, decisionText);
+        cohRequests.issueDecision(hearingId, decisionAward, decisionHeader, decisionReason, decisionText);
     }
 
     private CloseableHttpClient buildClient(String proxySystemProperty) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {

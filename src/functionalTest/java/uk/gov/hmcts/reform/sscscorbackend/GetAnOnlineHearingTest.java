@@ -11,43 +11,30 @@ import org.json.JSONObject;
 import org.junit.Test;
 
 public class GetAnOnlineHearingTest extends BaseFunctionTest {
-    private final String decisionAward = "FINAL";
-    private final String decisionHeader = "The decision";
-    private final String decisionReason = "Decision reason";
-    private final String decisionText = "The decision text";
 
     @Test
-    public void getAnOnlineHearing() throws IOException {
-        String emailAddress = createRandomEmail();
-        String caseId = sscsCorBackendRequests.createCase(emailAddress);
-        String expectedOnlineHearingId = cohRequests.createHearing(caseId);
+    public void getAnOnlineHearing() throws IOException, InterruptedException {
+        OnlineHearing onlineHearing = createHearingWithQuestion(true);
 
-        JSONObject onlineHearing = sscsCorBackendRequests.getOnlineHearing(emailAddress);
-        String onlineHearingId = onlineHearing.getString("online_hearing_id");
-        JSONObject decision = onlineHearing.optJSONObject("decision");
+        JSONObject onlineHearingResponse = sscsCorBackendRequests.getOnlineHearing(onlineHearing.getEmailAddress());
+        String onlineHearingId = onlineHearingResponse.getString("online_hearing_id");
+        JSONObject decision = onlineHearingResponse.optJSONObject("decision");
 
-        assertThat(onlineHearingId, is(expectedOnlineHearingId));
+        assertThat(onlineHearingId, is(onlineHearing.getHearingId()));
         assertThat(decision, is(nullValue()));
     }
 
     @Test
     public void getAnOnlineHearingWithDecision() throws IOException, InterruptedException {
-        String emailAddress = createRandomEmail();
-        String caseId = sscsCorBackendRequests.createCase(emailAddress);
-        String expectedOnlineHearingId = cohRequests.createHearing(caseId);
-        String questionId = cohRequests.createQuestion(expectedOnlineHearingId);
-        cohRequests.issueQuestionRound(expectedOnlineHearingId);
-        cohRequests.createAnswer(expectedOnlineHearingId, questionId, "Valid answer");
-        cohRequests.createDecision(expectedOnlineHearingId, decisionAward,
-                decisionHeader, decisionReason, decisionText);
-        cohRequests.issueDecision(expectedOnlineHearingId, decisionAward,
-                decisionHeader, decisionReason, decisionText);
+        OnlineHearing onlineHearing = createHearingWithQuestion(true);
+        answerQuestion(onlineHearing.getHearingId(), onlineHearing.getQuestionId());
+        createAndIssueDecision(onlineHearing.getHearingId());
 
-        JSONObject onlineHearing = sscsCorBackendRequests.getOnlineHearing(emailAddress);
-        String onlineHearingId = onlineHearing.getString("online_hearing_id");
-        JSONObject decision = onlineHearing.getJSONObject("decision");
+        JSONObject onlineHearingResponse = sscsCorBackendRequests.getOnlineHearing(onlineHearing.getEmailAddress());
+        String onlineHearingId = onlineHearingResponse.getString("online_hearing_id");
+        JSONObject decision = onlineHearingResponse.getJSONObject("decision");
 
-        assertThat(onlineHearingId, is(expectedOnlineHearingId));
+        assertThat(onlineHearingId, is(onlineHearing.getHearingId()));
         assertThat(decision.getString("decision_award"), is(decisionAward));
         assertThat(decision.getString("decision_header"), is(decisionHeader));
         assertThat(decision.getString("decision_reason"), is(decisionReason));

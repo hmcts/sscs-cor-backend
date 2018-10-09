@@ -14,16 +14,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class ExtendQuestionRoundDeadlineTest extends BaseFunctionTest {
     @Test
     public void extendsTheQuestionRoundDeadlineDate() throws IOException, InterruptedException {
-        String hearingId = cohRequests.createHearing();
-        cohRequests.createQuestion(hearingId);
-        cohRequests.issueQuestionRound(hearingId);
+        OnlineHearing onlineHearing = createHearingWithQuestion(false);
 
-        JSONObject questionRound = sscsCorBackendRequests.extendQuestionRoundDeadline(hearingId);
+        JSONObject questionRound = sscsCorBackendRequests.extendQuestionRoundDeadline(onlineHearing.getHearingId());
         String deadlineExpiryDate = questionRound.getString("deadline_expiry_date");
 
         assertThat(deadlineExpiryDate, is(notNullValue()));
 
-        int deadlineExtensionCount = cohRequests.getDeadlineExtensionCount(hearingId);
+        int deadlineExtensionCount = cohRequests.getDeadlineExtensionCount(onlineHearing.getHearingId());
 
         assertThat(deadlineExtensionCount, is(1));
     }
