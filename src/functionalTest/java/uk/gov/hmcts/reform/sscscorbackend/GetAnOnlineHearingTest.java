@@ -15,13 +15,6 @@ public class GetAnOnlineHearingTest extends BaseFunctionTest {
     private final String decisionHeader = "The decision";
     private final String decisionReason = "Decision reason";
     private final String decisionText = "The decision text";
-    
-    private String createRandomEmail() {
-        int randomNumber = (int) (Math.random() * 10000000);
-        String emailAddress = "test" + randomNumber + "@hmcts.net";
-        System.out.println("emailAddress " + emailAddress);
-        return emailAddress;
-    }
 
     @Test
     public void getAnOnlineHearing() throws IOException {

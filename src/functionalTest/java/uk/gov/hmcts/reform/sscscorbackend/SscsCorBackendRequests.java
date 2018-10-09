@@ -94,4 +94,11 @@ public class SscsCorBackendRequests {
 
         return new JSONObject(responseBody);
     }
+
+    public void recordTribunalViewResponse(String hearingId, String reply, String reason) throws IOException {
+        HttpResponse response = client.execute(patch(baseUrl + "/continuous-online-hearings/" + hearingId + "/tribunal-view")
+                .setEntity(new StringEntity("{\"reply\":\"" + reply + "\", \"reason\":\"" + reason + "\"}", APPLICATION_JSON))
+                .build());
+        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+    }
 }

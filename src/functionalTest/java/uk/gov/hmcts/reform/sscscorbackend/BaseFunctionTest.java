@@ -31,6 +31,13 @@ public abstract class BaseFunctionTest {
         cohRequests = new CohRequests(cohBaseUrl, cohClient);
     }
 
+    protected String createRandomEmail() {
+        int randomNumber = (int) (Math.random() * 10000000);
+        String emailAddress = "test" + randomNumber + "@hmcts.net";
+        System.out.println("emailAddress " + emailAddress);
+        return emailAddress;
+    }
+
     private CloseableHttpClient buildClient(String proxySystemProperty) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
         SSLContextBuilder builder = new SSLContextBuilder();
         builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());

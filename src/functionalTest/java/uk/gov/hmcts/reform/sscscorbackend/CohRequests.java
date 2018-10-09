@@ -113,6 +113,11 @@ public class CohRequests {
         return deadlineExtensionCount;
     }
 
+    public JSONObject getDecisionReplies(String hearingId) throws IOException {
+        String url = cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/decisionreplies";
+        return makeGetRequest(cohClient, url, null);
+    }
+
     private Supplier<Boolean> roundIssued(String hearingId) {
         return () -> {
             try {

@@ -30,8 +30,12 @@ public class TribunalViewController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> recordTribunalViewResponse(@PathVariable String onlineHearingId,
                                                            @RequestBody TribunalViewResponse tribunalViewResponse) {
-        if (tribunalViewResponse.getReply().equals("decision_rejected") && tribunalViewResponse.getReason().equals("")) {
+        if (tribunalViewResponse.getReply().equals("decision_rejected") && tribunalViewResponse.getReason().isEmpty()) {
             return ResponseEntity.badRequest().build();
+        }
+        // COH won't accept an empty reason, therefore set the reason to the reply if it's empty
+        if (tribunalViewResponse.getReason().isEmpty()) {
+            tribunalViewResponse.setReason(tribunalViewResponse.getReply());
         }
         onlineHearingService.addDecisionReply(onlineHearingId, tribunalViewResponse);
         return ResponseEntity.noContent().build();
