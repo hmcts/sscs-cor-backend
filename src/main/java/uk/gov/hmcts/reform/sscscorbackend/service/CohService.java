@@ -68,4 +68,8 @@ public class CohService {
     public Optional<CohDecision> getDecision(String onlineHearingId) {
         return cohClient.getDecision(OAUTH2_TOKEN, authTokenGenerator.generate(), onlineHearingId);
     }
+
+    public void addDecisionReply(String onlineHearingId, CohDecisionReply decisionReply) {
+        cohClient.addDecisionReply(OAUTH2_TOKEN, authTokenGenerator.generate(), onlineHearingId, decisionReply);
+    }
 }
