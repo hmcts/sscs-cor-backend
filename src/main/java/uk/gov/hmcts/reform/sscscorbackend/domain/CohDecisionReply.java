@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
@@ -7,10 +8,22 @@ import java.util.Objects;
 public class CohDecisionReply {
     private final String reply;
     private final String replyReason;
+    private String replyDateTime;
+    private String authorReference;
 
     public CohDecisionReply(String reply, String replyReason) {
         this.reply = reply;
         this.replyReason = replyReason;
+    }
+
+    public CohDecisionReply(@JsonProperty(value = "decision_reply") String reply,
+                       @JsonProperty(value = "decision_reply_reason") String replyReason,
+                       @JsonProperty(value = "decision_reply_date") String replyDateTime,
+                       @JsonProperty(value = "author_reference") String authorReference) {
+        this.reply = reply;
+        this.replyReason = replyReason;
+        this.replyDateTime = replyDateTime;
+        this.authorReference = authorReference;
     }
 
     @JsonProperty(value = "decision_reply")
@@ -23,6 +36,16 @@ public class CohDecisionReply {
         return replyReason;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public String getReplyDateTime() {
+        return replyDateTime;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public String getAuthorReference() {
+        return authorReference;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -33,12 +56,14 @@ public class CohDecisionReply {
         }
         CohDecisionReply that = (CohDecisionReply) o;
         return Objects.equals(reply, that.reply) &&
-                Objects.equals(replyReason, that.replyReason);
+                Objects.equals(replyReason, that.replyReason) &&
+                Objects.equals(replyDateTime, that.replyDateTime) &&
+                Objects.equals(authorReference, that.authorReference);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(reply, replyReason);
+        return Objects.hash(reply, replyReason, replyDateTime, authorReference);
     }
 
     @Override
@@ -46,6 +71,8 @@ public class CohDecisionReply {
         return "CohDecisionReply{" +
                 "  reply='" + reply + '\'' +
                 ", replyReason='" + replyReason + '\'' +
+                ", replyDateTime='" + replyDateTime + '\'' +
+                ", authorReference='" + authorReference + '\'' +
                 '}';
     }
 }

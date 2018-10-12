@@ -68,6 +68,10 @@ public abstract class BaseFunctionTest {
         cohRequests.issueDecision(hearingId, decisionAward, decisionHeader, decisionReason, decisionText);
     }
 
+    protected void recordAppellantViewResponse(String hearingId, String reply, String reason) throws IOException {
+        cohRequests.addDecisionReply(hearingId, reply, reason);
+    }
+
     private CloseableHttpClient buildClient(String proxySystemProperty) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
         SSLContextBuilder builder = new SSLContextBuilder();
         builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
