@@ -118,6 +118,15 @@ public class CohRequests {
         return makeGetRequest(cohClient, url, null);
     }
 
+    public String addDecisionReply(String hearingId, String reply, String reason) throws IOException {
+        String url = cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/decisionreplies";
+        String decisionReplyId = makePostRequest(cohClient, url, "{\n" +
+                "  \"decision_reply\": \"" + reply + "\",\n" +
+                "  \"decision_reply_reason\": \"" + reason + "\"\n" +
+                "}", "decision_reply_id");
+        return decisionReplyId;
+    }
+
     private Supplier<Boolean> roundIssued(String hearingId) {
         return () -> {
             try {

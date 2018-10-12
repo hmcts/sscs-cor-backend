@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,12 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohDecision;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohDecisionReply;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
-import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
-import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
-import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
+import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.exception.RestResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 
@@ -75,12 +72,29 @@ public class OnlineHearingService {
         cohClient.addDecisionReply(onlineHearingId, cohDecisionReply);
     }
 
+    private CohDecisionReply getAppellantDecisionReply(String onlineHearingId) {
+        Optional<CohDecisionReplies> decisionRepliesWrapper = cohClient.getDecisionReplies(onlineHearingId);
+        if (decisionRepliesWrapper.isPresent()) {
+            List<CohDecisionReply> decisionReplies = decisionRepliesWrapper.get().getDecisionReplies()
+                    .stream()
+                    .filter(d -> d.getAuthorReference().equals("oauth2Token"))
+                    .collect(Collectors.toList());
+
+            if (decisionReplies.size() > 0) {
+                return decisionReplies.get(0);
+            }
+        }
+        return new CohDecisionReply("", "", "", "");
+    }
+
     private Decision getDecision(String onlineHearingId) {
         Optional<CohDecision> decision = cohClient.getDecision(onlineHearingId);
+        CohDecisionReply appellantReply = getAppellantDecisionReply(onlineHearingId);
         return decision.map(d -> new Decision(onlineHearingId, d.getDecisionAward(),
                     d.getDecisionHeader(), d.getDecisionReason(),
                     d.getDecisionText(), d.getCurrentDecisionState().getStateName(),
-                    d.getCurrentDecisionState().getStateDateTime()))
+                    d.getCurrentDecisionState().getStateDateTime(),
+                    appellantReply.getReply(), appellantReply.getReplyDateTime()))
                 .orElse(null);
     }
 

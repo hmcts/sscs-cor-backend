@@ -19,13 +19,18 @@ public class Decision {
     private final String decisionState;
     private final String decisionStateDateTime;
 
+    private final String appellantReply;
+    private final String appellantReplyDateTime;
+
     public Decision(String onlineHearingId,
                     String decisionAward,
                     String decisionHeader,
                     String decisionReason,
                     String decisionText,
                     String decisionState,
-                    String decisionStateDateTime) {
+                    String decisionStateDateTime,
+                    String appellantReply,
+                    String appellantReplyDateTime) {
         this.onlineHearingId = onlineHearingId;
         this.decisionAward = decisionAward;
         this.decisionHeader = decisionHeader;
@@ -33,6 +38,8 @@ public class Decision {
         this.decisionText = decisionText;
         this.decisionState = decisionState;
         this.decisionStateDateTime = decisionStateDateTime;
+        this.appellantReply = appellantReply;
+        this.appellantReplyDateTime = appellantReplyDateTime;
     }
 
     @ApiModelProperty(example = "appeal-upheld", required = true)
@@ -71,6 +78,18 @@ public class Decision {
         return decisionStateDateTime;
     }
 
+    @ApiModelProperty(example = "decision_accepted", required = true)
+    @JsonProperty(value = "appellant_reply")
+    public String getAppellantReply() {
+        return appellantReply;
+    }
+
+    @ApiModelProperty(example = "2018-10-06T10:30:24Z", required = true)
+    @JsonProperty(value = "appellant_reply_datetime")
+    public String getAppellantReplyDateTime() {
+        return appellantReplyDateTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -86,12 +105,15 @@ public class Decision {
                 Objects.equals(decisionReason, decision.decisionReason) &&
                 Objects.equals(decisionText, decision.decisionText) &&
                 Objects.equals(decisionState, decision.decisionState) &&
-                Objects.equals(decisionStateDateTime, decision.decisionStateDateTime);
+                Objects.equals(decisionStateDateTime, decision.decisionStateDateTime) &&
+                Objects.equals(appellantReply, decision.appellantReply) &&
+                Objects.equals(appellantReplyDateTime, decision.appellantReplyDateTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(onlineHearingId, decisionAward, decisionHeader, decisionReason, decisionText, decisionState);
+        return Objects.hash(onlineHearingId, decisionAward, decisionHeader, decisionReason, decisionText, decisionState,
+                appellantReply, appellantReplyDateTime);
     }
 
     @Override
@@ -104,6 +126,8 @@ public class Decision {
                 ", decisionText='" + decisionText + '\'' +
                 ", decisionState='" + decisionState + '\'' +
                 ", decisionStateDateTime='" + decisionStateDateTime + '\'' +
+                ", appellantReply='" + appellantReply + '\'' +
+                ", appellantReplyDateTime='" + appellantReplyDateTime + '\'' +
                 '}';
     }
 }

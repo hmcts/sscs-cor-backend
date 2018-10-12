@@ -1,0 +1,12 @@
+{
+  "decision_replies": [
+    {
+      "decision_reply_id": "936d4e4c-bbb9-45df-a0aa-8033d7eba7cc",
+      "decision_id": "4158965d-003c-4f98-96a9-eef60d9744af",
+      "decision_reply": "{decision_reply}",
+      "decision_reply_reason": "decision_accepted",
+      "author_reference": "oauth2Token",
+      "decision_reply_date": "2018-10-12T09:59:30Z"
+    }
+  ]
+}

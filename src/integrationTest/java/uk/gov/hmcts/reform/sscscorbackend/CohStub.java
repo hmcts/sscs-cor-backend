@@ -232,6 +232,12 @@ public class CohStub extends BaseStub {
         return decisionAsString.replace("{online_hearing_id}", hearingId);
     }
 
+    private String getDecisionRepliesBody(String reply) {
+        InputStream decisionRepliesStream = getClass().getClassLoader().getResourceAsStream("json/get_decision_replies.json");
+        String decisionRepliesAsString = new BufferedReader(new InputStreamReader(decisionRepliesStream)).lines().collect(joining("\n"));
+        return decisionRepliesAsString.replace("{decision_reply}", reply);
+    }
+
     public void stubPostOnlineHearing(String onlineHearingId) {
         wireMock.stubFor(post(urlEqualTo("/continuous-online-hearings"))
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
@@ -304,6 +310,30 @@ public class CohStub extends BaseStub {
                     .withBody("{\n" +
                             "  \"decision_reply_id\": \"123\"\n" +
                             "}")
+                )
+        );
+    }
+
+    public void stubGetDecisionReplies(String hearingId, String reply) {
+        wireMock.stubFor(get("/continuous-online-hearings/" + hearingId + "/decisionreplies")
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .willReturn(okJson(getDecisionRepliesBody(reply))));
+    }
+
+    public void stubGetDecisionRepliesEmpty(String hearingId) {
+        wireMock.stubFor(get("/continuous-online-hearings/" + hearingId + "/decisionreplies")
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .willReturn(okJson("{\n" +
+                        "  \"decision_replies\": []\n" +
+                        "}")));
+    }
+
+    public void stubGetDecisionRepliesNotFound(String hearingId) {
+        wireMock.stubFor(get("/continuous-online-hearings/" + hearingId + "/decisionreplies")
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .willReturn(notFound()
+                        .withBody("Unable to find decision")
+                        .withHeader("Content-Type", "text/plain;charset=UTF-8")
                 )
         );
     }
