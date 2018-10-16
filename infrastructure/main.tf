@@ -62,22 +62,20 @@ module "sscs-core-backend" {
   asp_name            = "${var.product}-${var.component}-${var.env}"
 
   app_settings = {
-    IDAM.S2S-AUTH                   = "${local.s2sCnpUrl}"
-    IDAM.S2S-AUTH.MICROSERVICE      = "${var.idam_s2s_auth_microservice}"
-    IDAM.S2S-AUTH.TOTP_SECRET       = "${data.azurerm_key_vault_secret.sscs-s2s-secret.value}"
+    IDAM_S2S_AUTH                   = "${local.s2sCnpUrl}"
+    IDAM_S2S_AUTH_TOTP_SECRET       = "${data.azurerm_key_vault_secret.sscs-s2s-secret.value}"
     IDAM_SSCS_SYSTEMUPDATE_USER     = "${data.azurerm_key_vault_secret.idam-sscs-systemupdate-user.value}"
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD = "${data.azurerm_key_vault_secret.idam-sscs-systemupdate-password.value}"
-    IDAM_OAUTH2_CLIENT_ID           = "${var.idam_oauth2_client_id}"
     IDAM_OAUTH2_CLIENT_SECRET       = "${data.azurerm_key_vault_secret.idam-sscs-oauth2-client-secret.value}"
     IDAM_OAUTH2_REDIRECT_URL        = "${var.idam_redirect_url}"
     IDAM_URL                        = "${local.idam_url}"
     IDAM_SSCS_URL                   = "${var.idam_sscs_url}"
 
     COH_URL = "${local.cohUrl}"
-
     CORE_CASE_DATA_URL = "${local.ccdApi}"
 
     CREATE_CCD_ENDPOINT = "${local.createCcdEndpoint}"
+
     DOCUMENT_MANAGEMENT_URL = "${local.documentManagementUrl}"
   }
 }
