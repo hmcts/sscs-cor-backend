@@ -17,11 +17,16 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
+@TestPropertySource(properties = {
+        "idam.s2s-auth.url=http://rpe-service-auth-provider-aat.service.core-compute-aat.internal",
+        "coh.url=http://coh-cor-aat.service.core-compute-aat.internal"
+})
 public abstract class BaseFunctionTest {
     private final String baseUrl = System.getenv("TEST_URL");
     private String cohBaseUrl = "http://coh-cor-aat.service.core-compute-aat.internal";
