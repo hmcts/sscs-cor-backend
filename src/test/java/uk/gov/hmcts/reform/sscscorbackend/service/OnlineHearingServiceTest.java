@@ -5,8 +5,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohOnlineHearingId;
-import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someRequest;
+import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 
@@ -66,7 +66,7 @@ public class OnlineHearingServiceTest {
                         createNonOnlineHearingCaseDetails(22222L, "otherCaseRef", "otherFirstName", "otherLastName"),
                         caseDetails));
 
-        CohOnlineHearings cohOnlineHearings = someCohOnlineHearingId();
+        CohOnlineHearings cohOnlineHearings = someCohOnlineHearings();
         when(cohService.getOnlineHearing(someCaseId)).thenReturn(cohOnlineHearings);
 
         Optional<OnlineHearing> onlineHearing = underTest.getOnlineHearing(someEmailAddress);
@@ -76,6 +76,18 @@ public class OnlineHearingServiceTest {
         assertThat(onlineHearing.get().getOnlineHearingId(), is(expectedOnlineHearingId));
         assertThat(onlineHearing.get().getCaseReference(), is(expectedCaseReference));
         assertThat(onlineHearing.get().getAppellantName(), is(firstName + " " + lastName));
+    }
+
+    @Test
+    public void getsACcdIdFromAHearing() {
+        String onlineHearingId = "someOnlineHearingId";
+        CohOnlineHearing cohOnlineHearing = someCohOnlineHearing();
+        when(cohService.getOnlineHearing(onlineHearingId)).thenReturn(cohOnlineHearing);
+
+        Optional<Long> ccdCaseId = underTest.getCcdCaseId(onlineHearingId);
+
+        assertThat(ccdCaseId.isPresent(), is(true));
+        assertThat(ccdCaseId.get(), is(cohOnlineHearing.getCcdCaseId()));
     }
 
     @Test(expected = IllegalStateException.class)

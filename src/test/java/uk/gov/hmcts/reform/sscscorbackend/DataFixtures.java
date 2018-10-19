@@ -77,8 +77,12 @@ public class DataFixtures {
     }
 
 
-    public static CohOnlineHearings someCohOnlineHearingId() {
-        return new CohOnlineHearings(singletonList(new CohOnlineHearing("someOnlineHearingId")));
+    public static CohOnlineHearings someCohOnlineHearings() {
+        return new CohOnlineHearings(singletonList(someCohOnlineHearing()));
+    }
+
+    public static CohOnlineHearing someCohOnlineHearing() {
+        return new CohOnlineHearing("someOnlineHearingId", "123");
     }
 
     public static OnlineHearing someOnlineHearing() {

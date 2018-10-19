@@ -44,6 +44,13 @@ public class CcdStub extends BaseStub {
         );
     }
 
+    public void stubFindCaseByCaseId(Long caseId) {
+        wireMock.stubFor(get(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId))
+                        .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                        .willReturn(okJson(createCaseDetails(caseId, "caseRef", "firstName", "lastName")))
+        );
+    }
+
     private String createCaseDetails(Long caseId, String caseReference, String firstName, String lastName) {
         return caseDetailsJson.replace("{caseId}", caseId.toString())
                 .replace("{caseReference}", caseReference)
