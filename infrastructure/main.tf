@@ -11,18 +11,22 @@ resource "azurerm_resource_group" "rg" {
 }
 
 data "vault_generic_secret" "sscs_s2s_secret" {
+  name = "sscs_s2s_secret"
   path = "secret/${var.infrastructure_env}/ccidam/service-auth-provider/api/microservice-keys/sscs"
 }
 
 data "vault_generic_secret" "idam_sscs_systemupdate_user" {
+  name = "idam_sscs_systemupdate_user"
   path = "secret/${var.infrastructure_env}/ccidam/idam-api/sscs/systemupdate/user"
 }
 
 data "vault_generic_secret" "idam_sscs_systemupdate_password" {
+  name = "idam_sscs_systemupdate_password"
   path = "secret/${var.infrastructure_env}/ccidam/idam-api/sscs/systemupdate/password"
 }
 
 data "vault_generic_secret" "idam_oauth2_client_secret" {
+  name = "idam_oauth2_client_secret"
   path = "secret/${var.infrastructure_env}/ccidam/idam-api/oauth2/client-secrets/sscs"
 }
 
