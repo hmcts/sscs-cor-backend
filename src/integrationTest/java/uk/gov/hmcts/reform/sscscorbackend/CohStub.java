@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static java.lang.String.valueOf;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.stream.Collectors.joining;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
@@ -100,29 +101,31 @@ public class CohStub extends BaseStub {
             "        }";
 
     private static final String onlineHearingJson = "{\n" +
+                    "    \"online_hearing_id\": \"{online_hearing_id}\",\n" +
+                    "    \"case_id\": \"{case_id}\",\n" +
+                    "    \"start_date\": \"2018-08-15T12:57:07Z\",\n" +
+                    "    \"panel\": [\n" +
+                    "        {\n" +
+                    "            \"name\": \"John Dead\"\n" +
+                    "        }\n" +
+                    "    ],\n" +
+                    "    \"current_state\": {\n" +
+                    "        \"state_name\": \"continuous_online_hearing_started\",\n" +
+                    "        \"state_desc\": \"Continuous Online Hearing Started\",\n" +
+                    "        \"state_datetime\": \"2018-08-20T16:17:06Z\"\n" +
+                    "    },\n" +
+                    "    \"history\": [\n" +
+                    "        {\n" +
+                    "            \"state_name\": \"continuous_online_hearing_started\",\n" +
+                    "            \"state_desc\": \"Continuous Online Hearing Started\",\n" +
+                    "            \"state_datetime\": \"2018-08-20T16:17:06Z\"\n" +
+                    "        }\n" +
+                    "    ]\n" +
+                    "}";
+
+    private static final String onlineHearingsJson = "{\n" +
             "    \"online_hearings\": [\n" +
-            "        {\n" +
-            "            \"online_hearing_id\": \"{online_hearing_id}\",\n" +
-            "            \"case_id\": \"chrisg-4\",\n" +
-            "            \"start_date\": \"2018-08-15T12:57:07Z\",\n" +
-            "            \"panel\": [\n" +
-            "                {\n" +
-            "                    \"name\": \"John Dead\"\n" +
-            "                }\n" +
-            "            ],\n" +
-            "            \"current_state\": {\n" +
-            "                \"state_name\": \"continuous_online_hearing_started\",\n" +
-            "                \"state_desc\": \"Continuous Online Hearing Started\",\n" +
-            "                \"state_datetime\": \"2018-08-20T16:17:06Z\"\n" +
-            "            },\n" +
-            "            \"history\": [\n" +
-            "                {\n" +
-            "                    \"state_name\": \"continuous_online_hearing_started\",\n" +
-            "                    \"state_desc\": \"Continuous Online Hearing Started\",\n" +
-            "                    \"state_datetime\": \"2018-08-20T16:17:06Z\"\n" +
-            "                }\n" +
-            "            ]\n" +
-            "        }\n" +
+            onlineHearingJson +
             "    ]\n" +
             "}";
 
@@ -252,10 +255,17 @@ public class CohStub extends BaseStub {
     }
 
     public void stubGetOnlineHearing(Long caseId, String onlineHearingId) {
-        String body = onlineHearingJson.replace("{online_hearing_id}", onlineHearingId);
+        String body = onlineHearingsJson.replace("{online_hearing_id}", onlineHearingId)
+                .replace("{case_id}", valueOf(caseId));
         wireMock.stubFor(get("/continuous-online-hearings?case_id=" + caseId)
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
                 .willReturn(okJson(body)));
+
+        wireMock.stubFor(get("/continuous-online-hearings/" + onlineHearingId)
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .willReturn(okJson(onlineHearingJson.replace("{online_hearing_id}", onlineHearingId)
+                        .replace("{case_id}", valueOf(caseId))
+                )));
     }
 
     public void stubExtendQuestionRoundDeadline(String hearingId) {

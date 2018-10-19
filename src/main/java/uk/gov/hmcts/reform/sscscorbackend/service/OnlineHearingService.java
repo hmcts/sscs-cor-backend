@@ -67,6 +67,11 @@ public class OnlineHearingService {
                 .flatMap(getHearingFromCoh());
     }
 
+    public Optional<Long> getCcdCaseId(String onlineHearingId) {
+        CohOnlineHearing onlineHearing = cohClient.getOnlineHearing(onlineHearingId);
+        return (onlineHearing != null) ? Optional.of(onlineHearing.getCcdCaseId()) : Optional.empty();
+    }
+
     public void addDecisionReply(String onlineHearingId, TribunalViewResponse tribunalViewResponse) {
         CohDecisionReply cohDecisionReply = new CohDecisionReply(tribunalViewResponse.getReply(), tribunalViewResponse.getReason());
         cohClient.addDecisionReply(onlineHearingId, cohDecisionReply);

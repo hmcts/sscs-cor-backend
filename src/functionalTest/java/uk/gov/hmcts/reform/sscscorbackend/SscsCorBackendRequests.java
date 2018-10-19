@@ -6,8 +6,11 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
@@ -100,5 +103,20 @@ public class SscsCorBackendRequests {
                 .setEntity(new StringEntity("{\"reply\":\"" + reply + "\", \"reason\":\"" + reason + "\"}", APPLICATION_JSON))
                 .build());
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+    }
+
+    public void uploadEvidence(String hearingId, String questionId) throws IOException {
+        HttpEntity data = MultipartEntityBuilder.create()
+                .setContentType(ContentType.MULTIPART_FORM_DATA)
+                .addBinaryBody("file",
+                        this.getClass().getClassLoader().getResourceAsStream("evidence.png"),
+                        ContentType.IMAGE_PNG,
+                        "evidence.png")
+                .build();
+
+        HttpResponse response = client.execute(post(baseUrl + "/continuous-online-hearings/" + hearingId + "/questions/" + questionId + "/evidence")
+                .setEntity(data)
+                .build());
+        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
     }
 }

@@ -36,6 +36,7 @@ locals {
   cohUrl    = "http://coh-cor-${local.local_env}.service.${local.local_ase}.internal"
   ccdApi    = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
   idam_url  = "https://preprod-idamapi.reform.hmcts.net:3511"
+  documentManagementUrl = "http://dm-store-${local.local_env}.service.${local.local_ase}.internal"
 
   createCcdEndpoint = "${(var.env == "preview" || var.env == "spreview" ||  var.env == "aat") ? "true" : "false"}"
 }
@@ -70,5 +71,6 @@ module "sscs-core-backend" {
     CORE_CASE_DATA_URL = "${local.ccdApi}"
 
     CREATE_CCD_ENDPOINT = "${local.createCcdEndpoint}"
+    DOCUMENT_MANAGEMENT_URL = "${local.documentManagementUrl}"
   }
 }

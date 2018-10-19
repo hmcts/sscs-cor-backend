@@ -51,6 +51,10 @@ public class CohService {
         return cohClient.getOnlineHearing(OAUTH2_TOKEN, authTokenGenerator.generate(), caseId);
     }
 
+    public CohOnlineHearing getOnlineHearing(String onlineHearingId) {
+        return cohClient.getOnlineHearing(OAUTH2_TOKEN, authTokenGenerator.generate(), onlineHearingId);
+    }
+
     // Empty body sets Content-Length: 0 header which we need to get through our proxy. Cannot get feigns @Headers
     // annotation to work.
     public boolean extendQuestionRoundDeadline(String onlineHearingId) {
