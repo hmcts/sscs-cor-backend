@@ -29,3 +29,6 @@ core_case_data:
   jurisdictionId: SSCS
 
 create_ccd_endpoint: ${CREATE_CCD_ENDPOINT:false}
+
+document_management:
+  url: ${DOCUMENT_MANAGEMENT_URL:http://localhost:4603}

@@ -18,9 +18,10 @@ public abstract class BaseStub {
     public void printAllRequests() {
         if (System.getenv("PRINT_REQUESTS") != null) {
             wireMock.findAll(RequestPatternBuilder.allRequests()).forEach(request -> {
-                System.out.println("**********************IDAM**********************");
+                String stubName = this.getClass().getSimpleName().replace("Stub", "");
+                System.out.println("**********************" + stubName + "**********************");
                 System.out.println(request);
-                System.out.println("**********************IDAM**********************");
+                System.out.println("**********************" + stubName + "**********************");
             });
         }
     }

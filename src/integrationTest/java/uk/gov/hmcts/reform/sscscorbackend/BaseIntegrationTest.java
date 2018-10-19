@@ -29,6 +29,8 @@ public abstract class BaseIntegrationTest {
     private String clientId;
     @Value("${idam.oauth2.client.secret}")
     private String clientSecret;
+    @Value("${document_management.url}")
+    private String documentStoreUrl;
 
     @LocalServerPort
     protected int applicationPort;
@@ -37,6 +39,7 @@ public abstract class BaseIntegrationTest {
     protected TokenGeneratorStub tokenGeneratorStub;
     protected CcdStub ccdStub;
     protected IdamStub idamStub;
+    protected DocumentStoreStub documentStoreStub;
 
     private List<BaseStub> stubs = new ArrayList<>();
 
@@ -50,6 +53,8 @@ public abstract class BaseIntegrationTest {
         stubs.add(ccdStub);
         idamStub = new IdamStub(idamUrl, idamRedirectUrl, clientId, clientSecret);
         stubs.add(idamStub);
+        documentStoreStub = new DocumentStoreStub(documentStoreUrl);
+        stubs.add(documentStoreStub);
     }
 
     @After

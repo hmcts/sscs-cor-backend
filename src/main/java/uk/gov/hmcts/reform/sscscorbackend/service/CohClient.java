@@ -70,6 +70,12 @@ public interface CohClient {
                                        @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
                                        @PathVariable("caseId") Long caseId);
 
+    @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings/{onlineHearingId}",
+            consumes = "application/json")
+    CohOnlineHearing getOnlineHearing(@RequestHeader(AUTHORIZATION) String authorisation,
+                                       @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
+                                       @PathVariable("onlineHearingId") String onlineHearingId);
+
     @RequestMapping(method = RequestMethod.PUT,
             value = "/continuous-online-hearings/{onlineHearingId}/questions-deadline-extension"
     )
