@@ -27,6 +27,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withPipeline(type, product, component) {
+    setVaultName('sscs-aat')
     loadVaultSecrets(secrets)
     enableDockerBuild()
     enableDeployToAKS()
