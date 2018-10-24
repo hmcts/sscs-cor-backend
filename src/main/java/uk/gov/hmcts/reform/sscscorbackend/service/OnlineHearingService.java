@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
 import static java.util.stream.Collectors.toList;
+import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 
 import com.google.common.collect.ImmutableMap;
@@ -12,34 +13,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
+import uk.gov.hmcts.reform.
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
-import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.OnlineHearingPdfWraper;
+import uk.gov.hmcts.reform.sscscorbackend.exception.RestResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 
 @Service
 public class OnlineHearingService {
 
+    private static final Logger LOG = getLogger(RestResponseEntityExceptionHandler.class);
     private static final String HEARING_TYPE_ONLINE_RESOLUTION = "cor";
 
     private final CohService cohClient;
     private final CcdService ccdService;
     private final IdamService idamService;
-    private PDFServiceClient pdfServiceClient;
+    private final PDFServiceClient pdfServiceClient;
     private final String appellantTemplatePath;
     private SscsPdfService sscsPdfService;
     private EvidenceUploadService evidenceUploadService;
+
 
     public OnlineHearingService(
                                 PDFServiceClient pdfServiceClient,
@@ -200,11 +202,6 @@ public class OnlineHearingService {
 
     }
 
-    private byte[] getTemplate() throws IOException {
-        InputStream in = getClass().getResourceAsStream(appellantTemplatePath);
-        return IOUtils.toByteArray(in);
-    }
-
     @Autowired
     public void setEvidenceUploadService(EvidenceUploadService evidenceUploadService) {
         this.evidenceUploadService = evidenceUploadService;
@@ -213,4 +210,11 @@ public class OnlineHearingService {
     public EvidenceUploadService getEvidenceUploadService() {
         return evidenceUploadService;
     }
+
+    private byte[] getTemplate() throws IOException {
+        InputStream in = getClass().getResourceAsStream(appellantTemplatePath);
+        return IOUtils.toByteArray(in);
+    }
+
+
 }
