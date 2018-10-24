@@ -25,6 +25,7 @@ public class QuestionMatcher extends TypeSafeMatcher<String> {
         expected.add("\"answer_date\":\"" + answerDate.format(ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")) + "\"");
         evidenceList.stream().forEach(evidence -> {
             expected.add("\"file_name\":\"" + evidence.getFileName() + "\"");
+            expected.add("\"created_date\":\"" + evidence.getCreatedDate() + "\"");
         });
     }
 
