@@ -14,7 +14,7 @@ public class GetAQuestionTest extends BaseFunctionTest {
 
     @Test
     public void getsAndAnswersAQuestion() throws IOException, InterruptedException {
-        OnlineHearing onlineHearing = createHearingWithQuestion(false);
+        OnlineHearing onlineHearing = createHearingWithQuestion(true);
 
         JSONObject jsonObject = sscsCorBackendRequests.getQuestion(onlineHearing.getHearingId(), onlineHearing.getQuestionId());
         String questionBodyText = jsonObject.getString("question_body_text");

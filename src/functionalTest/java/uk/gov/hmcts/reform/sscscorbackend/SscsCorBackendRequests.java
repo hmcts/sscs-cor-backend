@@ -105,13 +105,13 @@ public class SscsCorBackendRequests {
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
     }
 
-    public void uploadEvidence(String hearingId, String questionId) throws IOException {
+    public void uploadEvidence(String hearingId, String questionId, String fileName) throws IOException {
         HttpEntity data = MultipartEntityBuilder.create()
                 .setContentType(ContentType.MULTIPART_FORM_DATA)
                 .addBinaryBody("file",
-                        this.getClass().getClassLoader().getResourceAsStream("evidence.png"),
+                        this.getClass().getClassLoader().getResourceAsStream(fileName),
                         ContentType.IMAGE_PNG,
-                        "evidence.png")
+                        fileName)
                 .build();
 
         HttpResponse response = client.execute(post(baseUrl + "/continuous-online-hearings/" + hearingId + "/questions/" + questionId + "/evidence")
