@@ -19,10 +19,12 @@ public class Evidence {
         this.createdDate = createdDate;
     }
 
-    @ApiModelProperty(example = "http://dm-store-aat.service.core-compute-aat.internal/documents/8f79deb3-5d7a-4e6f-846a-a8131ac6a3bb", required = true)
-    @JsonProperty(value = "document_link")
-    public String getDocumentLink() {
-        return documentLink;
+    @ApiModelProperty(example = "8f79deb3-5d7a-4e6f-846a-a8131ac6a3bb", required = true)
+    @JsonProperty(value = "id")
+    public String getId() {
+        String[] split = documentLink.split("/");
+
+        return split[split.length - 1];
     }
 
     @ApiModelProperty(example = "some_file_name.txt", required = true)

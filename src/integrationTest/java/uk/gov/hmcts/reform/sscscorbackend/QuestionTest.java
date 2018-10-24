@@ -39,10 +39,11 @@ public class QuestionTest extends BaseIntegrationTest {
         cohStub.stubGetOnlineHearing(CCD_CASE_ID, hearingId);
         String fileName = "someFileName.txt";
         String evidenceCreatedDate = "2018-10-24'T'12:11:21Z";
-        ccdStub.stubFindCaseByCaseId(CCD_CASE_ID, questionId, fileName, evidenceCreatedDate);
+        String evidenceUrl = "http://exmple.com/document/1";
+        ccdStub.stubFindCaseByCaseId(CCD_CASE_ID, questionId, fileName, evidenceCreatedDate, evidenceUrl);
 
         RestAssured.baseURI = "http://localhost:" + applicationPort;
-        Evidence expectedEvidence = new Evidence("http://exmple.com/document/1", fileName, evidenceCreatedDate);
+        Evidence expectedEvidence = new Evidence(evidenceUrl, fileName, evidenceCreatedDate);
         RestAssured.given()
                 .when()
                 .get("/continuous-online-hearings/" + hearingId + "/questions/" + questionId)
