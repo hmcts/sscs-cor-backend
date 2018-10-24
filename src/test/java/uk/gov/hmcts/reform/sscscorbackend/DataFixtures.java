@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseData;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
+import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CohEvent;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 
 
@@ -79,6 +80,14 @@ public class DataFixtures {
         CcdEvent ccdEvent = new CcdEvent(caseDetails);
 
         return ccdEvent;
+    }
+
+    public static CohEvent someCohEvent(String caseId, String hearingId, String event) {
+        CohEvent cohEvent = CohEvent.builder().caseId(caseId)
+                .eventType(event)
+                .onlineHearingId(hearingId).build();
+
+        return cohEvent;
     }
 
 

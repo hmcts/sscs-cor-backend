@@ -12,17 +12,21 @@ import java.util.Collections;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearing;
+import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 
 public class OnlineHearingServiceTest {
     private CohService cohService;
     private CcdService ccdService;
+    PDFServiceClient pdfServiceClient;
+    SscsPdfService sscsPdfService;
 
     private OnlineHearingService underTest;
 
@@ -34,11 +38,14 @@ public class OnlineHearingServiceTest {
     public void setUp() {
         cohService = mock(CohService.class);
         ccdService = mock(CcdService.class);
+        pdfServiceClient = mock(PDFServiceClient.class);
+        sscsPdfService = mock(SscsPdfService.class);
         IdamService idamService = mock(IdamService.class);
         idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        underTest = new OnlineHearingService(cohService, ccdService, idamService);
+        underTest = new OnlineHearingService(cohService, ccdService, idamService,
+                pdfServiceClient, sscsPdfService, "template path");
 
         someEmailAddress = "someEmailAddress";
         someCaseId = 1234321L;

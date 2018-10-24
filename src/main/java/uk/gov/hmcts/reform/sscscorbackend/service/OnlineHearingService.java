@@ -3,15 +3,28 @@ package uk.gov.hmcts.reform.sscscorbackend.service;
 import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.ImmutableMap;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
+import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.OnlineHearingPdfWraper;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 
 @Service
@@ -22,14 +35,24 @@ public class OnlineHearingService {
     private final CohService cohClient;
     private final CcdService ccdService;
     private final IdamService idamService;
+    private final PDFServiceClient pdfServiceClient;
+    private final String appellantTemplatePath;
+    private SscsPdfService sscsPdfService;
+
 
     public OnlineHearingService(@Autowired CohService cohService,
                                 @Autowired CcdService ccdService,
-                                @Autowired IdamService idamService
+                                @Autowired IdamService idamService,
+                                @Autowired PDFServiceClient pdfServiceClient,
+                                @Autowired SscsPdfService sscsPdfService,
+                                @Value("${appellant.appeal.html.template.path}") String appellantTemplatePath
     ) {
         this.cohClient = cohService;
         this.ccdService = ccdService;
         this.idamService = idamService;
+        this.pdfServiceClient = pdfServiceClient;
+        this.sscsPdfService = sscsPdfService;
+        this.appellantTemplatePath = appellantTemplatePath;
     }
 
     public String createOnlineHearing(String caseId) {
@@ -121,4 +144,48 @@ public class OnlineHearingService {
                     );
                 });
     }
+
+    public CohQuestionRounds getQuestionRounds(String onlineHearingId) {
+        return cohClient.getQuestionRounds(onlineHearingId);
+    }
+
+    public void storeOnlineHearingInCcd(String onlineHearingId, String caseId) {
+        //get the questions and answers
+        CohQuestionRounds questionRounds = getQuestionRounds(onlineHearingId);
+
+        IdamTokens idamTokens = idamService.getIdamTokens();
+
+        SscsCaseDetails caseDetails = ccdService.getByCaseId(Long.valueOf(caseId), idamTokens);
+
+        String appellantName = caseDetails.getData().getAppeal().getAppellant().getName().getFullName();
+
+        String nino = caseDetails.getData().getGeneratedNino();
+
+        String caseReference = caseDetails.getData().getCaseReference();
+
+        OnlineHearingPdfWraper onlineHearingPdfWraper = OnlineHearingPdfWraper.builder()
+                .appellantName(appellantName).cohQuestionRounds(questionRounds)
+                .nino(nino).caseReference(caseReference).build();
+
+        Map<String, Object> placeholders = Collections.singletonMap("PdfWrapper", onlineHearingPdfWraper);
+
+        byte[] template;
+        try {
+            template = getTemplate();
+        } catch (IOException e) {
+            throw new PdfGenerationException("Error getting template " + appellantTemplatePath, e);
+        }
+
+        byte[] pdfBytes = pdfServiceClient.generateFromHtml(template, placeholders);
+
+        sscsPdfService.mergeDocIntoCcd("COR Transcript - " + caseReference + ".pdf", pdfBytes,
+                Long.valueOf(caseId), caseDetails.getData(), idamTokens);
+    }
+
+    private byte[] getTemplate() throws IOException {
+        InputStream in = getClass().getResourceAsStream(appellantTemplatePath);
+        return IOUtils.toByteArray(in);
+    }
+
+
 }
