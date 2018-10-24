@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.Date;
@@ -27,9 +26,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 public class EvidenceUploadServiceTest {
 
     private EvidenceUploadService evidenceUploadService;
-    private EvidenceManagementService evidenceManagementService;
     private CcdService ccdService;
-    private IdamService idamService;
     private OnlineHearingService onlineHearingService;
     private String someOnlineHearingId;
     private String someQuestionId;
@@ -41,9 +38,7 @@ public class EvidenceUploadServiceTest {
 
     @Before
     public void setUp() {
-        evidenceManagementService = mock(EvidenceManagementService.class);
         ccdService = mock(CcdService.class);
-        idamService = mock(IdamService.class);
         onlineHearingService = mock(OnlineHearingService.class);
         someOnlineHearingId = "someOnlinehearingId";
         someQuestionId = "someQuestionId";
@@ -51,9 +46,11 @@ public class EvidenceUploadServiceTest {
         someCcdCaseId = 123L;
         when(onlineHearingService.getCcdCaseId(someOnlineHearingId)).thenReturn(Optional.of(someCcdCaseId));
 
+        IdamService idamService = mock(IdamService.class);
         idamTokens = mock(IdamTokens.class);
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
+        EvidenceManagementService evidenceManagementService = mock(EvidenceManagementService.class);
         evidenceUploadService = new EvidenceUploadService(
                 evidenceManagementService,
                 ccdService,
@@ -132,10 +129,8 @@ public class EvidenceUploadServiceTest {
         when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
 
 
-        Optional<List<Evidence>> evidence = evidenceUploadService.listEvidence(someOnlineHearingId, someQuestionId);
+        List<Evidence> evidenceList = evidenceUploadService.listEvidence(someOnlineHearingId, someQuestionId);
 
-        assertThat(evidence.isPresent(), is(true));
-        List<Evidence> evidenceList = evidence.get();
         assertThat(evidenceList.size(), is(1));
         assertThat(evidenceList.get(0), is(new Evidence(documentUrl, fileName)));
     }
@@ -145,10 +140,8 @@ public class EvidenceUploadServiceTest {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
         when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
 
-        Optional<List<Evidence>> evidence = evidenceUploadService.listEvidence(someOnlineHearingId, someQuestionId);
+        List<Evidence> evidenceList = evidenceUploadService.listEvidence(someOnlineHearingId, someQuestionId);
 
-        assertThat(evidence.isPresent(), is(true));
-        List<Evidence> evidenceList = evidence.get();
         assertThat(evidenceList.isEmpty(), is(true));
     }
 
@@ -157,10 +150,8 @@ public class EvidenceUploadServiceTest {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails("someOtherQuestionId", fileName, documentUrl);
         when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
 
-        Optional<List<Evidence>> evidence = evidenceUploadService.listEvidence(someOnlineHearingId, someQuestionId);
+        List<Evidence> evidenceList = evidenceUploadService.listEvidence(someOnlineHearingId, someQuestionId);
 
-        assertThat(evidence.isPresent(), is(true));
-        List<Evidence> evidenceList = evidence.get();
         assertThat(evidenceList.isEmpty(), is(true));
     }
 
@@ -169,9 +160,9 @@ public class EvidenceUploadServiceTest {
         String nonExistentHearingId = "nonExistentHearingId";
         when(onlineHearingService.getCcdCaseId(nonExistentHearingId)).thenReturn(Optional.empty());
 
-        Optional<List<Evidence>> evidence = evidenceUploadService.listEvidence(nonExistentHearingId, someQuestionId);
+        List<Evidence> evidenceList = evidenceUploadService.listEvidence(nonExistentHearingId, someQuestionId);
 
-        assertThat(evidence.isPresent(), is(false));
+        assertThat(evidenceList, is(emptyList()));
     }
 
     @Test(expected = IllegalStateException.class)

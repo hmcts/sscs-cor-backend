@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
 import java.util.Objects;
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
@@ -18,20 +19,14 @@ public class Question {
     private final String answer;
     private final AnswerState answerState;
     private final String answerDate;
+    private final List<Evidence> evidence;
 
     public Question(String onlineHearingId,
                     String questionId,
                     int questionOrdinal,
                     String questionHeaderText,
                     String questionBodyText) {
-        this.onlineHearingId = onlineHearingId;
-        this.questionId = questionId;
-        this.questionOrdinal = questionOrdinal;
-        this.questionHeaderText = questionHeaderText;
-        this.questionBodyText = questionBodyText;
-        this.answer = null;
-        this.answerState = AnswerState.unanswered;
-        this.answerDate = null;
+        this(onlineHearingId, questionId, questionOrdinal, questionHeaderText, questionBodyText, null, AnswerState.unanswered, null, null);
     }
 
     public Question(String onlineHearingId,
@@ -41,7 +36,8 @@ public class Question {
                     String questionBodyText,
                     String answer,
                     AnswerState answerState,
-                    String answerDate) {
+                    String answerDate,
+                    List<Evidence> evidence) {
         this.onlineHearingId = onlineHearingId;
         this.questionId = questionId;
         this.questionOrdinal = questionOrdinal;
@@ -50,6 +46,7 @@ public class Question {
         this.answer = answer;
         this.answerState = answerState;
         this.answerDate = answerDate;
+        this.evidence = evidence;
     }
 
     @ApiModelProperty(example = "ID_1", required = true)
@@ -100,6 +97,12 @@ public class Question {
         return answerDate;
     }
 
+    @ApiModelProperty(required = true)
+    @JsonProperty(value = "evidence")
+    public List<Evidence> getEvidence() {
+        return evidence;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -109,11 +112,12 @@ public class Question {
             return false;
         }
         Question question = (Question) o;
-        return Objects.equals(onlineHearingId, question.onlineHearingId) &&
+        return questionOrdinal == question.questionOrdinal &&
+                Objects.equals(onlineHearingId, question.onlineHearingId) &&
                 Objects.equals(questionId, question.questionId) &&
-                Objects.equals(questionOrdinal, question.questionOrdinal) &&
                 Objects.equals(questionHeaderText, question.questionHeaderText) &&
                 Objects.equals(questionBodyText, question.questionBodyText) &&
+                Objects.equals(evidence, question.evidence) &&
                 Objects.equals(answer, question.answer) &&
                 answerState == question.answerState &&
                 Objects.equals(answerDate, question.answerDate);
@@ -121,8 +125,7 @@ public class Question {
 
     @Override
     public int hashCode() {
-        return Objects.hash(onlineHearingId, questionId, questionOrdinal,
-                questionHeaderText, questionBodyText, answer, answerState, answerDate);
+        return Objects.hash(onlineHearingId, questionId, questionOrdinal, questionHeaderText, questionBodyText, evidence, answer, answerState, answerDate);
     }
 
     @Override
@@ -130,9 +133,10 @@ public class Question {
         return "Question{" +
                 "onlineHearingId='" + onlineHearingId + '\'' +
                 ", questionId='" + questionId + '\'' +
-                ", questionOrdinal='" + questionOrdinal + '\'' +
+                ", questionOrdinal=" + questionOrdinal +
                 ", questionHeaderText='" + questionHeaderText + '\'' +
                 ", questionBodyText='" + questionBodyText + '\'' +
+                ", evidence=" + evidence +
                 ", answer='" + answer + '\'' +
                 ", answerState=" + answerState +
                 ", answerDate='" + answerDate + '\'' +

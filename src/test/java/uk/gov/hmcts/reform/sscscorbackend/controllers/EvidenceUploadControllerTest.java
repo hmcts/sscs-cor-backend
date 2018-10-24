@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers;
 
-import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
@@ -10,7 +9,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
@@ -57,27 +55,5 @@ public class EvidenceUploadControllerTest {
         );
 
         assertThat(evidenceResponseEntity.getStatusCode(), is(NOT_FOUND));
-    }
-
-    @Test
-    public void canListEvidence() {
-        List<Evidence> expectedEvidenceList = singletonList(evidence);
-        when(evidenceUploadService.listEvidence(someOnlineHearingId, someQuestionId)).thenReturn(of(expectedEvidenceList));
-
-        ResponseEntity<List<Evidence>> evidenceList =
-                evidenceUploadController.listEvidence(someOnlineHearingId, someQuestionId);
-
-        assertThat(evidenceList.getStatusCode(), is(OK));
-        assertThat(evidenceList.getBody(), is(expectedEvidenceList));
-    }
-
-    @Test
-    public void cannotListEvidenceWhenOnlineHearingIsNotFound() {
-        when(evidenceUploadService.listEvidence(someOnlineHearingId, someQuestionId)).thenReturn(empty());
-
-        ResponseEntity<List<Evidence>> evidenceList =
-                evidenceUploadController.listEvidence(someOnlineHearingId, someQuestionId);
-
-        assertThat(evidenceList.getStatusCode(), is(NOT_FOUND));
     }
 }

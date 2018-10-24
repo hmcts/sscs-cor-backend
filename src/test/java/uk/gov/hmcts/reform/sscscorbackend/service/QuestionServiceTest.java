@@ -25,6 +25,7 @@ public class QuestionServiceTest {
     private String questionId;
     private CohAnswer cohAnswer;
     private QuestionService underTest;
+    private EvidenceUploadService evidenceUploadService;
 
     @Before
     public void setUp() {
@@ -33,7 +34,8 @@ public class QuestionServiceTest {
         onlineHearingId = cohQuestion.getOnlineHearingId();
         questionId = cohQuestion.getQuestionId();
         cohAnswer = someCohAnswer();
-        underTest = new QuestionService(cohService);
+        evidenceUploadService = mock(EvidenceUploadService.class);
+        underTest = new QuestionService(cohService, evidenceUploadService);
     }
 
     @Test
@@ -137,9 +139,11 @@ public class QuestionServiceTest {
     }
 
     @Test
-    public void getsAQuestionWithAnAnswer() {
+    public void getsAQuestionWithAnAnswerAnEvidence() {
         when(cohService.getQuestion(onlineHearingId, questionId)).thenReturn(cohQuestion);
         when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(singletonList(cohAnswer));
+        List<Evidence> evidenceList = singletonList(someEvidence());
+        when(evidenceUploadService.listEvidence(onlineHearingId, questionId)).thenReturn(evidenceList);
 
         Question question = underTest.getQuestion(onlineHearingId, questionId);
 
@@ -150,7 +154,8 @@ public class QuestionServiceTest {
                 cohQuestion.getQuestionBodyText(),
                 cohAnswer.getAnswerText(),
                 AnswerState.of(cohAnswer.getCurrentAnswerState().getStateName()),
-                cohAnswer.getCurrentAnswerState().getStateDateTime()))
+                cohAnswer.getCurrentAnswerState().getStateDateTime(),
+                evidenceList))
         );
     }
 
@@ -165,10 +170,7 @@ public class QuestionServiceTest {
                 cohQuestion.getQuestionId(),
                 cohQuestion.getQuestionOrdinal(),
                 cohQuestion.getQuestionHeaderText(),
-                cohQuestion.getQuestionBodyText(),
-                null,
-                AnswerState.unanswered,
-                null))
+                cohQuestion.getQuestionBodyText()))
         );
     }
 
