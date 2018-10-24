@@ -8,6 +8,8 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -35,6 +37,7 @@ public class EvidenceUploadServiceTest {
     private String fileName;
     private String documentUrl;
     private MultipartFile file;
+    private final Date evidenceCreatedOn = new Date();
 
     @Before
     public void setUp() {
@@ -67,7 +70,7 @@ public class EvidenceUploadServiceTest {
 
     @Test
     public void uploadsEvidenceAndAddsItToCorDocumentsInCcd() {
-        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl);
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
         final int originalNumberOfCorDocuments = sscsCaseDetails.getData().getCorDocument().size();
         when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
 
@@ -75,7 +78,7 @@ public class EvidenceUploadServiceTest {
 
         assertThat(evidenceOptional.isPresent(), is(true));
         Evidence evidence = evidenceOptional.get();
-        assertThat(evidence, is(new Evidence(documentUrl, fileName)));
+        assertThat(evidence, is(new Evidence(documentUrl, fileName, convertCreatedOnDate(evidenceCreatedOn))));
         verify(ccdService).updateCase(
                 hasCorDocument(originalNumberOfCorDocuments, someQuestionId, documentUrl, fileName),
                 eq(someCcdCaseId),
@@ -95,7 +98,7 @@ public class EvidenceUploadServiceTest {
 
         assertThat(evidenceOptional.isPresent(), is(true));
         Evidence evidence = evidenceOptional.get();
-        assertThat(evidence, is(new Evidence(documentUrl, fileName)));
+        assertThat(evidence, is(new Evidence(documentUrl, fileName, convertCreatedOnDate(evidenceCreatedOn))));
         verify(ccdService).updateCase(
                 hasCorDocument(0, someQuestionId, documentUrl, fileName),
                 eq(someCcdCaseId),
@@ -125,14 +128,14 @@ public class EvidenceUploadServiceTest {
 
     @Test
     public void listEvidence() {
-        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl);
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
         when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
 
 
         List<Evidence> evidenceList = evidenceUploadService.listEvidence(someOnlineHearingId, someQuestionId);
 
         assertThat(evidenceList.size(), is(1));
-        assertThat(evidenceList.get(0), is(new Evidence(documentUrl, fileName)));
+        assertThat(evidenceList.get(0), is(new Evidence(documentUrl, fileName, convertCreatedOnDate(evidenceCreatedOn))));
     }
 
     @Test
@@ -147,7 +150,7 @@ public class EvidenceUploadServiceTest {
 
     @Test
     public void listEvidenceWhenEvidenceHasOnlyBeenUploadedForOtherQuestions() {
-        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails("someOtherQuestionId", fileName, documentUrl);
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails("someOtherQuestionId", fileName, documentUrl, evidenceCreatedOn);
         when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
 
         List<Evidence> evidenceList = evidenceUploadService.listEvidence(someOnlineHearingId, someQuestionId);
@@ -174,7 +177,7 @@ public class EvidenceUploadServiceTest {
 
     private UploadResponse createUploadResponse() {
         Document document = new Document();
-        document.createdOn = new Date();
+        document.createdOn = evidenceCreatedOn;
         document.links = new Document.Links();
         document.links.self = new Document.Link();
         document.links.self.href = documentUrl;
@@ -196,7 +199,7 @@ public class EvidenceUploadServiceTest {
         });
     }
 
-    private SscsCaseDetails createSscsCaseDetails(String someQuestionId, String fileName, String documentUrl) {
+    private SscsCaseDetails createSscsCaseDetails(String someQuestionId, String fileName, String documentUrl, Date evidenceCreatedOn) {
         return SscsCaseDetails.builder()
                 .data(SscsCaseData.builder()
                         .corDocument(singletonList(CorDocument.builder()
@@ -207,6 +210,7 @@ public class EvidenceUploadServiceTest {
                                                 .documentLink(DocumentLink.builder()
                                                         .documentUrl(documentUrl)
                                                         .build())
+                                                .documentDateAdded(convertCreatedOnDate(evidenceCreatedOn))
                                                 .build())
                                         .build())
                                 .build()))
@@ -216,5 +220,12 @@ public class EvidenceUploadServiceTest {
 
     private SscsCaseDetails createSscsCaseDetailsWithoutCcdDocuments() {
         return SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build();
+    }
+
+    private String convertCreatedOnDate(Date date) {
+        return date.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+                .format(DateTimeFormatter.ISO_DATE);
     }
 }

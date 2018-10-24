@@ -101,6 +101,6 @@ public class DataFixtures {
     }
 
     public static Evidence someEvidence() {
-        return new Evidence("http://example.com/document/1", "someFilename.txt");
+        return new Evidence("http://example.com/document/1", "someFilename.txt", "2018-10-24'T'12:11:21Z");
     }
 }

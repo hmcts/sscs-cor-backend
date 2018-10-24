@@ -40,7 +40,7 @@ public class EvidenceUploadService {
                     Document document = uploadDocument(file);
                     addDocumentToCcd(questionId, ccdCaseId, document);
 
-                    return new Evidence(document.links.self.href, document.originalDocumentName);
+                    return new Evidence(document.links.self.href, document.originalDocumentName, getCreatedDate(document));
                 });
     }
 
@@ -72,8 +72,8 @@ public class EvidenceUploadService {
             DocumentLink documentLink = sscsDocumentDetails.getDocumentLink();
             return new Evidence(
                     documentLink != null ? documentLink.getDocumentUrl() : null,
-                    sscsDocumentDetails.getDocumentFileName()
-            );
+                    sscsDocumentDetails.getDocumentFileName(),
+                    sscsDocumentDetails.getDocumentDateAdded());
         };
     }
 
@@ -112,10 +112,7 @@ public class EvidenceUploadService {
     }
 
     private CorDocument createNewCorDocument(String questionId, Document document) {
-        String createdOn = document.createdOn.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate()
-                .format(DateTimeFormatter.ISO_DATE);
+        String createdOn = getCreatedDate(document);
         DocumentLink documentLink = DocumentLink.builder()
                 .documentUrl(document.links.self.href)
                 .build();
@@ -125,5 +122,12 @@ public class EvidenceUploadService {
         );
 
         return new CorDocument(new CorDocumentDetails(sscsDocument, questionId));
+    }
+
+    private String getCreatedDate(Document document) {
+        return document.createdOn.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+                .format(DateTimeFormatter.ISO_DATE);
     }
 }

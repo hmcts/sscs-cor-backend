@@ -31,6 +31,7 @@ public class CcdStub extends BaseStub {
             "          \"value\": {\n" +
             "            \"document\": {\n" +
             "              \"documentFileName\": \"{evidenceFileName}\",\n" +
+            "              \"documentDateAdded\": \"{evidenceCreatedDate}\",\n" +
             "              \"documentLink\": {\n" +
             "                \"document_url\": \"http://exmple.com/document/1\"\n" +
             "              }\n" +
@@ -47,7 +48,7 @@ public class CcdStub extends BaseStub {
     }
 
     public void stubSearchCaseWithEmailAddress(String email, Long caseId, String caseReference, String firstName, String lastName) throws JsonProcessingException, UnsupportedEncodingException {
-        String caseDetailsJson = "[" + createCaseDetails(caseId, caseReference, firstName, lastName, "someQuestionId", "someFileName.txt") + "]";
+        String caseDetailsJson = "[" + createCaseDetails(caseId, caseReference, firstName, lastName, "someQuestionId", "someFileName.txt", "2018-10-24'T'12:11:21Z") + "]";
 
         wireMock.stubFor(get(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases?" +
                         "case.subscriptions.appellantSubscription.email=" + encode(email, UTF_8.name())
@@ -57,20 +58,21 @@ public class CcdStub extends BaseStub {
         );
     }
 
-    public void stubFindCaseByCaseId(Long caseId, String evidenceQuestionId, String evidenceFileName) {
+    public void stubFindCaseByCaseId(Long caseId, String evidenceQuestionId, String evidenceFileName, String evidenceCreatedDate) {
         wireMock.stubFor(get(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId))
                         .withHeader("ServiceAuthorization", new RegexPattern(".*"))
-                        .willReturn(okJson(createCaseDetails(caseId, "caseRef", "firstName", "lastName", evidenceQuestionId, evidenceFileName)))
+                        .willReturn(okJson(createCaseDetails(caseId, "caseRef", "firstName", "lastName", evidenceQuestionId, evidenceFileName, evidenceCreatedDate)))
         );
     }
 
-    private String createCaseDetails(Long caseId, String caseReference, String firstName, String lastName, String evidenceQuestionId, String evidenceFileName) {
+    private String createCaseDetails(Long caseId, String caseReference, String firstName, String lastName, String evidenceQuestionId, String evidenceFileName, String evidenceCreatedDate) {
         return caseDetailsJson.replace("{caseId}", caseId.toString())
                 .replace("{caseReference}", caseReference)
                 .replace("{firstName}", firstName)
                 .replace("{lastName}", lastName)
                 .replace("{evidenceQuestionId}", evidenceQuestionId)
-                .replace("{evidenceFileName}", evidenceFileName);
+                .replace("{evidenceFileName}", evidenceFileName)
+                .replace("{evidenceCreatedDate}", evidenceCreatedDate);
 
     }
 }
