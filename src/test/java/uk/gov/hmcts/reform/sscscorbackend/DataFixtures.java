@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscscorbackend;
 
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
 
@@ -27,7 +28,7 @@ public class DataFixtures {
     }
 
     public static Question someQuestion() {
-        return new Question("someHearingId", "someQuestionId", 1, "someQuestionHeader", "someBody", "someAnswer", draft, "2018-08-08T09:12:12Z");
+        return new Question("someHearingId", "someQuestionId", 1, "someQuestionHeader", "someBody", "someAnswer", draft, "2018-08-08T09:12:12Z", emptyList());
     }
 
     public static CohQuestion someCohQuestion() {
@@ -97,5 +98,9 @@ public class DataFixtures {
     public static OnlineHearing someOnlineHearingWithDecisionAndAppellentReply() {
         Decision decision = new Decision("someOnlineHearingId", "decisionAward", "decisionHeader", "decisionReason", "decisionText", "decision_issued", now().format(ISO_LOCAL_DATE_TIME), "decision_accepted", now().format(ISO_LOCAL_DATE_TIME));
         return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", decision);
+    }
+
+    public static Evidence someEvidence() {
+        return new Evidence("http://example.com/document/1", "someFilename.txt");
     }
 }

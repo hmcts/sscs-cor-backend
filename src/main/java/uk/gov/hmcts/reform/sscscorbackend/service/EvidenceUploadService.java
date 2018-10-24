@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import org.springframework.stereotype.Service;
@@ -41,22 +44,22 @@ public class EvidenceUploadService {
                 });
     }
 
-    public Optional<List<Evidence>> listEvidence(String onlineHearingId, String questionId) {
+    public List<Evidence> listEvidence(String onlineHearingId, String questionId) {
         return onlineHearingService.getCcdCaseId(onlineHearingId)
-                .map(ccdCaseId -> {
+                .<List<Evidence>>map(ccdCaseId -> {
                     IdamTokens idamTokens = idamService.getIdamTokens();
                     SscsCaseDetails caseDetails = getSscsCaseDetails(ccdCaseId, idamTokens);
 
                     List<CorDocument> corDocuments = caseDetails.getData().getCorDocument();
                     if (corDocuments == null) {
-                        return Collections.emptyList();
+                        return emptyList();
                     }
 
                     return corDocuments.stream()
                             .filter(documentsForQuestion(questionId))
                             .map(corDocumentToEvidence())
                             .collect(toList());
-                });
+                }).orElse(emptyList());
     }
 
     private Predicate<CorDocument> documentsForQuestion(String questionId) {

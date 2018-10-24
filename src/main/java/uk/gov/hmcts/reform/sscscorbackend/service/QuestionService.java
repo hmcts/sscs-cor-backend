@@ -14,9 +14,11 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 @Service
 public class QuestionService {
     private final CohService cohService;
+    private final EvidenceUploadService evidenceUploadService;
 
-    public QuestionService(@Autowired CohService cohService) {
+    public QuestionService(@Autowired CohService cohService, @Autowired EvidenceUploadService evidenceUploadService) {
         this.cohService = cohService;
+        this.evidenceUploadService = evidenceUploadService;
     }
 
     public Question getQuestion(String onlineHearingId, String questionId) {
@@ -24,6 +26,7 @@ public class QuestionService {
         if (question != null) {
             List<CohAnswer> answers = cohService.getAnswers(onlineHearingId, questionId);
             if (answers != null && !answers.isEmpty()) {
+                List<Evidence> evidence = evidenceUploadService.listEvidence(onlineHearingId, questionId);
                 return new Question(question.getOnlineHearingId(),
                         question.getQuestionId(),
                         question.getQuestionOrdinal(),
@@ -31,7 +34,9 @@ public class QuestionService {
                         question.getQuestionBodyText(),
                         answers.get(0).getAnswerText(),
                         getAnswerState(answers),
-                        answers.get(0).getCurrentAnswerState().getStateDateTime());
+                        answers.get(0).getCurrentAnswerState().getStateDateTime(),
+                        evidence
+                );
             } else {
                 return new Question(question.getOnlineHearingId(),
                         question.getQuestionId(),

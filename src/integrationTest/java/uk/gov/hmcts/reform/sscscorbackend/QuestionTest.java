@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscscorbackend;
 
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohAnswers;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionReference;
+import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -25,6 +27,7 @@ public class QuestionTest extends BaseIntegrationTest {
     private static final String QUESTION_BODY = "Question body";
     private static final String ANSWER_TEXT = "Answer text";
     private static final String ANSWER_STATUS = "draft";
+    private static final Long CCD_CASE_ID = 123L;
 
     @Test
     public void getQuestion() {
@@ -33,14 +36,18 @@ public class QuestionTest extends BaseIntegrationTest {
         cohStub.stubGetQuestion(hearingId, questionId, QUESTION_HEADER, QUESTION_BODY);
         ZonedDateTime answerDate = ZonedDateTime.now();
         cohStub.stubGetAnswer(hearingId, questionId, ANSWER_TEXT, UUID.randomUUID().toString(), "answer_drafted", answerDate);
+        cohStub.stubGetOnlineHearing(CCD_CASE_ID, hearingId);
+        String fileName = "someFileName.txt";
+        ccdStub.stubFindCaseByCaseId(CCD_CASE_ID, questionId, fileName);
 
         RestAssured.baseURI = "http://localhost:" + applicationPort;
+        Evidence expectedEvidence = new Evidence("http://exmple.com/document/1", fileName);
         RestAssured.given()
                 .when()
                 .get("/continuous-online-hearings/" + hearingId + "/questions/" + questionId)
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .body(new QuestionMatcher(QUESTION_HEADER, QUESTION_BODY, ANSWER_TEXT, answerDate));
+                .body(new QuestionMatcher(QUESTION_HEADER, QUESTION_BODY, ANSWER_TEXT, answerDate, singletonList(expectedEvidence)));
     }
 
     @Test
