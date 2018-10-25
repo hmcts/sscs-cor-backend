@@ -1,16 +1,15 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
+import static java.util.Collections.*;
+import static java.util.stream.Collectors.*;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
@@ -45,25 +44,25 @@ public class EvidenceUploadService {
     }
 
     public List<Evidence> listEvidence(String onlineHearingId, String questionId) {
+        return listEvidence(onlineHearingId).getOrDefault(questionId, emptyList());
+    }
+
+    public Map<String, List<Evidence>> listEvidence(String onlineHearingId) {
         return onlineHearingService.getCcdCaseId(onlineHearingId)
-                .<List<Evidence>>map(ccdCaseId -> {
+                .<Map<String, List<Evidence>>>map(ccdCaseId -> {
                     IdamTokens idamTokens = idamService.getIdamTokens();
                     SscsCaseDetails caseDetails = getSscsCaseDetails(ccdCaseId, idamTokens);
 
                     List<CorDocument> corDocuments = caseDetails.getData().getCorDocument();
                     if (corDocuments == null) {
-                        return emptyList();
+                        return emptyMap();
                     }
 
-                    return corDocuments.stream()
-                            .filter(documentsForQuestion(questionId))
-                            .map(corDocumentToEvidence())
-                            .collect(toList());
-                }).orElse(emptyList());
-    }
-
-    private Predicate<CorDocument> documentsForQuestion(String questionId) {
-        return corDocument -> questionId.equals(corDocument.getValue().getQuestionId());
+                    return corDocuments.stream().collect(groupingBy(
+                        corDocumentDetails -> corDocumentDetails.getValue().getQuestionId(),
+                        mapping(corDocumentToEvidence(), toList()))
+                    );
+                }).orElse(emptyMap());
     }
 
     private Function<CorDocument, Evidence> corDocumentToEvidence() {

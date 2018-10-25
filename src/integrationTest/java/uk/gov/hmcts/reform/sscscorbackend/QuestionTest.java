@@ -26,7 +26,6 @@ public class QuestionTest extends BaseIntegrationTest {
     private static final String QUESTION_HEADER = "Question header";
     private static final String QUESTION_BODY = "Question body";
     private static final String ANSWER_TEXT = "Answer text";
-    private static final String ANSWER_STATUS = "draft";
     private static final Long CCD_CASE_ID = 123L;
 
     @Test
@@ -129,6 +128,9 @@ public class QuestionTest extends BaseIntegrationTest {
                 "first-id", 1, "first question", deadlineExpiryDate, someCohAnswers("answer_drafted")
         );
         cohStub.stubGetAllQuestionRounds(hearingId, questionSummary);
+        Long caseId = 123L;
+        cohStub.stubGetOnlineHearing(caseId, hearingId);
+        ccdStub.stubFindCaseByCaseId(caseId, "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
 
         RestAssured.baseURI = "http://localhost:" + applicationPort;
         RestAssured.given()
