@@ -12,6 +12,7 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
@@ -80,12 +81,7 @@ public class QuestionServiceTest {
                         new CohQuestionReference("someQuestionId", 1, "first question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), null)
                 ), 0)
         ));
-        CohQuestionReference cohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
-                .getQuestionReferences().get(0);
-        String id = cohQuestionReference.getQuestionId();
-        int questionOrdinal = cohQuestionReference.getQuestionOrdinal();
-        String questionHeaderText = cohQuestionReference.getQuestionHeaderText();
-        QuestionSummary questionSummary = new QuestionSummary(id, questionOrdinal, questionHeaderText, unanswered);
+        QuestionSummary questionSummary = createQuestionSummary(cohQuestionRounds, 0, unanswered);
 
         when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
 
@@ -96,14 +92,29 @@ public class QuestionServiceTest {
     }
 
     @Test
+    public void getsAListOfQuestionsWithNoAnswerButHasEvidence() {
+        CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(
+                new CohQuestionRound(singletonList(
+                        new CohQuestionReference("someQuestionId", 1, "first question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), null)
+                ), 0)
+        ));
+
+        when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+        HashMap<String, List<Evidence>> evidenceToQuestionsMap = new HashMap<>();
+        evidenceToQuestionsMap.put(questionId, asList(someEvidence()));
+        when(evidenceUploadService.listEvidence(onlineHearingId)).thenReturn(evidenceToQuestionsMap);
+
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
+        List<QuestionSummary> questions = questionRound.getQuestions();
+
+        QuestionSummary questionSummary = createQuestionSummary(cohQuestionRounds, 0, draft);
+        assertThat(questions, contains(questionSummary));
+    }
+
+    @Test
     public void getsAListOfQuestionsWhenThereIsMultipleRoundsOfQuestions() {
         CohQuestionRounds cohQuestionRounds = someCohQuestionRoundsMultipleRoundsOfQuestions();
-        CohQuestionReference cohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(1)
-                .getQuestionReferences().get(0);
-        String id = cohQuestionReference.getQuestionId();
-        int questionOrdinal = cohQuestionReference.getQuestionOrdinal();
-        String questionHeaderText = cohQuestionReference.getQuestionHeaderText();
-        QuestionSummary questionSummary = new QuestionSummary(id, questionOrdinal, questionHeaderText, draft);
+        QuestionSummary questionSummary = createQuestionSummary(cohQuestionRounds, 1, draft);
         when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
         List<QuestionSummary> questions = questionRound.getQuestions();
@@ -139,7 +150,7 @@ public class QuestionServiceTest {
     }
 
     @Test
-    public void getsAQuestionWithAnAnswerAnEvidence() {
+    public void getsAQuestionWithAnAnswerAndEvidence() {
         when(cohService.getQuestion(onlineHearingId, questionId)).thenReturn(cohQuestion);
         when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(singletonList(cohAnswer));
         List<Evidence> evidenceList = singletonList(someEvidence());
@@ -163,6 +174,7 @@ public class QuestionServiceTest {
     public void getsAQuestionWithoutAnAnswer() {
         when(cohService.getQuestion(onlineHearingId, questionId)).thenReturn(cohQuestion);
         when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(emptyList());
+        when(evidenceUploadService.listEvidence(onlineHearingId, questionId)).thenReturn(emptyList());
 
         Question question = underTest.getQuestion(onlineHearingId, questionId);
 
@@ -170,7 +182,32 @@ public class QuestionServiceTest {
                 cohQuestion.getQuestionId(),
                 cohQuestion.getQuestionOrdinal(),
                 cohQuestion.getQuestionHeaderText(),
-                cohQuestion.getQuestionBodyText()))
+                cohQuestion.getQuestionBodyText(),
+                null,
+                unanswered,
+                null,
+                emptyList()))
+        );
+    }
+
+    @Test
+    public void getsAQuestionWithoutAnAnswerAndEvidence() {
+        when(cohService.getQuestion(onlineHearingId, questionId)).thenReturn(cohQuestion);
+        when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(emptyList());
+        List<Evidence> evidenceList = singletonList(someEvidence());
+        when(evidenceUploadService.listEvidence(onlineHearingId, questionId)).thenReturn(evidenceList);
+
+        Question question = underTest.getQuestion(onlineHearingId, questionId);
+
+        assertThat(question, is(new Question(cohQuestion.getOnlineHearingId(),
+                cohQuestion.getQuestionId(),
+                cohQuestion.getQuestionOrdinal(),
+                cohQuestion.getQuestionHeaderText(),
+                cohQuestion.getQuestionBodyText(),
+                null,
+                draft,
+                null,
+                evidenceList))
         );
     }
 
@@ -258,5 +295,14 @@ public class QuestionServiceTest {
         CohQuestionRounds cohQuestionRounds = someCohQuestionRoundsWithSingleRoundOfQuestions();
 
         assertThat(cohQuestionRounds.getCohQuestionRound().get(0).getDeadlineExtensionCount(), is(0));
+    }
+
+    private QuestionSummary createQuestionSummary(CohQuestionRounds cohQuestionRounds, int i, AnswerState answerState) {
+        CohQuestionReference cohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(i)
+                .getQuestionReferences().get(0);
+        String id = cohQuestionReference.getQuestionId();
+        int questionOrdinal = cohQuestionReference.getQuestionOrdinal();
+        String questionHeaderText = cohQuestionReference.getQuestionHeaderText();
+        return new QuestionSummary(id, questionOrdinal, questionHeaderText, answerState);
     }
 }

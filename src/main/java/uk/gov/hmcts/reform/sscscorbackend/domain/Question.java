@@ -25,14 +25,6 @@ public class Question {
                     String questionId,
                     int questionOrdinal,
                     String questionHeaderText,
-                    String questionBodyText) {
-        this(onlineHearingId, questionId, questionOrdinal, questionHeaderText, questionBodyText, null, AnswerState.unanswered, null, null);
-    }
-
-    public Question(String onlineHearingId,
-                    String questionId,
-                    int questionOrdinal,
-                    String questionHeaderText,
                     String questionBodyText,
                     String answer,
                     AnswerState answerState,

@@ -14,7 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class ExtendQuestionRoundDeadlineTest extends BaseFunctionTest {
     @Test
     public void extendsTheQuestionRoundDeadlineDate() throws IOException, InterruptedException {
-        OnlineHearing onlineHearing = createHearingWithQuestion(false);
+        OnlineHearing onlineHearing = createHearingWithQuestion(true);
 
         JSONObject questionRound = sscsCorBackendRequests.extendQuestionRoundDeadline(onlineHearing.getHearingId());
         String deadlineExpiryDate = questionRound.getString("deadline_expiry_date");

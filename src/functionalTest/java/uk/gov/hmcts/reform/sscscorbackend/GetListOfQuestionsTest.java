@@ -14,7 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class GetListOfQuestionsTest extends BaseFunctionTest {
     @Test
     public void getAListOfQuestionTitles() throws IOException, InterruptedException {
-        OnlineHearing onlineHearing = createHearingWithQuestion(false);
+        OnlineHearing onlineHearing = createHearingWithQuestion(true);
 
         JSONObject questionRound = sscsCorBackendRequests.getQuestions(onlineHearing.getHearingId());
         JSONArray questions = questionRound.getJSONArray("questions");

@@ -22,6 +22,9 @@ public class ListQuestionsTest extends BaseIntegrationTest {
                 "second-id", 2, "second question", deadlineExpiryDate, someCohAnswers("answer_submitted")
         );
         cohStub.stubGetAllQuestionRounds(hearingId, firstQuestionSummary, secondQuestionSummary);
+        long caseId = 123L;
+        cohStub.stubGetOnlineHearing(caseId, hearingId);
+        ccdStub.stubFindCaseByCaseId(caseId, "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
 
         RestAssured.baseURI = "http://localhost:" + applicationPort;
         RestAssured.given()
