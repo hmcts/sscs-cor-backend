@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearing;
+import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 

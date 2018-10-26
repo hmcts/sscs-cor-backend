@@ -37,11 +37,10 @@ public class OnlineHearingService {
     private final CohService cohClient;
     private final CcdService ccdService;
     private final IdamService idamService;
-    private final PDFServiceClient pdfServiceClient;
+    private PDFServiceClient pdfServiceClient;
     private final String appellantTemplatePath;
     private SscsPdfService sscsPdfService;
     private EvidenceUploadService evidenceUploadService;
-
 
     public OnlineHearingService(
                                 PDFServiceClient pdfServiceClient,
