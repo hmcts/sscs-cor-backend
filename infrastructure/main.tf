@@ -46,6 +46,7 @@ locals {
   ccdApi    = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
   idam_url  = "https://preprod-idamapi.reform.hmcts.net:3511"
   documentManagementUrl = "http://dm-store-${local.local_env}.service.${local.local_ase}.internal"
+  pdfService    = "http://cmc-pdf-service-${local.local_env}.service.${local.local_ase}.internal"
 
   azureVaultName = "sscs-${local.local_env}"
 
@@ -81,5 +82,6 @@ module "sscs-core-backend" {
     CREATE_CCD_ENDPOINT = "${local.createCcdEndpoint}"
 
     DOCUMENT_MANAGEMENT_URL = "${local.documentManagementUrl}"
+    PDF_API_URL = "${local.pdfService}"
   }
 }

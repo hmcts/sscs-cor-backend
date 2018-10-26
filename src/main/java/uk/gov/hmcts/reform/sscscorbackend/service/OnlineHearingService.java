@@ -35,17 +35,17 @@ public class OnlineHearingService {
     private final CohService cohClient;
     private final CcdService ccdService;
     private final IdamService idamService;
-    private final PDFServiceClient pdfServiceClient;
+    private PDFServiceClient pdfServiceClient;
     private final String appellantTemplatePath;
     private SscsPdfService sscsPdfService;
 
-
-    public OnlineHearingService(@Autowired CohService cohService,
+    public OnlineHearingService(
+                                PDFServiceClient pdfServiceClient,
+                                @Autowired CohService cohService,
                                 @Autowired CcdService ccdService,
                                 @Autowired IdamService idamService,
-                                @Autowired PDFServiceClient pdfServiceClient,
                                 @Autowired SscsPdfService sscsPdfService,
-                                @Value("${appellant.appeal.html.template.path}") String appellantTemplatePath
+                                @Value("${online_hearing_finished.html.template.path}") String appellantTemplatePath
     ) {
         this.cohClient = cohService;
         this.ccdService = ccdService;
@@ -157,17 +157,20 @@ public class OnlineHearingService {
 
         SscsCaseDetails caseDetails = ccdService.getByCaseId(Long.valueOf(caseId), idamTokens);
 
-        String appellantName = caseDetails.getData().getAppeal().getAppellant().getName().getFullName();
-
+        String appellantTitle = caseDetails.getData().getAppeal().getAppellant().getName().getTitle();
+        String appellantFirstName = caseDetails.getData().getAppeal().getAppellant().getName().getFirstName();
+        String appellantLastName = caseDetails.getData().getAppeal().getAppellant().getName().getLastName();
+        
         String nino = caseDetails.getData().getGeneratedNino();
 
         String caseReference = caseDetails.getData().getCaseReference();
 
         OnlineHearingPdfWraper onlineHearingPdfWraper = OnlineHearingPdfWraper.builder()
-                .appellantName(appellantName).cohQuestionRounds(questionRounds)
+                .appellantTitle(appellantTitle).appellantFirstName(appellantFirstName)
+                .appellantLastName(appellantLastName).cohQuestionRounds(questionRounds)
                 .nino(nino).caseReference(caseReference).build();
 
-        Map<String, Object> placeholders = Collections.singletonMap("PdfWrapper", onlineHearingPdfWraper);
+        Map<String, Object> placeholders = Collections.singletonMap("OnlineHearingPdfWrapper", onlineHearingPdfWraper);
 
         byte[] template;
         try {
@@ -176,7 +179,7 @@ public class OnlineHearingService {
             throw new PdfGenerationException("Error getting template " + appellantTemplatePath, e);
         }
 
-        byte[] pdfBytes = pdfServiceClient.generateFromHtml(template, placeholders);
+        byte[] pdfBytes =  pdfServiceClient.generateFromHtml(template, placeholders);
 
         sscsPdfService.mergeDocIntoCcd("COR Transcript - " + caseReference + ".pdf", pdfBytes,
                 Long.valueOf(caseId), caseDetails.getData(), idamTokens);

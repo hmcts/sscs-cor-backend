@@ -17,8 +17,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearing;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 
@@ -44,8 +44,8 @@ public class OnlineHearingServiceTest {
         idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        underTest = new OnlineHearingService(cohService, ccdService, idamService,
-                pdfServiceClient, sscsPdfService, "template path");
+        underTest = new OnlineHearingService(pdfServiceClient, cohService, ccdService, idamService,
+                 sscsPdfService, "template path");
 
         someEmailAddress = "someEmailAddress";
         someCaseId = 1234321L;
