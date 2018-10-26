@@ -38,6 +38,7 @@ public class EvidenceUploadServiceTest {
     private String documentUrl;
     private MultipartFile file;
     private final Date evidenceCreatedOn = new Date();
+    private String someEvidenceId;
 
     @Before
     public void setUp() {
@@ -45,6 +46,7 @@ public class EvidenceUploadServiceTest {
         onlineHearingService = mock(OnlineHearingService.class);
         someOnlineHearingId = "someOnlinehearingId";
         someQuestionId = "someQuestionId";
+        someEvidenceId = "someEvidenceId";
 
         someCcdCaseId = 123L;
         when(onlineHearingService.getCcdCaseId(someOnlineHearingId)).thenReturn(Optional.of(someCcdCaseId));
@@ -61,7 +63,7 @@ public class EvidenceUploadServiceTest {
                 onlineHearingService
         );
         fileName = "someFileName.txt";
-        documentUrl = "http://example.com/someDocumentUrl";
+        documentUrl = "http://example.com/document/" + someEvidenceId;
         file = mock(MultipartFile.class);
 
         UploadResponse uploadResponse = createUploadResponse();
@@ -175,6 +177,45 @@ public class EvidenceUploadServiceTest {
         evidenceUploadService.listEvidence(someOnlineHearingId, someQuestionId);
     }
 
+    @Test
+    public void deleteEvidenceFromCcd() {
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
+        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
+
+        boolean hearingFound = evidenceUploadService.deleteEvidence(someOnlineHearingId, someEvidenceId);
+
+        assertThat(hearingFound, is(true));
+        verify(ccdService).updateCase(
+                doesNotHaveCorDocuments(),
+                eq(someCcdCaseId),
+                eq("uploadCorDocument"),
+                eq("SSCS - cor evidence deleted"),
+                eq("Updated SSCS"),
+                eq(idamTokens)
+        );
+    }
+
+    @Test
+    public void deleteEvidenceIfCaseHadNoCohEvidence() {
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
+        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
+
+        boolean hearingFound = evidenceUploadService.deleteEvidence(someOnlineHearingId, someEvidenceId);
+
+        assertThat(hearingFound, is(true));
+        verify(ccdService, never()).updateCase(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    public void deleteEvidenceForAHearingThatDoesNotExist() {
+        String nonExistentHearingId = "nonExistentHearingId";
+        when(onlineHearingService.getCcdCaseId(nonExistentHearingId)).thenReturn(Optional.empty());
+
+        boolean hearingFound = evidenceUploadService.deleteEvidence(nonExistentHearingId, someEvidenceId);
+
+        assertThat(hearingFound, is(false));
+    }
+
     private UploadResponse createUploadResponse() {
         Document document = new Document();
         document.createdOn = evidenceCreatedOn;
@@ -196,6 +237,13 @@ public class EvidenceUploadServiceTest {
                     corDocument.get(originalNumberOfCorDocuments).getValue().getQuestionId().equals(someQuestionId) &&
                     corDocument.get(originalNumberOfCorDocuments).getValue().getDocument().getDocumentLink().getDocumentUrl().equals(documentUrl) &&
                     corDocument.get(originalNumberOfCorDocuments).getValue().getDocument().getDocumentFileName().equals(fileName);
+        });
+    }
+
+    private SscsCaseData doesNotHaveCorDocuments() {
+        return argThat(argument -> {
+            List<CorDocument> corDocument = argument.getCorDocument();
+            return corDocument.isEmpty();
         });
     }
 
