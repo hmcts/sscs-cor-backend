@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 import org.junit.Before;
@@ -22,6 +23,7 @@ public class EvidenceUploadControllerTest {
     private EvidenceUploadController evidenceUploadController;
     private String someOnlineHearingId;
     private String someQuestionId;
+    private String someEvidenceId;
     private Evidence evidence;
 
     @Before
@@ -30,6 +32,7 @@ public class EvidenceUploadControllerTest {
         evidenceUploadController = new EvidenceUploadController(evidenceUploadService);
         someOnlineHearingId = "someOnlineHearingId";
         someQuestionId = "someQuestionId";
+        someEvidenceId = "someEvidenceId";
         evidence = mock(Evidence.class);
     }
 
@@ -53,6 +56,24 @@ public class EvidenceUploadControllerTest {
         ResponseEntity<Evidence> evidenceResponseEntity = evidenceUploadController.uploadEvidence(
                 someOnlineHearingId, someQuestionId, file
         );
+
+        assertThat(evidenceResponseEntity.getStatusCode(), is(NOT_FOUND));
+    }
+
+    @Test
+    public void canDeleteEvidence() {
+        when(evidenceUploadService.deleteEvidence(someOnlineHearingId, someEvidenceId)).thenReturn(true);
+
+        ResponseEntity evidenceResponseEntity = evidenceUploadController.deleteEvidence(someOnlineHearingId, someEvidenceId);
+
+        assertThat(evidenceResponseEntity.getStatusCode(), is(NO_CONTENT));
+    }
+
+    @Test
+    public void cannotDeleteEvidenceWhenOnlineHearingDoesNotExist() {
+        when(evidenceUploadService.deleteEvidence(someOnlineHearingId, someEvidenceId)).thenReturn(false);
+
+        ResponseEntity evidenceResponseEntity = evidenceUploadController.deleteEvidence(someOnlineHearingId, someEvidenceId);
 
         assertThat(evidenceResponseEntity.getStatusCode(), is(NOT_FOUND));
     }

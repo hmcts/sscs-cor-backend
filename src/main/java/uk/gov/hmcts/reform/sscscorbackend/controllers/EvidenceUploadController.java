@@ -26,7 +26,7 @@ public class EvidenceUploadController {
 
     @ApiOperation(value = "Upload COR evidence",
             notes = "Uploads evidence for a COR appeal. You need to have an appeal in CCD and an online hearing in COH " +
-                    "that references the appeal in CCD. "
+                    "that references the appeal in CCD."
     )
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No online hearing found with online hearing id "),
@@ -45,5 +45,25 @@ public class EvidenceUploadController {
         Optional<Evidence> evidenceOptional = evidenceUploadService.uploadEvidence(onlineHearingId, questionId, file);
         return evidenceOptional.map(ResponseEntity::ok)
                 .orElse(notFound().build());
+    }
+
+    @ApiOperation(value = "Delete COR evidence",
+            notes = "Deletes evidence for a COR appeal. You need to have an appeal in CCD and an online hearing in COH " +
+                    "that references the appeal in CCD."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No online hearing found with online hearing id "),
+    })
+    @RequestMapping(
+            value = "{onlineHearingId}/questions/{questionId}/evidence/{evidenceId}",
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    public ResponseEntity deleteEvidence(
+            @PathVariable("onlineHearingId") String onlineHearingId,
+            @PathVariable("evidenceId") String evidenceId
+    ) {
+        boolean hearingFound = evidenceUploadService.deleteEvidence(onlineHearingId, evidenceId);
+        return hearingFound ? ResponseEntity.noContent().build() : notFound().build();
     }
 }

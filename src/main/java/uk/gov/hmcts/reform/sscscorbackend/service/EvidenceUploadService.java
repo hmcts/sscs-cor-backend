@@ -129,4 +129,23 @@ public class EvidenceUploadService {
                 .toLocalDate()
                 .format(DateTimeFormatter.ISO_DATE);
     }
+
+    public boolean deleteEvidence(String onlineHearingId, String evidenceId) {
+        return onlineHearingService.getCcdCaseId(onlineHearingId)
+                .map(ccdCaseId -> {
+                    IdamTokens idamTokens = idamService.getIdamTokens();
+                    SscsCaseDetails caseDetails = getSscsCaseDetails(ccdCaseId, idamTokens);
+                    List<CorDocument> corDocuments = caseDetails.getData().getCorDocument();
+
+                    if (corDocuments != null) {
+                        List<CorDocument> newCorDocuments = corDocuments.stream()
+                                .filter(corDocument -> !corDocument.getValue().getDocument().getDocumentLink().getDocumentUrl().endsWith(evidenceId))
+                                .collect(toList());
+                        caseDetails.getData().setCorDocument(newCorDocuments);
+
+                        ccdService.updateCase(caseDetails.getData(), ccdCaseId, "uploadCorDocument", "SSCS - cor evidence deleted", "Updated SSCS", idamTokens);
+                    }
+                    return true;
+                }).orElse(false);
+    }
 }
