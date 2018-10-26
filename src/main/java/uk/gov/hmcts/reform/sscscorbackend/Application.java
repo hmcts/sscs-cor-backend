@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
+import java.util.Properties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,7 +16,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 
-import java.util.Properties;
+
 
 @SpringBootApplication
 @EnableCircuitBreaker
