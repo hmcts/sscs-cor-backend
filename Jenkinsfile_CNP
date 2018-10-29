@@ -10,7 +10,24 @@ def type = "java"
 def product = "sscs-cor"
 def component = "backend"
 
+List<LinkedHashMap<String, Object>> secrets = [
+  secret('sscs-s2s-secret', 'IDAM.S2S-AUTH.TOTP_SECRET')
+]
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [ $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    version: '',
+    envVariable: envVar
+  ]
+}
+
+env['IDAM.S2S-AUTH'] = 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
+env.COH_URL = 'coh-cor-aat.service.core-compute-aat.internal'
+
 withPipeline(type, product, component) {
     enableSlackNotifications('#sscs-tech')
+    loadVaultSecrets(secrets)
 }
 
