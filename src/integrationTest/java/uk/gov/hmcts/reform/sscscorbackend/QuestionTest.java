@@ -12,15 +12,10 @@ import io.restassured.RestAssured;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionReference;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class QuestionTest extends BaseIntegrationTest {
 
     private static final String QUESTION_HEADER = "Question header";
