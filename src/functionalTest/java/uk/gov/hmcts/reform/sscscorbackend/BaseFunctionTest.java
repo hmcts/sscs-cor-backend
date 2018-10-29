@@ -14,7 +14,14 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = Application.class)
 public abstract class BaseFunctionTest {
     private final String baseUrl = System.getenv("TEST_URL");
     private String cohBaseUrl = "http://coh-cor-aat.service.core-compute-aat.internal";
@@ -29,12 +36,15 @@ public abstract class BaseFunctionTest {
     protected SscsCorBackendRequests sscsCorBackendRequests;
     protected CohRequests cohRequests;
 
+    @Autowired
+    private AuthTokenGenerator authTokenGenerator;
+
     @Before
     public void setUp() throws Exception {
         cohClient = buildClient("USE_COH_PROXY");
         client = buildClient("USE_BACKEND_PROXY");
         sscsCorBackendRequests = new SscsCorBackendRequests(baseUrl, client);
-        cohRequests = new CohRequests(cohBaseUrl, cohClient);
+        cohRequests = new CohRequests(authTokenGenerator, cohBaseUrl, cohClient);
     }
 
     protected String createRandomEmail() {

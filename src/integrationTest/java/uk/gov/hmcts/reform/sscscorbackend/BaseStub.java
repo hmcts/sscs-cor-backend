@@ -9,6 +9,7 @@ public abstract class BaseStub {
     protected final WireMockServer wireMock;
 
     public BaseStub(String url) {
+        System.out.println("Starting mock for [" + url + "]");
         wireMock = new WireMockServer(Integer.valueOf(url.split(":")[2]));
         wireMock.start();
 

@@ -10,6 +10,11 @@ resource "azurerm_resource_group" "rg" {
   location = "${var.location_app}"
 }
 
+data "azurerm_key_vault" "sscs_key_vault" {
+  name                = "${local.azureVaultName}"
+  resource_group_name = "${local.azureVaultName}"
+}
+
 data "vault_generic_secret" "sscs_s2s_secret" {
   path = "secret/${var.infrastructure_env}/ccidam/service-auth-provider/api/microservice-keys/sscs"
 }
@@ -37,6 +42,8 @@ locals {
   ccdApi    = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
   idam_url  = "https://preprod-idamapi.reform.hmcts.net:3511"
   documentManagementUrl = "http://dm-store-${local.local_env}.service.${local.local_ase}.internal"
+
+  azureVaultName = "sscs-${local.local_env}"
 
   createCcdEndpoint = "${(var.env == "preview" || var.env == "spreview" ||  var.env == "aat") ? "true" : "false"}"
 }

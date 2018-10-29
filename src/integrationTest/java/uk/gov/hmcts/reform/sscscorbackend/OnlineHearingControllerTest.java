@@ -3,13 +3,8 @@ package uk.gov.hmcts.reform.sscscorbackend;
 import io.restassured.RestAssured;
 import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class OnlineHearingControllerTest extends BaseIntegrationTest {
     private static final String ONLINE_HEARING_ID = "Online hearing id";
 

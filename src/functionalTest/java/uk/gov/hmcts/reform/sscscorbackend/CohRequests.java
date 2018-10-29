@@ -14,12 +14,15 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 public class CohRequests {
+    private AuthTokenGenerator authTokenGenerator;
     private String cohBaseUrl;
     private HttpClient cohClient;
 
-    public CohRequests(String cohBaseUrl, HttpClient cohClient) {
+    public CohRequests(AuthTokenGenerator authTokenGenerator, String cohBaseUrl, HttpClient cohClient) {
+        this.authTokenGenerator = authTokenGenerator;
         this.cohBaseUrl = cohBaseUrl;
         this.cohClient = cohClient;
     }
@@ -170,10 +173,10 @@ public class CohRequests {
         }
     }
 
-    private static String makePostRequest(HttpClient client, String uri, String body, String responseValue) throws IOException {
+    private String makePostRequest(HttpClient client, String uri, String body, String responseValue) throws IOException {
         HttpResponse httpResponse = client.execute(post(uri)
                 .setHeader(HttpHeaders.AUTHORIZATION, "oauth2Token")
-                .setHeader("ServiceAuthorization", "someValue")
+                .setHeader("ServiceAuthorization", authTokenGenerator.generate())
                 .setEntity(new StringEntity(body, APPLICATION_JSON))
                 .build());
 
@@ -183,20 +186,20 @@ public class CohRequests {
         return new JSONObject(responseBody).getString(responseValue);
     }
 
-    private static void makePutRequest(HttpClient client, String uri, String body) throws IOException {
+    private void makePutRequest(HttpClient client, String uri, String body) throws IOException {
         HttpResponse httpResponse = client.execute(put(uri)
                 .setHeader(HttpHeaders.AUTHORIZATION, "oauth2Token")
-                .setHeader("ServiceAuthorization", "someValue")
+                .setHeader("ServiceAuthorization", authTokenGenerator.generate())
                 .setEntity(new StringEntity(body, APPLICATION_JSON))
                 .build());
 
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
     }
 
-    private static JSONObject makeGetRequest(HttpClient client, String uri, String responseValue) throws IOException {
+    private JSONObject makeGetRequest(HttpClient client, String uri, String responseValue) throws IOException {
         HttpResponse httpResponse = client.execute(get(uri)
                 .setHeader(HttpHeaders.AUTHORIZATION, "oauth2Token")
-                .setHeader("ServiceAuthorization", "someValue")
+                .setHeader("ServiceAuthorization", authTokenGenerator.generate())
                 .setHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                 .build());
 
