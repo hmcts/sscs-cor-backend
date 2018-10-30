@@ -55,7 +55,7 @@ module "sscs-core-backend" {
   asp_name            = "${var.product}-${var.component}-${var.env}"
 
   app_settings = {
-    IDAM.S2S-AUTH                   = "${local.s2sCnpUrl}"
+    IDAM_S2S-AUTH                   = "${local.s2sCnpUrl}"
     IDAM.S2S-AUTH.MICROSERVICE      = "${var.idam_s2s_auth_microservice}"
     IDAM.S2S-AUTH.TOTP_SECRET       = "${data.vault_generic_secret.sscs_s2s_secret.data["value"]}"
     IDAM_SSCS_SYSTEMUPDATE_USER     = "${data.vault_generic_secret.idam_sscs_systemupdate_user.data["value"]}"

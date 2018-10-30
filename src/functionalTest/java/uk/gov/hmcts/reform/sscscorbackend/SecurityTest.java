@@ -8,7 +8,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscscorbackend.service.CohService;
 
 // Need to set the following to use
-// IDAM.S2S-AUTH
+// IDAM_S2S-AUTH
 // IDAM.S2S-AUTH.TOTP_SECRET
 // COH_URL
 
