@@ -10,6 +10,11 @@ resource "azurerm_resource_group" "rg" {
   location = "${var.location_app}"
 }
 
+data "azurerm_key_vault" "sscs_key_vault" {
+  name                = "${local.azureVaultName}"
+  resource_group_name = "${local.azureVaultName}"
+}
+
 data "vault_generic_secret" "sscs_s2s_secret" {
   path = "secret/${var.infrastructure_env}/ccidam/service-auth-provider/api/microservice-keys/sscs"
 }
