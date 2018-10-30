@@ -153,6 +153,7 @@ public class OnlineHearingService {
     }
 
     public void storeOnlineHearingInCcd(String onlineHearingId, String caseId) {
+        LOG.info("Storing online hearing data for case " +caseId + ", hearing " + onlineHearingId);
         //get the questions and answers
         CohQuestionRounds questionRounds = getQuestionRounds(onlineHearingId);
 
@@ -163,6 +164,7 @@ public class OnlineHearingService {
         SscsCaseDetails caseDetails = ccdService.getByCaseId(Long.valueOf(caseId), idamTokens);
 
         LOG.info("Got case details");
+
         String appellantTitle = caseDetails.getData().getAppeal().getAppellant().getName().getTitle();
         String appellantFirstName = caseDetails.getData().getAppeal().getAppellant().getName().getFirstName();
         String appellantLastName = caseDetails.getData().getAppeal().getAppellant().getName().getLastName();
