@@ -24,7 +24,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 env.IDAM_S2S_AUTH = 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
-env.COH_URL = 'coh-cor-aat.service.core-compute-aat.internal'
+env.COH_URL = 'http://coh-cor-aat.service.core-compute-aat.internal'
 
 withPipeline(type, product, component) {
     enableSlackNotifications('#sscs-tech')

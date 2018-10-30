@@ -11,7 +11,13 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {
+                "idam.s2s-auth.url=http://localhost:4502",
+                "coh.url=http://localhost:8081"
+        }
+)
 public abstract class BaseIntegrationTest {
 
     @Value("${coh.url}")
