@@ -150,7 +150,7 @@ public class OnlineHearingService {
     }
 
     public void storeOnlineHearingInCcd(String onlineHearingId, String caseId) {
-        LOG.info("Storing online hearing data for case " +caseId + ", hearing " + onlineHearingId);
+        LOG.info("Storing online hearing data for case " + caseId + ", hearing " + onlineHearingId);
         //get the questions and answers
         CohQuestionRounds questionRounds = getQuestionRounds(onlineHearingId);
 
