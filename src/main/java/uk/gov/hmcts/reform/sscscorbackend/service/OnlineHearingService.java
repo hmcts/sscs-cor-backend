@@ -150,12 +150,17 @@ public class OnlineHearingService {
     }
 
     public void storeOnlineHearingInCcd(String onlineHearingId, String caseId) {
+        LOG.info("Storing online hearing data for case " +caseId + ", hearing " + onlineHearingId);
         //get the questions and answers
         CohQuestionRounds questionRounds = getQuestionRounds(onlineHearingId);
+
+        LOG.info("Got question rounds");
 
         IdamTokens idamTokens = idamService.getIdamTokens();
 
         SscsCaseDetails caseDetails = ccdService.getByCaseId(Long.valueOf(caseId), idamTokens);
+
+        LOG.info("Got case details");
 
         String appellantTitle = caseDetails.getData().getAppeal().getAppellant().getName().getTitle();
         String appellantFirstName = caseDetails.getData().getAppeal().getAppellant().getName().getFirstName();
@@ -172,6 +177,13 @@ public class OnlineHearingService {
 
         Map<String, Object> placeholders = Collections.singletonMap("OnlineHearingPdfWrapper", onlineHearingPdfWraper);
 
+        byte[] pdfBytes = createPdf(placeholders);
+
+        sscsPdfService.mergeDocIntoCcd("COR Transcript - " + caseReference + ".pdf", pdfBytes,
+                Long.valueOf(caseId), caseDetails.getData(), idamTokens);
+    }
+
+    public byte[] createPdf(Map<String,Object> placeholders) {
         byte[] template;
         try {
             template = getTemplate();
@@ -179,10 +191,8 @@ public class OnlineHearingService {
             throw new PdfGenerationException("Error getting template " + appellantTemplatePath, e);
         }
 
-        byte[] pdfBytes =  pdfServiceClient.generateFromHtml(template, placeholders);
+        return pdfServiceClient.generateFromHtml(template, placeholders);
 
-        sscsPdfService.mergeDocIntoCcd("COR Transcript - " + caseReference + ".pdf", pdfBytes,
-                Long.valueOf(caseId), caseDetails.getData(), idamTokens);
     }
 
     private byte[] getTemplate() throws IOException {
