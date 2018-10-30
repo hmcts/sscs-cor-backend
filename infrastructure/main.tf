@@ -38,6 +38,8 @@ locals {
   idam_url  = "https://preprod-idamapi.reform.hmcts.net:3511"
   documentManagementUrl = "http://dm-store-${local.local_env}.service.${local.local_ase}.internal"
 
+  azureVaultName = "sscs-${local.local_env}"
+
   createCcdEndpoint = "${(var.env == "preview" || var.env == "spreview" ||  var.env == "aat") ? "true" : "false"}"
 }
 
