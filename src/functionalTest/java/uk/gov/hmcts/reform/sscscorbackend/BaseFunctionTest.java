@@ -64,16 +64,17 @@ public abstract class BaseFunctionTest {
     protected OnlineHearing createHearingWithQuestion(boolean ccdCaseRequired) throws IOException, InterruptedException {
         String hearingId;
         String emailAddress = null;
+        String caseId = null;
         if (ccdCaseRequired) {
             emailAddress = createRandomEmail();
-            String caseId = sscsCorBackendRequests.createCase(emailAddress);
+            caseId = sscsCorBackendRequests.createCase(emailAddress);
             hearingId = cohRequests.createHearing(caseId);
         } else {
             hearingId = cohRequests.createHearing();
         }
         String questionId = cohRequests.createQuestion(hearingId);
         cohRequests.issueQuestionRound(hearingId);
-        return new OnlineHearing(emailAddress, hearingId, questionId);
+        return new OnlineHearing(emailAddress, hearingId, questionId, caseId);
     }
 
     protected void answerQuestion(String hearingId, String questionId) throws IOException {
@@ -101,5 +102,9 @@ public abstract class BaseFunctionTest {
             httpClientBuilder = httpClientBuilder.setProxy(new HttpHost("proxyout.reform.hmcts.net", 8080));
         }
         return httpClientBuilder.build();
+    }
+
+    protected void resolveHearing(String hearingId, String caseId) throws IOException {
+        sscsCorBackendRequests.triggerResolve(hearingId, caseId);
     }
 }

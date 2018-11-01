@@ -4,11 +4,13 @@ public class OnlineHearing {
     private String emailAddress;
     private String hearingId;
     private String questionId;
+    private String caseId;
 
-    public OnlineHearing(String emailAddress, String hearingId, String questionId) {
+    public OnlineHearing(String emailAddress, String hearingId, String questionId, String caseId) {
         this.emailAddress = emailAddress;
         this.hearingId = hearingId;
         this.questionId = questionId;
+        this.caseId = caseId;
     }
 
     public String getEmailAddress() {
@@ -33,5 +35,13 @@ public class OnlineHearing {
 
     public void setQuestionId(String questionId) {
         this.questionId = questionId;
+    }
+
+    public String getCaseId() {
+        return caseId;
+    }
+
+    public void setCaseId(String caseId) {
+        this.caseId = caseId;
     }
 }
