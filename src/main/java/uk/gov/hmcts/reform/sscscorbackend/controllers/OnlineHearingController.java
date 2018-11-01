@@ -2,12 +2,14 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CohEvent;
 import uk.gov.hmcts.reform.sscscorbackend.exception.RestResponseEntityExceptionHandler;
