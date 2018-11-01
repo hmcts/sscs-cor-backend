@@ -5,10 +5,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CohEvent;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
@@ -47,7 +44,7 @@ public class OnlineHearingController {
                     "writes them into a pdf and attaches the pdf to the case in Core Data " +
                     "Management. This will get triggered by a COH event"
     )
-    @RequestMapping(value = "/notify/onlinehearing", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/notify/onlinehearing", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> catchCohEvent(@RequestBody CohEvent request) {
         if (request == null
                 || request.getCaseId() == null
