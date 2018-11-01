@@ -7,7 +7,7 @@ import org.junit.Test;
 
 public class CreateHearingPdfTest extends BaseFunctionTest {
 
-    //@Test
+    @Test
     public void testCreate() throws IOException, InterruptedException {
         OnlineHearing onlineHearing = createHearingWithQuestion(true);
 
@@ -15,11 +15,6 @@ public class CreateHearingPdfTest extends BaseFunctionTest {
 
         //now trigger our endpoint
         resolveHearing(onlineHearing.getHearingId(), onlineHearing.getCaseId());
-    }
-
-    @Test
-    public void test() throws IOException, InterruptedException {
-        Assert.assertTrue(true);
     }
 
 

@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.OnlineHearingPdfWraper;
 import uk.gov.hmcts.reform.sscscorbackend.exception.RestResponseEntityExceptionHandler;
@@ -153,7 +154,7 @@ public class OnlineHearingService {
     }
 
     public void storeOnlineHearingInCcd(String onlineHearingId, String caseId) {
-        LOG.info("Storing online hearing data for case {0}, hearing {1}", caseId, onlineHearingId);
+        Log.info(String.format("Storing online hearing data for case %s, hearing %s", caseId, onlineHearingId));
 
         //get the questions and answers
         CohQuestionRounds questionRounds = getQuestionRounds(onlineHearingId);
