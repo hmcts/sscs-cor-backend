@@ -142,9 +142,16 @@
                             {{ OnlineHearingPdfWrapper.caseReference }}
                         </dd>
                     </div>
-
-
                 </dl>
+
+                {% for cohQuestionRound in OnlineHearingPdfWrapper.sscsCaseData %}
+                    <p>Question Round</p>
+                    {% for questionReferences in cohQuestionRound %}
+                    <p>Question {{questionReferences.questionOrdinal}}</p>
+                    <h1>{{questionReferences.questionHeaderText}}</h1>
+                    {% endfor %}
+                {% endfor %}
+
                 <h2 class="heading-medium">
                     How do you walk to the doctors?
                 </h2>
