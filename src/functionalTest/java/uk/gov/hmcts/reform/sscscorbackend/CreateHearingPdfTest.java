@@ -7,7 +7,7 @@ import org.junit.Test;
 
 public class CreateHearingPdfTest extends BaseFunctionTest {
 
-    @Test
+    //@Test
     public void testCreate() throws IOException, InterruptedException {
         OnlineHearing onlineHearing = createHearingWithQuestion(true);
 
