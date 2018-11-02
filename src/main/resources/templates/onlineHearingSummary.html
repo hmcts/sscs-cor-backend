@@ -143,12 +143,12 @@
                         </dd>
                     </div>
                 </dl>
-
-                {% for cohQuestionRound in OnlineHearingPdfWrapper.sscsCaseData %}
+                <h2>Question Rounds</h2>
+                {% for cohQuestionRound in OnlineHearingPdfWrapper.cohQuestionRounds.cohQuestionRound %}
                     <p>Question Round</p>
-                    {% for questionReferences in cohQuestionRound %}
-                    <p>Question {{questionReferences.questionOrdinal}}</p>
-                    <h1>{{questionReferences.questionHeaderText}}</h1>
+                    {% for questionReference in cohQuestionRound.questionReferences %}
+                    <p>Question {{questionReference.questionOrdinal}}</p>
+                    <h1>{{questionReference.questionHeaderText}}</h1>
                     {% endfor %}
                 {% endfor %}
 
