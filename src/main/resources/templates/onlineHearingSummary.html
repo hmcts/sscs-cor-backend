@@ -144,144 +144,28 @@
                     </div>
                 </dl>
                 <h2>Question Rounds</h2>
-                {{ OnlineHearingPdfWrapper.question_rounds }}
-                {{ OnlineHearingPdfWrapper.cohQuestionRounds }}
-                {% for cohQuestionRound in OnlineHearingPdfWrapper.question_rounds %}
-                    <p>question_rounds</p>
-                {% endfor %}
 
-                {% for cohQuestionRound in OnlineHearingPdfWrapper.cohQuestionRounds %}
-                    <p>Question Round</p>
+                {% for cohQuestionRound in OnlineHearingPdfWrapper.cohQuestionRounds.cohQuestionRound %}
+                {{ cohQuestionRound }}
                     {% for questionReference in cohQuestionRound.questionReferences %}
-                    <p>Question {{questionReference.questionOrdinal}}</p>
-                    <h1>{{questionReference.questionHeaderText}}</h1>
+                        <h1>{{questionReference.questionHeaderText}}</h1>
+                        <h2 class="heading-medium">{{questionReference.questionHeaderText}}</h2>
+                        <p class="body-text">
+                        NEED THE BODY OF THE QUESTION</p>
+                        <p class="font-small">Issued: NEED DATE</p>
+                        {% for answer in questionReference.answers %}
+                            <div class="appellants-answer">
+                                <h2 class="bold-medium">Answer</h2>
+                                <p>{{ answer.answerText }}</p>
+
+                                <br/>
+                                <p class="font-small">Submitted: NEED DATE</p>
+                            </div>
+
+                        {% endfor %}
                     {% endfor %}
                 {% endfor %}
 
-                <h2 class="heading-medium">
-                    How do you walk to the doctors?
-                </h2>
-                <p class="body-text">
-                    The DWP healthcare professional noted that you occasionally walk to the GP’s surgery. </p>
-                <p>In 2017, please describe the journey, including:
-                </p>
-                <ul class="list list-bullet">
-                    <li> how long it took</li>
-                    <li> whether you needed to stop on the way</li>
-                    <li> if so, for how long</li>
-                    <li> if you used any aids to help you walk</li>
-                    <li> if you did, what aids did you use</li>
-                </ul>
-                <p class="font-small">Issued: 10 October 2018</p>
-                <div class="appellants-answer">
-                    <h2 class="bold-medium">Answer</h2>
-
-                    <p>[Answer text goes here ]</p>
-                    <!--<table>
-                      <thead>
-                        <tr>
-                          <th>Evidence provided</th>
-                          <th></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-
-                        <tr>
-                          <td>[Evidence file name goes here]</td>
-                          <td></td>
-                        </tr>
-                        <tr>
-                          <td>[Evidence file name goes here]</td>
-                          <td></td>
-                        </tr>
-                      </tbody>
-                    </table> -->
-
-                    <br/>
-                    <p class="font-small">Submitted: 17 October 2018</p>
-                </div>
-                <h2 class="heading-medium">
-                    How do you interact with people?
-                </h2>
-                <p class="body-text">
-                    You said you avoid interacting with people if possible. We’d like to know more about the times when you see friends and family.</p>
-                <p>Tell us about three separate occasions in 2017 that you have met with friends and family. </p>
-                <p>Tell us: </p>
-                <ul class="list list-bullet">
-                    <li>who you met</li>
-                    <li>when</li>
-                    <li>where</li>
-                    <li>how it made you feel</li>
-                </ul>
-                <p class="font-small">Issued: 10 October 2018</p>
-
-                <div class="appellants-answer">
-                    <h2 class="bold-medium">Answer</h2>
-
-                    <p>[Answer text goes here ]</p>
-                    <!-- <table>
-                       <thead>
-                         <tr>
-                           <th>Evidence provided</th>
-                           <th></th>
-                         </tr>
-                       </thead>
-                       <tbody>
-
-                         <tr>
-                           <td>[Evidence file name goes here]</td>
-                           <td></td>
-                         </tr>
-                         <tr>
-                           <td>[Evidence file name goes here]</td>
-                           <td></td>
-                         </tr>
-                       </tbody>
-                     </table> -->
-
-                    <br/>
-                    <p class="font-small">Submitted: 17 October 2018</p>
-                </div>
-                <h2 class="heading-medium">
-                    Your walking stick
-                </h2>
-                <p class="body-text">
-                    You said in your previous answer that you use a walking stick. </p>
-                <p>Please could you say:</p>
-                <ul class="list list-bullet">
-                    <li>where you got the stick from</li>
-                    <li>how often you use it </li>
-                    <li>how far you can walk without it </li>
-                </ul>
-                <p class="font-small">Issued: 30 October 2018</p>
-
-                <div class="appellants-answer">
-                    <h2 class="bold-medium">Answer</h2>
-
-                    <p>[Answer text goes here ]</p>
-                    <!-- <table>
-                      <thead>
-                        <tr>
-                          <th>Evidence provided</th>
-                          <th></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-
-                        <tr>
-                          <td>[Evidence file name goes here]</td>
-                          <td></td>
-                        </tr>
-                        <tr>
-                          <td>[Evidence file name goes here]</td>
-                          <td></td>
-                        </tr>
-                      </tbody>
-                    </table> -->
-
-                    <br/>
-                    <p class="font-small">Submitted: 7 November 2018</p>
-                </div>
                 <br/><br/><br/>
                 <span class="font-size: 12px">Mr Manish Sharma | SC242/16/03435</span>
             </div>
