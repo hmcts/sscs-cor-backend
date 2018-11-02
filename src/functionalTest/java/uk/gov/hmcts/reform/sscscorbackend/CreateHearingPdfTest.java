@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
 import java.io.IOException;
-//import org.junit.Test;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 public class CreateHearingPdfTest extends BaseFunctionTest {
 
@@ -13,6 +15,11 @@ public class CreateHearingPdfTest extends BaseFunctionTest {
 
         //now trigger our endpoint
         resolveHearing(onlineHearing.getHearingId(), onlineHearing.getCaseId());
+    }
+
+    @Test
+    public void test() throws IOException, InterruptedException {
+        Assert.assertTrue(true);
     }
 
 
