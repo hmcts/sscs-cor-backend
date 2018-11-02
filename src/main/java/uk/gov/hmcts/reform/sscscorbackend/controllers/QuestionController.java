@@ -120,7 +120,6 @@ public class QuestionController {
             @ApiResponse(code = 422, message = "Round cannot be extended extended")
     })
     @RequestMapping(method = RequestMethod.PATCH, value = "{onlineHearingId}")
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public ResponseEntity<QuestionRound> extendQuestionRoundDeadline(@PathVariable String onlineHearingId) {
         return questionService.extendQuestionRoundDeadline(onlineHearingId)
                 .map(ResponseEntity::ok)

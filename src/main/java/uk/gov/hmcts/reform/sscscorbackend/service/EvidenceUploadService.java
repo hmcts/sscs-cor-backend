@@ -18,16 +18,17 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
+import uk.gov.hmcts.reform.sscscorbackend.service.documentmanagement.DocumentManagementService;
 
 @Service
 public class EvidenceUploadService {
-    private final EvidenceManagementService evidenceManagementService;
+    private final DocumentManagementService documentManagementService;
     private final CcdService ccdService;
     private final IdamService idamService;
     private final OnlineHearingService onlineHearingService;
 
-    public EvidenceUploadService(EvidenceManagementService evidenceManagementService, CcdService ccdService, IdamService idamService, OnlineHearingService onlineHearingService) {
-        this.evidenceManagementService = evidenceManagementService;
+    public EvidenceUploadService(DocumentManagementService documentManagementService, CcdService ccdService, IdamService idamService, OnlineHearingService onlineHearingService) {
+        this.documentManagementService = documentManagementService;
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.onlineHearingService = onlineHearingService;
@@ -86,7 +87,7 @@ public class EvidenceUploadService {
     }
 
     private Document uploadDocument(MultipartFile file) {
-        return evidenceManagementService.upload(singletonList(file))
+        return documentManagementService.upload(singletonList(file))
                 .getEmbedded()
                 .getDocuments()
                 .get(0);
@@ -144,6 +145,8 @@ public class EvidenceUploadService {
                         caseDetails.getData().setCorDocument(newCorDocuments);
 
                         ccdService.updateCase(caseDetails.getData(), ccdCaseId, "uploadCorDocument", "SSCS - cor evidence deleted", "Updated SSCS", idamTokens);
+
+                        documentManagementService.delete(evidenceId);
                     }
                     return true;
                 }).orElse(false);
