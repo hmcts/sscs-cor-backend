@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.sscscorbackend.service.documentmanagement;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
@@ -27,7 +29,14 @@ public class DocumentManagementService {
     public UploadResponse upload(List<MultipartFile> files) {
         String serviceAuthorization = authTokenGenerator.generate();
 
-        return documentUploadClientApi.upload(OAUTH2_TOKEN, serviceAuthorization, USER_ID, files);
+        try {
+            return documentUploadClientApi.upload(OAUTH2_TOKEN, serviceAuthorization, USER_ID, files);
+        } catch (HttpClientErrorException exc) {
+            if (exc.getStatusCode().equals(HttpStatus.UNPROCESSABLE_ENTITY)) {
+                throw new IllegalFileTypeException(files.get(0).getName());
+            }
+            throw exc;
+        }
     }
 
     public void delete(String documentId) {
