@@ -143,12 +143,8 @@
                         </dd>
                     </div>
                 </dl>
-                <h2>Question Rounds</h2>
-
                 {% for cohQuestionRound in OnlineHearingPdfWrapper.cohQuestionRounds.cohQuestionRound %}
-                {{ cohQuestionRound }}
                     {% for questionReference in cohQuestionRound.questionReferences %}
-                        <h1>{{questionReference.questionHeaderText}}</h1>
                         <h2 class="heading-medium">{{questionReference.questionHeaderText}}</h2>
                         <p class="body-text">
                         NEED THE BODY OF THE QUESTION</p>
@@ -167,7 +163,12 @@
                 {% endfor %}
 
                 <br/><br/><br/>
-                <span class="font-size: 12px">Mr Manish Sharma | SC242/16/03435</span>
+                <span class="font-size: 12px">
+                    {{ OnlineHearingPdfWrapper.appellantTitle }}
+                    {{ OnlineHearingPdfWrapper.appellantFirstName }}
+                    {{ OnlineHearingPdfWrapper.appellantLastName }} |
+                {{ OnlineHearingPdfWrapper.caseReference }}
+                </span>
             </div>
         </div>
     </div>
