@@ -144,7 +144,13 @@
                     </div>
                 </dl>
                 <h2>Question Rounds</h2>
-                {% for cohQuestionRound in OnlineHearingPdfWrapper.cohQuestionRounds.cohQuestionRound %}
+                {{ OnlineHearingPdfWrapper.question_rounds }}
+                {{ OnlineHearingPdfWrapper.cohQuestionRounds }}
+                {% for cohQuestionRound in OnlineHearingPdfWrapper.question_rounds %}
+                    <p>question_rounds</p>
+                {% endfor %}
+
+                {% for cohQuestionRound in OnlineHearingPdfWrapper.cohQuestionRounds %}
                     <p>Question Round</p>
                     {% for questionReference in cohQuestionRound.questionReferences %}
                     <p>Question {{questionReference.questionOrdinal}}</p>
