@@ -131,7 +131,7 @@ public class SscsCorBackendRequests {
     public void triggerResolve(String hearingId, String caseId) throws IOException {
         String event = "continuous_online_hearing_resolved";
         HttpResponse resolveHearingResponse = client.execute(post(baseUrl + "/notify/onlinehearing")
-                .setEntity(new StringEntity("{\"case_id\":\"" + caseId + "{\"event_type\":\"" + event +
+                .setEntity(new StringEntity("{\"case_id\":\"" + caseId + "\", \"event_type\":\"" + event +
                         "\", \"online_hearing_id\":\"" + hearingId + "\"}", APPLICATION_JSON))
                 .build());
 
