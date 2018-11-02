@@ -6,9 +6,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 import uk.gov.hmcts.reform.sscscorbackend.service.EvidenceUploadService;
+import uk.gov.hmcts.reform.sscscorbackend.service.documentmanagement.IllegalFileTypeException;
 
 public class EvidenceUploadControllerTest {
 
@@ -58,6 +57,18 @@ public class EvidenceUploadControllerTest {
         );
 
         assertThat(evidenceResponseEntity.getStatusCode(), is(NOT_FOUND));
+    }
+
+    @Test
+    public void cannotUploadDocumentsThatDocumentStoreDoesNotSupport() {
+        MultipartFile file = mock(MultipartFile.class);
+        when(evidenceUploadService.uploadEvidence(someOnlineHearingId, someQuestionId, file)).thenThrow(new IllegalFileTypeException("someFile.bad"));
+
+        ResponseEntity<Evidence> evidenceResponseEntity = evidenceUploadController.uploadEvidence(
+                someOnlineHearingId, someQuestionId, file
+        );
+
+        assertThat(evidenceResponseEntity.getStatusCode(), is(UNPROCESSABLE_ENTITY));
     }
 
     @Test

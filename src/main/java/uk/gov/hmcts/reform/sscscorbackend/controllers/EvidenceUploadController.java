@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers;
 
 import static org.springframework.http.ResponseEntity.notFound;
+import static org.springframework.http.ResponseEntity.unprocessableEntity;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 import uk.gov.hmcts.reform.sscscorbackend.service.EvidenceUploadService;
+import uk.gov.hmcts.reform.sscscorbackend.service.documentmanagement.IllegalFileTypeException;
 
 @RestController
 @RequestMapping("/continuous-online-hearings")
@@ -31,7 +33,8 @@ public class EvidenceUploadController {
     )
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Evidence has been added to the appeal"),
-            @ApiResponse(code = 404, message = "No online hearing found with online hearing id ")
+            @ApiResponse(code = 404, message = "No online hearing found with online hearing id"),
+            @ApiResponse(code = 422, message = "The file cannot be added to the document store")
     })
     @RequestMapping(
             value = "{onlineHearingId}/questions/{questionId}/evidence",
@@ -44,9 +47,13 @@ public class EvidenceUploadController {
             @PathVariable("questionId") String questionId,
             @RequestParam("file") MultipartFile file
     ) {
-        Optional<Evidence> evidenceOptional = evidenceUploadService.uploadEvidence(onlineHearingId, questionId, file);
-        return evidenceOptional.map(ResponseEntity::ok)
-                .orElse(notFound().build());
+        try {
+            Optional<Evidence> evidenceOptional = evidenceUploadService.uploadEvidence(onlineHearingId, questionId, file);
+            return evidenceOptional.map(ResponseEntity::ok)
+                    .orElse(notFound().build());
+        } catch (IllegalFileTypeException exc) {
+            return unprocessableEntity().build();
+        }
     }
 
     @ApiOperation(value = "Delete COR evidence",
