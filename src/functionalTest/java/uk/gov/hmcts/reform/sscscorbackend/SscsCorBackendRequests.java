@@ -119,4 +119,12 @@ public class SscsCorBackendRequests {
                 .build());
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
     }
+
+    public void deleteEvidence(String hearingId, String questionId, String evidenceId) throws IOException {
+        HttpResponse getQuestionResponse = client.execute(delete(
+                baseUrl + "/continuous-online-hearings/" + hearingId + "/questions/" + questionId + "/evidence/" + evidenceId
+        ).build());
+
+        assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+    }
 }

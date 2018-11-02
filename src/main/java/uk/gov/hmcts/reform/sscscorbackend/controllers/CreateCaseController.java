@@ -19,11 +19,9 @@ import java.util.Map;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.logging.exception.AlertLevel;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -54,6 +52,7 @@ public class CreateCaseController {
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Case has been created")
     })
+    @ResponseStatus(value = HttpStatus.CREATED)
     @RequestMapping(value = "/case", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> createCase(
             @ApiParam(value = "email address of the appellant must be unique in CCD", example = "foo@bar.com", required = true)

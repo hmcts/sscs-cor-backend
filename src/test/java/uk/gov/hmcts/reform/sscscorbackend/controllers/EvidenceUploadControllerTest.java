@@ -64,7 +64,8 @@ public class EvidenceUploadControllerTest {
     public void canDeleteEvidence() {
         when(evidenceUploadService.deleteEvidence(someOnlineHearingId, someEvidenceId)).thenReturn(true);
 
-        ResponseEntity evidenceResponseEntity = evidenceUploadController.deleteEvidence(someOnlineHearingId, someEvidenceId);
+        ResponseEntity evidenceResponseEntity = evidenceUploadController
+                .deleteEvidence(someOnlineHearingId, someQuestionId, someEvidenceId);
 
         assertThat(evidenceResponseEntity.getStatusCode(), is(NO_CONTENT));
     }
@@ -73,7 +74,8 @@ public class EvidenceUploadControllerTest {
     public void cannotDeleteEvidenceWhenOnlineHearingDoesNotExist() {
         when(evidenceUploadService.deleteEvidence(someOnlineHearingId, someEvidenceId)).thenReturn(false);
 
-        ResponseEntity evidenceResponseEntity = evidenceUploadController.deleteEvidence(someOnlineHearingId, someEvidenceId);
+        ResponseEntity evidenceResponseEntity = evidenceUploadController
+                .deleteEvidence(someOnlineHearingId, someQuestionId, someEvidenceId);
 
         assertThat(evidenceResponseEntity.getStatusCode(), is(NOT_FOUND));
     }

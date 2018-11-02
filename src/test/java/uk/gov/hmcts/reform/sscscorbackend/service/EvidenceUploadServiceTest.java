@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
+import uk.gov.hmcts.reform.sscscorbackend.service.documentmanagement.DocumentManagementService;
 
 public class EvidenceUploadServiceTest {
 
@@ -55,9 +56,9 @@ public class EvidenceUploadServiceTest {
         idamTokens = mock(IdamTokens.class);
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        EvidenceManagementService evidenceManagementService = mock(EvidenceManagementService.class);
+        DocumentManagementService documentManagementService = mock(DocumentManagementService.class);
         evidenceUploadService = new EvidenceUploadService(
-                evidenceManagementService,
+                documentManagementService,
                 ccdService,
                 idamService,
                 onlineHearingService
@@ -67,7 +68,7 @@ public class EvidenceUploadServiceTest {
         file = mock(MultipartFile.class);
 
         UploadResponse uploadResponse = createUploadResponse();
-        when(evidenceManagementService.upload(singletonList(file))).thenReturn(uploadResponse);
+        when(documentManagementService.upload(singletonList(file))).thenReturn(uploadResponse);
     }
 
     @Test
