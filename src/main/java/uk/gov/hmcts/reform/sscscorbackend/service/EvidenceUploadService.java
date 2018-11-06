@@ -128,25 +128,7 @@ public class EvidenceUploadService {
 
         addNewScssDocumentToCaseDetails(document, caseDetails);
 
-        ccdService.updateCase(caseDetails.getData(), ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamTokens);
-    }
-
-    private void addNewScssDocumentToCaseDetails(Document document, SscsCaseDetails caseDetails) {
-        List<SscsDocument> currentSscsDocuments = caseDetails.getData().getSscsDocument();
-        ArrayList<SscsDocument> newSscsDocuments =
-                (currentSscsDocuments == null) ? new ArrayList<>() : new ArrayList<>(currentSscsDocuments);
-        newSscsDocuments.add(createNewSscsDocument(document));
-
-        caseDetails.getData().setSscsDocument(newSscsDocuments);
-    }
-
-    private void addSscsDocumentToCcd(Long ccdCaseId, Document document) {
-        IdamTokens idamTokens = idamService.getIdamTokens();
-        SscsCaseDetails caseDetails = getSscsCaseDetails(ccdCaseId, idamTokens);
-
-        addNewScssDocumentToCaseDetails(document, caseDetails);
-
-        ccdService.updateCase(caseDetails.getData(), ccdCaseId, "uploadCorDocument", "SSCS - cor evidence uploaded", "Updated SSCS", idamTokens);
+        ccdService.updateCase(caseDetails.getData(), ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", updatedSscs, idamTokens);
     }
 
     private void addNewScssDocumentToCaseDetails(Document document, SscsCaseDetails caseDetails) {
