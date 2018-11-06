@@ -34,6 +34,14 @@ public class EvidenceUploadService {
         this.onlineHearingService = onlineHearingService;
     }
 
+    public Evidence uploadEvidence(String ccdCaseId,  MultipartFile file) {
+        Document document = uploadDocument(file);
+        addSscsDocumentToCcd(Long.getLong(ccdCaseId), document);
+
+        return new Evidence(document.links.self.href, document.originalDocumentName, getCreatedDate(document));
+
+    }
+
     public Optional<Evidence> uploadEvidence(String onlineHearingId, String questionId, MultipartFile file) {
         return onlineHearingService.getCcdCaseId(onlineHearingId)
                 .map(ccdCaseId -> {
@@ -102,6 +110,24 @@ public class EvidenceUploadService {
         ccdService.updateCase(caseDetails.getData(), ccdCaseId, "uploadCorDocument", "SSCS - cor evidence uploaded", "Updated SSCS", idamTokens);
     }
 
+    private void addSscsDocumentToCcd(Long ccdCaseId, Document document) {
+        IdamTokens idamTokens = idamService.getIdamTokens();
+        SscsCaseDetails caseDetails = getSscsCaseDetails(ccdCaseId, idamTokens);
+
+        addNewScssDocumentToCaseDetails(document, caseDetails);
+
+        ccdService.updateCase(caseDetails.getData(), ccdCaseId, "uploadCorDocument", "SSCS - cor evidence uploaded", "Updated SSCS", idamTokens);
+    }
+
+    private void addNewScssDocumentToCaseDetails(Document document, SscsCaseDetails caseDetails) {
+        List<SscsDocument> currentSscsDocuments = caseDetails.getData().getSscsDocument();
+        ArrayList<SscsDocument> newSscsDocuments =
+                (currentSscsDocuments == null) ? new ArrayList<>() : new ArrayList<>(currentSscsDocuments);
+        newSscsDocuments.add(createNewSscsDocument(document));
+
+        caseDetails.getData().setSscsDocument(newSscsDocuments);
+    }
+
     private void addNewCorDocumentToCaseDetails(String questionId, Document document, SscsCaseDetails caseDetails) {
         List<CorDocument> currentCorDocuments = caseDetails.getData().getCorDocument();
         ArrayList<CorDocument> newCorDocuments =
@@ -109,6 +135,19 @@ public class EvidenceUploadService {
         newCorDocuments.add(createNewCorDocument(questionId, document));
 
         caseDetails.getData().setCorDocument(newCorDocuments);
+    }
+
+    private SscsDocument createNewSscsDocument(Document document) {
+        String createdOn = getCreatedDate(document);
+        DocumentLink documentLink = DocumentLink.builder()
+                .documentUrl(document.links.self.href)
+                .build();
+
+        SscsDocumentDetails sscsDocumentDetails = new SscsDocumentDetails(
+                "Other evidence", document.originalDocumentName, null, createdOn, documentLink, null
+        );
+
+        return new SscsDocument(sscsDocumentDetails);
     }
 
     private CorDocument createNewCorDocument(String questionId, Document document) {
