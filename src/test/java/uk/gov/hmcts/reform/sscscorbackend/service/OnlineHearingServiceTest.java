@@ -27,6 +27,7 @@ public class OnlineHearingServiceTest {
     private CcdService ccdService;
     PDFServiceClient pdfServiceClient;
     SscsPdfService sscsPdfService;
+    EvidenceUploadService evidenceUploadService;
 
     private OnlineHearingService underTest;
 
@@ -41,11 +42,12 @@ public class OnlineHearingServiceTest {
         pdfServiceClient = mock(PDFServiceClient.class);
         sscsPdfService = mock(SscsPdfService.class);
         IdamService idamService = mock(IdamService.class);
+        evidenceUploadService = mock(EvidenceUploadService.class);
         idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         underTest = new OnlineHearingService(pdfServiceClient, cohService, ccdService, idamService,
-                 sscsPdfService, "template path");
+                 sscsPdfService, "template path", evidenceUploadService);
 
         someEmailAddress = "someEmailAddress";
         someCaseId = 1234321L;
