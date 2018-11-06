@@ -27,8 +27,8 @@ public class EvidenceUploadService {
     private final IdamService idamService;
     private final OnlineHearingService onlineHearingService;
 
-    private final String updatedSscs = "Updated SSCS";
-    private final String uploadCorDocument = "uploadCorDocument";
+    private final static String updatedSscs = "Updated SSCS";
+    private final static String uploadCorDocument = "uploadCorDocument";
 
     public EvidenceUploadService(DocumentManagementService documentManagementService, CcdService ccdService, IdamService idamService, OnlineHearingService onlineHearingService) {
         this.documentManagementService = documentManagementService;
