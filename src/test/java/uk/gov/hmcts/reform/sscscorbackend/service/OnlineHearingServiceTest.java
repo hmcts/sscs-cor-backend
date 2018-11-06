@@ -47,7 +47,8 @@ public class OnlineHearingServiceTest {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         underTest = new OnlineHearingService(pdfServiceClient, cohService, ccdService, idamService,
-                 sscsPdfService, "template path", evidenceUploadService);
+                 sscsPdfService, "template path");
+        underTest.setEvidenceUploadService(evidenceUploadService);
 
         someEmailAddress = "someEmailAddress";
         someCaseId = 1234321L;
