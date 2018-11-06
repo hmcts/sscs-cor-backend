@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
 import static java.util.stream.Collectors.toList;
+import static org.springframework.http.MediaType.APPLICATION_PDF;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -38,6 +39,7 @@ public class OnlineHearingService {
     private PDFServiceClient pdfServiceClient;
     private final String appellantTemplatePath;
     private SscsPdfService sscsPdfService;
+    private EvidenceUploadService evidenceUploadService;
 
     public OnlineHearingService(
                                 PDFServiceClient pdfServiceClient,
@@ -45,7 +47,8 @@ public class OnlineHearingService {
                                 @Autowired CcdService ccdService,
                                 @Autowired IdamService idamService,
                                 @Autowired SscsPdfService sscsPdfService,
-                                @Value("${online_hearing_finished.html.template.path}") String appellantTemplatePath
+                                @Value("${online_hearing_finished.html.template.path}") String appellantTemplatePath,
+                                @Autowired EvidenceUploadService evidenceUploadService
     ) {
         this.cohClient = cohService;
         this.ccdService = ccdService;
@@ -53,6 +56,7 @@ public class OnlineHearingService {
         this.pdfServiceClient = pdfServiceClient;
         this.sscsPdfService = sscsPdfService;
         this.appellantTemplatePath = appellantTemplatePath;
+        this.evidenceUploadService = evidenceUploadService;
     }
 
     public String createOnlineHearing(String caseId) {
@@ -150,8 +154,6 @@ public class OnlineHearingService {
     }
 
     public void storeOnlineHearingInCcd(String onlineHearingId, String caseId) {
-        Log.info(String.format("Storing online hearing data for case %s, hearing %s", caseId, onlineHearingId));
-
         //get the questions and answers
         CohQuestionRounds questionRounds = getQuestionRounds(onlineHearingId);
 
@@ -162,11 +164,10 @@ public class OnlineHearingService {
         SscsCaseDetails caseDetails = ccdService.getByCaseId(Long.valueOf(caseId), idamTokens);
 
         LOG.info("Got case details");
-
         String appellantTitle = caseDetails.getData().getAppeal().getAppellant().getName().getTitle();
         String appellantFirstName = caseDetails.getData().getAppeal().getAppellant().getName().getFirstName();
         String appellantLastName = caseDetails.getData().getAppeal().getAppellant().getName().getLastName();
-        
+
         String nino = caseDetails.getData().getGeneratedNino();
 
         String caseReference = caseDetails.getData().getCaseReference();
@@ -180,7 +181,12 @@ public class OnlineHearingService {
 
         byte[] pdfBytes = createPdf(placeholders);
 
-        sscsPdfService.mergeDocIntoCcd("COR Transcript - " + caseReference + ".pdf", pdfBytes,
+        String fileName = "COR Transcript - " + caseReference + ".pdf";
+        ByteArrayMultipartFile file = ByteArrayMultipartFile.builder().content(pdfBytes).name(fileName).contentType(APPLICATION_PDF).build();
+
+        evidenceUploadService.uploadEvidence(caseId, file);
+
+        sscsPdfService.mergeDocIntoCcd(fileName, pdfBytes,
                 Long.valueOf(caseId), caseDetails.getData(), idamTokens);
     }
 
