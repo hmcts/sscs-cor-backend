@@ -46,6 +46,14 @@ public class EvidenceUploadService {
 
     }
 
+    public Evidence uploadEvidence(String ccdCaseId,  MultipartFile file) {
+        Document document = uploadDocument(file);
+        addSscsDocumentToCcd(Long.getLong(ccdCaseId), document);
+
+        return new Evidence(document.links.self.href, document.originalDocumentName, getCreatedDate(document));
+
+    }
+
     public Optional<Evidence> uploadEvidence(String onlineHearingId, String questionId, MultipartFile file) {
         return getOnlineHearingService().getCcdCaseId(onlineHearingId)
                 .map(ccdCaseId -> {
@@ -121,6 +129,24 @@ public class EvidenceUploadService {
         addNewScssDocumentToCaseDetails(document, caseDetails);
 
         ccdService.updateCase(caseDetails.getData(), ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamTokens);
+    }
+
+    private void addNewScssDocumentToCaseDetails(Document document, SscsCaseDetails caseDetails) {
+        List<SscsDocument> currentSscsDocuments = caseDetails.getData().getSscsDocument();
+        ArrayList<SscsDocument> newSscsDocuments =
+                (currentSscsDocuments == null) ? new ArrayList<>() : new ArrayList<>(currentSscsDocuments);
+        newSscsDocuments.add(createNewSscsDocument(document));
+
+        caseDetails.getData().setSscsDocument(newSscsDocuments);
+    }
+
+    private void addSscsDocumentToCcd(Long ccdCaseId, Document document) {
+        IdamTokens idamTokens = idamService.getIdamTokens();
+        SscsCaseDetails caseDetails = getSscsCaseDetails(ccdCaseId, idamTokens);
+
+        addNewScssDocumentToCaseDetails(document, caseDetails);
+
+        ccdService.updateCase(caseDetails.getData(), ccdCaseId, "uploadCorDocument", "SSCS - cor evidence uploaded", "Updated SSCS", idamTokens);
     }
 
     private void addNewScssDocumentToCaseDetails(Document document, SscsCaseDetails caseDetails) {
