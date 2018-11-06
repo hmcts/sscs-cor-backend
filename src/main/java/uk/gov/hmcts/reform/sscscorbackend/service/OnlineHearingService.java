@@ -51,8 +51,7 @@ public class OnlineHearingService {
                                 @Autowired CcdService ccdService,
                                 @Autowired IdamService idamService,
                                 @Autowired SscsPdfService sscsPdfService,
-                                @Value("${online_hearing_finished.html.template.path}") String appellantTemplatePath,
-                                @Autowired EvidenceUploadService evidenceUploadService
+                                @Value("${online_hearing_finished.html.template.path}") String appellantTemplatePath
     ) {
         this.cohClient = cohService;
         this.ccdService = ccdService;
@@ -60,7 +59,6 @@ public class OnlineHearingService {
         this.pdfServiceClient = pdfServiceClient;
         this.sscsPdfService = sscsPdfService;
         this.appellantTemplatePath = appellantTemplatePath;
-        this.evidenceUploadService = evidenceUploadService;
     }
 
     public String createOnlineHearing(String caseId) {
@@ -221,5 +219,7 @@ public class OnlineHearingService {
         return IOUtils.toByteArray(in);
     }
 
-
+    public void setEvidenceUploadService(@Autowired EvidenceUploadService evidenceUploadService) {
+        this.evidenceUploadService = evidenceUploadService;
+    }
 }
