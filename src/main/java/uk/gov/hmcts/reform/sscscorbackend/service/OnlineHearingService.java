@@ -21,6 +21,8 @@ import uk.gov.hmcts.reform.
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
+import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
@@ -49,7 +51,8 @@ public class OnlineHearingService {
                                 @Autowired CcdService ccdService,
                                 @Autowired IdamService idamService,
                                 @Autowired SscsPdfService sscsPdfService,
-                                @Value("${online_hearing_finished.html.template.path}") String appellantTemplatePath
+                                @Value("${online_hearing_finished.html.template.path}") String appellantTemplatePath,
+                                @Autowired EvidenceUploadService evidenceUploadService
     ) {
         this.cohClient = cohService;
         this.ccdService = ccdService;
@@ -57,6 +60,7 @@ public class OnlineHearingService {
         this.pdfServiceClient = pdfServiceClient;
         this.sscsPdfService = sscsPdfService;
         this.appellantTemplatePath = appellantTemplatePath;
+        this.evidenceUploadService = evidenceUploadService;
     }
 
     public String createOnlineHearing(String caseId) {
