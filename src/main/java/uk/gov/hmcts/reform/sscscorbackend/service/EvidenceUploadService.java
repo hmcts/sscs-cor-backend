@@ -27,8 +27,8 @@ public class EvidenceUploadService {
     private final IdamService idamService;
     private final OnlineHearingService onlineHearingService;
 
-    private static final String updatedSscs = "Updated SSCS";
-    private static final String uploadCorDocument = "uploadCorDocument";
+    private static final String UPDATED_SSCS = "Updated SSCS";
+    private static final String UPLOAD_COR_DOCUMENT = "uploadCorDocument";
 
     public EvidenceUploadService(DocumentManagementService documentManagementService, CcdService ccdService, IdamService idamService, OnlineHearingService onlineHearingService) {
         this.documentManagementService = documentManagementService;
@@ -110,7 +110,7 @@ public class EvidenceUploadService {
 
         addNewCorDocumentToCaseDetails(questionId, document, caseDetails);
 
-        ccdService.updateCase(caseDetails.getData(), ccdCaseId, uploadCorDocument, "SSCS - cor evidence uploaded", updatedSscs, idamTokens);
+        ccdService.updateCase(caseDetails.getData(), ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamTokens);
     }
 
     private void addSscsDocumentToCcd(Long ccdCaseId, Document document) {
@@ -119,7 +119,7 @@ public class EvidenceUploadService {
 
         addNewScssDocumentToCaseDetails(document, caseDetails);
 
-        ccdService.updateCase(caseDetails.getData(), ccdCaseId, uploadCorDocument, "SSCS - cor evidence uploaded", updatedSscs, idamTokens);
+        ccdService.updateCase(caseDetails.getData(), ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamTokens);
     }
 
     private void addNewScssDocumentToCaseDetails(Document document, SscsCaseDetails caseDetails) {
@@ -186,7 +186,7 @@ public class EvidenceUploadService {
                                 .collect(toList());
                         caseDetails.getData().setCorDocument(newCorDocuments);
 
-                        ccdService.updateCase(caseDetails.getData(), ccdCaseId, uploadCorDocument, "SSCS - cor evidence deleted", updatedSscs, idamTokens);
+                        ccdService.updateCase(caseDetails.getData(), ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence deleted", UPDATED_SSCS, idamTokens);
 
                         documentManagementService.delete(evidenceId);
                     }
