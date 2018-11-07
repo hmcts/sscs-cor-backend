@@ -46,13 +46,6 @@ public class EvidenceUploadService {
 
     }
 
-    public Evidence uploadEvidence(String ccdCaseId,  MultipartFile file) {
-        Document document = uploadDocument(file);
-        addSscsDocumentToCcd(Long.getLong(ccdCaseId), document);
-
-        return new Evidence(document.links.self.href, document.originalDocumentName, getCreatedDate(document));
-
-    }
 
     public Optional<Evidence> uploadEvidence(String onlineHearingId, String questionId, MultipartFile file) {
         return getOnlineHearingService().getCcdCaseId(onlineHearingId)
