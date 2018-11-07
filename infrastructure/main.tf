@@ -1,9 +1,5 @@
 provider "azurerm" {}
 
-provider "vault" {
-  address = "https://vault.reform.hmcts.net:6200"
-}
-
 # Make sure the resource group exists
 resource "azurerm_resource_group" "rg" {
   name     = "${var.product}-${var.component}-${var.env}"
@@ -15,20 +11,24 @@ data "azurerm_key_vault" "sscs_key_vault" {
   resource_group_name = "${local.azureVaultName}"
 }
 
-data "vault_generic_secret" "sscs_s2s_secret" {
-  path = "secret/${var.infrastructure_env}/ccidam/service-auth-provider/api/microservice-keys/sscs"
+data "azurerm_key_vault_secret" "sscs-s2s-secret" {
+  name = "sscs-s2s-secret"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
-data "vault_generic_secret" "idam_sscs_systemupdate_user" {
-  path = "secret/${var.infrastructure_env}/ccidam/idam-api/sscs/systemupdate/user"
+data "azurerm_key_vault_secret" "idam-sscs-systemupdate-user" {
+  name = "idam-sscs-systemupdate-user"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
-data "vault_generic_secret" "idam_sscs_systemupdate_password" {
-  path = "secret/${var.infrastructure_env}/ccidam/idam-api/sscs/systemupdate/password"
+data "azurerm_key_vault_secret" "idam-sscs-systemupdate-password" {
+  name = "idam-sscs-systemupdate-password"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
-data "vault_generic_secret" "idam_oauth2_client_secret" {
-  path = "secret/${var.infrastructure_env}/ccidam/idam-api/oauth2/client-secrets/sscs"
+data "azurerm_key_vault_secret" "idam-sscs-oauth2-client-secret" {
+  name = "idam-sscs-oauth2-client-secret"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
 locals {
@@ -64,11 +64,11 @@ module "sscs-core-backend" {
   app_settings = {
     IDAM.S2S-AUTH                   = "${local.s2sCnpUrl}"
     IDAM.S2S-AUTH.MICROSERVICE      = "${var.idam_s2s_auth_microservice}"
-    IDAM.S2S-AUTH.TOTP_SECRET       = "${data.vault_generic_secret.sscs_s2s_secret.data["value"]}"
-    IDAM_SSCS_SYSTEMUPDATE_USER     = "${data.vault_generic_secret.idam_sscs_systemupdate_user.data["value"]}"
-    IDAM_SSCS_SYSTEMUPDATE_PASSWORD = "${data.vault_generic_secret.idam_sscs_systemupdate_password.data["value"]}"
+    IDAM.S2S-AUTH.TOTP_SECRET       = "${data.azurerm_key_vault_secret.sscs-s2s-secret.value}"
+    IDAM_SSCS_SYSTEMUPDATE_USER     = "${data.azurerm_key_vault_secret.idam-sscs-systemupdate-user.value}"
+    IDAM_SSCS_SYSTEMUPDATE_PASSWORD = "${data.azurerm_key_vault_secret.idam-sscs-systemupdate-password.value}"
     IDAM_OAUTH2_CLIENT_ID           = "${var.idam_oauth2_client_id}"
-    IDAM_OAUTH2_CLIENT_SECRET       = "${data.vault_generic_secret.idam_oauth2_client_secret.data["value"]}"
+    IDAM_OAUTH2_CLIENT_SECRET       = "${data.azurerm_key_vault_secret.idam-sscs-oauth2-client-secret.value}"
     IDAM_OAUTH2_REDIRECT_URL        = "${var.idam_redirect_url}"
     IDAM_URL                        = "${local.idam_url}"
     IDAM_SSCS_URL                   = "${var.idam_sscs_url}"
