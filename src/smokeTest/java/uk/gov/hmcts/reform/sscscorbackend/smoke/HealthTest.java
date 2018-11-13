@@ -1,10 +1,14 @@
 package uk.gov.hmcts.reform.sscscorbackend.smoke;
 
 import io.restassured.RestAssured;
+import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
 public class HealthTest {
+    @Rule
+    public Retry retry = new Retry(3);
+
     private final String baseUrl = System.getenv("TEST_URL");
 
     @Test
