@@ -159,15 +159,13 @@ public class OnlineHearingService {
         //get the questions and answers
         CohQuestionRounds questionRounds = getQuestionRounds(onlineHearingId);
 
-        LOG.info("Got question rounds for hearing " + onlineHearingId);
+        LOG.info("Got question rounds for hearing {} ...", onlineHearingId);
 
         IdamTokens idamTokens = idamService.getIdamTokens();
 
         SscsCaseDetails caseDetails = ccdService.getByCaseId(Long.valueOf(caseId), idamTokens);
 
-        LOG.info("Got case details");
-
-        LOG.info("Got case details for " + caseId);
+        LOG.info("Got case details for {} ...", caseId);
         String appellantTitle = caseDetails.getData().getAppeal().getAppellant().getName().getTitle();
         String appellantFirstName = caseDetails.getData().getAppeal().getAppellant().getName().getFirstName();
         String appellantLastName = caseDetails.getData().getAppeal().getAppellant().getName().getLastName();
@@ -187,7 +185,7 @@ public class OnlineHearingService {
 
         String fileName = "COR Transcript - " + caseReference + ".pdf";
         ByteArrayMultipartFile file = ByteArrayMultipartFile.builder().content(pdfBytes).name(fileName).contentType(APPLICATION_PDF).build();
-        LOG.info("Creating file " + fileName);
+        LOG.info("Creating file {} ...", fileName);
 
         getEvidenceUploadService().uploadEvidence(caseId, file);
 

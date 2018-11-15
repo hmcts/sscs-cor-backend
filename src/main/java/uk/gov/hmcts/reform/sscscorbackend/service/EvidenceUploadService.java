@@ -43,7 +43,7 @@ public class EvidenceUploadService {
 
     public Evidence uploadEvidence(String ccdCaseId,  MultipartFile file) {
         Document document = uploadDocument(file);
-        log.info("Upload document for case " + ccdCaseId);
+        log.info("Upload document for case {} ...", ccdCaseId);
         addSscsDocumentToCcd(Long.getLong(ccdCaseId), document);
 
         return new Evidence(document.links.self.href, document.originalDocumentName, getCreatedDate(document));
@@ -120,7 +120,7 @@ public class EvidenceUploadService {
     }
 
     private void addSscsDocumentToCcd(Long ccdCaseId, Document document) {
-        log.info("Adding document to case " + ccdCaseId);
+        log.info("Adding document to case {} ...",ccdCaseId);
         IdamTokens idamTokens = idamService.getIdamTokens();
         log.info("Got idam tokens ");
 
