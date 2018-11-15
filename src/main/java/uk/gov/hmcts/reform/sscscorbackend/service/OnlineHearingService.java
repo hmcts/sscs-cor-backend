@@ -182,7 +182,7 @@ public class OnlineHearingService {
         String fileName = "COR Transcript - " + caseReference + ".pdf";
         ByteArrayMultipartFile file = ByteArrayMultipartFile.builder().content(pdfBytes).name(fileName).contentType(APPLICATION_PDF).build();
 
-        evidenceUploadService.uploadEvidence(caseId, file);
+        getEvidenceUploadService().uploadEvidence(caseId, file);
 
         sscsPdfService.mergeDocIntoCcd(fileName, pdfBytes,
                 Long.valueOf(caseId), caseDetails.getData(), idamTokens);
@@ -205,7 +205,12 @@ public class OnlineHearingService {
         return IOUtils.toByteArray(in);
     }
 
-    public void setEvidenceUploadService(@Autowired EvidenceUploadService evidenceUploadService) {
+    @Autowired
+    public void setEvidenceUploadService(EvidenceUploadService evidenceUploadService) {
         this.evidenceUploadService = evidenceUploadService;
+    }
+
+    public EvidenceUploadService getEvidenceUploadService() {
+        return evidenceUploadService;
     }
 }
