@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
@@ -25,16 +27,15 @@ public class EvidenceUploadService {
     private final DocumentManagementService documentManagementService;
     private final CcdService ccdService;
     private final IdamService idamService;
-    private final OnlineHearingService onlineHearingService;
+    private OnlineHearingService onlineHearingService;
 
     private static final String UPDATED_SSCS = "Updated SSCS";
     private static final String UPLOAD_COR_DOCUMENT = "uploadCorDocument";
 
-    public EvidenceUploadService(DocumentManagementService documentManagementService, CcdService ccdService, IdamService idamService, OnlineHearingService onlineHearingService) {
+    public EvidenceUploadService(DocumentManagementService documentManagementService, CcdService ccdService, IdamService idamService) {
         this.documentManagementService = documentManagementService;
         this.ccdService = ccdService;
         this.idamService = idamService;
-        this.onlineHearingService = onlineHearingService;
     }
 
     public Evidence uploadEvidence(String ccdCaseId,  MultipartFile file) {
@@ -46,7 +47,7 @@ public class EvidenceUploadService {
     }
 
     public Optional<Evidence> uploadEvidence(String onlineHearingId, String questionId, MultipartFile file) {
-        return onlineHearingService.getCcdCaseId(onlineHearingId)
+        return getOnlineHearingService().getCcdCaseId(onlineHearingId)
                 .map(ccdCaseId -> {
                     Document document = uploadDocument(file);
                     addDocumentToCcd(questionId, ccdCaseId, document);
@@ -60,7 +61,7 @@ public class EvidenceUploadService {
     }
 
     public Map<String, List<Evidence>> listEvidence(String onlineHearingId) {
-        return onlineHearingService.getCcdCaseId(onlineHearingId)
+        return getOnlineHearingService().getCcdCaseId(onlineHearingId)
                 .<Map<String, List<Evidence>>>map(ccdCaseId -> {
                     IdamTokens idamTokens = idamService.getIdamTokens();
                     SscsCaseDetails caseDetails = getSscsCaseDetails(ccdCaseId, idamTokens);
@@ -174,7 +175,7 @@ public class EvidenceUploadService {
     }
 
     public boolean deleteEvidence(String onlineHearingId, String evidenceId) {
-        return onlineHearingService.getCcdCaseId(onlineHearingId)
+        return getOnlineHearingService().getCcdCaseId(onlineHearingId)
                 .map(ccdCaseId -> {
                     IdamTokens idamTokens = idamService.getIdamTokens();
                     SscsCaseDetails caseDetails = getSscsCaseDetails(ccdCaseId, idamTokens);
@@ -192,5 +193,14 @@ public class EvidenceUploadService {
                     }
                     return true;
                 }).orElse(false);
+    }
+
+    @Autowired
+    public void setOnlineHearingService(OnlineHearingService onlineHearingService) {
+        this.onlineHearingService = onlineHearingService;
+    }
+
+    public OnlineHearingService getOnlineHearingService() {
+        return onlineHearingService;
     }
 }
