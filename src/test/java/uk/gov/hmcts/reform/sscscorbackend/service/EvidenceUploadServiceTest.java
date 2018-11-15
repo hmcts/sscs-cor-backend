@@ -60,9 +60,9 @@ public class EvidenceUploadServiceTest {
         evidenceUploadService = new EvidenceUploadService(
                 documentManagementService,
                 ccdService,
-                idamService,
-                onlineHearingService
+                idamService
         );
+        evidenceUploadService.setOnlineHearingService(onlineHearingService);
         fileName = "someFileName.txt";
         documentUrl = "http://example.com/document/" + someEvidenceId;
         file = mock(MultipartFile.class);
