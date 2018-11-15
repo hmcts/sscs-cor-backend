@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscscorbackend.service;
 
 import static java.util.Collections.*;
 import static java.util.stream.Collectors.*;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 import uk.gov.hmcts.reform.sscscorbackend.service.documentmanagement.DocumentManagementService;
 
+@Slf4j
 @Service
 public class EvidenceUploadService {
     private final DocumentManagementService documentManagementService;
@@ -40,6 +43,7 @@ public class EvidenceUploadService {
 
     public Evidence uploadEvidence(String ccdCaseId,  MultipartFile file) {
         Document document = uploadDocument(file);
+        log.info("Upload document for case " + ccdCaseId);
         addSscsDocumentToCcd(Long.getLong(ccdCaseId), document);
 
         return new Evidence(document.links.self.href, document.originalDocumentName, getCreatedDate(document));
@@ -116,7 +120,10 @@ public class EvidenceUploadService {
     }
 
     private void addSscsDocumentToCcd(Long ccdCaseId, Document document) {
+        log.info("Adding document to case " + ccdCaseId);
         IdamTokens idamTokens = idamService.getIdamTokens();
+        log.info("Got idam tokens ");
+
         SscsCaseDetails caseDetails = getSscsCaseDetails(ccdCaseId, idamTokens);
 
         addNewScssDocumentToCaseDetails(document, caseDetails);
