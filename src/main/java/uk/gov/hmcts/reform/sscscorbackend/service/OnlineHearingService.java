@@ -219,7 +219,12 @@ public class OnlineHearingService {
         return IOUtils.toByteArray(in);
     }
 
-    public void setEvidenceUploadService(@Autowired EvidenceUploadService evidenceUploadService) {
+    @Autowired
+    public void setEvidenceUploadService(EvidenceUploadService evidenceUploadService) {
         this.evidenceUploadService = evidenceUploadService;
+    }
+
+    public EvidenceUploadService getEvidenceUploadService() {
+        return evidenceUploadService;
     }
 }
