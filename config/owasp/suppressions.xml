@@ -28,4 +28,7 @@
     <gav regex="true">^commons-collections:commons-collections:.*$</gav>
     <cve>CVE-2017-15708</cve>
   </suppress>
+  <suppress>
+    <cve>CVE-2018-10237</cve>
+  </suppress>
 </suppressions>
