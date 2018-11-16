@@ -78,14 +78,6 @@ public class CreateCaseController {
         try {
             sscsCaseData = new ObjectMapper().readValue(caseAsString, SscsCaseData.class);
 
-            Event events = Event.builder()
-                    .value(EventDetails.builder()
-                            .type("appealCreated")
-                            .description("Some Events")
-                            .date("2017-05-24T14:01:18.243")
-                            .build())
-                    .build();
-
             sscsCaseData = sscsCaseData.toBuilder()
                     .onlinePanel(OnlinePanel.builder()
                             .assignedTo("someJudge")
