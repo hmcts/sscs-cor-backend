@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -78,12 +79,21 @@ public class CreateCaseController {
         try {
             sscsCaseData = new ObjectMapper().readValue(caseAsString, SscsCaseData.class);
 
+            Event events = Event.builder()
+                    .value(EventDetails.builder()
+                            .type("appealCreated")
+                            .description("Some Events")
+                            .date("2017-05-24T14:01:18.243")
+                            .build())
+                    .build();
+
             sscsCaseData = sscsCaseData.toBuilder()
                     .onlinePanel(OnlinePanel.builder()
                             .assignedTo("someJudge")
                             .disabilityQualifiedMember("disabilityQualifiedMember")
                             .medicalMember("medicalMember")
                             .build())
+                    .events(Collections.singletonList(events))
                     .caseReference("SC285/17/" + new Random().nextInt(90000) + 10000)
                     .subscriptions(
                             Subscriptions.builder()
