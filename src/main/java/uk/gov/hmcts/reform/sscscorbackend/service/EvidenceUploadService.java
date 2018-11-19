@@ -44,7 +44,7 @@ public class EvidenceUploadService {
     public Evidence uploadEvidence(String ccdCaseId,  MultipartFile file) {
         Document document = uploadDocument(file);
         log.info("Upload document for case {} ...", ccdCaseId);
-        addSscsDocumentToCcd(Long.getLong(ccdCaseId), document);
+        addSscsDocumentToCcd(Long.parseLong(ccdCaseId), document);
 
         return new Evidence(document.links.self.href, document.originalDocumentName, getCreatedDate(document));
 
