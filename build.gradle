@@ -164,7 +164,7 @@ dependencies {
   compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.4.1'
   compile group: 'uk.gov.hmcts.reform', name:'sscs-common', version: '0.0.117'
 
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-robotics-email-common', version: '0.0.83'
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-robotics-email-common', version: '0.0.84'
   compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '4.0.1'
 
   // Removed for now as we have an issue with some of its dependencies
