@@ -24,7 +24,8 @@ import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
                 "uk.gov.hmcts.reform.sscscorbackend.service",
                 "uk.gov.hmcts.reform.ccd.client",
                 "uk.gov.hmcts.reform.sscs.idam",
-                "uk.gov.hmcts.reform.authorisation"
+                "uk.gov.hmcts.reform.authorisation",
+                "uk.gov.hmcts.reform.sscs.document"
         })
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 @ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
