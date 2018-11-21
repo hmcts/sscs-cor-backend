@@ -135,6 +135,6 @@ public class SscsCorBackendRequests {
                         "\", \"online_hearing_id\":\"" + hearingId + "\"}", APPLICATION_JSON))
                 .build());
 
-        assertThat(resolveHearingResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+        assertThat(resolveHearingResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
     }
 }
