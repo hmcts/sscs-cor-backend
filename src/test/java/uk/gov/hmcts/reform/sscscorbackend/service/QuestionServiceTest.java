@@ -12,6 +12,7 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +38,17 @@ public class QuestionServiceTest {
         cohAnswer = someCohAnswer();
         evidenceUploadService = mock(EvidenceUploadService.class);
         underTest = new QuestionService(cohService, evidenceUploadService);
+    }
+
+    @Test
+    public void getsAnEmptyListOfQuestionsWhenNoRoundsHaveBeenIssued() {
+        CohQuestionRounds cohQuestionRounds = someUnpublishedCohQuestionRounds();
+
+        when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
+        List<QuestionSummary> questions = questionRound.getQuestions();
+
+        assertThat(questions, is(Collections.emptyList()));
     }
 
     @Test
