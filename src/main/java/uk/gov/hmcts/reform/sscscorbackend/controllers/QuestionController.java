@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.Answer;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
 import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionRound;
+import uk.gov.hmcts.reform.sscscorbackend.service.CaseNotCorException;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.QuestionService;
 
@@ -37,6 +38,7 @@ public class QuestionController {
     )
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No online hearing found for email address"),
+            @ApiResponse(code = 409, message = "Case found but it is not a COR case"),
             @ApiResponse(code = 422, message = "Multiple online hearings found for email address")
     })
     @RequestMapping(method = RequestMethod.GET)
@@ -48,8 +50,9 @@ public class QuestionController {
                     .orElse(ResponseEntity.notFound().build());
         } catch (IllegalStateException exc) {
             return ResponseEntity.unprocessableEntity().build();
+        } catch (CaseNotCorException exc) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-
     }
 
     @ApiOperation(value = "Get a list of questions",

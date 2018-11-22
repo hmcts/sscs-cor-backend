@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
+import uk.gov.hmcts.reform.sscscorbackend.service.CaseNotCorException;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.QuestionService;
 
@@ -22,7 +23,6 @@ public class QuestionControllerTest {
     private String onlineHearingId;
     private String questionId;
     private QuestionController underTest;
-    private List<QuestionSummary> expectedQuestions;
     private QuestionRound questionRound;
     private OnlineHearingService onlineHearingService;
 
@@ -31,7 +31,6 @@ public class QuestionControllerTest {
         expectedQuestion = someQuestion();
         onlineHearingId = expectedQuestion.getOnlineHearingId();
         questionId = expectedQuestion.getQuestionId();
-        expectedQuestions = someQuestionSummaries();
         questionRound = someQuestionRound();
 
         questionService = mock(QuestionService.class);
@@ -84,6 +83,17 @@ public class QuestionControllerTest {
         ResponseEntity<OnlineHearing> onlineHearingResponse = underTest.getOnlineHearing(someEmailAddress);
 
         assertThat(onlineHearingResponse.getStatusCode(), is(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    public void foundAHearingButItIsNotACorCase() {
+        String someEmailAddress = "someEmailAddress";
+        when(onlineHearingService.getOnlineHearing(someEmailAddress))
+                .thenThrow(new CaseNotCorException());
+
+        ResponseEntity<OnlineHearing> onlineHearingResponse = underTest.getOnlineHearing(someEmailAddress);
+
+        assertThat(onlineHearingResponse.getStatusCode(), is(HttpStatus.CONFLICT));
     }
 
     @Test

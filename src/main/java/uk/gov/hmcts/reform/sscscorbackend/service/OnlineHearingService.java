@@ -1,15 +1,12 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
+import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,17 +51,28 @@ public class OnlineHearingService {
                 idamService.getIdamTokens()
         );
 
+        if (cases == null || cases.isEmpty()) {
+            return Optional.empty();
+        }
+        List<SscsCaseDetails> corCases = filterCorCases(cases);
+
+        if (corCases.size() == 0) {
+            throw new CaseNotCorException();
+        } else if (corCases.size() > 1) {
+            throw new IllegalStateException("Multiple appeals with online hearings found.");
+        }
+
+        return loadOnlineHearingFromCoh(corCases.get(0));
+    }
+
+    private List<SscsCaseDetails> filterCorCases(List<SscsCaseDetails> cases) {
         final AtomicInteger counter = new AtomicInteger(1);
-        return cases.stream()
-                .filter(caseDetails -> caseDetails.getData() != null &&
-                        caseDetails.getData().getAppeal() != null &&
-                        HEARING_TYPE_ONLINE_RESOLUTION.equalsIgnoreCase(caseDetails.getData().getAppeal().getHearingType())
-                )
-                .peek(caseDetails -> {
-                    LOG.info(counter.getAndIncrement() + ") case id: " + caseDetails.getId());
-                })
-                .reduce(checkThereIsOnlyOneCase())
-                .flatMap(getHearingFromCoh());
+        return cases.stream().filter(caseDetails -> caseDetails.getData() != null &&
+                caseDetails.getData().getAppeal() != null &&
+                HEARING_TYPE_ONLINE_RESOLUTION.equalsIgnoreCase(caseDetails.getData().getAppeal().getHearingType())
+        )
+                .peek(caseDetails -> LOG.info(counter.getAndIncrement() + ") case id: " + caseDetails.getId()))
+                .collect(toList());
     }
 
     public Optional<Long> getCcdCaseId(String onlineHearingId) {
@@ -83,7 +91,7 @@ public class OnlineHearingService {
             List<CohDecisionReply> decisionReplies = decisionRepliesWrapper.get().getDecisionReplies()
                     .stream()
                     .filter(d -> d.getAuthorReference().equals("oauth2Token"))
-                    .collect(Collectors.toList());
+                    .collect(toList());
 
             if (decisionReplies.size() > 0) {
                 return decisionReplies.get(0);
@@ -103,29 +111,21 @@ public class OnlineHearingService {
                 .orElse(null);
     }
 
-    private BinaryOperator<SscsCaseDetails> checkThereIsOnlyOneCase() {
-        return (a, b) -> {
-            throw new IllegalStateException("Multiple appeals with online hearings found.");
-        };
-    }
+    private Optional<OnlineHearing> loadOnlineHearingFromCoh(SscsCaseDetails sscsCaseDeails) {
+        CohOnlineHearings cohOnlineHearings = cohClient.getOnlineHearing(sscsCaseDeails.getId());
 
-    private Function<SscsCaseDetails, Optional<OnlineHearing>> getHearingFromCoh() {
-        return firstCase -> {
-            CohOnlineHearings cohOnlineHearings = cohClient.getOnlineHearing(firstCase.getId());
+        return cohOnlineHearings.getOnlineHearings().stream()
+                .findFirst()
+                .map(onlineHearing -> {
+                    Name name = sscsCaseDeails.getData().getAppeal().getAppellant().getName();
+                    String nameString = name.getFirstName() + " " + name.getLastName();
 
-            return cohOnlineHearings.getOnlineHearings().stream()
-                    .findFirst()
-                    .map(onlineHearing -> {
-                        Name name = firstCase.getData().getAppeal().getAppellant().getName();
-                        String nameString = name.getFirstName() + " " + name.getLastName();
-
-                        return new OnlineHearing(
-                                onlineHearing.getOnlineHearingId(),
-                                nameString,
-                                firstCase.getData().getCaseReference(),
-                                getDecision(onlineHearing.getOnlineHearingId())
-                        );
-                    });
-        };
+                    return new OnlineHearing(
+                            onlineHearing.getOnlineHearingId(),
+                            nameString,
+                            sscsCaseDeails.getData().getCaseReference(),
+                            getDecision(onlineHearing.getOnlineHearingId())
+                    );
+                });
     }
 }
