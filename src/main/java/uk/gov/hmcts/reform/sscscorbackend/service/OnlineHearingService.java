@@ -174,12 +174,18 @@ public class OnlineHearingService {
 
         String caseReference = caseDetails.getData().getCaseReference();
 
-        OnlineHearingPdfWraper onlineHearingPdfWraper = OnlineHearingPdfWraper.builder()
+        OnlineHearingPdfWraper onlineHearingPdfWrapper = OnlineHearingPdfWraper.builder()
                 .appellantTitle(appellantTitle).appellantFirstName(appellantFirstName)
                 .appellantLastName(appellantLastName).cohQuestionRounds(questionRounds)
                 .nino(nino).caseReference(caseReference).build();
 
-        Map<String, Object> placeholders = Collections.singletonMap("OnlineHearingPdfWrapper", onlineHearingPdfWraper);
+        LOG.info("questionRounds: ", onlineHearingPdfWrapper.getCohQuestionRounds());
+
+        LOG.info("Current Question Round: ", onlineHearingPdfWrapper.getCohQuestionRounds().getCurrentQuestionRound());
+
+        LOG.info("Question Round Size: ", onlineHearingPdfWrapper.getCohQuestionRounds().getCohQuestionRound().size());
+
+        Map<String, Object> placeholders = Collections.singletonMap("OnlineHearingPdfWrapper", onlineHearingPdfWrapper);
 
         byte[] pdfBytes = createPdf(placeholders);
 
