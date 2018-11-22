@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscscorbackend.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Collections;
 import java.util.List;
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
@@ -32,5 +33,9 @@ public class QuestionRound {
     @JsonProperty(value = "deadline_extension_count")
     public int getDeadlineExtensionCount() {
         return deadlineExtensionCount;
+    }
+
+    public static QuestionRound emptyQuestionRound() {
+        return new QuestionRound(Collections.emptyList(), null, 0);
     }
 }

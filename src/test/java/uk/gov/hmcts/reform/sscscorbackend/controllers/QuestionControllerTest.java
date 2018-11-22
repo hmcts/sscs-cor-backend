@@ -5,7 +5,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 
-import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;

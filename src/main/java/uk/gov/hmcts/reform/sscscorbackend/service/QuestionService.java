@@ -81,6 +81,10 @@ public class QuestionService {
         Map<String, List<Evidence>> evidencePerQuestion = evidenceUploadService.listEvidence(onlineHearingId);
 
         int currentQuestionRoundNumber = questionRounds.getCurrentQuestionRound();
+        if (currentQuestionRoundNumber == 0) {
+            return QuestionRound.emptyQuestionRound();
+        }
+
         CohQuestionRound currentQuestionRound = questionRounds.getCohQuestionRound().get(currentQuestionRoundNumber - 1);
         String deadlineExpiryDate = getQuestionRoundDeadlineExpiryDate(currentQuestionRound);
         int deadlineExtensionCount = currentQuestionRound.getDeadlineExtensionCount();

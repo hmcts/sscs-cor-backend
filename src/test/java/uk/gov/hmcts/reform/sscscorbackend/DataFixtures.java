@@ -55,6 +55,10 @@ public class DataFixtures {
         return new CohQuestionRounds(1, singletonList(new CohQuestionRound(cohQuestionReferenceList, 0)));
     }
 
+    public static CohQuestionRounds someUnpublishedCohQuestionRounds() {
+        return new CohQuestionRounds(0, Collections.emptyList());
+    }
+
     public static CohQuestionRounds someCohQuestionRoundsMultipleRoundsOfQuestions() {
         return new CohQuestionRounds(2, Arrays.asList(
                 new CohQuestionRound(singletonList(
