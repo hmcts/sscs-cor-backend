@@ -114,6 +114,14 @@ public class OnlineHearingServiceTest {
         assertThat(onlineHearing.isPresent(), is(false));
     }
 
+    @Test(expected = CaseNotCorException.class)
+    public void noOnlineHearingIfFoundInCcdButNotAnOnlineResolutionAppeal() {
+        when(ccdService.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress), idamTokens))
+                .thenReturn(singletonList(createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "paper")));
+
+        underTest.getOnlineHearing(someEmailAddress);
+    }
+
     @Test
     public void noOnlineHearingIfNotFoundInCOh() {
         when(ccdService.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress), idamTokens))
@@ -124,13 +132,17 @@ public class OnlineHearingServiceTest {
     }
 
     private SscsCaseDetails createCaseDetails(Long caseId, String expectedCaseReference, String firstName, String lastName) {
+        return createCaseDetails(caseId, expectedCaseReference, firstName, lastName, "cor");
+    }
+
+    private SscsCaseDetails createCaseDetails(Long caseId, String expectedCaseReference, String firstName, String lastName, String hearingType) {
         return SscsCaseDetails.builder()
                 .id(caseId)
                 .data(SscsCaseData.builder()
                         .caseReference(expectedCaseReference)
                         .onlinePanel(OnlinePanel.builder().assignedTo("someJudge").build())
                         .appeal(Appeal.builder()
-                                .hearingType("cor")
+                                .hearingType(hearingType)
                                 .appellant(Appellant.builder()
                                         .name(Name.builder()
                                                 .firstName(firstName)
