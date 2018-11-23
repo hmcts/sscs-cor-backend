@@ -14,15 +14,16 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 public class CohRequests {
-    private AuthTokenGenerator authTokenGenerator;
+    private final IdamTokens idamTokens;
     private String cohBaseUrl;
     private HttpClient cohClient;
 
-    public CohRequests(AuthTokenGenerator authTokenGenerator, String cohBaseUrl, HttpClient cohClient) {
-        this.authTokenGenerator = authTokenGenerator;
+    public CohRequests(IdamService idamService, String cohBaseUrl, HttpClient cohClient) {
+        idamTokens = idamService.getIdamTokens();
         this.cohBaseUrl = cohBaseUrl;
         this.cohClient = cohClient;
     }
@@ -175,8 +176,8 @@ public class CohRequests {
 
     private String makePostRequest(HttpClient client, String uri, String body, String responseValue) throws IOException {
         HttpResponse httpResponse = client.execute(post(uri)
-                .setHeader(HttpHeaders.AUTHORIZATION, "oauth2Token")
-                .setHeader("ServiceAuthorization", authTokenGenerator.generate())
+                .setHeader(HttpHeaders.AUTHORIZATION, idamTokens.getIdamOauth2Token())
+                .setHeader("ServiceAuthorization", idamTokens.getServiceAuthorization())
                 .setEntity(new StringEntity(body, APPLICATION_JSON))
                 .build());
 
@@ -188,8 +189,8 @@ public class CohRequests {
 
     private void makePutRequest(HttpClient client, String uri, String body) throws IOException {
         HttpResponse httpResponse = client.execute(put(uri)
-                .setHeader(HttpHeaders.AUTHORIZATION, "oauth2Token")
-                .setHeader("ServiceAuthorization", authTokenGenerator.generate())
+                .setHeader(HttpHeaders.AUTHORIZATION, idamTokens.getIdamOauth2Token())
+                .setHeader("ServiceAuthorization", idamTokens.getServiceAuthorization())
                 .setEntity(new StringEntity(body, APPLICATION_JSON))
                 .build());
 
@@ -198,8 +199,8 @@ public class CohRequests {
 
     private JSONObject makeGetRequest(HttpClient client, String uri, String responseValue) throws IOException {
         HttpResponse httpResponse = client.execute(get(uri)
-                .setHeader(HttpHeaders.AUTHORIZATION, "oauth2Token")
-                .setHeader("ServiceAuthorization", authTokenGenerator.generate())
+                .setHeader(HttpHeaders.AUTHORIZATION, idamTokens.getIdamOauth2Token())
+                .setHeader("ServiceAuthorization", idamTokens.getServiceAuthorization())
                 .setHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                 .build());
 

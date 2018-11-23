@@ -1,13 +1,10 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
 import static java.util.stream.Collectors.toList;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -15,13 +12,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
-import uk.gov.hmcts.reform.sscscorbackend.exception.RestResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 
 @Service
 public class OnlineHearingService {
 
-    private static final Logger LOG = getLogger(RestResponseEntityExceptionHandler.class);
     private static final String HEARING_TYPE_ONLINE_RESOLUTION = "cor";
 
     private final CohService cohClient;
@@ -56,7 +51,7 @@ public class OnlineHearingService {
         }
         List<SscsCaseDetails> corCases = filterCorCases(cases);
 
-        if (corCases.size() == 0) {
+        if (corCases.isEmpty()) {
             throw new CaseNotCorException();
         } else if (corCases.size() > 1) {
             throw new IllegalStateException("Multiple appeals with online hearings found.");
@@ -66,12 +61,10 @@ public class OnlineHearingService {
     }
 
     private List<SscsCaseDetails> filterCorCases(List<SscsCaseDetails> cases) {
-        final AtomicInteger counter = new AtomicInteger(1);
         return cases.stream().filter(caseDetails -> caseDetails.getData() != null &&
                 caseDetails.getData().getAppeal() != null &&
                 HEARING_TYPE_ONLINE_RESOLUTION.equalsIgnoreCase(caseDetails.getData().getAppeal().getHearingType())
         )
-                .peek(caseDetails -> LOG.info(counter.getAndIncrement() + ") case id: " + caseDetails.getId()))
                 .collect(toList());
     }
 
@@ -90,7 +83,7 @@ public class OnlineHearingService {
         if (decisionRepliesWrapper.isPresent()) {
             List<CohDecisionReply> decisionReplies = decisionRepliesWrapper.get().getDecisionReplies()
                     .stream()
-                    .filter(d -> d.getAuthorReference().equals("oauth2Token"))
+                    //.filter(d -> d.getAuthorReference().equals("oauth2Token"))
                     .collect(toList());
 
             if (decisionReplies.size() > 0) {
