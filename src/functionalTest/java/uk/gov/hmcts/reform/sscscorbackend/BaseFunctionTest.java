@@ -19,12 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 @TestPropertySource(properties = {
         "idam.s2s-auth.url=http://rpe-service-auth-provider-aat.service.core-compute-aat.internal",
+        "idam.url=https://preprod-idamapi.reform.hmcts.net:3511",
+        "idam.oauth2.redirectUrl=https://evidence-sharing-preprod.sscs.reform.hmcts.net",
         "coh.url=http://coh-cor-aat.service.core-compute-aat.internal"
 })
 public abstract class BaseFunctionTest {
@@ -42,14 +44,14 @@ public abstract class BaseFunctionTest {
     protected CohRequests cohRequests;
 
     @Autowired
-    private AuthTokenGenerator authTokenGenerator;
+    private IdamService idamService;
 
     @Before
     public void setUp() throws Exception {
         cohClient = buildClient("USE_COH_PROXY");
         client = buildClient("USE_BACKEND_PROXY");
         sscsCorBackendRequests = new SscsCorBackendRequests(baseUrl, client);
-        cohRequests = new CohRequests(authTokenGenerator, cohBaseUrl, cohClient);
+        cohRequests = new CohRequests(idamService, cohBaseUrl, cohClient);
     }
 
     protected String createRandomEmail() {
