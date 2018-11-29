@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscscorbackend.service;
 
 import static java.util.Collections.*;
 import static java.util.stream.Collectors.*;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -128,7 +127,7 @@ public class EvidenceUploadService {
 
         addNewScssDocumentToCaseDetails(document, caseDetails);
 
-        ccdService.updateCase(caseDetails.getData(), ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", updatedSscs, idamTokens);
+        ccdService.updateCase(caseDetails.getData(), ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamTokens);
     }
 
     private void addNewScssDocumentToCaseDetails(Document document, SscsCaseDetails caseDetails) {

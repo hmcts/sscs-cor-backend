@@ -13,11 +13,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.poi.util.IOUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.
+import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -186,7 +187,7 @@ public class OnlineHearingService {
         LOG.info("Question Round Size: ", onlineHearingPdfWrapper.getCohQuestionRounds().getCohQuestionRound().size());
 
         LOG.info("Question header text: ", onlineHearingPdfWrapper.getCohQuestionRounds().getCohQuestionRound().get(0)
-        .getQuestionReferences().get(0).getQuestionHeaderText());
+            .getQuestionReferences().get(0).getQuestionHeaderText());
 
         Map<String, Object> placeholders = Collections.singletonMap("OnlineHearingPdfWrapper", onlineHearingPdfWrapper);
 
