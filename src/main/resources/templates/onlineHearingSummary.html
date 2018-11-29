@@ -146,7 +146,23 @@
                 <h3>Question rounds here</h3>
                 <p>{{ OnlineHearingPdfWrapper.cohQuestionRounds }}</p>
                 {% for question_Round in OnlineHearingPdfWrapper.cohQuestionRounds.question_rounds %}
-                AAAAA
+                    {% for questionReference in question_Round.questionReferences %}
+                    <h4>Question reference</h4>
+                    <h2 class="heading-medium">{{questionReference.questionHeaderText}}</h2>
+                    <p class="body-text">
+                        NEED THE BODY OF THE QUESTION</p>
+                    <p class="font-small">Issued: NEED DATE</p>
+                        {% for answer in questionReference.answers %}
+                        <div class="appellants-answer">
+                            <h2 class="bold-medium">Answer</h2>
+                            <p>{{ answer.answerText }}</p>
+
+                            <br/>
+                            <p class="font-small">Submitted: NEED DATE</p>
+                        </div>
+
+                        {% endfor %}
+                    {% endfor %}
                 {% endfor %}
 
                 {% for cohQuestionRound in OnlineHearingPdfWrapper.cohQuestionRounds.cohQuestionRound %}
