@@ -149,7 +149,7 @@
                 {% for question_round in OnlineHearingPdfWrapper.cohQuestionRounds.question_rounds %}
                     <h4>Question round</h4>
                     <h5>{{ question_round }}</h5>
-                    {% for questionReference in questionReferences %}
+                    {% for questionReference in question_round.questionReferences %}
                     <h4>Question reference</h4>
                     <h2 class="heading-medium">{{questionReference.questionHeaderText}}</h2>
                     <p class="body-text">
