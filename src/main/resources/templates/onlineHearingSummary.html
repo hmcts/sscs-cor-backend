@@ -143,8 +143,12 @@
                         </dd>
                     </div>
                 </dl>
+                <h3>Question rounds here</h3>
+                <p>{{ OnlineHearingPdfWrapper.cohQuestionRounds }}</p>
                 {% for cohQuestionRound in OnlineHearingPdfWrapper.cohQuestionRounds.cohQuestionRound %}
+                <h4>Question round</h4>
                     {% for questionReference in cohQuestionRound.questionReferences %}
+                        <h4>Question reference</h4>
                         <h2 class="heading-medium">{{questionReference.questionHeaderText}}</h2>
                         <p class="body-text">
                         NEED THE BODY OF THE QUESTION</p>

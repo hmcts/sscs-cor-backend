@@ -188,6 +188,8 @@ public class OnlineHearingService {
 
         LOG.info("Question header text: {}", onlineHearingPdfWrapper.getCohQuestionRounds().getCohQuestionRound().get(0)
             .getQuestionReferences().get(0).getQuestionHeaderText());
+        LOG.info("Question header text: {}", onlineHearingPdfWrapper.getCohQuestionRounds().getCohQuestionRound().get(0)
+                .getQuestionReferences().get(0).getAnswers().get(0));
 
         Map<String, Object> placeholders = Collections.singletonMap("OnlineHearingPdfWrapper", onlineHearingPdfWrapper);
 
