@@ -185,6 +185,9 @@ public class OnlineHearingService {
 
         LOG.info("Question Round Size: ", onlineHearingPdfWrapper.getCohQuestionRounds().getCohQuestionRound().size());
 
+        LOG.info("Question header text: ", onlineHearingPdfWrapper.getCohQuestionRounds().getCohQuestionRound().get(0)
+        .getQuestionReferences().get(0).getQuestionHeaderText());
+
         Map<String, Object> placeholders = Collections.singletonMap("OnlineHearingPdfWrapper", onlineHearingPdfWrapper);
 
         byte[] pdfBytes = createPdf(placeholders);
