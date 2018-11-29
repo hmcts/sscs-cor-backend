@@ -146,6 +146,14 @@
                 <h3>Question rounds here</h3>
                 <p>{{ OnlineHearingPdfWrapper.cohQuestionRounds }}</p>
 
+                {current_question_round=1, question_rounds=[{question_references=[{question_id=af4e50f4-9f85-
+                43e9-8e99-6a995ef44526, question_ordinal=1, question_header_text=question header,
+                deadline_expiry_date=2018-12-06T23:59:59Z, answers=[{answer_id=40d788d9-6f6d-41fb-b399-
+                81d260ee15e2, answer_text=Valid answer, current_answer_state=
+                {state_name=answer_submitted, state_datetime=2018-11-29T17:09:12Z}}]}],
+                deadline_extension_count=0}]}
+
+
                 {% for question_Round in OnlineHearingPdfWrapper.cohQuestionRounds.question_rounds %}
                     {% for questionReference in question_Round.questionReferences %}
                         <h2 class="heading-medium">{{questionReference.questionHeaderText}}</h2>
@@ -153,15 +161,18 @@
                             NEED THE BODY OF THE QUESTION</p>
                         <p class="font-small">Issued: NEED DATE</p>
                         {% for answer in questionReference.answers %}
-                            <div class="appellants-answer">
-                                <h2 class="bold-medium">Answer</h2>
-                                <p>{{ answer.answerText }}</p>
+                        <div class="appellants-answer">
+                            <h2 class="bold-medium">Answer</h2>
+                            <p>{{ answer.answerText }}</p>
 
-                                <br/>
-                                <p class="font-small">Submitted: NEED DATE</p>
-                            </div>
-                        {% endfor %}
+                            <br/>
+                            <p class="font-small">Submitted: NEED DATE</p>
+                        </div>
+
+                {% endfor %}
                     {% endfor %}
+                {% endfor %}
+
                 {% endfor %}
 
                 <br/><br/><br/>
