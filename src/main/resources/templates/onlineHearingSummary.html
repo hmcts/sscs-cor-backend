@@ -143,11 +143,12 @@
                         </dd>
                     </div>
                 </dl>
+                
                 <h3>Question rounds here</h3>
                 <p>{{ OnlineHearingPdfWrapper.cohQuestionRounds }}</p>
-                {% for question_Round in OnlineHearingPdfWrapper.cohQuestionRounds.question_rounds %}
+                {% for question_round in OnlineHearingPdfWrapper.cohQuestionRounds.question_rounds %}
                     <h4>Question round</h4>
-                    {% for questionReference in question_Round.questionReferences %}
+                    {% for questionReference in question_round.questionReferences %}
                     <h4>Question reference</h4>
                     <h2 class="heading-medium">{{questionReference.questionHeaderText}}</h2>
                     <p class="body-text">
