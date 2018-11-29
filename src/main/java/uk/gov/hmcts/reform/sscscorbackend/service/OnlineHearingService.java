@@ -180,13 +180,13 @@ public class OnlineHearingService {
                 .appellantLastName(appellantLastName).cohQuestionRounds(questionRounds)
                 .nino(nino).caseReference(caseReference).build();
 
-        LOG.info("questionRounds: ", onlineHearingPdfWrapper.getCohQuestionRounds());
+        LOG.info("questionRounds: {}", onlineHearingPdfWrapper.getCohQuestionRounds());
 
-        LOG.info("Current Question Round: ", onlineHearingPdfWrapper.getCohQuestionRounds().getCurrentQuestionRound());
+        LOG.info("Current Question Round: {}", onlineHearingPdfWrapper.getCohQuestionRounds().getCurrentQuestionRound());
 
-        LOG.info("Question Round Size: ", onlineHearingPdfWrapper.getCohQuestionRounds().getCohQuestionRound().size());
+        LOG.info("Question Round Size: {}", onlineHearingPdfWrapper.getCohQuestionRounds().getCohQuestionRound().size());
 
-        LOG.info("Question header text: ", onlineHearingPdfWrapper.getCohQuestionRounds().getCohQuestionRound().get(0)
+        LOG.info("Question header text: {}", onlineHearingPdfWrapper.getCohQuestionRounds().getCohQuestionRound().get(0)
             .getQuestionReferences().get(0).getQuestionHeaderText());
 
         Map<String, Object> placeholders = Collections.singletonMap("OnlineHearingPdfWrapper", onlineHearingPdfWrapper);
