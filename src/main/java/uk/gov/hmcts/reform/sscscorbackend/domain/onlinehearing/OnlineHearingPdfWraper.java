@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionRounds;
 
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class OnlineHearingPdfWraper {
     private String appellantTitle;
     private String appellantFirstName;
@@ -11,6 +12,10 @@ public class OnlineHearingPdfWraper {
     private String caseReference;
     private String nino;
     private CohQuestionRounds cohQuestionRounds;
+
+    public OnlineHearingPdfWraper() {
+
+    }
 
     public OnlineHearingPdfWraper(@JsonProperty(value = "appellant_title") String appellantTitle,
                                   @JsonProperty(value = "appellant_first_name") String appellantFirstName,
