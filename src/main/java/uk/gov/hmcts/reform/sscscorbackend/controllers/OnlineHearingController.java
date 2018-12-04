@@ -1,23 +1,20 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers;
 
-import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CohEvent;
-import uk.gov.hmcts.reform.sscscorbackend.exception.RestResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 
 
-
+@Slf4j
 @RestController
 public class OnlineHearingController {
-    private static final Logger LOG = getLogger(RestResponseEntityExceptionHandler.class);
 
     private OnlineHearingService onlineHearingService;
 
@@ -61,7 +58,7 @@ public class OnlineHearingController {
 
         String onlineHearingId = request.getOnlineHearingId();
         String caseId = request.getCaseId();
-        LOG.info("Received event for storing online hearing for case {} and hearing {} ...",
+        log.info("Received event for storing online hearing for case {} and hearing {} ...",
                 caseId, onlineHearingId);
 
         onlineHearingService.storeOnlineHearingInCcd(onlineHearingId, caseId);

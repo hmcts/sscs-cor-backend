@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
 import static java.util.stream.Collectors.toList;
-import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 
 import com.google.common.collect.ImmutableMap;
@@ -13,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.util.IOUtils;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -29,13 +28,11 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.OnlineHearingPdfWraper;
-import uk.gov.hmcts.reform.sscscorbackend.exception.RestResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 
+@Slf4j
 @Service
 public class OnlineHearingService {
-
-    private static final Logger LOG = getLogger(RestResponseEntityExceptionHandler.class);
     private static final String HEARING_TYPE_ONLINE_RESOLUTION = "cor";
 
     private final CohService cohClient;
@@ -160,13 +157,13 @@ public class OnlineHearingService {
         //get the questions and answers
         CohQuestionRounds questionRounds = getQuestionRounds(onlineHearingId);
 
-        LOG.info("Got question rounds for hearing {} ...", onlineHearingId);
+        log.info("Got question rounds for hearing {}", onlineHearingId);
 
         IdamTokens idamTokens = idamService.getIdamTokens();
 
         SscsCaseDetails caseDetails = ccdService.getByCaseId(Long.valueOf(caseId), idamTokens);
 
-        LOG.info("Got case details for {} ...", caseId);
+        log.info("Got case details for {}", caseId);
         String appellantTitle = caseDetails.getData().getAppeal().getAppellant().getName().getTitle();
         String appellantFirstName = caseDetails.getData().getAppeal().getAppellant().getName().getFirstName();
         String appellantLastName = caseDetails.getData().getAppeal().getAppellant().getName().getLastName();
@@ -180,24 +177,13 @@ public class OnlineHearingService {
                 .appellantLastName(appellantLastName).cohQuestionRounds(questionRounds)
                 .nino(nino).caseReference(caseReference).build();
 
-        LOG.info("questionRounds: {}", onlineHearingPdfWrapper.getCohQuestionRounds());
-
-        LOG.info("Current Question Round: {}", onlineHearingPdfWrapper.getCohQuestionRounds().getCurrentQuestionRound());
-
-        LOG.info("Question Round Size: {}", onlineHearingPdfWrapper.getCohQuestionRounds().getCohQuestionRound().size());
-
-        LOG.info("Question header text: {}", onlineHearingPdfWrapper.getCohQuestionRounds().getCohQuestionRound().get(0)
-            .getQuestionReferences().get(0).getQuestionHeaderText());
-        LOG.info("Question header text: {}", onlineHearingPdfWrapper.getCohQuestionRounds().getCohQuestionRound().get(0)
-                .getQuestionReferences().get(0).getAnswers().get(0));
-
         Map<String, Object> placeholders = Collections.singletonMap("OnlineHearingPdfWrapper", onlineHearingPdfWrapper);
 
         byte[] pdfBytes = createPdf(placeholders);
 
         String fileName = "COR Transcript - " + caseReference + ".pdf";
         ByteArrayMultipartFile file = ByteArrayMultipartFile.builder().content(pdfBytes).name(fileName).contentType(APPLICATION_PDF).build();
-        LOG.info("Creating file {} ...", fileName);
+        log.info("Creating transcript file {} for hearing {}", fileName, onlineHearingId);
 
         getEvidenceUploadService().uploadEvidence(caseId, file);
 
