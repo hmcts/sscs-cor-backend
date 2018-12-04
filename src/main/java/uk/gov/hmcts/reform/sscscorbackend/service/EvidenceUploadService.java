@@ -40,10 +40,11 @@ public class EvidenceUploadService {
         this.idamService = idamService;
     }
 
-    public Evidence uploadEvidence(String ccdCaseId,  MultipartFile file) {
+    public Evidence uploadEvidence(String ccdCaseId,  MultipartFile file,
+                                   IdamTokens idamTokens) {
         Document document = uploadDocument(file);
         log.info("Upload document for case {} ...", ccdCaseId);
-        addSscsDocumentToCcd(Long.parseLong(ccdCaseId), document);
+        addSscsDocumentToCcd(Long.parseLong(ccdCaseId), document, idamTokens);
 
         return new Evidence(document.links.self.href, document.originalDocumentName, getCreatedDate(document));
 
@@ -118,10 +119,9 @@ public class EvidenceUploadService {
         ccdService.updateCase(caseDetails.getData(), ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamTokens);
     }
 
-    private void addSscsDocumentToCcd(Long ccdCaseId, Document document) {
+    private void addSscsDocumentToCcd(Long ccdCaseId, Document document,
+                                      IdamTokens idamTokens) {
         log.info("Adding document to case {} ...",ccdCaseId);
-        IdamTokens idamTokens = idamService.getIdamTokens();
-        log.info("Got idam tokens ");
 
         SscsCaseDetails caseDetails = getSscsCaseDetails(ccdCaseId, idamTokens);
 

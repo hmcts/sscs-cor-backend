@@ -172,10 +172,9 @@ public class OnlineHearingService {
 
         String caseReference = caseDetails.getData().getCaseReference();
 
-        OnlineHearingPdfWraper onlineHearingPdfWrapper = OnlineHearingPdfWraper.builder()
-                .appellantTitle(appellantTitle).appellantFirstName(appellantFirstName)
-                .appellantLastName(appellantLastName).cohQuestionRounds(questionRounds)
-                .nino(nino).caseReference(caseReference).build();
+        OnlineHearingPdfWraper onlineHearingPdfWrapper =
+                new OnlineHearingPdfWraper(appellantTitle,appellantFirstName,
+                        appellantLastName,caseReference,nino,questionRounds);
 
         Map<String, Object> placeholders = Collections.singletonMap("OnlineHearingPdfWrapper", onlineHearingPdfWrapper);
 
@@ -185,7 +184,7 @@ public class OnlineHearingService {
         ByteArrayMultipartFile file = ByteArrayMultipartFile.builder().content(pdfBytes).name(fileName).contentType(APPLICATION_PDF).build();
         log.info("Creating transcript file {} for hearing {}", fileName, onlineHearingId);
 
-        getEvidenceUploadService().uploadEvidence(caseId, file);
+        getEvidenceUploadService().uploadEvidence(caseId, file, idamTokens);
 
         sscsPdfService.mergeDocIntoCcd(fileName, pdfBytes,
                 Long.valueOf(caseId), caseDetails.getData(), idamTokens);

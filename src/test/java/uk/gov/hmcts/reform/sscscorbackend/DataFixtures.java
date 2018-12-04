@@ -83,9 +83,7 @@ public class DataFixtures {
     }
 
     public static CohEvent someCohEvent(String caseId, String hearingId, String event) {
-        CohEvent cohEvent = CohEvent.builder().caseId(caseId)
-                .eventType(event)
-                .onlineHearingId(hearingId).build();
+        CohEvent cohEvent = new CohEvent(caseId, hearingId, event, null, null);
 
         return cohEvent;
     }
