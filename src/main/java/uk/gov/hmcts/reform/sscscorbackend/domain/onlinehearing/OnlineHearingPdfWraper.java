@@ -2,9 +2,12 @@ package uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonRootName;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionRounds;
 
+
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonRootName(value = "online_hearing_pdf_wrapper")
 public class OnlineHearingPdfWraper {
     private String appellantTitle;
     private String appellantFirstName;

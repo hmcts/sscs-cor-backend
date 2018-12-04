@@ -99,7 +99,7 @@
                             Title
                         </dt>
                         <dd class="cya-answer">
-                            {{ OnlineHearingPdfWrapper.appellant_title }}
+                            {{ online_hearing_pdf_wrapper.appellant_title }}
                         </dd>
                     </div>
                     <div>
@@ -107,7 +107,7 @@
                             First name
                         </dt>
                         <dd class="cya-answer">
-                            {{ OnlineHearingPdfWrapper.appellant_first_name }}
+                            {{ online_hearing_pdf_wrapper.appellant_first_name }}
                         </dd>
                     </div>
                     <div>
@@ -115,7 +115,7 @@
                             Surname
                         </dt>
                         <dd class="cya-answer">
-                            {{ OnlineHearingPdfWrapper.appellant_last_name }}
+                            {{ online_hearing_pdf_wrapper.appellant_last_name }}
                         </dd>
                     </div>
                     <div>
@@ -123,7 +123,7 @@
                             NINO
                         </dt>
                         <dd class="cya-answer">
-                            {{ OnlineHearingPdfWrapper.nino }}
+                            {{ online_hearing_pdf_wrapper.nino }}
                         </dd>
                     </div>
                     <!--<div>
@@ -139,12 +139,12 @@
                             Appeal reference number
                         </dt>
                         <dd class="cya-answer">
-                            {{ OnlineHearingPdfWrapper.case_reference }}
+                            {{ online_hearing_pdf_wrapper.case_reference }}
                         </dd>
                     </div>
                 </dl>
 
-                {% for question_round in OnlineHearingPdfWrapper.coh_question_rounds.question_rounds %}
+                {% for question_round in online_hearing_pdf_wrapper.coh_question_rounds.question_rounds %}
                     {% for questionReference in question_round.question_references %}
                         <h2 class="heading-medium">{{ questionReference.question_header_text }}</h2>
                         <p class="body-text">
@@ -165,10 +165,10 @@
 
                 <br/><br/><br/>
                 <span class="font-size: 12px">
-                    {{ OnlineHearingPdfWrapper.appellant_title }}
-                    {{ OnlineHearingPdfWrapper.appellant_first_name }}
-                    {{ OnlineHearingPdfWrapper.appellant_last_name }} |
-                {{ OnlineHearingPdfWrapper.case_reference }}
+                    {{ online_hearing_pdf_wrapper.appellant_title }}
+                    {{ online_hearing_pdf_wrapper.appellant_first_name }}
+                    {{ online_hearing_pdf_wrapper.appellant_last_name }} |
+                {{ online_hearing_pdf_wrapper.case_reference }}
                 </span>
             </div>
         </div>
