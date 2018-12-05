@@ -127,4 +127,14 @@ public class SscsCorBackendRequests {
 
         assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
     }
+
+    public void triggerResolve(String hearingId, String caseId) throws IOException {
+        String event = "continuous_online_hearing_resolved";
+        HttpResponse resolveHearingResponse = client.execute(post(baseUrl + "/notify/onlinehearing")
+                .setEntity(new StringEntity("{\"case_id\":\"" + caseId + "\", \"event_type\":\"" + event +
+                        "\", \"online_hearing_id\":\"" + hearingId + "\"}", APPLICATION_JSON))
+                .build());
+
+        assertThat(resolveHearingResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+    }
 }
