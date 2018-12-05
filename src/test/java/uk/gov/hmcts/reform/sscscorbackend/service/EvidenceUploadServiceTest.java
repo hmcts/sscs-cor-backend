@@ -277,4 +277,34 @@ public class EvidenceUploadServiceTest {
                 .toLocalDate()
                 .format(DateTimeFormatter.ISO_DATE);
     }
+
+    @Test
+    public void addSscsDocumentToCcdTest() {
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
+        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
+
+        Document document = new Document();
+        document.createdOn = evidenceCreatedOn;
+        document.links = new Document.Links();
+        document.links.self = new Document.Link();
+        document.links.self.href = documentUrl;
+        document.originalDocumentName = fileName;
+
+        evidenceUploadService.addSscsDocumentToCcd(someCcdCaseId, document, idamTokens);
+    }
+
+
+    @Test
+    public void createNewSscsDocumentTest() {
+        Document document = new Document();
+        document.createdOn = evidenceCreatedOn;
+        document.links = new Document.Links();
+        document.links.self = new Document.Link();
+        document.links.self.href = documentUrl;
+        document.originalDocumentName = fileName;
+
+        SscsDocument sscsDocument = evidenceUploadService.createNewSscsDocument(document);
+
+        assertThat(sscsDocument.getValue().getDocumentLink().getDocumentUrl(), is("http://example.com/document/someEvidenceId"));
+    }
 }
