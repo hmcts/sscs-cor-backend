@@ -176,7 +176,7 @@ public class OnlineHearingService {
                 new OnlineHearingPdfWraper(appellantTitle,appellantFirstName,
                         appellantLastName,caseReference,nino,questionRounds);
 
-        Map<String, Object> placeholders = Collections.singletonMap("OnlineHearingPdfWrapper", onlineHearingPdfWrapper);
+        Map<String, Object> placeholders = Collections.singletonMap("online_hearing_pdf_wrapper", onlineHearingPdfWrapper);
 
         byte[] pdfBytes = createPdf(placeholders);
 

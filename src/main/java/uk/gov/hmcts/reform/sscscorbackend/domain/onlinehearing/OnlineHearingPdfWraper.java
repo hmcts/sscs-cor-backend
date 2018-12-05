@@ -32,7 +32,29 @@ public class OnlineHearingPdfWraper {
         this.caseReference = caseReference;
         this.nino = nino;
         this.cohQuestionRounds = cohQuestionRounds;
+    }
 
+    public String getAppellantTitle() {
+        return appellantTitle;
+    }
 
+    public String getAppellantFirstName() {
+        return appellantFirstName;
+    }
+
+    public String getAppellantLastName() {
+        return appellantLastName;
+    }
+
+    public String getCaseReference() {
+        return caseReference;
+    }
+
+    public String getNino() {
+        return nino;
+    }
+
+    public CohQuestionRounds getCohQuestionRounds() {
+        return cohQuestionRounds;
     }
 }
