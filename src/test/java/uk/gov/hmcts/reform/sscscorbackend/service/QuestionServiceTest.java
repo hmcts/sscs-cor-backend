@@ -90,7 +90,7 @@ public class QuestionServiceTest {
     public void getsAListOfQuestionsWithUnansweredStatesWhenTheQuestionHasNotBeenAnswered() {
         CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(
                 new CohQuestionRound(singletonList(
-                        new CohQuestionReference("someQuestionId", 1, "first question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), null)
+                        new CohQuestionReference("someQuestionId", 1, "first question", "first question body", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), null)
                 ), 0)
         ));
         QuestionSummary questionSummary = createQuestionSummary(cohQuestionRounds, 0, unanswered);
@@ -107,7 +107,7 @@ public class QuestionServiceTest {
     public void getsAListOfQuestionsWithNoAnswerButHasEvidence() {
         CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(
                 new CohQuestionRound(singletonList(
-                        new CohQuestionReference("someQuestionId", 1, "first question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), null)
+                        new CohQuestionReference("someQuestionId", 1, "first question", "first question body", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), null)
                 ), 0)
         ));
 
@@ -137,8 +137,8 @@ public class QuestionServiceTest {
     @Test
     public void getsAListOfQuestionsInTheCorrectOrderWhenTheyAreReturnedInTheIncorrectOrder() {
         CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(new CohQuestionRound(
-                asList(new CohQuestionReference("questionId2", 2, "second question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted")),
-                        new CohQuestionReference("questionId1", 1, "first question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))), 0)
+                asList(new CohQuestionReference("questionId2", 2, "second question", "second question body", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted")),
+                        new CohQuestionReference("questionId1", 1, "first question", "first question body", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))), 0)
         ));
         CohQuestionReference firstCohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
                 .getQuestionReferences().get(1);

@@ -16,10 +16,10 @@ public class ListQuestionsTest extends BaseIntegrationTest {
         String hearingId = "1";
         String deadlineExpiryDate = now().plusDays(7).format(ISO_LOCAL_DATE_TIME);
         CohQuestionReference firstQuestionSummary = new CohQuestionReference(
-                "first-id", 1, "first question", deadlineExpiryDate, someCohAnswers("answer_drafted")
+                "first-id", 1, "first question", "first question body", deadlineExpiryDate, someCohAnswers("answer_drafted")
         );
         CohQuestionReference secondQuestionSummary = new CohQuestionReference(
-                "second-id", 2, "second question", deadlineExpiryDate, someCohAnswers("answer_submitted")
+                "second-id", 2, "second question", "first question body", deadlineExpiryDate, someCohAnswers("answer_submitted")
         );
         cohStub.stubGetAllQuestionRounds(hearingId, firstQuestionSummary, secondQuestionSummary);
         long caseId = 123L;

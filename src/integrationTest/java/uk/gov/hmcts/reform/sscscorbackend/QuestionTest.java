@@ -120,7 +120,7 @@ public class QuestionTest extends BaseIntegrationTest {
         cohStub.stubExtendQuestionRoundDeadline(hearingId);
         String deadlineExpiryDate = now().plusDays(7).format(ISO_LOCAL_DATE_TIME);
         CohQuestionReference questionSummary = new CohQuestionReference(
-                "first-id", 1, "first question", deadlineExpiryDate, someCohAnswers("answer_drafted")
+                "first-id", 1, "first question", "first question body", deadlineExpiryDate, someCohAnswers("answer_drafted")
         );
         cohStub.stubGetAllQuestionRounds(hearingId, questionSummary);
         Long caseId = 123L;

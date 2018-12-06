@@ -75,6 +75,10 @@
             margin-top: 30px;
         }
 
+        .preserve-format {
+            white-space: pre-wrap;
+        }
+
     </style>
 </head>
 
@@ -147,14 +151,12 @@
                 {% for question_round in online_hearing_pdf_wrapper.coh_question_rounds.question_rounds %}
                     {% for questionReference in question_round.question_references %}
                         <h2 class="heading-medium">{{ questionReference.question_header_text }}</h2>
-                        <p class="body-text">
-                        NEED THE BODY OF THE QUESTION</p>
+                        <p class="body-text preserve-format">{{ questionReference.question_body_text }}</p>
                         <p class="font-small">Issued: NEED DATE</p>
                         {% for answer in questionReference.answers %}
                             <div class="appellants-answer">
                                 <h2 class="bold-medium">Answer</h2>
-                                <p>{{ answer.answer_text }}</p>
-
+                                <p class="preserve-format">{{ answer.answer_text }}</p>
                                 <br/>
                                 <p class="font-small">Submitted: NEED DATE</p>
                             </div>
