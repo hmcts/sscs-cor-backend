@@ -213,7 +213,9 @@ sonarqube {
         property "sonar.exclusions", "**/SscsCorBackendException.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscscorbackend/service/ccd/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscscorbackend/domain/**," +
-                "src/main/java/uk/gov/hmcts/reform/sscscorbackend/service/idam/**"
+                "src/main/java/uk/gov/hmcts/reform/sscscorbackend/service/idam/**," +
+                "src/main/java/uk/gov/hmcts/reform/sscscorbackend/service/EvidenceUploadService," +
+                "src/main/java/uk/gov/hmcts/reform/sscscorbackend/service/OnlineHearingService"
     }
 }
 
