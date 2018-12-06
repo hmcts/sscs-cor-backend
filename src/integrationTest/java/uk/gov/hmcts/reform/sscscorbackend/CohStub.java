@@ -92,7 +92,7 @@ public class CohStub extends BaseStub {
             "            }\n" +
             "          ],\n" +
             "          \"owner_reference\": \"string\",\n" +
-            "          \"question_body_text\": \"string\",\n" +
+            "          \"question_body_text\": \"{question_body}\",\n" +
             "          \"question_header_text\": \"{question_header}\",\n" +
             "          \"question_id\": \"{question_id}\",\n" +
             "          \"question_ordinal\": \"{question_ordinal}\",\n" +
@@ -213,6 +213,7 @@ public class CohStub extends BaseStub {
                 .map(questionSummary -> questionReferenceJson
                         .replace("{question_ordinal}", "" + index.getAndIncrement())
                         .replace("{question_header}", questionSummary.getQuestionHeaderText())
+                        .replace("{question_body}", questionSummary.getQuestionBodyText())
                         .replace("{question_id}", questionSummary.getQuestionId())
                         .replace("{answer_state}", questionSummary.getAnswers().get(0).getCurrentAnswerState().getStateName())
                         .replace("{deadline_expiry_date}", questionSummary.getDeadlineExpiryDate())

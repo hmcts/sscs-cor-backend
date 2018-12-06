@@ -6,6 +6,7 @@ import java.util.List;
 public class CohQuestionReference {
     private String questionId;
     private String questionHeaderText;
+    private String questionBodyText;
     private int questionOrdinal;
     private String deadlineExpiryDate;
     private List<CohAnswer> answers;
@@ -14,12 +15,14 @@ public class CohQuestionReference {
             @JsonProperty(value = "question_id") String questionId,
             @JsonProperty(value = "question_ordinal") int questionOrdinal,
             @JsonProperty(value = "question_header_text") String questionHeaderText,
+            @JsonProperty(value = "question_body_text") String questionBodyText,
             @JsonProperty(value = "deadline_expiry_date") String deadlineExpiryDate,
             @JsonProperty(value = "answers") List<CohAnswer> answers
     ) {
         this.questionId = questionId;
         this.questionOrdinal = questionOrdinal;
         this.questionHeaderText = questionHeaderText;
+        this.questionBodyText = questionBodyText;
         this.deadlineExpiryDate = deadlineExpiryDate;
         this.answers = answers;
     }
@@ -34,6 +37,10 @@ public class CohQuestionReference {
 
     public String getQuestionHeaderText() {
         return questionHeaderText;
+    }
+
+    public String getQuestionBodyText() {
+        return questionBodyText;
     }
 
     public String getDeadlineExpiryDate() {

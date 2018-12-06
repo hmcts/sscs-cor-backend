@@ -50,8 +50,8 @@ public class DataFixtures {
 
     public static CohQuestionRounds someCohQuestionRoundsWithSingleRoundOfQuestions() {
         List<CohQuestionReference> cohQuestionReferenceList = Arrays.asList(
-                new CohQuestionReference("someQuestionId1", 1, "first question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted")),
-                new CohQuestionReference("someQuestionId2", 2, "second question", now().plusDays(10).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))
+                new CohQuestionReference("someQuestionId1", 1, "first question", "first question body",  now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted")),
+                new CohQuestionReference("someQuestionId2", 2, "second question", "second question body",  now().plusDays(10).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))
         );
         return new CohQuestionRounds(1, singletonList(new CohQuestionRound(cohQuestionReferenceList, 0)));
     }
@@ -63,9 +63,9 @@ public class DataFixtures {
     public static CohQuestionRounds someCohQuestionRoundsMultipleRoundsOfQuestions() {
         return new CohQuestionRounds(2, Arrays.asList(
                 new CohQuestionRound(singletonList(
-                        new CohQuestionReference("someQuestionId", 1, "first round question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))), 0),
+                        new CohQuestionReference("someQuestionId", 1, "first round question", "first question body", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))), 0),
                 new CohQuestionRound(singletonList(
-                        new CohQuestionReference("someOtherQuestionId", 1, "second round question", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))), 0)
+                        new CohQuestionReference("someOtherQuestionId", 1, "second round question","second question body",  now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))), 0)
         ));
     }
 
