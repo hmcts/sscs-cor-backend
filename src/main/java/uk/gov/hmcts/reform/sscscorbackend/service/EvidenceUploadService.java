@@ -119,8 +119,8 @@ public class EvidenceUploadService {
         ccdService.updateCase(caseDetails.getData(), ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamTokens);
     }
 
-    protected void addSscsDocumentToCcd(Long ccdCaseId, Document document,
-                              IdamTokens idamTokens) {
+    private void addSscsDocumentToCcd(Long ccdCaseId, Document document,
+                                      IdamTokens idamTokens) {
         log.info("Adding document to case {} ...",ccdCaseId);
 
         SscsCaseDetails caseDetails = getSscsCaseDetails(ccdCaseId, idamTokens);
@@ -148,7 +148,7 @@ public class EvidenceUploadService {
         caseDetails.getData().setCorDocument(newCorDocuments);
     }
 
-    protected SscsDocument createNewSscsDocument(Document document) {
+    private SscsDocument createNewSscsDocument(Document document) {
         String createdOn = getCreatedDate(document);
         DocumentLink documentLink = DocumentLink.builder()
                 .documentUrl(document.links.self.href)
