@@ -107,4 +107,11 @@ public interface CohClient {
             @RequestHeader(AUTHORIZATION) String authorisation,
             @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
             @PathVariable("onlineHearingId") String onlineHearingId);
+
+    @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings/{onlineHearingId}/conversations",
+            consumes = "application/json")
+    Optional<CohConversations> getConversations(
+            @RequestHeader(AUTHORIZATION) String authorisation,
+            @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
+            @PathVariable("onlineHearingId") String onlineHearingId);
 }

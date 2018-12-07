@@ -156,6 +156,7 @@ public class OnlineHearingService {
     public void storeOnlineHearingInCcd(String onlineHearingId, String caseId) {
         //get the questions and answers
         CohQuestionRounds questionRounds = getQuestionRounds(onlineHearingId);
+        Optional<CohConversations> conversations = cohClient.getConversations(onlineHearingId);
 
         log.info("Got question rounds for hearing {}", onlineHearingId);
 

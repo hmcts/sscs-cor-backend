@@ -31,7 +31,7 @@ public class CohStub extends BaseStub {
             "  \"question_header_text\": \"{question_header}\",\n" +
             "  \"question_id\": \"string\",\n" +
             "  \"question_ordinal\": \"1\",\n" +
-            "  \"question_round\": \"string\"\n" +
+            "  \"question_round\": \"1\"\n" +
             "}";
 
     private static final String getAnswersJson = "[\n" +

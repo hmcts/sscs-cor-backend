@@ -92,4 +92,9 @@ public class CohService {
         IdamTokens idamTokens = idamService.getIdamTokens();
         return cohClient.getDecisionReplies(idamTokens.getIdamOauth2Token(), idamTokens.getServiceAuthorization(), onlineHearingId);
     }
+
+    public Optional<CohConversations> getConversations(String onlineHearingId) {
+        IdamTokens idamTokens = idamService.getIdamTokens();
+        return cohClient.getConversations(idamTokens.getIdamOauth2Token(), idamTokens.getServiceAuthorization(), onlineHearingId);
+    }
 }
