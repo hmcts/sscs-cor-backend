@@ -33,15 +33,19 @@ public class DataFixtures {
     }
 
     public static CohQuestion someCohQuestion() {
-        return new CohQuestion("someHearingId", "someQuestionId", 1, "someHeader", "someBody");
+        return new CohQuestion("someHearingId", 1, "someQuestionId", 1, "someHeader", "someBody", emptyList(), emptyList());
+    }
+
+    public static CohQuestion someCohQuestion(int questionRound, List<CohState> history) {
+        return new CohQuestion("someOnlineHearingid", questionRound, "someQuestionId", 1, "questionHeaderText", "questionBodyText", history, emptyList());
     }
 
     public static CohAnswer someCohAnswer() {
-        return new CohAnswer("answerId", "Some answer", someCohState("answer_drafted"));
+        return new CohAnswer("answerId", "Some answer", someCohState("answer_drafted"), emptyList());
     }
 
     public static List<CohAnswer> someCohAnswers(String state) {
-        return Collections.singletonList(new CohAnswer("answerId", "Some answer", someCohState(state)));
+        return Collections.singletonList(new CohAnswer("answerId", "Some answer", someCohState(state), emptyList()));
     }
 
     public static CohState someCohState(String state) {
@@ -77,15 +81,11 @@ public class DataFixtures {
         CaseData caseData = new CaseData(null);
 
         CaseDetails caseDetails = new CaseDetails(caseId, caseData);
-        CcdEvent ccdEvent = new CcdEvent(caseDetails);
-
-        return ccdEvent;
+        return new CcdEvent(caseDetails);
     }
 
     public static CohEvent someCohEvent(String caseId, String hearingId, String event) {
-        CohEvent cohEvent = new CohEvent(caseId, hearingId, event, null, null);
-
-        return cohEvent;
+        return new CohEvent(caseId, hearingId, event, null, null);
     }
 
 

@@ -12,7 +12,6 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.*;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +47,7 @@ public class QuestionServiceTest {
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
         List<QuestionSummary> questions = questionRound.getQuestions();
 
-        assertThat(questions, is(Collections.emptyList()));
+        assertThat(questions, is(emptyList()));
     }
 
     @Test
@@ -247,7 +246,7 @@ public class QuestionServiceTest {
         String newAnswer = "new answer";
         String answerId = "some-id";
         when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(
-                singletonList(new CohAnswer(answerId, "original answer", someCohState("answer_draQuestionService.javafted")))
+                singletonList(new CohAnswer(answerId, "original answer", someCohState("answer_draQuestionService.javafted"), emptyList()))
         );
         underTest.updateAnswer(onlineHearingId, questionId, newAnswer);
 
@@ -259,7 +258,7 @@ public class QuestionServiceTest {
         String answerId = "some-id";
         String answer = "answer";
         when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(
-                singletonList(new CohAnswer(answerId, answer, someCohState("answer_drafted")))
+                singletonList(new CohAnswer(answerId, answer, someCohState("answer_drafted"), emptyList()))
         );
 
         boolean hasBeenSubmitted = underTest.submitAnswer(onlineHearingId, questionId);
