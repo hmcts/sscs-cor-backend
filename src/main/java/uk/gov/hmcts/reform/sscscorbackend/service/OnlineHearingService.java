@@ -23,7 +23,6 @@ public class OnlineHearingService {
     private final CohService cohClient;
     private final CcdService ccdService;
     private final IdamService idamService;
-    private EvidenceUploadService evidenceUploadService;
 
     public OnlineHearingService(
             @Autowired CohService cohService,
@@ -123,16 +122,5 @@ public class OnlineHearingService {
                             getDecision(onlineHearing.getOnlineHearingId())
                     );
                 });
-    }
-
-
-
-    @Autowired
-    public void setEvidenceUploadService(EvidenceUploadService evidenceUploadService) {
-        this.evidenceUploadService = evidenceUploadService;
-    }
-
-    public EvidenceUploadService getEvidenceUploadService() {
-        return evidenceUploadService;
     }
 }
