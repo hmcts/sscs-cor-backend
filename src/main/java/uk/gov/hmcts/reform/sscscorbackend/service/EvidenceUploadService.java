@@ -34,10 +34,12 @@ public class EvidenceUploadService {
     private static final String UPDATED_SSCS = "Updated SSCS";
     private static final String UPLOAD_COR_DOCUMENT = "uploadCorDocument";
 
-    public EvidenceUploadService(DocumentManagementService documentManagementService, CcdService ccdService, IdamService idamService) {
+    @Autowired
+    public EvidenceUploadService(DocumentManagementService documentManagementService, CcdService ccdService, IdamService idamService, OnlineHearingService onlineHearingService) {
         this.documentManagementService = documentManagementService;
         this.ccdService = ccdService;
         this.idamService = idamService;
+        this.onlineHearingService = onlineHearingService;
     }
 
     public Evidence uploadEvidence(String ccdCaseId, MultipartFile file) {
@@ -51,7 +53,7 @@ public class EvidenceUploadService {
 
 
     public Optional<Evidence> uploadEvidence(String onlineHearingId, String questionId, MultipartFile file) {
-        return getOnlineHearingService().getCcdCaseId(onlineHearingId)
+        return onlineHearingService.getCcdCaseId(onlineHearingId)
                 .map(ccdCaseId -> {
                     Document document = uploadDocument(file);
                     addDocumentToCcd(questionId, ccdCaseId, document);
@@ -65,7 +67,7 @@ public class EvidenceUploadService {
     }
 
     public Map<String, List<Evidence>> listEvidence(String onlineHearingId) {
-        return getOnlineHearingService().getCcdCaseId(onlineHearingId)
+        return onlineHearingService.getCcdCaseId(onlineHearingId)
                 .<Map<String, List<Evidence>>>map(ccdCaseId -> {
                     IdamTokens idamTokens = idamService.getIdamTokens();
                     SscsCaseDetails caseDetails = getSscsCaseDetails(ccdCaseId, idamTokens);
@@ -181,7 +183,7 @@ public class EvidenceUploadService {
     }
 
     public boolean deleteEvidence(String onlineHearingId, String evidenceId) {
-        return getOnlineHearingService().getCcdCaseId(onlineHearingId)
+        return onlineHearingService.getCcdCaseId(onlineHearingId)
                 .map(ccdCaseId -> {
                     IdamTokens idamTokens = idamService.getIdamTokens();
                     SscsCaseDetails caseDetails = getSscsCaseDetails(ccdCaseId, idamTokens);
@@ -199,14 +201,5 @@ public class EvidenceUploadService {
                     }
                     return true;
                 }).orElse(false);
-    }
-
-    @Autowired
-    public void setOnlineHearingService(OnlineHearingService onlineHearingService) {
-        this.onlineHearingService = onlineHearingService;
-    }
-
-    public OnlineHearingService getOnlineHearingService() {
-        return onlineHearingService;
     }
 }
