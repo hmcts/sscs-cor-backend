@@ -14,6 +14,10 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseData;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CohEvent;
+import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
+import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestion;
+import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestionRound;
+import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 
 
@@ -36,6 +40,10 @@ public class DataFixtures {
         return new CohQuestion("someHearingId", 1, "someQuestionId", 1, "someHeader", "someBody", emptyList(), emptyList());
     }
 
+    public static CohQuestion someCohQuestion(CohAnswer answer) {
+        return new CohQuestion("someHearingId", 1, "someQuestionId", 1, "someHeader", "someBody", emptyList(), singletonList(answer));
+    }
+
     public static CohQuestion someCohQuestion(int questionRound, List<CohState> history) {
         return new CohQuestion("someOnlineHearingid", questionRound, "someQuestionId", 1, "questionHeaderText", "questionBodyText", history, emptyList());
     }
@@ -45,7 +53,7 @@ public class DataFixtures {
     }
 
     public static List<CohAnswer> someCohAnswers(String state) {
-        return Collections.singletonList(new CohAnswer("answerId", "Some answer", someCohState(state), emptyList()));
+        return singletonList(new CohAnswer("answerId", "Some answer", someCohState(state), emptyList()));
     }
 
     public static CohState someCohState(String state) {
@@ -113,5 +121,19 @@ public class DataFixtures {
 
     public static Evidence someEvidence() {
         return new Evidence("http://example.com/document/1", "someFilename.txt", "2018-10-24'T'12:11:21Z");
+    }
+
+    public static PdfSummary somePdfSummary() {
+        return new PdfSummary(somePdfAppealDetails(),
+                singletonList(
+                        new PdfQuestionRound(singletonList(
+                                new PdfQuestion("title", "body", "answer", "issueDate", "submittedDate")
+                        ))
+                )
+        );
+    }
+
+    public static PdfAppealDetails somePdfAppealDetails() {
+        return new PdfAppealDetails("someTitle", "someFirstName", "someSurname", "someNino", "someCaseRef");
     }
 }

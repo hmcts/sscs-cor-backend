@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohConversations;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionRounds;
 
 
@@ -15,6 +16,7 @@ public class OnlineHearingPdfWraper {
     private String caseReference;
     private String nino;
     private CohQuestionRounds cohQuestionRounds;
+    private CohConversations cohConversations;
 
     public OnlineHearingPdfWraper() {
 
@@ -25,13 +27,15 @@ public class OnlineHearingPdfWraper {
                                   @JsonProperty(value = "appellant_last_name") String appellantLastName,
                                   @JsonProperty(value = "case_reference") String caseReference,
                                   @JsonProperty(value = "nino") String nino,
-                                  @JsonProperty(value = "coh_question_rounds") CohQuestionRounds cohQuestionRounds) {
+                                  @JsonProperty(value = "coh_question_rounds") CohQuestionRounds cohQuestionRounds,
+                                  @JsonProperty(value = "coh_conversations") CohConversations cohConversations) {
         this.appellantTitle = appellantTitle;
         this.appellantTitle = appellantFirstName;
         this.appellantLastName = appellantLastName;
         this.caseReference = caseReference;
         this.nino = nino;
         this.cohQuestionRounds = cohQuestionRounds;
+        this.cohConversations = cohConversations;
     }
 
     public String getAppellantTitle() {
@@ -56,5 +60,9 @@ public class OnlineHearingPdfWraper {
 
     public CohQuestionRounds getCohQuestionRounds() {
         return cohQuestionRounds;
+    }
+
+    public CohConversations getCohConversations() {
+        return cohConversations;
     }
 }

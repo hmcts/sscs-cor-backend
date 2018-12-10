@@ -46,8 +46,7 @@ public class OnlineHearingServiceTest {
         idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        underTest = new OnlineHearingService(pdfServiceClient, cohService, ccdService, idamService,
-                 sscsPdfService, "template path");
+        underTest = new OnlineHearingService(cohService, ccdService, idamService);
         underTest.setEvidenceUploadService(evidenceUploadService);
 
         someEmailAddress = "someEmailAddress";

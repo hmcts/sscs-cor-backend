@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.sscscorbackend.domain;
 
+import static uk.gov.hmcts.reform.sscscorbackend.domain.HistoryEventExtractor.getStateDate;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
+import java.util.Optional;
 
 public class CohAnswer {
     private final String answerId;
@@ -33,5 +36,9 @@ public class CohAnswer {
 
     public List<CohState> getHistory() {
         return history;
+    }
+
+    public Optional<String> getAnsweredDate() {
+        return getStateDate(history, "answer_submitted");
     }
 }
