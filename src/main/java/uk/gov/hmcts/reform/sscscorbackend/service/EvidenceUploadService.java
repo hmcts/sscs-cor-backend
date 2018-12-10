@@ -40,11 +40,10 @@ public class EvidenceUploadService {
         this.idamService = idamService;
     }
 
-    public Evidence uploadEvidence(String ccdCaseId,  MultipartFile file,
-                                   IdamTokens idamTokens) {
+    public Evidence uploadEvidence(String ccdCaseId, MultipartFile file) {
         Document document = uploadDocument(file);
         log.info("Upload document for case {} ...", ccdCaseId);
-        addSscsDocumentToCcd(Long.parseLong(ccdCaseId), document, idamTokens);
+        addSscsDocumentToCcd(Long.parseLong(ccdCaseId), document, idamService.getIdamTokens());
 
         return new Evidence(document.links.self.href, document.originalDocumentName, getCreatedDate(document));
 

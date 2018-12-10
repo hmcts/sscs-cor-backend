@@ -1,49 +1,61 @@
 package uk.gov.hmcts.reform.sscscorbackend.domain;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohQuestion;
-import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohState;
 
-import java.util.List;
 import java.util.Optional;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
 
 public class CohQuestionTest {
     @Test
-    public void getQuestionIssueDateFromHistory() {
-        String issueDate = "issueDate";
-        List<CohState> history = asList(new CohState("question_issued", issueDate), someCohState("someOtherState"));
-        CohQuestion cohQuestion = someCohQuestion(1, history);
+    public void getAnswer() {
+        CohState answerSubmitted = DataFixtures.someCohState("answer_submitted");
+        CohAnswer answer = new CohAnswer("answerId", "Some answer", answerSubmitted, singletonList(answerSubmitted));
+        CohQuestion cohQuestion = someCohQuestion(answer);
 
-        assertThat(cohQuestion.getIssueDate(), is(Optional.of(issueDate)));
+        assertThat(cohQuestion.getAnswer(), is(Optional.of(answer)));
     }
 
     @Test
-    public void getQuestionIssueDateWhenQuestionHasNotBeenIssued() {
-        List<CohState> history = singletonList(someCohState("someOtherState"));
-        CohQuestion cohQuestion = someCohQuestion(1, history);
-
-        assertThat(cohQuestion.getIssueDate(), is(Optional.empty()));
+    public void getAnswerWhenNotAnswered() {
+        CohQuestion cohQuestion = someCohQuestion();
+        assertThat(cohQuestion.getAnswer(), is(Optional.empty()));
     }
 
     @Test
-    public void getQuestionIssueDateWhenQuestionHistoryEmpty() {
-        List<CohState> history = emptyList();
-        CohQuestion cohQuestion = someCohQuestion(1, history);
+    public void getSubmittedDate() {
+        CohState answerSubmitted = DataFixtures.someCohState("answer_submitted");
+        CohAnswer answer = new CohAnswer("answerId", "Some answer", answerSubmitted, singletonList(answerSubmitted));
+        CohQuestion cohQuestion = someCohQuestion(answer);
 
-        assertThat(cohQuestion.getIssueDate(), is(Optional.empty()));
+        assertThat(cohQuestion.getSubmittedDate(), is(Optional.of(answerSubmitted.getStateDateTime())));
     }
 
     @Test
-    public void getQuestionIssueDateWhenQuestionHistoryNull() {
-        List<CohState> history = null;
-        CohQuestion cohQuestion = someCohQuestion(1, history);
+    public void getSubmittedDateWhenAnswerDrafted() {
+        CohState answerSubmitted = DataFixtures.someCohState("answer_drafted");
+        CohAnswer answer = new CohAnswer("answerId", "Some answer", answerSubmitted, singletonList(answerSubmitted));
+        CohQuestion cohQuestion = someCohQuestion(answer);
 
-        assertThat(cohQuestion.getIssueDate(), is(Optional.empty()));
+        assertThat(cohQuestion.getSubmittedDate(), is(Optional.empty()));
+    }
+
+    @Test
+    public void getSubmittedDateWhenNoAnswer() {
+        CohQuestion cohQuestion = someCohQuestion();
+
+        assertThat(cohQuestion.getSubmittedDate(), is(Optional.empty()));
+    }
+
+    @Test
+    public void getSubmittedDateWhenAnswerNull() {
+        CohQuestion cohQuestion = new CohQuestion("someHearingId", 1, "someQuestionId", 1, "someHeader", "someBody", emptyList(), null);
+
+        assertThat(cohQuestion.getSubmittedDate(), is(Optional.empty()));
     }
 
 }

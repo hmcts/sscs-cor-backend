@@ -1,33 +1,18 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
 import static java.util.stream.Collectors.toList;
-import static org.springframework.http.MediaType.APPLICATION_PDF;
 
 import com.google.common.collect.ImmutableMap;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
-import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.OnlineHearingPdfWraper;
 import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 
 @Slf4j
@@ -38,25 +23,16 @@ public class OnlineHearingService {
     private final CohService cohClient;
     private final CcdService ccdService;
     private final IdamService idamService;
-    private PDFServiceClient pdfServiceClient;
-    private final String appellantTemplatePath;
-    private SscsPdfService sscsPdfService;
     private EvidenceUploadService evidenceUploadService;
 
     public OnlineHearingService(
-                                PDFServiceClient pdfServiceClient,
-                                @Autowired CohService cohService,
-                                @Autowired CcdService ccdService,
-                                @Autowired IdamService idamService,
-                                @Autowired SscsPdfService sscsPdfService,
-                                @Value("${online_hearing_finished.html.template.path}") String appellantTemplatePath
+            @Autowired CohService cohService,
+            @Autowired CcdService ccdService,
+            @Autowired IdamService idamService
     ) {
         this.cohClient = cohService;
         this.ccdService = ccdService;
         this.idamService = idamService;
-        this.pdfServiceClient = pdfServiceClient;
-        this.sscsPdfService = sscsPdfService;
-        this.appellantTemplatePath = appellantTemplatePath;
     }
 
     public String createOnlineHearing(String caseId) {
@@ -149,64 +125,7 @@ public class OnlineHearingService {
                 });
     }
 
-    public CohQuestionRounds getQuestionRounds(String onlineHearingId) {
-        return cohClient.getQuestionRounds(onlineHearingId);
-    }
 
-    public void storeOnlineHearingInCcd(String onlineHearingId, String caseId) {
-        //get the questions and answers
-        CohQuestionRounds questionRounds = getQuestionRounds(onlineHearingId);
-        Optional<CohConversations> conversations = cohClient.getConversations(onlineHearingId);
-
-        log.info("Got question rounds for hearing {}", onlineHearingId);
-
-        IdamTokens idamTokens = idamService.getIdamTokens();
-
-        SscsCaseDetails caseDetails = ccdService.getByCaseId(Long.valueOf(caseId), idamTokens);
-
-        log.info("Got case details for {}", caseId);
-        String appellantTitle = caseDetails.getData().getAppeal().getAppellant().getName().getTitle();
-        String appellantFirstName = caseDetails.getData().getAppeal().getAppellant().getName().getFirstName();
-        String appellantLastName = caseDetails.getData().getAppeal().getAppellant().getName().getLastName();
-
-        String nino = caseDetails.getData().getGeneratedNino();
-
-        String caseReference = caseDetails.getData().getCaseReference();
-
-        OnlineHearingPdfWraper onlineHearingPdfWrapper =
-                new OnlineHearingPdfWraper(appellantTitle,appellantFirstName,
-                        appellantLastName,caseReference,nino,questionRounds);
-
-        Map<String, Object> placeholders = Collections.singletonMap("online_hearing_pdf_wrapper", onlineHearingPdfWrapper);
-
-        byte[] pdfBytes = createPdf(placeholders);
-
-        String fileName = "COR Transcript - " + caseReference + ".pdf";
-        ByteArrayMultipartFile file = ByteArrayMultipartFile.builder().content(pdfBytes).name(fileName).contentType(APPLICATION_PDF).build();
-        log.info("Creating transcript file {} for hearing {}", fileName, onlineHearingId);
-
-        getEvidenceUploadService().uploadEvidence(caseId, file, idamTokens);
-
-        sscsPdfService.mergeDocIntoCcd(fileName, pdfBytes,
-                Long.valueOf(caseId), caseDetails.getData(), idamTokens);
-    }
-
-    public byte[] createPdf(Map<String,Object> placeholders) {
-        byte[] template;
-        try {
-            template = getTemplate();
-        } catch (IOException e) {
-            throw new PdfGenerationException("Error getting template " + appellantTemplatePath, e);
-        }
-
-        return pdfServiceClient.generateFromHtml(template, placeholders);
-
-    }
-
-    private byte[] getTemplate() throws IOException {
-        InputStream in = getClass().getResourceAsStream(appellantTemplatePath);
-        return IOUtils.toByteArray(in);
-    }
 
     @Autowired
     public void setEvidenceUploadService(EvidenceUploadService evidenceUploadService) {

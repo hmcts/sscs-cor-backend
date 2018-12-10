@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.domain;
 
+import static uk.gov.hmcts.reform.sscscorbackend.domain.HistoryEventExtractor.getStateDate;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Optional;
@@ -66,13 +68,19 @@ public class CohQuestion {
     }
 
     public Optional<String> getIssueDate() {
-        if (history != null) {
-            return history.stream()
-                    .filter(historyState -> historyState.getStateName().equals("question_issued"))
-                    .map(CohState::getStateDateTime)
+        return getStateDate(history, "question_issued");
+    }
+
+    public Optional<CohAnswer> getAnswer() {
+        if (answers != null) {
+            return answers.stream()
                     .findFirst();
         } else {
             return Optional.empty();
         }
+    }
+
+    public Optional<String> getSubmittedDate() {
+        return getAnswer().flatMap(CohAnswer::getAnsweredDate);
     }
 }

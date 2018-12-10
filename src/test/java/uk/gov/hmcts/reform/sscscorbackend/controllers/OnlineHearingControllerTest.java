@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCcdEvent;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohEvent;
 
@@ -14,15 +13,17 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CohEvent;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
-
+import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
 
 
 public class OnlineHearingControllerTest {
     private OnlineHearingService onlineHearingService;
+    private StoreOnlineHearingService storeOnlineHearingService;
 
     @Before
     public void setUp() {
         onlineHearingService = mock(OnlineHearingService.class);
+        storeOnlineHearingService = mock(StoreOnlineHearingService.class);
     }
 
     @Test
@@ -35,7 +36,7 @@ public class OnlineHearingControllerTest {
 
         when(onlineHearingService.createOnlineHearing(caseId)).thenReturn(hearingId);
 
-        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService);
+        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService, storeOnlineHearingService);
 
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchEvent(ccdEvent);
 
@@ -53,7 +54,7 @@ public class OnlineHearingControllerTest {
 
         when(onlineHearingService.createOnlineHearing(caseId)).thenReturn(hearingId);
 
-        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService);
+        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService, storeOnlineHearingService);
 
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchEvent(ccdEvent);
 
@@ -68,14 +69,14 @@ public class OnlineHearingControllerTest {
 
         CohEvent cohEvent = someCohEvent(caseId, hearingId, "continuous_online_hearing_resolved");
 
-        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService);
+        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService, storeOnlineHearingService);
 
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchCohEvent(cohEvent);
 
         assertThat(stringResponseEntity.getStatusCode(), is(HttpStatus.OK));
         assertThat(stringResponseEntity.getBody(), is(""));
+        verify(storeOnlineHearingService).storeOnlineHearingInCcd(hearingId, caseId);
     }
-
 
     @Test
     public void testCatchCohEventNullCaseId() {
@@ -85,7 +86,7 @@ public class OnlineHearingControllerTest {
 
         CohEvent cohEvent = someCohEvent(caseId, hearingId, "continuous_online_hearing_resolved");
 
-        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService);
+        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService, storeOnlineHearingService);
 
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchCohEvent(cohEvent);
 
@@ -101,7 +102,7 @@ public class OnlineHearingControllerTest {
 
         CohEvent cohEvent = someCohEvent(caseId, hearingId, null);
 
-        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService);
+        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService, storeOnlineHearingService);
 
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchCohEvent(cohEvent);
 
@@ -117,7 +118,7 @@ public class OnlineHearingControllerTest {
 
         CohEvent cohEvent = someCohEvent(caseId, hearingId, "continuous_online_hearing_started");
 
-        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService);
+        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService, storeOnlineHearingService);
 
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchCohEvent(cohEvent);
 

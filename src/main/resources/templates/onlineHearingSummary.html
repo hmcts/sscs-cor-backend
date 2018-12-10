@@ -103,7 +103,7 @@
                             Title
                         </dt>
                         <dd class="cya-answer">
-                            {{ online_hearing_pdf_wrapper.appellant_title }}
+                            {{ online_hearing_pdf_wrapper.appealDetails.title }}
                         </dd>
                     </div>
                     <div>
@@ -111,7 +111,7 @@
                             First name
                         </dt>
                         <dd class="cya-answer">
-                            {{ online_hearing_pdf_wrapper.appellant_first_name }}
+                            {{ online_hearing_pdf_wrapper.appealDetails.firstName }}
                         </dd>
                     </div>
                     <div>
@@ -119,7 +119,7 @@
                             Surname
                         </dt>
                         <dd class="cya-answer">
-                            {{ online_hearing_pdf_wrapper.appellant_last_name }}
+                            {{ online_hearing_pdf_wrapper.appealDetails.surname }}
                         </dd>
                     </div>
                     <div>
@@ -127,7 +127,7 @@
                             NINO
                         </dt>
                         <dd class="cya-answer">
-                            {{ online_hearing_pdf_wrapper.nino }}
+                            {{ online_hearing_pdf_wrapper.appealDetails.nino }}
                         </dd>
                     </div>
                     <!--<div>
@@ -143,34 +143,31 @@
                             Appeal reference number
                         </dt>
                         <dd class="cya-answer">
-                            {{ online_hearing_pdf_wrapper.case_reference }}
+                            {{ online_hearing_pdf_wrapper.appealDetails.caseReference }}
                         </dd>
                     </div>
                 </dl>
 
-                {% for question_round in online_hearing_pdf_wrapper.coh_question_rounds.question_rounds %}
-                    {% for questionReference in question_round.question_references %}
-                        <h2 class="heading-medium">{{ questionReference.question_header_text }}</h2>
-                        <p class="body-text preserve-format">{{ questionReference.question_body_text }}</p>
-                        <p class="font-small">Issued: NEED DATE</p>
-                        {% for answer in questionReference.answers %}
-                            <div class="appellants-answer">
-                                <h2 class="bold-medium">Answer</h2>
-                                <p class="preserve-format">{{ answer.answer_text }}</p>
-                                <br/>
-                                <p class="font-small">Submitted: NEED DATE</p>
-                            </div>
-
-                        {% endfor %}
+                {% for question_round in online_hearing_pdf_wrapper.questionRounds %}
+                    {% for questionReference in question_round.questions %}
+                        <h2 class="heading-medium">{{ questionReference.questionTitle }}</h2>
+                        <p class="body-text preserve-format">{{ questionReference.questionBody }}</p>
+                        <p class="font-small">Issued: {{ questionReference.issuedDate }}</p>
+                        <div class="appellants-answer">
+                            <h2 class="bold-medium">Answer</h2>
+                            <p class="preserve-format">{{ questionReference.answer }}</p>
+                            <br/>
+                            <p class="font-small">Submitted: {{ questionReference.submittedDate }}</p>
+                        </div>
                     {% endfor %}
                 {% endfor %}
 
                 <br/><br/><br/>
                 <span class="font-size: 12px">
-                    {{ online_hearing_pdf_wrapper.appellant_title }}
-                    {{ online_hearing_pdf_wrapper.appellant_first_name }}
-                    {{ online_hearing_pdf_wrapper.appellant_last_name }} |
-                {{ online_hearing_pdf_wrapper.case_reference }}
+                    {{ online_hearing_pdf_wrapper.appealDetails.title }}
+                    {{ online_hearing_pdf_wrapper.appealDetails.firstName }}
+                    {{ online_hearing_pdf_wrapper.appealDetails.surname }} |
+                    {{ online_hearing_pdf_wrapper.appealDetails.caseReference }}
                 </span>
             </div>
         </div>

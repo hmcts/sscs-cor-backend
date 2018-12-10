@@ -10,16 +10,20 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CohEvent;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
+import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
 
 
 @Slf4j
 @RestController
 public class OnlineHearingController {
 
-    private OnlineHearingService onlineHearingService;
+    private final OnlineHearingService onlineHearingService;
+    private final StoreOnlineHearingService storeOnlineHearingService;
 
-    public OnlineHearingController(@Autowired OnlineHearingService onlineHearingService) {
+    public OnlineHearingController(@Autowired OnlineHearingService onlineHearingService,
+                                   @Autowired StoreOnlineHearingService storeOnlineHearingService) {
         this.onlineHearingService = onlineHearingService;
+        this.storeOnlineHearingService = storeOnlineHearingService;
     }
 
     @ApiOperation(value = "Create online hearing",
@@ -61,7 +65,7 @@ public class OnlineHearingController {
         log.info("Received event for storing online hearing for case {} and hearing {} ...",
                 caseId, onlineHearingId);
 
-        onlineHearingService.storeOnlineHearingInCcd(onlineHearingId, caseId);
+        storeOnlineHearingService.storeOnlineHearingInCcd(onlineHearingId, caseId);
 
         return ResponseEntity.ok("");
     }
