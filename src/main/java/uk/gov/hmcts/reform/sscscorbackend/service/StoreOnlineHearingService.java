@@ -60,7 +60,7 @@ public class StoreOnlineHearingService {
         ByteArrayMultipartFile file = ByteArrayMultipartFile.builder().content(pdfBytes).name(fileName).contentType(APPLICATION_PDF).build();
         log.info("Creating transcript file {} for hearing {}", fileName, onlineHearingId);
 
-        evidenceUploadService.uploadEvidence(caseId, file); // todo do we need to do this, is the call below also not adding the file to doc store?
+        evidenceUploadService.uploadEvidence(caseId, file); // Do we need to do this, is the call below also not adding the file to doc store?
 
         sscsPdfService.mergeDocIntoCcd(fileName, pdfBytes, Long.valueOf(caseId), caseDetails.getData(), idamTokens);
     }

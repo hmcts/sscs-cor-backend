@@ -19,34 +19,28 @@ import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHear
 )
 public interface CohClient {
 
-    @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings/{onlineHearingId}/questions/{questionId}")
+    @GetMapping(value = "/continuous-online-hearings/{onlineHearingId}/questions/{questionId}")
     CohQuestion getQuestion(
             @RequestHeader(AUTHORIZATION) String authorisation,
             @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
             @PathVariable("onlineHearingId") String onlineHearingId,
             @PathVariable("questionId") String questionId);
 
-    @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings/{onlineHearingId}/questions/{questionId}/answers")
+    @GetMapping(value = "/continuous-online-hearings/{onlineHearingId}/questions/{questionId}/answers")
     List<CohAnswer> getAnswers(
             @RequestHeader(AUTHORIZATION) String authorisation,
             @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
             @PathVariable("onlineHearingId") String onlineHearingId,
             @PathVariable("questionId") String questionId);
 
-    @RequestMapping(
-            method = RequestMethod.POST,
-            value = "/continuous-online-hearings/{onlineHearingId}/questions/{questionId}/answers"
-    )
+    @PostMapping(value = "/continuous-online-hearings/{onlineHearingId}/questions/{questionId}/answers")
     void createAnswer(@RequestHeader(AUTHORIZATION) String authorisation,
                       @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
                       @PathVariable("onlineHearingId") String onlineHearingId,
                       @PathVariable("questionId") String questionId,
                       @RequestBody CohUpdateAnswer newAnswer);
 
-    @RequestMapping(
-            method = RequestMethod.PUT,
-            value = "/continuous-online-hearings/{onlineHearingId}/questions/{questionId}/answers/{answerId}"
-    )
+    @PutMapping(value = "/continuous-online-hearings/{onlineHearingId}/questions/{questionId}/answers/{answerId}")
     void updateAnswer(@RequestHeader(AUTHORIZATION) String authorisation,
                       @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
                       @PathVariable("onlineHearingId") String onlineHearingId,
@@ -54,61 +48,56 @@ public interface CohClient {
                       @PathVariable("answerId") String answerId,
                       @RequestBody CohUpdateAnswer newAnswer);
 
-    @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings/{onlineHearingId}/questionrounds")
+    @GetMapping(value = "/continuous-online-hearings/{onlineHearingId}/questionrounds")
     CohQuestionRounds getQuestionRounds(@RequestHeader(AUTHORIZATION) String authorisation,
                                         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
                                         @PathVariable("onlineHearingId") String onlineHearingId);
 
-    @RequestMapping(method = RequestMethod.POST, value = "/continuous-online-hearings")
+    @PostMapping(value = "/continuous-online-hearings")
     String createOnlineHearing(@RequestHeader(AUTHORIZATION) String authorisation,
                                @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
                                CreateOnlineHearingRequest createOnlineHearingRequest);
 
-    @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings?case_id={caseId}",
+    @GetMapping(value = "/continuous-online-hearings?case_id={caseId}",
             consumes = "application/json")
     CohOnlineHearings getOnlineHearing(@RequestHeader(AUTHORIZATION) String authorisation,
                                        @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
                                        @PathVariable("caseId") Long caseId);
 
-    @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings/{onlineHearingId}",
+    @GetMapping(value = "/continuous-online-hearings/{onlineHearingId}",
             consumes = "application/json")
     CohOnlineHearing getOnlineHearing(@RequestHeader(AUTHORIZATION) String authorisation,
                                        @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
                                        @PathVariable("onlineHearingId") String onlineHearingId);
 
-    @RequestMapping(method = RequestMethod.PUT,
-            value = "/continuous-online-hearings/{onlineHearingId}/questions-deadline-extension"
-    )
+    @PutMapping(value = "/continuous-online-hearings/{onlineHearingId}/questions-deadline-extension")
     void extendQuestionRoundDeadline(@RequestHeader(AUTHORIZATION) String oauthToken,
                                      @RequestHeader(SERVICE_AUTHORIZATION) String generate,
                                      @PathVariable("onlineHearingId") String onlineHearingId,
                                      @RequestBody String content
     );
 
-    @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings/{onlineHearingId}/decisions",
+    @GetMapping(value = "/continuous-online-hearings/{onlineHearingId}/decisions",
             consumes = "application/json")
     Optional<CohDecision> getDecision(
             @RequestHeader(AUTHORIZATION) String authorisation,
             @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
             @PathVariable("onlineHearingId") String onlineHearingId);
 
-    @RequestMapping(
-            method = RequestMethod.POST,
-            value = "/continuous-online-hearings/{onlineHearingId}/decisionreplies"
-    )
+    @PostMapping(value = "/continuous-online-hearings/{onlineHearingId}/decisionreplies")
     void addDecisionReply(@RequestHeader(AUTHORIZATION) String authorisation,
                       @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
                       @PathVariable("onlineHearingId") String onlineHearingId,
                       @RequestBody CohDecisionReply decisionReply);
 
-    @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings/{onlineHearingId}/decisionreplies",
+    @GetMapping(value = "/continuous-online-hearings/{onlineHearingId}/decisionreplies",
             consumes = "application/json")
     Optional<CohDecisionReplies> getDecisionReplies(
             @RequestHeader(AUTHORIZATION) String authorisation,
             @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
             @PathVariable("onlineHearingId") String onlineHearingId);
 
-    @RequestMapping(method = RequestMethod.GET, value = "/continuous-online-hearings/{onlineHearingId}/conversations",
+    @GetMapping(value = "/continuous-online-hearings/{onlineHearingId}/conversations",
             consumes = "application/json")
     CohConversations getConversations(
             @RequestHeader(AUTHORIZATION) String authorisation,
