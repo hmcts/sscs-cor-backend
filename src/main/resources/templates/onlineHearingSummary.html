@@ -103,7 +103,7 @@
                             Title
                         </dt>
                         <dd class="cya-answer">
-                            {{ online_hearing_pdf_wrapper.appealDetails.title }}
+                            {{ pdfSummary.appealDetails.title }}
                         </dd>
                     </div>
                     <div>
@@ -111,7 +111,7 @@
                             First name
                         </dt>
                         <dd class="cya-answer">
-                            {{ online_hearing_pdf_wrapper.appealDetails.firstName }}
+                            {{ pdfSummary.appealDetails.firstName }}
                         </dd>
                     </div>
                     <div>
@@ -119,7 +119,7 @@
                             Surname
                         </dt>
                         <dd class="cya-answer">
-                            {{ online_hearing_pdf_wrapper.appealDetails.surname }}
+                            {{ pdfSummary.appealDetails.surname }}
                         </dd>
                     </div>
                     <div>
@@ -127,7 +127,7 @@
                             NINO
                         </dt>
                         <dd class="cya-answer">
-                            {{ online_hearing_pdf_wrapper.appealDetails.nino }}
+                            {{ pdfSummary.appealDetails.nino }}
                         </dd>
                     </div>
                     <!--<div>
@@ -143,12 +143,12 @@
                             Appeal reference number
                         </dt>
                         <dd class="cya-answer">
-                            {{ online_hearing_pdf_wrapper.appealDetails.caseReference }}
+                            {{ pdfSummary.appealDetails.caseReference }}
                         </dd>
                     </div>
                 </dl>
 
-                {% for question_round in online_hearing_pdf_wrapper.questionRounds %}
+                {% for question_round in pdfSummary.questionRounds %}
                     {% for questionReference in question_round.questions %}
                         <h2 class="heading-medium">{{ questionReference.questionTitle }}</h2>
                         <p class="body-text preserve-format">{{ questionReference.questionBody }}</p>
@@ -164,10 +164,10 @@
 
                 <br/><br/><br/>
                 <span class="font-size: 12px">
-                    {{ online_hearing_pdf_wrapper.appealDetails.title }}
-                    {{ online_hearing_pdf_wrapper.appealDetails.firstName }}
-                    {{ online_hearing_pdf_wrapper.appealDetails.surname }} |
-                    {{ online_hearing_pdf_wrapper.appealDetails.caseReference }}
+                    {{ pdfSummary.appealDetails.title }}
+                    {{ pdfSummary.appealDetails.firstName }}
+                    {{ pdfSummary.appealDetails.surname }} |
+                    {{ pdfSummary.appealDetails.caseReference }}
                 </span>
             </div>
         </div>

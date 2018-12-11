@@ -24,7 +24,7 @@ public class PdfService {
     }
 
     public byte[] createPdf(PdfSummary pdfSummary) {
-        Map<String, Object> placeholders = ImmutableMap.of("online_hearing_pdf_wrapper", pdfSummary);
+        Map<String, Object> placeholders = ImmutableMap.of("pdfSummary", pdfSummary);
 
         try {
             byte[] template = getTemplate();
