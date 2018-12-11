@@ -22,7 +22,7 @@ public class PdfServiceTest {
         PdfSummary pdfSummary = DataFixtures.somePdfSummary();
 
         byte[] expectedPdf = new byte[]{ 1, 2, 3};
-        when(pdfServiceClient.generateFromHtml(any(), eq(ImmutableMap.of("online_hearing_pdf_wrapper", pdfSummary))))
+        when(pdfServiceClient.generateFromHtml(any(), eq(ImmutableMap.of("pdfSummary", pdfSummary))))
                 .thenReturn(expectedPdf);
 
         byte[] pdf = appellantTemplatePath.createPdf(pdfSummary);
