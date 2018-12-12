@@ -162,7 +162,7 @@ dependencies {
   compileOnly 'org.projectlombok:lombok:1.18.4'
   compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
   compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.4.1'
-  compile group: 'uk.gov.hmcts.reform', name:'sscs-common', version: '0.0.117'
+  compile group: 'uk.gov.hmcts.reform', name:'sscs-common', version: '0.0.124'
 
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-robotics-email-common', version: '0.0.86'
   compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '4.0.1'
