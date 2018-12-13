@@ -144,6 +144,10 @@ def versions = [
 ]
 
 dependencies {
+  //added these due to vulnerability https://nvd.nist.gov/vuln/detail/CVE-2018-8088
+  //Remove when springboot has been upgraded to a later version of slf4j
+  compile group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta2'
+  
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: versions.springBoot
@@ -166,7 +170,7 @@ dependencies {
 
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-robotics-email-common', version: '0.0.94'
   compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '4.0.1'
-
+  
   // Removed for now as we have an issue with some of its dependencies
   // compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix-dashboard', version: versions.springHystrix
 
