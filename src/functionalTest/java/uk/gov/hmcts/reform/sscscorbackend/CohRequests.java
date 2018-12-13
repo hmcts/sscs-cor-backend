@@ -24,6 +24,8 @@ public class CohRequests {
 
     public CohRequests(IdamService idamService, String cohBaseUrl, HttpClient cohClient) {
         idamTokens = idamService.getIdamTokens();
+        System.out.println("Authorization" + idamTokens.getIdamOauth2Token());
+        System.out.println("ServiceAuthorization" + idamTokens.getServiceAuthorization());
         this.cohBaseUrl = cohBaseUrl;
         this.cohClient = cohClient;
     }
@@ -102,7 +104,31 @@ public class CohRequests {
                         "  \"decision_award\": \"" + decisionAward + "\",\n" +
                         "  \"decision_header\": \"" + decisionHeader + "\",\n" +
                         "  \"decision_reason\": \"" + decisionReason + "\",\n" +
-                        "  \"decision_text\": \"" + decisionText + "\",\n" +
+                        "  \"decision_text\": \"{\n" +
+                        "  \\\"dailyLivingRate\\\": \\\"Standard rate\\\",\n" +
+                        "  \\\"mobilityRate\\\": \\\"No award\\\",\n" +
+                        "  \\\"reasonsForView\\\": \\\"We considered all the evidence you and DWP submitted in relation to your appeal. This includes any additional evidence you submitted./nAfter considering this evidence we acknowledge that you experience pain in your lower back when doing some tasks around the house. Specifically washing yourself and preparing food. We consider that this pain does not hinder you enough to be awarded the enhanced rate of the daily living component of PIP. It is therefore our view that you are eligible for Daily living at the standard rate.\\\",\n" +
+                        "  \\\"dailyLivingActivities\\\": [{\n" +
+                        "  \\\"activity\\\": \\\"Preparing food\\\",\n" +
+                        "  \\\"descriptor\\\": \\\"Needs to use an aid or appliance to be able to prepare or cook a simple meal\\\",\n" +
+                        "  \\\"points\\\": \\\"2\\\"\n" +
+                        "  },\n" +
+                        "  {\n" +
+                        "  \\\"activity\\\": \\\"Washing and bathing\\\",\n" +
+                        "  \\\"descriptor\\\": \\\"Needs to use an aid or appliance to be able to wash or bathe\\\",\n" +
+                        "  \\\"points\\\": \\\"2\\\"\n" +
+                        "  }\n" +
+                        "  ],\n" +
+                        "  \\\"mobilityActivities\\\": [{\n" +
+                        "  \\\"activity\\\": \\\"Planning and following journeys\\\",\n" +
+                        "  \\\"descriptor\\\": \\\"Needs prompting to be able to undertake any journey to avoid overwhelming psychological distress to the claimant.\\\",\n" +
+                        "  \\\"points\\\": 4\n" +
+                        "  },\n" +
+                        "  {\n" +
+                        "  \\\"activity\\\": \\\"Moving around\\\",\n" +
+                        "  \\\"descriptor\\\": \\\"Can stand and then move more than 50 metres but no more than 200 metres, either aided or unaided\\\",\n" +
+                        "  \\\"points\\\": 4\n" +
+                        "  }\",\n" +
                         "  \"decision_state\": \"decision_issue_pending\"\n" +
                         "}"
         );
