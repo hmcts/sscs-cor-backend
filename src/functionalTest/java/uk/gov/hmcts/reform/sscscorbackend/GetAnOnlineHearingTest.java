@@ -38,7 +38,7 @@ public class GetAnOnlineHearingTest extends BaseFunctionTest {
         assertThat(decision.getString("decision_award"), is(decisionAward));
         assertThat(decision.getString("decision_header"), is(decisionHeader));
         assertThat(decision.getString("decision_reason"), is(decisionReason));
-        assertThat(decision.getString("decision_text"), is(decisionText));
+        assertThat(decision.getString("decision_text"), is(decisionTextResponse));
         assertThat(decision.getString("decision_state"), is("decision_issued"));
         assertThat(decision.getString("decision_state_datetime"), is(notNullValue()));
         assertThat(decision.has("appellant_reply"), is(false));
@@ -60,7 +60,7 @@ public class GetAnOnlineHearingTest extends BaseFunctionTest {
         assertThat(decision.getString("decision_award"), is(decisionAward));
         assertThat(decision.getString("decision_header"), is(decisionHeader));
         assertThat(decision.getString("decision_reason"), is(decisionReason));
-        assertThat(decision.getString("decision_text"), is(decisionText));
+        assertThat(decision.getString("decision_text"), is(decisionTextResponse));
         assertThat(decision.getString("decision_state"), is("decision_issued"));
         assertThat(decision.getString("decision_state_datetime"), is(notNullValue()));
         assertThat(decision.getString("appellant_reply"), is("decision_accepted"));
@@ -82,7 +82,7 @@ public class GetAnOnlineHearingTest extends BaseFunctionTest {
         assertThat(decision.getString("decision_award"), is(decisionAward));
         assertThat(decision.getString("decision_header"), is(decisionHeader));
         assertThat(decision.getString("decision_reason"), is(decisionReason));
-        assertThat(decision.getString("decision_text"), is(decisionText));
+        assertThat(decision.getString("decision_text"), is(decisionTextResponse));
         assertThat(decision.getString("decision_state"), is("decision_issued"));
         assertThat(decision.getString("decision_state_datetime"), is(notNullValue()));
         assertThat(decision.getString("appellant_reply"), is("decision_rejected"));

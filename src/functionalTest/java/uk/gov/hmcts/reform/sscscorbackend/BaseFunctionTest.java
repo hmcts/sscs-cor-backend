@@ -38,7 +38,7 @@ public abstract class BaseFunctionTest {
     protected final String decisionAward = "appeal-upheld";
     protected final String decisionHeader = "appeal-upheld";
     protected final String decisionReason = "Decision reason";
-    protected final String decisionText = "{\\\"dailyLivingRate\\\": \\\"Standard rate\\\",\\\"mobilityRate\\\": \\\"No award\\\"," +
+    protected final String decisionTextRequest = "{\\\"dailyLivingRate\\\": \\\"Standard rate\\\",\\\"mobilityRate\\\": \\\"No award\\\"," +
             "\\\"reasonsForView\\\": \\\"We considered all the evidence you and DWP submitted in relation to your appeal. " +
             "This includes any additional evidence you submitted./nAfter considering this evidence we acknowledge that you " +
             "experience pain in your lower back when doing some tasks around the house. Specifically washing yourself and " +
@@ -58,6 +58,26 @@ public abstract class BaseFunctionTest {
             "\\\"activity\\\": \\\"Moving around\\\"," +
             "\\\"descriptor\\\": \\\"Can stand and then move more than 50 metres but no more than 200 metres, either aided or unaided\\\"," +
             "\\\"points\\\": 4 }] }";
+    protected final String decisionTextResponse = "{\"dailyLivingRate\": \"Standard rate\",\"mobilityRate\": \"No award\"," +
+            "\"reasonsForView\": \"We considered all the evidence you and DWP submitted in relation to your appeal. " +
+            "This includes any additional evidence you submitted./nAfter considering this evidence we acknowledge that you " +
+            "experience pain in your lower back when doing some tasks around the house. Specifically washing yourself and " +
+            "preparing food. We consider that this pain does not hinder you enough to be awarded the enhanced rate of " +
+            "the daily living component of PIP. It is therefore our view that you are eligible for Daily living at " +
+            "the standard rate.\"," +
+            "\"dailyLivingActivities\": [{" +
+            "\"activity\": \"Preparing food\"," +
+            "\"descriptor\": \"Needs to use an aid or appliance to be able to prepare or cook a simple meal\"," +
+            "\"points\": \"2\"}, {\"activity\": \"Washing and bathing\"," +
+            "\"descriptor\": \"Needs to use an aid or appliance to be able to wash or bathe\"," +
+            "\"points\": \"2\" }]," +
+            "\"mobilityActivities\": [{" +
+            "\"activity\": \"Planning and following journeys\"," +
+            "\"descriptor\": \"Needs prompting to be able to undertake any journey to avoid overwhelming psychological distress to the claimant.\"," +
+            "\"points\": 4\"},{" +
+            "\"activity\": \"Moving around\"," +
+            "\"descriptor\": \"Can stand and then move more than 50 metres but no more than 200 metres, either aided or unaided\"," +
+            "\"points\": 4 }] }";
 
     protected SscsCorBackendRequests sscsCorBackendRequests;
     protected CohRequests cohRequests;
@@ -101,8 +121,8 @@ public abstract class BaseFunctionTest {
     }
 
     protected void createAndIssueDecision(String hearingId) throws IOException, InterruptedException {
-        cohRequests.createDecision(hearingId, decisionAward, decisionHeader, decisionReason, decisionText);
-        cohRequests.issueDecision(hearingId, decisionAward, decisionHeader, decisionReason, decisionText);
+        cohRequests.createDecision(hearingId, decisionAward, decisionHeader, decisionReason, decisionTextRequest);
+        cohRequests.issueDecision(hearingId, decisionAward, decisionHeader, decisionReason, decisionTextRequest);
     }
 
     protected void recordAppellantViewResponse(String hearingId, String reply, String reason) throws IOException {

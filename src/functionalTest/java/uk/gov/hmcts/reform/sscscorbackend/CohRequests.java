@@ -45,7 +45,7 @@ public class CohRequests {
                 "  \"start_date\": \"2018-08-09T13:14:45.178Z\",\n" +
                 "  \"state\": \"continuous_online_hearing_started\"\n" +
                 "}", "online_hearing_id");
-        
+
         return hearingId;
     }
 
@@ -91,7 +91,6 @@ public class CohRequests {
                 "  \"decision_reason\": \"" + decisionReason + "\",\n" +
                 "  \"decision_text\": \"" + decisionText + "\"\n" +
                 "}";
-        System.out.println(body);
 
         String decisionId = makePostRequest(cohClient, url, body, "decision_id");
         System.out.println("Decision id " + decisionId);
