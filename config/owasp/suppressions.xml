@@ -31,4 +31,7 @@
   <suppress>
     <cve>CVE-2018-10237</cve>
   </suppress>
+  <suppress>
+    <cve>CVE-2018-8088</cve>
+  </suppress>
 </suppressions>
