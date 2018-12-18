@@ -42,7 +42,7 @@ public class CohRequests {
                 "      \"name\": \"John Dead\"\n" +
                 "    }\n" +
                 "  ],\n" +
-                "  \"start_date\": \"2018-08-09T13:14:45.178Z\",\n" +
+                "  \"start_date\": \"2018-08-09T13:14:45Z\",\n" +
                 "  \"state\": \"continuous_online_hearing_started\"\n" +
                 "}", "online_hearing_id");
         System.out.println("Hearing id " + hearingId);
