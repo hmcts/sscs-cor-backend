@@ -23,15 +23,18 @@ public class OnlineHearingService {
     private final CohService cohClient;
     private final CcdService ccdService;
     private final IdamService idamService;
+    private final DecisionExtractor decisionExtractor;
 
     public OnlineHearingService(
             @Autowired CohService cohService,
             @Autowired CcdService ccdService,
-            @Autowired IdamService idamService
+            @Autowired IdamService idamService,
+            @Autowired DecisionExtractor decisionExtractor
     ) {
         this.cohClient = cohService;
         this.ccdService = ccdService;
         this.idamService = idamService;
+        this.decisionExtractor = decisionExtractor;
     }
 
     public String createOnlineHearing(String caseId) {
@@ -95,14 +98,11 @@ public class OnlineHearingService {
         return new CohDecisionReply("", "", "", "");
     }
 
-    private Decision getDecision(String onlineHearingId) {
+    private Decision getDecision(String onlineHearingId, long caseId) {
         Optional<CohDecision> decision = cohClient.getDecision(onlineHearingId);
         CohDecisionReply appellantReply = getAppellantDecisionReply(onlineHearingId);
-        return decision.map(d -> new Decision(onlineHearingId, d.getDecisionAward(),
-                    d.getDecisionHeader(), d.getDecisionReason(),
-                    d.getDecisionText(), d.getCurrentDecisionState().getStateName(),
-                    d.getCurrentDecisionState().getStateDateTime(),
-                    appellantReply.getReply(), appellantReply.getReplyDateTime()))
+
+        return decision.map(d -> decisionExtractor.extract(caseId, d, appellantReply))
                 .orElse(null);
     }
 
@@ -119,7 +119,7 @@ public class OnlineHearingService {
                             onlineHearing.getOnlineHearingId(),
                             nameString,
                             sscsCaseDeails.getData().getCaseReference(),
-                            getDecision(onlineHearing.getOnlineHearingId())
+                            getDecision(onlineHearing.getOnlineHearingId(), sscsCaseDeails.getId())
                     );
                 });
     }

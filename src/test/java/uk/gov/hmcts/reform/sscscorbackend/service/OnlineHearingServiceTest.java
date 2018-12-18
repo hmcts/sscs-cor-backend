@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -7,26 +8,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearing;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohOnlineHearings;
-import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
+import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
+import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 
 public class OnlineHearingServiceTest {
     private CohService cohService;
     private CcdService ccdService;
-    PDFServiceClient pdfServiceClient;
-    SscsPdfService sscsPdfService;
+    private DecisionExtractor decisionExtractor;
 
     private OnlineHearingService underTest;
 
@@ -38,13 +34,12 @@ public class OnlineHearingServiceTest {
     public void setUp() {
         cohService = mock(CohService.class);
         ccdService = mock(CcdService.class);
-        pdfServiceClient = mock(PDFServiceClient.class);
-        sscsPdfService = mock(SscsPdfService.class);
-        IdamService idamService = mock(IdamService.class);
+        decisionExtractor = mock(DecisionExtractor.class);
         idamTokens = IdamTokens.builder().build();
+        IdamService idamService = mock(IdamService.class);
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        underTest = new OnlineHearingService(cohService, ccdService, idamService);
+        underTest = new OnlineHearingService(cohService, ccdService, idamService, decisionExtractor);
 
         someEmailAddress = "someEmailAddress";
         someCaseId = 1234321L;
@@ -68,7 +63,7 @@ public class OnlineHearingServiceTest {
 
         SscsCaseDetails caseDetails = createCaseDetails(someCaseId, expectedCaseReference, firstName, lastName);
         when(ccdService.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress), idamTokens))
-                .thenReturn(Arrays.asList(
+                .thenReturn(asList(
                         createNonOnlineHearingCaseDetails(22222L, "otherCaseRef", "otherFirstName", "otherLastName"),
                         caseDetails));
 
@@ -82,6 +77,44 @@ public class OnlineHearingServiceTest {
         assertThat(onlineHearing.get().getOnlineHearingId(), is(expectedOnlineHearingId));
         assertThat(onlineHearing.get().getCaseReference(), is(expectedCaseReference));
         assertThat(onlineHearing.get().getAppellantName(), is(firstName + " " + lastName));
+    }
+
+    @Test
+    public void getsAnOnlineHearingWithDecision() {
+        String expectedCaseReference = "someCaseReference";
+        String firstName = "firstName";
+        String lastName = "lastName";
+
+        SscsCaseDetails caseDetails = createCaseDetails(someCaseId, expectedCaseReference, firstName, lastName);
+        when(ccdService.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress), idamTokens))
+                .thenReturn(asList(
+                        createNonOnlineHearingCaseDetails(22222L, "otherCaseRef", "otherFirstName", "otherLastName"),
+                        caseDetails));
+
+        CohOnlineHearings cohOnlineHearings = someCohOnlineHearings();
+        when(cohService.getOnlineHearing(someCaseId)).thenReturn(cohOnlineHearings);
+
+        String onlineHearingId = cohOnlineHearings.getOnlineHearings().get(0).getOnlineHearingId();
+        CohDecision cohDecision = new CohDecision(
+                onlineHearingId,
+                "decisionAward",
+                "decisionHeader",
+                "decisionReason",
+                "{}",
+                new CohState("decision_state", "decision_date")
+        );
+        when(cohService.getDecision(onlineHearingId))
+                .thenReturn(Optional.of(cohDecision));
+        CohDecisionReply cohDecisionReply = new CohDecisionReply("reply", "replyReason", "replyDateTime", "authorRef");
+        when(cohService.getDecisionReplies(onlineHearingId)).thenReturn(Optional.of(new CohDecisionReplies(singletonList(cohDecisionReply))));
+        Decision someDecision = DataFixtures.someDecision();
+        when(decisionExtractor.extract(someCaseId, cohDecision, cohDecisionReply)).thenReturn(someDecision);
+
+        Optional<OnlineHearing> onlineHearing = underTest.getOnlineHearing(someEmailAddress);
+
+        assertThat(onlineHearing.isPresent(), is(true));
+        Decision decision = onlineHearing.get().getDecision();
+        assertThat(decision, is(someDecision));
     }
 
     @Test
@@ -101,9 +134,7 @@ public class OnlineHearingServiceTest {
         SscsCaseDetails caseDetails1 = createCaseDetails(someCaseId, "someCaseReference", "firstName", "lastName");
         SscsCaseDetails caseDetails2 = createCaseDetails(22222L, "otherRef", "otherFirstName", "otherLatName");
         when(ccdService.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress), idamTokens))
-                .thenReturn(Arrays.asList(
-                        caseDetails1,
-                        caseDetails2));
+                .thenReturn(asList(caseDetails1, caseDetails2));
 
         underTest.getOnlineHearing(someEmailAddress);
     }

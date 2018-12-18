@@ -230,10 +230,11 @@ public class CohStub extends BaseStub {
         return answerState.getCohAnswerState();
     }
 
-    private String getDecisionsBody(String hearingId) {
+    private String getDecisionsBody(String hearingId, long caseId) {
         InputStream decisionStream = getClass().getClassLoader().getResourceAsStream("json/get_decision.json");
         String decisionAsString = new BufferedReader(new InputStreamReader(decisionStream)).lines().collect(joining("\n"));
-        return decisionAsString.replace("{online_hearing_id}", hearingId);
+        return decisionAsString.replace("{online_hearing_id}", hearingId)
+                .replace("{case_reference}", caseId + "");
     }
 
     private String getDecisionRepliesBody(String reply) {
@@ -293,10 +294,10 @@ public class CohStub extends BaseStub {
         }
     }
 
-    public void stubGetDecisions(String hearingId) {
+    public void stubGetDecisions(String hearingId, long caseId) {
         wireMock.stubFor(get("/continuous-online-hearings/" + hearingId + "/decisions")
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
-                .willReturn(okJson(getDecisionsBody(hearingId))));
+                .willReturn(okJson(getDecisionsBody(hearingId, caseId))));
     }
 
     public void stubGetDecisionNotFound(String hearingId) {

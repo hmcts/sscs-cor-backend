@@ -1,9 +1,9 @@
 {
   "deadline_expiry_date": "string",
   "decision_award": "Final",
-  "decision_header": "Tribunal's final decision",
+  "decision_header": "n/a",
   "decision_id": "string",
-  "decision_reason": "The decision reason",
+  "decision_reason": "n/a",
   "decision_replies": [
     {
       "author_reference": "string",
@@ -20,7 +20,7 @@
     "state_desc": "Decision Issued",
     "state_name": "decision_issued"
   },
-  "decision_text": "Some text about the decision",
+  "decision_text": "{\"decisions_SSCS_benefit_{case_reference}\":{\"preliminaryView\":\"yes\",\"visitedPages\":{\"create\":true,\"preliminary-advanced\":true,\"set-award-dates\":true,\"scores\":true,\"budgeting-decisions\":true,\"planning-journeys\":true},\"forDailyLiving\":\"noAward\",\"forMobility\":\"enhancedRate\",\"compareToDWPAward\":\"Higher\",\"awardEndDateDay\":\"11\",\"awardEndDateMonth\":\"12\",\"awardEndDateYear\":\"2018\",\"approveDraftConsent\":\"indefinite\",\"preparingFood\":false,\"takingNutrition\":false,\"managingTherapy\":false,\"washingBathing\":false,\"managingToilet\":false,\"dressingUndressing\":false,\"communicatingVerbally\":false,\"readingAndUnderstanding\":false,\"engagingWithOtherPeople\":false,\"makingBudgetingDecisions\":true,\"planningFollowingJourneys\":true,\"movingAround\":false,\"dailyLivingMakingBudgetDecisions\":\"6\",\"MobilityPlanningJourneys\":\"12\",\"reasonsTribunalView\":\"There was a reason!\",\"awardStartDateDay\":\"1\",\"awardStartDateMonth\":\"4\",\"awardStartDateYear\":\"2017\"}}",
   "history": [
     {
       "state_datetime": "string",

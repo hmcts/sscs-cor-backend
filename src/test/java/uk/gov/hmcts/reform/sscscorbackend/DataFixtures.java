@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscscorbackend;
 
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
@@ -110,12 +111,12 @@ public class DataFixtures {
     }
 
     public static OnlineHearing someOnlineHearingWithDecision() {
-        Decision decision = new Decision("someOnlineHearingId", "decisionAward", "decisionHeader", "decisionReason", "decisionText", "decision_issued", now().format(ISO_LOCAL_DATE_TIME), null, null);
+        Decision decision = new Decision("decision_issued", now().format(ISO_LOCAL_DATE_TIME), null, null, "startDate", "endDate", null, "decisionReason", null);
         return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", decision);
     }
 
     public static OnlineHearing someOnlineHearingWithDecisionAndAppellentReply() {
-        Decision decision = new Decision("someOnlineHearingId", "decisionAward", "decisionHeader", "decisionReason", "decisionText", "decision_issued", now().format(ISO_LOCAL_DATE_TIME), "decision_accepted", now().format(ISO_LOCAL_DATE_TIME));
+        Decision decision = new Decision("decision_issued", now().format(ISO_LOCAL_DATE_TIME), "decision_accepted", now().format(ISO_LOCAL_DATE_TIME), "startDate", "endDate", null, "decisionReason", null);
         return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", decision);
     }
 
@@ -135,5 +136,21 @@ public class DataFixtures {
 
     public static PdfAppealDetails somePdfAppealDetails() {
         return new PdfAppealDetails("someTitle", "someFirstName", "someSurname", "someNino", "someCaseRef");
+    }
+
+    public static Decision someDecision() {
+        return new Decision(
+                "decisionsState",
+                "decisionsStartDateTime",
+                "appellantReply",
+                "appellantReplyDateTime",
+                "2017-04-01",
+                "2018-12-11",
+                new DecisionRates(Rate.noAward, Rate.enhancedRate, ComparedRate.Higher),
+                "There was a reason!",
+                new Activities(
+                        asList(new Activity("dailyActivity1", 10), new Activity("dailyActivity2", 5)),
+                        asList(new Activity("mobilityActivity1", 10), new Activity("mobilityActivity2", 7)))
+        );
     }
 }

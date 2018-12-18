@@ -1,69 +1,30 @@
 package uk.gov.hmcts.reform.sscscorbackend.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-
 import java.util.Objects;
 
-@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Decision {
-
-    private final String onlineHearingId;
-    private final String decisionAward;
-    private final String decisionHeader;
-    private final String decisionReason;
-    private final String decisionText;
     private final String decisionState;
     private final String decisionStateDateTime;
-
     private final String appellantReply;
     private final String appellantReplyDateTime;
+    private final String startDate;
+    private final String endDate;
+    private final DecisionRates decisionRates;
+    private final String reason;
+    private final Activities activities;
 
-    public Decision(String onlineHearingId,
-                    String decisionAward,
-                    String decisionHeader,
-                    String decisionReason,
-                    String decisionText,
-                    String decisionState,
-                    String decisionStateDateTime,
-                    String appellantReply,
-                    String appellantReplyDateTime) {
-        this.onlineHearingId = onlineHearingId;
-        this.decisionAward = decisionAward;
-        this.decisionHeader = decisionHeader;
-        this.decisionReason = decisionReason;
-        this.decisionText = decisionText;
+    public Decision(String decisionState, String decisionStateDateTime, String appellantReply, String appellantReplyDateTime, String startDate, String endDate, DecisionRates decisionRates, String reason, Activities activities) {
         this.decisionState = decisionState;
         this.decisionStateDateTime = decisionStateDateTime;
         this.appellantReply = appellantReply;
         this.appellantReplyDateTime = appellantReplyDateTime;
-    }
-
-    @ApiModelProperty(example = "appeal-upheld", required = true)
-    @JsonProperty(value = "decision_award")
-    public String getDecisionAward() {
-        return decisionAward;
-    }
-
-    @ApiModelProperty(example = "appeal-upheld", required = true)
-    @JsonProperty(value = "decision_header")
-    public String getDecisionHeader() {
-        return decisionHeader;
-    }
-
-    @ApiModelProperty(example = "Decision reason", required = true)
-    @JsonProperty(value = "decision_reason")
-    public String getDecisionReason() {
-        return decisionReason;
-    }
-
-    @ApiModelProperty(example = "Decision text", required = true)
-    @JsonProperty(value = "decision_text")
-    public String getDecisionText() {
-        return decisionText;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.decisionRates = decisionRates;
+        this.reason = reason;
+        this.activities = activities;
     }
 
     @ApiModelProperty(example = "decision_issued", required = true)
@@ -76,6 +37,34 @@ public class Decision {
     @JsonProperty(value = "decision_state_datetime")
     public String getDecisionStateDateTime() {
         return decisionStateDateTime;
+    }
+
+    @ApiModelProperty(example = "2018-10-05", required = true)
+    @JsonProperty(value = "start_date")
+    public String getStartDate() {
+        return startDate;
+    }
+
+    @ApiModelProperty(example = "2018-10-05", required = true)
+    @JsonProperty(value = "end_date")
+    public String getEndDate() {
+        return endDate;
+    }
+
+    @JsonProperty(value = "decision_rates")
+    public DecisionRates getDecisionRates() {
+        return decisionRates;
+    }
+
+    @ApiModelProperty(example = "Some reason for the decision", required = true)
+    @JsonProperty(value = "reason")
+    public String getReason() {
+        return reason;
+    }
+
+    @JsonProperty(value = "activities")
+    public Activities getActivities() {
+        return activities;
     }
 
     @ApiModelProperty(example = "decision_accepted", required = true)
@@ -99,35 +88,34 @@ public class Decision {
             return false;
         }
         Decision decision = (Decision) o;
-        return Objects.equals(onlineHearingId, decision.onlineHearingId) &&
-                Objects.equals(decisionAward, decision.decisionAward) &&
-                Objects.equals(decisionHeader, decision.decisionHeader) &&
-                Objects.equals(decisionReason, decision.decisionReason) &&
-                Objects.equals(decisionText, decision.decisionText) &&
-                Objects.equals(decisionState, decision.decisionState) &&
+        return Objects.equals(decisionState, decision.decisionState) &&
                 Objects.equals(decisionStateDateTime, decision.decisionStateDateTime) &&
+                Objects.equals(startDate, decision.startDate) &&
+                Objects.equals(endDate, decision.endDate) &&
+                Objects.equals(decisionRates, decision.decisionRates) &&
+                Objects.equals(reason, decision.reason) &&
+                Objects.equals(activities, decision.activities) &&
                 Objects.equals(appellantReply, decision.appellantReply) &&
                 Objects.equals(appellantReplyDateTime, decision.appellantReplyDateTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(onlineHearingId, decisionAward, decisionHeader, decisionReason, decisionText, decisionState,
-                appellantReply, appellantReplyDateTime);
+        return Objects.hash(decisionState, decisionStateDateTime, startDate, endDate, decisionRates, reason, activities, appellantReply, appellantReplyDateTime);
     }
 
     @Override
     public String toString() {
         return "Decision{" +
-                "  onlineHearingId='" + onlineHearingId + '\'' +
-                ", decisionAward='" + decisionAward + '\'' +
-                ", decisionHeader='" + decisionHeader + '\'' +
-                ", decisionReason='" + decisionReason + '\'' +
-                ", decisionText='" + decisionText + '\'' +
-                ", decisionState='" + decisionState + '\'' +
+                "decisionState='" + decisionState + '\'' +
                 ", decisionStateDateTime='" + decisionStateDateTime + '\'' +
                 ", appellantReply='" + appellantReply + '\'' +
                 ", appellantReplyDateTime='" + appellantReplyDateTime + '\'' +
+                ", startDate='" + startDate + '\'' +
+                ", endDate='" + endDate + '\'' +
+                ", decisionRates=" + decisionRates +
+                ", reason='" + reason + '\'' +
+                ", activities=" + activities +
                 '}';
     }
 }

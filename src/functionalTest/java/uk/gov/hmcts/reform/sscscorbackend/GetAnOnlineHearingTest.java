@@ -28,17 +28,13 @@ public class GetAnOnlineHearingTest extends BaseFunctionTest {
     public void getAnOnlineHearingWithDecision() throws IOException, InterruptedException {
         OnlineHearing onlineHearing = createHearingWithQuestion(true);
         answerQuestion(onlineHearing.getHearingId(), onlineHearing.getQuestionId());
-        createAndIssueDecision(onlineHearing.getHearingId());
+        createAndIssueDecision(onlineHearing.getHearingId(), onlineHearing.getCaseId());
 
         JSONObject onlineHearingResponse = sscsCorBackendRequests.getOnlineHearing(onlineHearing.getEmailAddress());
         String onlineHearingId = onlineHearingResponse.getString("online_hearing_id");
         JSONObject decision = onlineHearingResponse.getJSONObject("decision");
 
         assertThat(onlineHearingId, is(onlineHearing.getHearingId()));
-        assertThat(decision.getString("decision_award"), is(decisionAward));
-        assertThat(decision.getString("decision_header"), is(decisionHeader));
-        assertThat(decision.getString("decision_reason"), is(decisionReason));
-        assertThat(decision.getString("decision_text"), is(decisionText));
         assertThat(decision.getString("decision_state"), is("decision_issued"));
         assertThat(decision.getString("decision_state_datetime"), is(notNullValue()));
         assertThat(decision.has("appellant_reply"), is(false));
@@ -49,7 +45,7 @@ public class GetAnOnlineHearingTest extends BaseFunctionTest {
     public void getAnOnlineHearingWithDecisionAndAppellantReplyAccepted() throws IOException, InterruptedException {
         OnlineHearing onlineHearing = createHearingWithQuestion(true);
         answerQuestion(onlineHearing.getHearingId(), onlineHearing.getQuestionId());
-        createAndIssueDecision(onlineHearing.getHearingId());
+        createAndIssueDecision(onlineHearing.getHearingId(), onlineHearing.getCaseId());
         recordAppellantViewResponse(onlineHearing.getHearingId(), "decision_accepted", "decision_accepted");
 
         JSONObject onlineHearingResponse = sscsCorBackendRequests.getOnlineHearing(onlineHearing.getEmailAddress());
@@ -57,35 +53,10 @@ public class GetAnOnlineHearingTest extends BaseFunctionTest {
         JSONObject decision = onlineHearingResponse.getJSONObject("decision");
 
         assertThat(onlineHearingId, is(onlineHearing.getHearingId()));
-        assertThat(decision.getString("decision_award"), is(decisionAward));
-        assertThat(decision.getString("decision_header"), is(decisionHeader));
-        assertThat(decision.getString("decision_reason"), is(decisionReason));
-        assertThat(decision.getString("decision_text"), is(decisionText));
+
         assertThat(decision.getString("decision_state"), is("decision_issued"));
         assertThat(decision.getString("decision_state_datetime"), is(notNullValue()));
         assertThat(decision.getString("appellant_reply"), is("decision_accepted"));
-        assertThat(decision.getString("appellant_reply_datetime"), is(notNullValue()));
-    }
-
-    @Test
-    public void getAnOnlineHearingWithDecisionAndAppellantReplyRejected() throws IOException, InterruptedException {
-        OnlineHearing onlineHearing = createHearingWithQuestion(true);
-        answerQuestion(onlineHearing.getHearingId(), onlineHearing.getQuestionId());
-        createAndIssueDecision(onlineHearing.getHearingId());
-        recordAppellantViewResponse(onlineHearing.getHearingId(), "decision_rejected", "Some reasons");
-
-        JSONObject onlineHearingResponse = sscsCorBackendRequests.getOnlineHearing(onlineHearing.getEmailAddress());
-        String onlineHearingId = onlineHearingResponse.getString("online_hearing_id");
-        JSONObject decision = onlineHearingResponse.getJSONObject("decision");
-
-        assertThat(onlineHearingId, is(onlineHearing.getHearingId()));
-        assertThat(decision.getString("decision_award"), is(decisionAward));
-        assertThat(decision.getString("decision_header"), is(decisionHeader));
-        assertThat(decision.getString("decision_reason"), is(decisionReason));
-        assertThat(decision.getString("decision_text"), is(decisionText));
-        assertThat(decision.getString("decision_state"), is("decision_issued"));
-        assertThat(decision.getString("decision_state_datetime"), is(notNullValue()));
-        assertThat(decision.getString("appellant_reply"), is("decision_rejected"));
         assertThat(decision.getString("appellant_reply_datetime"), is(notNullValue()));
     }
 }
