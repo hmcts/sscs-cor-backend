@@ -4,25 +4,30 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateOnlineHearingRequest {
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     @JsonCreator
-    public CreateOnlineHearingRequest(@JsonProperty(value = "case_id")String caseId) {
+    public CreateOnlineHearingRequest(String caseId) {
         this.caseId = caseId;
-        this.startDate = LocalDateTime.now();
+        this.startDateTime = LocalDateTime.now();
     }
 
+    @JsonProperty(value = "case_id")
     private String caseId;
 
     @JsonProperty(value = "jurisdiction")
     private String jurisdiction = "SSCS";
 
     @JsonProperty(value = "start_date")
-    private LocalDateTime startDate;
+    private String startDate;
+
+    private LocalDateTime startDateTime;
 
     @JsonProperty(value = "state")
     private String state = "continuous_online_hearing_started";
@@ -35,8 +40,8 @@ public class CreateOnlineHearingRequest {
         return jurisdiction;
     }
 
-    public LocalDateTime getStartDate() {
-        return startDate;
+    public String getStartDate() {
+        return startDateTime.format(formatter);
     }
 
     public String getState() {
