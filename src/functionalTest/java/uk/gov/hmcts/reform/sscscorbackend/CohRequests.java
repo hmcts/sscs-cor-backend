@@ -7,6 +7,8 @@ import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.util.function.Supplier;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.entity.StringEntity;
@@ -16,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
 
 public class CohRequests {
     private final IdamTokens idamTokens;
@@ -33,18 +36,10 @@ public class CohRequests {
     }
 
     public String createHearing(String caseId) throws IOException {
-        String hearingId = makePostRequest(cohClient, cohBaseUrl + "/continuous-online-hearings", "{\n" +
-                "  \"case_id\": \"" + caseId + "\",\n" +
-                "  \"jurisdiction\": \"SSCS\",\n" +
-                "  \"panel\": [\n" +
-                "    {\n" +
-                "      \"identity_token\": \"Judge\",\n" +
-                "      \"name\": \"John Dead\"\n" +
-                "    }\n" +
-                "  ],\n" +
-                "  \"start_date\": \"2018-08-09T13:14:45Z\",\n" +
-                "  \"state\": \"continuous_online_hearing_started\"\n" +
-                "}", "online_hearing_id");
+        CreateOnlineHearingRequest request = new CreateOnlineHearingRequest(caseId);
+        String body = new ObjectMapper().writeValueAsString(request);
+
+        String hearingId = makePostRequest(cohClient, cohBaseUrl + "/continuous-online-hearings", body, "online_hearing_id");
         System.out.println("Hearing id " + hearingId);
         return hearingId;
     }
