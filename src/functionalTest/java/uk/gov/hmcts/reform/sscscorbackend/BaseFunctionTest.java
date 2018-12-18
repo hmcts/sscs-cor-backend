@@ -38,7 +38,7 @@ public abstract class BaseFunctionTest {
     protected final String decisionAward = "appeal-upheld";
     protected final String decisionHeader = "appeal-upheld";
     protected final String decisionReason = "Decision reason";
-    protected final String decisionText = "Decision reason";
+    protected final String decisionText = "{\\\"decisions_SSCS_benefit_1544785998546961\\\":{\\\"preliminaryView\\\":\\\"yes\\\",\\\"visitedPages\\\":{\\\"create\\\":true,\\\"preliminary-advanced\\\":true,\\\"set-award-dates\\\":true,\\\"scores\\\":true,\\\"budgeting-decisions\\\":true,\\\"planning-journeys\\\":true},\\\"forDailyLiving\\\":\\\"noAward\\\",\\\"forMobility\\\":\\\"enhancedRate\\\",\\\"compareToDWPAward\\\":\\\"Higher\\\",\\\"awardEndDateDay\\\":\\\"11\\\",\\\"awardEndDateMonth\\\":\\\"12\\\",\\\"awardEndDateYear\\\":\\\"2018\\\",\\\"approveDraftConsent\\\":\\\"indefinite\\\",\\\"preparingFood\\\":false,\\\"takingNutrition\\\":false,\\\"managingTherapy\\\":false,\\\"washingBathing\\\":false,\\\"managingToilet\\\":false,\\\"dressingUndressing\\\":false,\\\"communicatingVerbally\\\":false,\\\"readingAndUnderstanding\\\":false,\\\"engagingWithOtherPeople\\\":false,\\\"makingBudgetingDecisions\\\":true,\\\"planningFollowingJourneys\\\":true,\\\"movingAround\\\":false,\\\"dailyLivingMakingBudgetDecisions\\\":\\\"6\\\",\\\"MobilityPlanningJourneys\\\":\\\"12\\\",\\\"reasonsTribunalView\\\":\\\"There was a reason!\\\",\\\"awardStartDateDay\\\":\\\"1\\\",\\\"awardStartDateMonth\\\":\\\"4\\\",\\\"awardStartDateYear\\\":\\\"2017\\\"}}";
 
     protected SscsCorBackendRequests sscsCorBackendRequests;
     protected CohRequests cohRequests;
@@ -81,9 +81,10 @@ public abstract class BaseFunctionTest {
         cohRequests.createAnswer(hearingId, questionId, "Valid answer");
     }
 
-    protected void createAndIssueDecision(String hearingId) throws IOException, InterruptedException {
-        cohRequests.createDecision(hearingId, decisionAward, decisionHeader, decisionReason, decisionText);
-        cohRequests.issueDecision(hearingId, decisionAward, decisionHeader, decisionReason, decisionText);
+    protected void createAndIssueDecision(String hearingId, String caseId) throws IOException, InterruptedException {
+        String decisionTextJson = decisionText.replace("{case_id}", caseId);
+        cohRequests.createDecision(hearingId, decisionAward, decisionHeader, decisionReason, decisionTextJson);
+        cohRequests.issueDecision(hearingId, decisionAward, decisionHeader, decisionReason, decisionTextJson);
     }
 
     protected void recordAppellantViewResponse(String hearingId, String reply, String reason) throws IOException {

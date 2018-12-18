@@ -13,7 +13,7 @@ public class RecordTribunalViewResponseTest extends BaseFunctionTest {
     public void recordAcceptedResponse() throws IOException, InterruptedException {
         OnlineHearing onlineHearing = createHearingWithQuestion(true);
         answerQuestion(onlineHearing.getHearingId(), onlineHearing.getQuestionId());
-        createAndIssueDecision(onlineHearing.getHearingId());
+        createAndIssueDecision(onlineHearing.getHearingId(), onlineHearing.getCaseId());
 
         String reply = "decision_accepted";
         String reason = "";
@@ -34,7 +34,7 @@ public class RecordTribunalViewResponseTest extends BaseFunctionTest {
     public void recordRejectedResponse() throws IOException, InterruptedException {
         OnlineHearing onlineHearing = createHearingWithQuestion(true);
         answerQuestion(onlineHearing.getHearingId(), onlineHearing.getQuestionId());
-        createAndIssueDecision(onlineHearing.getHearingId());
+        createAndIssueDecision(onlineHearing.getHearingId(), onlineHearing.getCaseId());
 
         String reply = "decision_rejected";
         String reason = "I reject this view because...";
