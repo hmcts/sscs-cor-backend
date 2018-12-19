@@ -1,16 +1,20 @@
 package uk.gov.hmcts.reform.sscscorbackend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Objects;
 
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Activity {
     private final String activity;
-    private final int points;
+    private final String selectionKey;
 
-    public Activity(String activity, int points) {
+    public Activity(String activity, String selectionKey) {
         this.activity = activity;
-        this.points = points;
+        this.selectionKey = selectionKey;
     }
 
     @ApiModelProperty(example = "an activity", required = true)
@@ -19,10 +23,10 @@ public class Activity {
         return activity;
     }
 
-    @ApiModelProperty(example = "5", required = true)
-    @JsonProperty(value = "points")
-    public int getPoints() {
-        return points;
+    @ApiModelProperty(example = "2.1", required = true)
+    @JsonProperty(value = "selection_key")
+    public String getSelectionKey() {
+        return selectionKey;
     }
 
     @Override
@@ -34,12 +38,12 @@ public class Activity {
             return false;
         }
         Activity activity1 = (Activity) o;
-        return points == activity1.points &&
-                Objects.equals(activity, activity1.activity);
+        return Objects.equals(activity, activity1.activity) &&
+                Objects.equals(selectionKey, activity1.selectionKey);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(activity, points);
+        return Objects.hash(activity, selectionKey);
     }
 }

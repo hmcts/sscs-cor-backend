@@ -1,8 +1,12 @@
 package uk.gov.hmcts.reform.sscscorbackend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DecisionRates {
     private final Rate dailyLiving;
     private final Rate mobility;

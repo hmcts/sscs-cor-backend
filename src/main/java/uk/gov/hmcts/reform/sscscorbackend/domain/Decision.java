@@ -1,9 +1,13 @@
 package uk.gov.hmcts.reform.sscscorbackend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Objects;
 
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Decision {
     private final String decisionState;
     private final String decisionStateDateTime;
@@ -67,13 +71,13 @@ public class Decision {
         return activities;
     }
 
-    @ApiModelProperty(example = "decision_accepted", required = true)
+    @ApiModelProperty(example = "decision_accepted")
     @JsonProperty(value = "appellant_reply")
     public String getAppellantReply() {
         return appellantReply;
     }
 
-    @ApiModelProperty(example = "2018-10-06T10:30:24Z", required = true)
+    @ApiModelProperty(example = "2018-10-06T10:30:24Z")
     @JsonProperty(value = "appellant_reply_datetime")
     public String getAppellantReplyDateTime() {
         return appellantReplyDateTime;
