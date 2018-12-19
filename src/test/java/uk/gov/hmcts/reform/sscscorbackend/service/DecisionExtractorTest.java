@@ -74,9 +74,9 @@ public class DecisionExtractorTest {
                 new DecisionRates(Rate.noAward, Rate.enhancedRate, ComparedRate.Higher),
                 "There was a reason!",
                 new Activities(
-                        asList(new Activity("dailyActivity1", 10), new Activity("dailyActivity2", 5)),
-                        asList(new Activity("mobilityActivity1", 10), new Activity("mobilityActivity2", 7)))
-                )
+                        asList(new Activity("makingBudgetingDecisions", "6")),
+                        asList(new Activity("planningFollowingJourneys", "12"))
+                ))
         ));
     }
 }
