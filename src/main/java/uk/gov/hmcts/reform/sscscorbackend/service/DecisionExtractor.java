@@ -49,7 +49,9 @@ public class DecisionExtractor {
         JSONObject decisionJson = jsonObject.getJSONObject("decisions_SSCS_benefit_" + caseId);
 
         String startDateString = getDate(decisionJson, "Start");
-        String endDateString = getDate(decisionJson, "End");
+
+        String approveDraftConsent = decisionJson.getString("approveDraftConsent");
+        String endDateString = approveDraftConsent.equalsIgnoreCase("indefinite") ? null : getDate(decisionJson, "End");
         DecisionRates decisionRates = getDecisionRates(decisionJson);
         String reason = decisionJson.getString("reasonsTribunalView");
         Activities activities = getActivities(decisionJson);

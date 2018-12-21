@@ -49,7 +49,7 @@ public class Decision {
         return startDate;
     }
 
-    @ApiModelProperty(example = "2018-10-05", required = true)
+    @ApiModelProperty(example = "2018-10-05")
     @JsonProperty(value = "end_date")
     public String getEndDate() {
         return endDate;
