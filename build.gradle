@@ -177,7 +177,7 @@ dependencies {
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath
 
-  integrationTestCompile "com.github.tomakehurst:wiremock:2.19.0"
+  integrationTestCompile "com.github.tomakehurst:wiremock:2.20.0"
   integrationTestCompile group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
 
   functionalTestCompile sourceSets.main.runtimeClasspath
