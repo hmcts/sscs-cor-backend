@@ -47,6 +47,10 @@ appellant:
       template:
         path: /
 
+preliminary_view:
+  html:
+    template:
+      path: /templates/tribunalsView.html
 online_hearing_finished:
   html:
     template:
