@@ -3,39 +3,31 @@ package uk.gov.hmcts.reform.sscscorbackend.service;
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import org.apache.poi.util.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
-import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
-import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
 
-@Service
 public class PdfService {
     private final PDFServiceClient pdfServiceClient;
-    private final String appellantTemplatePath;
+    private final byte[] template;
+    private final HashMap i18n;
 
-    public PdfService(@Autowired PDFServiceClient pdfServiceClient,
-                      @Value("${online_hearing_finished.html.template.path}") String appellantTemplatePath) {
+    public PdfService(PDFServiceClient pdfServiceClient, String appellantTemplatePath, I18nBuilder i18nBuilder) throws IOException {
         this.pdfServiceClient = pdfServiceClient;
-        this.appellantTemplatePath = appellantTemplatePath;
+
+        template = getResource(appellantTemplatePath);
+        i18n = i18nBuilder.build();
     }
 
-    public byte[] createPdf(PdfSummary pdfSummary) {
-        Map<String, Object> placeholders = ImmutableMap.of("pdfSummary", pdfSummary);
+    public byte[] createPdf(Object pdfSummary) {
+        Map<String, Object> placeholders = ImmutableMap.of("pdfSummary", pdfSummary, "i18n", i18n);
 
-        try {
-            byte[] template = getTemplate();
-            return pdfServiceClient.generateFromHtml(template, placeholders);
-        } catch (IOException e) {
-            throw new PdfGenerationException("Error getting template " + appellantTemplatePath, e);
-        }
+        return pdfServiceClient.generateFromHtml(template, placeholders);
     }
 
-    private byte[] getTemplate() throws IOException {
-        InputStream in = getClass().getResourceAsStream(appellantTemplatePath);
+    private byte[] getResource(String file) throws IOException {
+        InputStream in = getClass().getResourceAsStream(file);
         return IOUtils.toByteArray(in);
     }
 }
