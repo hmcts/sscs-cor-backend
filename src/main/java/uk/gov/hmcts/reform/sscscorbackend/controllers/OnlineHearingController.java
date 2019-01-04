@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CohEvent;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
+import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
 
 
 @Slf4j
@@ -19,11 +20,14 @@ public class OnlineHearingController {
 
     private final OnlineHearingService onlineHearingService;
     private final StoreOnlineHearingService storeOnlineHearingService;
+    private final StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService;
 
     public OnlineHearingController(@Autowired OnlineHearingService onlineHearingService,
-                                   @Autowired StoreOnlineHearingService storeOnlineHearingService) {
+                                   @Autowired StoreOnlineHearingService storeOnlineHearingService,
+                                   @Autowired StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService) {
         this.onlineHearingService = onlineHearingService;
         this.storeOnlineHearingService = storeOnlineHearingService;
+        this.storeOnlineHearingTribunalsViewService = storeOnlineHearingTribunalsViewService;
     }
 
     @ApiOperation(value = "Create online hearing",
@@ -65,7 +69,11 @@ public class OnlineHearingController {
         log.info("Received event for storing online hearing for case {} and hearing {} ...",
                 caseId, onlineHearingId);
 
-        storeOnlineHearingService.storeOnlineHearingInCcd(onlineHearingId, caseId);
+        if (request.getNotificationEventType().equalsIgnoreCase("decision_issued")) {
+            storeOnlineHearingTribunalsViewService.storeTribunalsView(Long.valueOf(caseId));
+        } else {
+            storeOnlineHearingService.storeOnlineHearingInCcd(onlineHearingId, caseId);
+        }
 
         return ResponseEntity.ok("");
     }

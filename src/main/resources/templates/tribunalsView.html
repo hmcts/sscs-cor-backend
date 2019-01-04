@@ -1,0 +1,190 @@
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Online Hearing</title>
+
+    <style type="text/css">
+        main {
+            font-family: sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.3;
+            color: #0b0c0c;
+        }
+
+        h1 {
+            font-weight: 700;
+            text-transform: none;
+            font-size: 24px;
+            line-height: 1.1;
+        }
+
+        p {
+            margin-top: 0.3em;
+            margin-bottom: 1em;
+        }
+
+        h2 {
+            font-weight: 700;
+            text-transform: none;
+            font-size: 18px;
+            line-height: 1.2;
+        }
+
+        .panel-blue {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #eef7ff;
+        }
+
+        .divider {
+            border-bottom: 3px solid #005ea5;
+        }
+
+        .govuk-table {
+            width: 100%;
+        }
+
+        .govuk-table__header, .govuk-table__cell {
+            padding: 10px 20px 10px 0;
+            border-bottom: 1px solid #bfc1c3;
+            text-align: left;
+        }
+
+
+    </style>
+</head>
+
+<body class="">
+
+<main class="content">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div id="appeal-details">
+                <h1>Tribunal's view</h1>
+                <h2 class="govuk-heading-m">
+                    <span id="appellant-name">{{ pdfSummary.appellant_name }}</span>
+                </h2>
+                <p>Appeal reference: <span id="case-reference">{{ pdfSummary.case_reference }}</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="divider"></div>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div id="decision">
+                <div id="decision-outcome" class="panel-blue">
+                    <p>The tribunal have considered all the information submitted by you and DWP.</p>
+                    <p>
+                        {% if pdfSummary.decision.end_date is not empty %}
+                            Their view is that you’re entitled to PIP at the rate below from {{ pdfSummary.decision.start_date }} until {{ pdfSummary.decision.end_date }}.
+                        {% else %}
+                            Their view is that you’re entitled to PIP at the rate below from {{ pdfSummary.decision.start_date }}.
+                        {% endif %}
+                    </p>
+
+                    <p><table class="govuk-table">
+                        <tbody class="govuk-table__body">
+                        <tr class="govuk-table__row">
+                            <th class="govuk-table__cell">
+                                Daily living
+                            </th>
+                            <td class="govuk-table__cell">
+                                {% if pdfSummary.decision.decision_rates.daily_living == 'noAward' %}
+                                    No award
+                                {% elseif pdfSummary.decision.decision_rates.daily_living == 'enhancedRate' %}
+                                    Enhanced rate
+                                {% elseif pdfSummary.decision.decision_rates.daily_living == 'standardRate' %}
+                                    Standard rate
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr class="govuk-table__row">
+                            <th class="govuk-table__cell">
+                                Mobility
+                            </th>
+                            <td class="govuk-table__cell">
+                                {% if pdfSummary.decision.decision_rates.mobility == 'noAward' %}
+                                    No award
+                                {% elseif pdfSummary.decision.decision_rates.mobility == 'enhancedRate' %}
+                                    Enhanced rate
+                                {% elseif pdfSummary.decision.decision_rates.mobility == 'standardRate' %}
+                                    Standard rate
+                                {% endif %}
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table></p>
+                    <p>
+                        {% if pdfSummary.decision.decision_rates.compared_to_dwp == 'Higher' %}
+                            This is the same as DWP initially awarded you.
+                        {% elseif pdfSummary.decision.decision_rates.compared_to_dwp == 'Same' %}
+                            This is the same as DWP initially awarded you.
+                        {% elseif pdfSummary.decision.decision_rates.compared_to_dwp == 'Lower' %}
+                            This is lower than DWP initially awarded you.
+                        {% endif %}
+                    </p>
+                </div>
+                <div id="decision-reason">
+                    <h2 class="govuk-heading-m">The reason for the tribunal's view</h2>
+                    <p id="decision-text">{{ pdfSummary.decision.reason }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="decision-activities">
+            <div>
+                <div class="govuk-details__text">
+                    <h2 class="govuk-heading-m">Daily living activities and descriptors the tribunal considers to apply</h2>
+                    <table class="govuk-table">
+                        <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th class="govuk-table__header">Activity</th>
+                            <th class="govuk-table__header">Descriptor</th>
+                            <th class="govuk-table__header">Points</th>
+                        </tr>
+                        </thead>
+                        <tbody class="govuk-table__body">
+                            {% for activity in pdfSummary.decision.activities.daily_living %}
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell">{{ i18n.tribunalView.activities.dailyLiving[activity.activity].name }}</td>
+                                    <td class="govuk-table__cell">{{ i18n.tribunalView.activities.dailyLiving[activity.activity].scores[activity.selection_key].text | raw }}</td>
+                                    <td class="govuk-table__cell">{{ i18n.tribunalView.activities.dailyLiving[activity.activity].scores[activity.selection_key].score }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <h2 class="govuk-heading-m">Mobility activities and descriptors the tribunal considers to apply</h2>
+                    <table class="govuk-table">
+                        <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th class="govuk-table__header">Activity</th>
+                            <th class="govuk-table__header">Descriptor</th>
+                            <th class="govuk-table__header">Points</th>
+                        </tr>
+                        </thead>
+                        <tbody class="govuk-table__body">
+                            {% for activity in pdfSummary.decision.activities.mobility %}
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell">{{ i18n.tribunalView.activities.mobility[activity.activity].name }}</td>
+                                    <td class="govuk-table__cell">{{ i18n.tribunalView.activities.mobility[activity.activity].scores[activity.selection_key].text | raw }}</td>
+                                    <td class="govuk-table__cell">{{ i18n.tribunalView.activities.mobility[activity.activity].scores[activity.selection_key].score }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

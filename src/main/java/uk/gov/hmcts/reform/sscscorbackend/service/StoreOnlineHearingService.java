@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscscorbackend.service;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -31,7 +32,7 @@ public class StoreOnlineHearingService {
                                      PdfSummaryBuilder pdfSummaryBuilder,
                                      EvidenceUploadService evidenceUploadService,
                                      SscsPdfService sscsPdfService,
-                                     PdfService pdfService) {
+                                     @Qualifier("QuestionAnswerPdfService") PdfService pdfService) {
         this.cohService = cohService;
         this.idamService = idamService;
         this.ccdService = ccdService;

@@ -106,7 +106,7 @@ public class OnlineHearingService {
                 .orElse(null);
     }
 
-    private Optional<OnlineHearing> loadOnlineHearingFromCoh(SscsCaseDetails sscsCaseDeails) {
+    public Optional<OnlineHearing> loadOnlineHearingFromCoh(SscsCaseDetails sscsCaseDeails) {
         CohOnlineHearings cohOnlineHearings = cohClient.getOnlineHearing(sscsCaseDeails.getId());
 
         return cohOnlineHearings.getOnlineHearings().stream()
