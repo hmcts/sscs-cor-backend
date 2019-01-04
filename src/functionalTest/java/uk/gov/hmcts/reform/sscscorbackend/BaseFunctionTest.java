@@ -106,6 +106,10 @@ public abstract class BaseFunctionTest {
     }
 
     protected void resolveHearing(String hearingId, String caseId) throws IOException {
-        sscsCorBackendRequests.triggerResolve(hearingId, caseId);
+        sscsCorBackendRequests.cohHearingResolved(hearingId, caseId);
+    }
+
+    protected void decisionIssued(String hearingId, String caseId) throws IOException {
+        sscsCorBackendRequests.cohDecisionIssued(hearingId, caseId);
     }
 }
