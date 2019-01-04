@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscscorbackend.service;
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
 import org.apache.poi.util.IOUtils;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
@@ -11,7 +10,7 @@ import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 public class PdfService {
     private final PDFServiceClient pdfServiceClient;
     private final byte[] template;
-    private final HashMap i18n;
+    private final Map i18n;
 
     public PdfService(PDFServiceClient pdfServiceClient, String appellantTemplatePath, I18nBuilder i18nBuilder) throws IOException {
         this.pdfServiceClient = pdfServiceClient;
