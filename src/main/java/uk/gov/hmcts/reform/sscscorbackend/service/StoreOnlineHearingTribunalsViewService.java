@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 @Service
 public class StoreOnlineHearingTribunalsViewService {
 
+    public static final String TRIBUNALS_VIEW_PDF_PREFIX = "Tribunals view - ";
     private final OnlineHearingService onlineHearingService;
     private final PdfService pdfService;
     private final OnlineHearingDateReformatter onlineHearingDateReformatter;
@@ -38,10 +39,18 @@ public class StoreOnlineHearingTribunalsViewService {
     public void storeTribunalsView(Long caseId) {
         IdamTokens idamTokens = idamService.getIdamTokens();
         SscsCaseDetails caseDetails = ccdService.getByCaseId(caseId, idamTokens);
-        Optional<OnlineHearing> optioanlOnlineHearing = onlineHearingService.loadOnlineHearingFromCoh(caseDetails);
-        OnlineHearing onlineHearing = optioanlOnlineHearing.orElseThrow(() -> new IllegalArgumentException("Cannot find online hearing for case id [" + caseId + "]"));
-        byte[] pdfBytes = pdfService.createPdf(onlineHearingDateReformatter.getReformattedOnlineHearing(onlineHearing));
-        SscsCaseData caseData = caseDetails.getData();
-        sscsPdfService.mergeDocIntoCcd("Tribunals view - " + caseData.getCaseReference() + ".pdf", pdfBytes, caseId, caseData, idamTokens);
+        if (doesNotHaveATribunalView(caseDetails)) {
+            Optional<OnlineHearing> optioanlOnlineHearing = onlineHearingService.loadOnlineHearingFromCoh(caseDetails);
+            OnlineHearing onlineHearing = optioanlOnlineHearing.orElseThrow(() -> new IllegalArgumentException("Cannot find online hearing for case id [" + caseId + "]"));
+            byte[] pdfBytes = pdfService.createPdf(onlineHearingDateReformatter.getReformattedOnlineHearing(onlineHearing));
+            SscsCaseData caseData = caseDetails.getData();
+            sscsPdfService.mergeDocIntoCcd(TRIBUNALS_VIEW_PDF_PREFIX + caseData.getCaseReference() + ".pdf", pdfBytes, caseId, caseData, idamTokens);
+        }
+    }
+
+    private boolean doesNotHaveATribunalView(SscsCaseDetails caseDetails) {
+        return caseDetails.getData().getSscsDocument().stream().noneMatch(
+                sscsDocument -> sscsDocument.getValue().getDocumentFileName().startsWith(TRIBUNALS_VIEW_PDF_PREFIX)
+        );
     }
 }
