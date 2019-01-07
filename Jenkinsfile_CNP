@@ -29,7 +29,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 withPipeline(type, product, component) {
     setVaultName('sscs')
     loadVaultSecrets(secrets)
-    onPR { enableDockerBuild() }
+    enableDockerBuild()
     enableDeployToAKS()
     enableSlackNotifications('#sscs-tech')
 }
