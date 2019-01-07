@@ -49,10 +49,13 @@ public class OnlineHearingController {
         return ResponseEntity.ok(onlineHearingId);
     }
 
-    @ApiOperation(value = "Store online hearing details in CDM",
-            notes = "Gets the details of the online hearing, e.g. the questions and answers, " +
-                    "writes them into a pdf and attaches the pdf to the case in Core Data " +
-                    "Management. This will get triggered by a COH event"
+    @ApiOperation(value = "Handle COH events",
+            notes = "Currently we need to handle two types of events. The " +
+                    "continuous_online_hearing_relisted to get the details of " +
+                    "the online hearing, e.g. the questions and answers, write "+
+                    "them into a pdf and attach the pdf to the case in CCD. The " +
+                    "decision_issued to store the tribunals view as a pdf in CCD " +
+                    "then send an email to the appellant."
     )
     @PostMapping(value = "/notify/onlinehearing", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> catchCohEvent(@RequestBody CohEvent request) {
