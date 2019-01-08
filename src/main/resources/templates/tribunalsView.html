@@ -61,7 +61,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <div id="appeal-details">
-                <h1>Tribunal's view</h1>
+                <h1>Read the tribunal's view on your appeal</h1>
                 <h2 class="govuk-heading-m">
                     <span id="appellant-name">{{ pdfSummary.appellant_name }}</span>
                 </h2>
@@ -80,12 +80,11 @@
         <div class="govuk-grid-column-two-thirds">
             <div id="decision">
                 <div id="decision-outcome" class="panel-blue">
-                    <p>The tribunal have considered all the information submitted by you and DWP.</p>
                     <p>
                         {% if pdfSummary.decision.end_date is not empty %}
-                            Their view is that you’re entitled to PIP at the rate below from {{ pdfSummary.decision.start_date }} until {{ pdfSummary.decision.end_date }}.
+                            You are entitled to PIP at the rate below from {{ pdfSummary.decision.start_date }} until {{ pdfSummary.decision.end_date }}.
                         {% else %}
-                            Their view is that you’re entitled to PIP at the rate below from {{ pdfSummary.decision.start_date }}.
+                            You are entitled to PIP at the rate below from {{ pdfSummary.decision.start_date }}.
                         {% endif %}
                     </p>
 
@@ -123,11 +122,11 @@
                     </table></p>
                     <p>
                         {% if pdfSummary.decision.decision_rates.compared_to_dwp == 'Higher' %}
-                            This is the same as DWP initially awarded you.
+                            This is more than DWP initially awarded you.
                         {% elseif pdfSummary.decision.decision_rates.compared_to_dwp == 'Same' %}
                             This is the same as DWP initially awarded you.
                         {% elseif pdfSummary.decision.decision_rates.compared_to_dwp == 'Lower' %}
-                            This is lower than DWP initially awarded you.
+                            This is less than DWP initially awarded you.
                         {% endif %}
                     </p>
                 </div>
