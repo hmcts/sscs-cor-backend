@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend;
+package uk.gov.hmcts.reform.sscscorbackend.stubs;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.lang.String.valueOf;
@@ -7,7 +7,6 @@ import static java.util.stream.Collectors.joining;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
 
 import com.github.tomakehurst.wiremock.matching.RegexPattern;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -101,27 +100,27 @@ public class CohStub extends BaseStub {
             "        }";
 
     private static final String onlineHearingJson = "{\n" +
-                    "    \"online_hearing_id\": \"{online_hearing_id}\",\n" +
-                    "    \"case_id\": \"{case_id}\",\n" +
-                    "    \"start_date\": \"2018-08-15T12:57:07Z\",\n" +
-                    "    \"panel\": [\n" +
-                    "        {\n" +
-                    "            \"name\": \"John Dead\"\n" +
-                    "        }\n" +
-                    "    ],\n" +
-                    "    \"current_state\": {\n" +
-                    "        \"state_name\": \"continuous_online_hearing_started\",\n" +
-                    "        \"state_desc\": \"Continuous Online Hearing Started\",\n" +
-                    "        \"state_datetime\": \"2018-08-20T16:17:06Z\"\n" +
-                    "    },\n" +
-                    "    \"history\": [\n" +
-                    "        {\n" +
-                    "            \"state_name\": \"continuous_online_hearing_started\",\n" +
-                    "            \"state_desc\": \"Continuous Online Hearing Started\",\n" +
-                    "            \"state_datetime\": \"2018-08-20T16:17:06Z\"\n" +
-                    "        }\n" +
-                    "    ]\n" +
-                    "}";
+            "    \"online_hearing_id\": \"{online_hearing_id}\",\n" +
+            "    \"case_id\": \"{case_id}\",\n" +
+            "    \"start_date\": \"2018-08-15T12:57:07Z\",\n" +
+            "    \"panel\": [\n" +
+            "        {\n" +
+            "            \"name\": \"John Dead\"\n" +
+            "        }\n" +
+            "    ],\n" +
+            "    \"current_state\": {\n" +
+            "        \"state_name\": \"continuous_online_hearing_started\",\n" +
+            "        \"state_desc\": \"Continuous Online Hearing Started\",\n" +
+            "        \"state_datetime\": \"2018-08-20T16:17:06Z\"\n" +
+            "    },\n" +
+            "    \"history\": [\n" +
+            "        {\n" +
+            "            \"state_name\": \"continuous_online_hearing_started\",\n" +
+            "            \"state_desc\": \"Continuous Online Hearing Started\",\n" +
+            "            \"state_datetime\": \"2018-08-20T16:17:06Z\"\n" +
+            "        }\n" +
+            "    ]\n" +
+            "}";
 
     private static final String onlineHearingsJson = "{\n" +
             "    \"online_hearings\": [\n" +
@@ -319,9 +318,9 @@ public class CohStub extends BaseStub {
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
                 .withRequestBody(equalToJson("{\"decision_reply\":\"" + reply + "\", \"decision_reply_reason\":\"" + reason + "\"}"))
                 .willReturn(status(201)
-                    .withBody("{\n" +
-                            "  \"decision_reply_id\": \"123\"\n" +
-                            "}")
+                        .withBody("{\n" +
+                                "  \"decision_reply_id\": \"123\"\n" +
+                                "}")
                 )
         );
     }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.sscscorbackend.stubs.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -22,6 +23,8 @@ public abstract class BaseIntegrationTest {
     private String idamUrl;
     @Value("${core_case_data.api.url}")
     private String ccdUrl;
+    @Value("${notifications.url}")
+    private String notificationsUrl;
 
     @Value("${idam.oauth2.redirectUrl}")
     private String idamRedirectUrl;
@@ -31,6 +34,8 @@ public abstract class BaseIntegrationTest {
     private String clientSecret;
     @Value("${document_management.url}")
     private String documentStoreUrl;
+    @Value("${pdf.api.url}")
+    private String pdfServiceUrl;
 
     @LocalServerPort
     protected int applicationPort;
@@ -40,6 +45,8 @@ public abstract class BaseIntegrationTest {
     protected CcdStub ccdStub;
     protected IdamStub idamStub;
     protected DocumentStoreStub documentStoreStub;
+    protected PdfServiceStub pdfServiceStub;
+    protected NotificationsStub notificationsStub;
 
     private List<BaseStub> stubs = new ArrayList<>();
 
@@ -55,6 +62,10 @@ public abstract class BaseIntegrationTest {
         stubs.add(idamStub);
         documentStoreStub = new DocumentStoreStub(documentStoreUrl);
         stubs.add(documentStoreStub);
+        notificationsStub = new NotificationsStub(notificationsUrl);
+        stubs.add(notificationsStub);
+        pdfServiceStub = new PdfServiceStub(pdfServiceUrl);
+        stubs.add(pdfServiceStub);
     }
 
     @After

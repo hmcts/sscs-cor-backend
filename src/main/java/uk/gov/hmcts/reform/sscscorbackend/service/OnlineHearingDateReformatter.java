@@ -13,8 +13,7 @@ public class OnlineHearingDateReformatter {
     public OnlineHearing getReformattedOnlineHearing(OnlineHearing onlineHearing) {
         Decision originalDecision = onlineHearing.getDecision();
         String reformattedStartDate = reformatDate(originalDecision.getStartDate());
-        String reformattedEndDate = isNotBlank(originalDecision.getEndDate())
-                ? reformatDate(originalDecision.getEndDate()) : originalDecision.getEndDate();
+        String reformattedEndDate = reformatDate(originalDecision.getEndDate());
 
         Decision newDecision = new Decision(
                 originalDecision.getDecisionState(),
@@ -35,7 +34,10 @@ public class OnlineHearingDateReformatter {
         );
     }
 
-    private String reformatDate(String startDateString) {
-        return LocalDate.parse(startDateString).format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+    private String reformatDate(String dateString) {
+        if (isNotBlank(dateString)) {
+            return LocalDate.parse(dateString).format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        }
+        return dateString;
     }
 }

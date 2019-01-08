@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend;
+package uk.gov.hmcts.reform.sscscorbackend.stubs;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 

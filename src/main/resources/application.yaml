@@ -12,6 +12,9 @@ spring:
 coh:
   url: ${COH_URL:http://localhost:8081}
 
+notifications:
+  url: ${NOTIFICATIONS_URL:http://localhost:8082}
+
 idam:
   url: ${IDAM_URL:http://localhost:4501}
   s2s-auth:
