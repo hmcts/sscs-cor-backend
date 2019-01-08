@@ -14,4 +14,13 @@ public class CreateHearingPdfTest extends BaseFunctionTest {
         //now trigger our endpoint
         resolveHearing(onlineHearing.getHearingId(), onlineHearing.getCaseId());
     }
+
+    @Test
+    public void recordRejectedResponse() throws IOException, InterruptedException {
+        OnlineHearing onlineHearing = createHearingWithQuestion(true);
+        answerQuestion(onlineHearing.getHearingId(), onlineHearing.getQuestionId());
+        createAndIssueDecision(onlineHearing.getHearingId(), onlineHearing.getCaseId());
+
+        decisionIssued(onlineHearing.getHearingId(), onlineHearing.getCaseId());
+    }
 }
