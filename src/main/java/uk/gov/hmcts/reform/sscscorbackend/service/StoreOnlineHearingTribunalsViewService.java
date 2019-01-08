@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -49,8 +51,8 @@ public class StoreOnlineHearingTribunalsViewService {
     }
 
     private boolean doesNotHaveATribunalView(SscsCaseDetails caseDetails) {
-        return caseDetails.getData().getSscsDocument().stream().noneMatch(
-                sscsDocument -> sscsDocument.getValue().getDocumentFileName().startsWith(TRIBUNALS_VIEW_PDF_PREFIX)
-        );
+        List<SscsDocument> sscsDocuments = caseDetails.getData().getSscsDocument();
+        return sscsDocuments == null || sscsDocuments.stream()
+                .noneMatch(sscsDocument -> sscsDocument.getValue().getDocumentFileName().startsWith(TRIBUNALS_VIEW_PDF_PREFIX));
     }
 }

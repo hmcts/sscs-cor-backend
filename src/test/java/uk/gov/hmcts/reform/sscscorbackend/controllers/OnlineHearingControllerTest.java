@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CohEvent;
+import uk.gov.hmcts.reform.sscscorbackend.service.NotificationsService;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
@@ -21,12 +22,21 @@ public class OnlineHearingControllerTest {
     private OnlineHearingService onlineHearingService;
     private StoreOnlineHearingService storeOnlineHearingService;
     private StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService;
+    private OnlineHearingController onlineHearingController;
+    private NotificationsService notificationsService;
 
     @Before
     public void setUp() {
         onlineHearingService = mock(OnlineHearingService.class);
         storeOnlineHearingService = mock(StoreOnlineHearingService.class);
         storeOnlineHearingTribunalsViewService = mock(StoreOnlineHearingTribunalsViewService.class);
+        notificationsService = mock(NotificationsService.class);
+
+        onlineHearingController = new OnlineHearingController(
+                onlineHearingService,
+                storeOnlineHearingService,
+                storeOnlineHearingTribunalsViewService,
+                notificationsService);
     }
 
     @Test
@@ -38,8 +48,6 @@ public class OnlineHearingControllerTest {
         CcdEvent ccdEvent = someCcdEvent(caseId);
 
         when(onlineHearingService.createOnlineHearing(caseId)).thenReturn(hearingId);
-
-        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService, storeOnlineHearingService, storeOnlineHearingTribunalsViewService);
 
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchEvent(ccdEvent);
 
@@ -57,8 +65,6 @@ public class OnlineHearingControllerTest {
 
         when(onlineHearingService.createOnlineHearing(caseId)).thenReturn(hearingId);
 
-        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService, storeOnlineHearingService, storeOnlineHearingTribunalsViewService);
-
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchEvent(ccdEvent);
 
         assertThat(stringResponseEntity.getStatusCode(), is(HttpStatus.BAD_REQUEST));
@@ -71,8 +77,6 @@ public class OnlineHearingControllerTest {
         String caseId = "caseId";
 
         CohEvent cohEvent = someCohEvent(caseId, hearingId, "continuous_online_hearing_resolved");
-
-        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService, storeOnlineHearingService, storeOnlineHearingTribunalsViewService);
 
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchCohEvent(cohEvent);
 
@@ -89,8 +93,6 @@ public class OnlineHearingControllerTest {
 
         CohEvent cohEvent = someCohEvent(caseId, hearingId, "continuous_online_hearing_resolved");
 
-        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService, storeOnlineHearingService, storeOnlineHearingTribunalsViewService);
-
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchCohEvent(cohEvent);
 
         assertThat(stringResponseEntity.getStatusCode(), is(HttpStatus.BAD_REQUEST));
@@ -104,8 +106,6 @@ public class OnlineHearingControllerTest {
         String caseId = "caseId";
 
         CohEvent cohEvent = someCohEvent(caseId, hearingId, null);
-
-        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService, storeOnlineHearingService, storeOnlineHearingTribunalsViewService);
 
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchCohEvent(cohEvent);
 
@@ -121,8 +121,6 @@ public class OnlineHearingControllerTest {
 
         CohEvent cohEvent = someCohEvent(caseId, hearingId, "continuous_online_hearing_started");
 
-        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService, storeOnlineHearingService, storeOnlineHearingTribunalsViewService);
-
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchCohEvent(cohEvent);
 
         assertThat(stringResponseEntity.getStatusCode(), is(HttpStatus.BAD_REQUEST));
@@ -136,13 +134,11 @@ public class OnlineHearingControllerTest {
 
         CohEvent cohEvent = someCohEvent(caseId, hearingId, "decision_issued");
 
-        OnlineHearingController onlineHearingController = new OnlineHearingController(onlineHearingService, storeOnlineHearingService, storeOnlineHearingTribunalsViewService);
-
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchCohEvent(cohEvent);
 
         assertThat(stringResponseEntity.getStatusCode(), is(HttpStatus.OK));
         assertThat(stringResponseEntity.getBody(), is(""));
         verify(storeOnlineHearingTribunalsViewService).storeTribunalsView(Long.valueOf(caseId));
+        verify(notificationsService).send(cohEvent);
     }
-
 }

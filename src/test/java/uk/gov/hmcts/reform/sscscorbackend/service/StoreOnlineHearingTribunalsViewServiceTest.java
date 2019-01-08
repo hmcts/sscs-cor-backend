@@ -43,7 +43,13 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
         ccdService = mock(CcdService.class);
         idamTokens = mock(IdamTokens.class);
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
-        storeOnlineHearingTribunalsViewService = new StoreOnlineHearingTribunalsViewService(onlineHearingService, pdfService, onlineHearingDateReformatter, sscsPdfService, ccdService, idamService);
+        storeOnlineHearingTribunalsViewService = new StoreOnlineHearingTribunalsViewService(
+                onlineHearingService,
+                pdfService,
+                onlineHearingDateReformatter,
+                sscsPdfService,
+                ccdService,
+                idamService);
         sscsCaseDetails = mock(SscsCaseDetails.class);
         sscsCaseData = mock(SscsCaseData.class);
         when(sscsCaseDetails.getData()).thenReturn(sscsCaseData);

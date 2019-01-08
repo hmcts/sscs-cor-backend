@@ -47,6 +47,7 @@ locals {
   idam_url  = "https://preprod-idamapi.reform.hmcts.net:3511"
   documentManagementUrl = "http://dm-store-${local.local_env}.service.${local.local_ase}.internal"
   pdfService    = "http://cmc-pdf-service-${local.local_env}.service.${local.local_ase}.internal"
+  notificationsUrl = "http://sscs-tya-notif-${local.local_env}-staging.service.${local.local_ase}.internal"
 
   azureVaultName = "sscs-${local.local_env}"
 
@@ -83,5 +84,6 @@ module "sscs-core-backend" {
 
     DOCUMENT_MANAGEMENT_URL = "${local.documentManagementUrl}"
     PDF_API_URL = "${local.pdfService}"
+    NOTIFICATIONS_URL = "${local.notificationsUrl}"
   }
 }
