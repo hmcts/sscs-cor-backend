@@ -50,8 +50,8 @@ public class DecisionExtractor {
 
         String startDateString = getDate(decisionJson, "Start");
 
-        String approveDraftConsent = decisionJson.getString("approveDraftConsent");
-        String endDateString = approveDraftConsent.equalsIgnoreCase("indefinite") ? null : getDate(decisionJson, "End");
+        String endDateRadio = decisionJson.getString("endDateRadio");
+        String endDateString = endDateRadio.equalsIgnoreCase("indefinite") ? null : getDate(decisionJson, "End");
         DecisionRates decisionRates = getDecisionRates(decisionJson);
         String reason = decisionJson.getString("reasonsTribunalView");
         Activities activities = getActivities(decisionJson);
