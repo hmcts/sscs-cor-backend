@@ -26,7 +26,7 @@ public class DecisionExtractorTest {
             "      \\\"awardEndDateDay\\\":\\\"11\\\",\n" +
             "      \\\"awardEndDateMonth\\\":\\\"12\\\",\n" +
             "      \\\"awardEndDateYear\\\":\\\"2018\\\",\n" +
-            "      \\\"approveDraftConsent\\\":\\\"endDate\\\",\n" +
+            "      \\\"endDateRadio\\\":\\\"endDate\\\",\n" +
             "      \\\"preparingFood\\\":false,\n" +
             "      \\\"takingNutrition\\\":false,\n" +
             "      \\\"managingTherapy\\\":false,\n" +
@@ -65,7 +65,7 @@ public class DecisionExtractorTest {
             "      \\\"awardEndDateDay\\\":\\\"null\\\",\n" +
             "      \\\"awardEndDateMonth\\\":\\\"null\\\",\n" +
             "      \\\"awardEndDateYear\\\":\\\"null\\\",\n" +
-            "      \\\"approveDraftConsent\\\":\\\"indefinite\\\",\n" +
+            "      \\\"endDateRadio\\\":\\\"indefinite\\\",\n" +
             "      \\\"preparingFood\\\":false,\n" +
             "      \\\"takingNutrition\\\":false,\n" +
             "      \\\"managingTherapy\\\":false,\n" +
