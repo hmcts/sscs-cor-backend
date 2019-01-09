@@ -1,14 +1,16 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static java.util.Collections.singletonList;
+import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService.TRIBUNALS_VIEW_PDF_PREFIX;
 
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -41,7 +43,13 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
         ccdService = mock(CcdService.class);
         idamTokens = mock(IdamTokens.class);
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
-        storeOnlineHearingTribunalsViewService = new StoreOnlineHearingTribunalsViewService(onlineHearingService, pdfService, onlineHearingDateReformatter, sscsPdfService, ccdService, idamService);
+        storeOnlineHearingTribunalsViewService = new StoreOnlineHearingTribunalsViewService(
+                onlineHearingService,
+                pdfService,
+                onlineHearingDateReformatter,
+                sscsPdfService,
+                ccdService,
+                idamService);
         sscsCaseDetails = mock(SscsCaseDetails.class);
         sscsCaseData = mock(SscsCaseData.class);
         when(sscsCaseDetails.getData()).thenReturn(sscsCaseData);
@@ -70,4 +78,14 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
         verify(sscsPdfService).mergeDocIntoCcd(fileName, pdfBytes, someCaseId, sscsCaseData, idamTokens);
     }
 
+    @Test
+    public void doNotStorePdfIfCaseAlreadyHasATribunalsView() {
+        when(sscsCaseData.getSscsDocument()).thenReturn(singletonList(SscsDocument.builder().value(
+                SscsDocumentDetails.builder().documentFileName(TRIBUNALS_VIEW_PDF_PREFIX + someCaseId + ".pdf").build()
+        ).build()));
+
+        storeOnlineHearingTribunalsViewService.storeTribunalsView(someCaseId);
+
+        verifyZeroInteractions(sscsPdfService);
+    }
 }

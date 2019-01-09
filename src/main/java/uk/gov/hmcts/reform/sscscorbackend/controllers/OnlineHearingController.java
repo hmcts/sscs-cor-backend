@@ -9,9 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CohEvent;
-import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
-import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
-import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
+import uk.gov.hmcts.reform.sscscorbackend.service.*;
 
 
 @Slf4j
@@ -21,13 +19,16 @@ public class OnlineHearingController {
     private final OnlineHearingService onlineHearingService;
     private final StoreOnlineHearingService storeOnlineHearingService;
     private final StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService;
+    private final NotificationsService notificationsService;
+
 
     public OnlineHearingController(@Autowired OnlineHearingService onlineHearingService,
                                    @Autowired StoreOnlineHearingService storeOnlineHearingService,
-                                   @Autowired StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService) {
+                                   @Autowired StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService, NotificationsService notificationsService) {
         this.onlineHearingService = onlineHearingService;
         this.storeOnlineHearingService = storeOnlineHearingService;
         this.storeOnlineHearingTribunalsViewService = storeOnlineHearingTribunalsViewService;
+        this.notificationsService = notificationsService;
     }
 
     @ApiOperation(value = "Create online hearing",
@@ -49,17 +50,20 @@ public class OnlineHearingController {
         return ResponseEntity.ok(onlineHearingId);
     }
 
-    @ApiOperation(value = "Store online hearing details in CDM",
-            notes = "Gets the details of the online hearing, e.g. the questions and answers, " +
-                    "writes them into a pdf and attaches the pdf to the case in Core Data " +
-                    "Management. This will get triggered by a COH event"
+    @ApiOperation(value = "Handle COH events",
+            notes = "Currently we need to handle two types of events. The " +
+                    "continuous_online_hearing_relisted to get the details of " +
+                    "the online hearing, e.g. the questions and answers, write " +
+                    "them into a pdf and attach the pdf to the case in CCD. The " +
+                    "decision_issued to store the tribunals view as a pdf in CCD " +
+                    "then send an email to the appellant."
     )
     @PostMapping(value = "/notify/onlinehearing", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> catchCohEvent(@RequestBody CohEvent request) {
         if (request == null
                 || request.getCaseId() == null
                 || request.getOnlineHearingId() == null
-                || request.getNotificationEventType() == null) {
+                || request.getEventType() == null) {
             //throw a bad request error
             return ResponseEntity.badRequest().build();
         }
@@ -69,8 +73,9 @@ public class OnlineHearingController {
         log.info("Received event for storing online hearing for case {} and hearing {} ...",
                 caseId, onlineHearingId);
 
-        if (request.getNotificationEventType().equalsIgnoreCase("decision_issued")) {
+        if (request.getEventType().equalsIgnoreCase("decision_issued")) {
             storeOnlineHearingTribunalsViewService.storeTribunalsView(Long.valueOf(caseId));
+            notificationsService.send(request);
         } else {
             storeOnlineHearingService.storeOnlineHearingInCcd(onlineHearingId, caseId);
         }

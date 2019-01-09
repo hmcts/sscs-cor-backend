@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend;
+package uk.gov.hmcts.reform.sscscorbackend.stubs;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -18,7 +18,7 @@ public class DocumentStoreStub extends BaseStub {
             "        \"_links\":{  \n" +
             "          \"self\":{  \n" +
             "            \"href\":\"http://example.com/someDocument\"\n" +
-            "          },\n" +
+            "          }\n" +
             "        }\n" +
             "      }" +
             "    ]" +

@@ -52,6 +52,7 @@ tasks.withType(JavaCompile) {
 task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
+  maxParallelForks = Runtime.runtime.availableProcessors()
 }
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {

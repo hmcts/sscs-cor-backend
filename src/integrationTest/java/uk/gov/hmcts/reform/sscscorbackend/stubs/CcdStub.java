@@ -1,12 +1,15 @@
-package uk.gov.hmcts.reform.sscscorbackend;
+package uk.gov.hmcts.reform.sscscorbackend.stubs;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.net.URLEncoder.encode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.matching.RegexPattern;
 import java.io.UnsupportedEncodingException;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 
 public class CcdStub extends BaseStub {
 
@@ -23,8 +26,10 @@ public class CcdStub extends BaseStub {
             "          \"name\": {\n" +
             "            \"firstName\": \"{firstName}\",\n" +
             "            \"lastName\": \"{lastName}\"\n" +
-            "          }\n" +
-            "        }\n" +
+            "          },\n" +
+            "          \"identity\": { \"nino\": \"nino\" }\n" +
+            "        },\n" +
+            "        \"benefitType\": { \"code\": \"PIP\" }\n" +
             "      },\n" +
             "      \"corDocument\": [\n" +
             "        {\n" +
@@ -53,16 +58,24 @@ public class CcdStub extends BaseStub {
         wireMock.stubFor(get(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases?" +
                         "case.subscriptions.appellantSubscription.email=" + encode(email, UTF_8.name())
                 ))
-                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
-                .willReturn(okJson(caseDetailsJson))
+                        .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                        .willReturn(okJson(caseDetailsJson))
         );
     }
 
     public void stubFindCaseByCaseId(Long caseId, String evidenceQuestionId, String evidenceFileName, String evidenceCreatedDate, String evidenceUrl) {
         wireMock.stubFor(get(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId))
-                        .withHeader("ServiceAuthorization", new RegexPattern(".*"))
-                        .willReturn(okJson(createCaseDetails(caseId, "caseRef", "firstName", "lastName", evidenceQuestionId, evidenceFileName, evidenceCreatedDate, evidenceUrl)))
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .willReturn(okJson(createCaseDetails(caseId, "caseRef", "firstName", "lastName", evidenceQuestionId, evidenceFileName, evidenceCreatedDate, evidenceUrl)))
         );
+    }
+
+    public void stubUpdateCase(Long caseId) throws JsonProcessingException {
+        wireMock.stubFor(get("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/event-triggers/uploadDocument/token")
+                .willReturn(okJson(new ObjectMapper().writeValueAsString(StartEventResponse.builder().build()))));
+
+        wireMock.stubFor(post("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true")
+                .willReturn(okJson(new ObjectMapper().writeValueAsString(CaseDetails.builder().build()))));
     }
 
     private String createCaseDetails(Long caseId, String caseReference, String firstName, String lastName, String evidenceQuestionId, String evidenceFileName, String evidenceCreatedDate, String evidenceUrl) {
