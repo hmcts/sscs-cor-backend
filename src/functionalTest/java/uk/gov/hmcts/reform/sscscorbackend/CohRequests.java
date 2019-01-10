@@ -133,7 +133,9 @@ public class CohRequests {
                         cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/questionrounds/1",
                         "question_round_state.state_name"
                 ).getJSONObject("question_round_state").getString("state_name");
-                return roundState.equals("question_issued");
+                boolean questionIssued = roundState.equals("question_issued");
+                System.out.println("Question round issued [" + questionIssued + "]");
+                return questionIssued;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -148,7 +150,9 @@ public class CohRequests {
                         cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/decisions",
                         "decision_state.state_name"
                 ).getJSONObject("decision_state").getString("state_name");
-                return decisionState.equals("decision_issued");
+                boolean decisionIssued = decisionState.equals("decision_issued");
+                System.out.println("Decision issued [" + decisionIssued + "]");
+                return decisionIssued;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

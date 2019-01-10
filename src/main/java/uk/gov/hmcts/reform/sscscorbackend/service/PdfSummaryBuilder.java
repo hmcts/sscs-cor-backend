@@ -7,6 +7,7 @@ import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.sscscorbackend.service.DecodeJsonUtil.decodeStringWithWhitespace;
 
 import java.util.Comparator;
 import java.util.List;
@@ -40,10 +41,6 @@ public class PdfSummaryBuilder {
             return decodeStringWithWhitespace(relisting.getReason());
         }
         return "";
-    }
-
-    private String decodeStringWithWhitespace(String value) {
-        return value.replaceAll("\\\\n", "\n");
     }
 
     private List<PdfQuestionRound> buildQuestionRounds(CohConversations conversations) {
@@ -89,7 +86,7 @@ public class PdfSummaryBuilder {
     private String getAnswer(CohQuestion question) {
         return question.getAnswer()
                 .map(CohAnswer::getAnswerText)
-                .map(this::decodeStringWithWhitespace)
+                .map(DecodeJsonUtil::decodeStringWithWhitespace)
                 .orElse("");
     }
 
