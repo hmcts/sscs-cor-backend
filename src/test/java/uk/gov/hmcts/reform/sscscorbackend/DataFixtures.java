@@ -126,6 +126,7 @@ public class DataFixtures {
 
     public static PdfSummary somePdfSummary() {
         return new PdfSummary(somePdfAppealDetails(),
+                "relisting reason",
                 singletonList(
                         new PdfQuestionRound(singletonList(
                                 new PdfQuestion("title", "body", "answer", "issueDate", "submittedDate")

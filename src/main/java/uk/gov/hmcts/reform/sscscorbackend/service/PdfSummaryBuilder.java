@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohAnswer;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohConversations;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestion;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohRelisting;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestionRound;
@@ -28,8 +29,21 @@ public class PdfSummaryBuilder {
     public PdfSummary buildPdfSummary(CohConversations conversations, PdfAppealDetails appealDetails) {
         return new PdfSummary(
                 appealDetails,
+                getRelistingReason(conversations),
                 buildQuestionRounds(conversations)
         );
+    }
+
+    private String getRelistingReason(CohConversations conversations) {
+        CohRelisting relisting = conversations.getConversation().getRelisting();
+        if (relisting != null) {
+            return decodeStringWithWhitespace(relisting.getReason());
+        }
+        return "";
+    }
+
+    private String decodeStringWithWhitespace(String value) {
+        return value.replaceAll("\\\\n", "\n");
     }
 
     private List<PdfQuestionRound> buildQuestionRounds(CohConversations conversations) {
@@ -65,7 +79,7 @@ public class PdfSummaryBuilder {
     private Function<CohQuestion, PdfQuestion> createPdfQuestion() {
         return question -> new PdfQuestion(
                 question.getQuestionHeaderText(),
-                question.getQuestionBodyText(),
+                decodeStringWithWhitespace(question.getQuestionBodyText()),
                 getAnswer(question),
                 formatDate(question.getIssueDate()),
                 formatDate(question.getSubmittedDate())
@@ -75,6 +89,7 @@ public class PdfSummaryBuilder {
     private String getAnswer(CohQuestion question) {
         return question.getAnswer()
                 .map(CohAnswer::getAnswerText)
+                .map(this::decodeStringWithWhitespace)
                 .orElse("");
     }
 
