@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
+import feign.Logger;
 import java.io.IOException;
 import java.util.Properties;
 import org.springframework.beans.factory.annotation.Value;
@@ -95,5 +96,10 @@ public class Application {
                                                 @Value("${preliminary_view.html.template.path}") String appellantTemplatePath,
                                                 I18nBuilder i18nBuilder) throws IOException {
         return new PdfService(pdfServiceClient, appellantTemplatePath, i18nBuilder);
+    }
+
+    @Bean
+    public Logger.Level feignLoggerLevel() {
+        return Logger.Level.FULL;
     }
 }
