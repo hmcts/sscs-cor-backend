@@ -14,4 +14,4 @@ data:
   IDAM_SSCS_URL: "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
   DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
   PDF_API_URL: "http://cmc-pdf-service-aat.service.core-compute-aat.internal"
-  NOTIFICATIONS_URL: "http://sscs-tya-notif-aat-staging.service.core-compute-aat.internal"
+  NOTIFICATIONS_API_URL: "http://sscs-tya-notif-aat.service.core-compute-aat.internal"
