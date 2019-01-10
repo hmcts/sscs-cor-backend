@@ -153,6 +153,10 @@
                         </dd>
                     </div>
                 </dl>
+                <div class="govuk-check-your-answers">
+                    <h2 class="heading-medium">Relisting reason</h2>
+                    <p class="preserve-format">{{ pdfSummary.relistingReason }}</p>
+                </div>
 
                 {% for question_round in pdfSummary.questionRounds %}
                     {% for questionReference in question_round.questions %}
