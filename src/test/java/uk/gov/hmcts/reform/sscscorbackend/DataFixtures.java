@@ -11,15 +11,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseData;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CaseDetails;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CohEvent;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestionRound;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
-import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseData;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseDetails;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.*;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
 
 
 public class DataFixtures {

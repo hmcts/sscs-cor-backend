@@ -5,10 +5,15 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.unanswered;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.*;
 
 @Service
 public class QuestionService {

@@ -13,8 +13,8 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionReference;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohQuestionReference;
 
 public class QuestionTest extends BaseIntegrationTest {
 

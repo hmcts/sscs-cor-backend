@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscscorbackend.service.DecodeJsonUtil.decodeStringWithWhitespace;
+import static uk.gov.hmcts.reform.sscscorbackend.service.pdf.DecodeJsonUtil.decodeStringWithWhitespace;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

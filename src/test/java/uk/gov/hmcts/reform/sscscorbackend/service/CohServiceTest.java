@@ -11,6 +11,8 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohClient;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
 
 public class CohServiceTest {
 

@@ -8,7 +8,7 @@ import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohAnswers;
 import io.restassured.RestAssured;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionReference;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohQuestionReference;
 
 public class ListQuestionsTest extends BaseIntegrationTest {
     @Test

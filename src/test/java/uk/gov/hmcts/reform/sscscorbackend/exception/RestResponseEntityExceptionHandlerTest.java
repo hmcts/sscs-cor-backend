@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscscorbackend.exception;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.junit.Test;

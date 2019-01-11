@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 import uk.gov.hmcts.reform.sscscorbackend.service.EvidenceUploadService;
-import uk.gov.hmcts.reform.sscscorbackend.service.documentmanagement.IllegalFileTypeException;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.IllegalFileTypeException;
 
 @RestController
 @RequestMapping("/continuous-online-hearings")

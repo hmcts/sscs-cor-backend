@@ -18,6 +18,8 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.*;
 
 public class QuestionServiceTest {
     private CohService cohService;

@@ -17,7 +17,11 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
-import uk.gov.hmcts.reform.sscscorbackend.domain.*;
+import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
+import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.DecisionExtractor;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.*;
 
 public class OnlineHearingServiceTest {
     private CohService cohService;

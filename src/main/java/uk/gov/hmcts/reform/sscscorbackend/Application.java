@@ -17,19 +17,19 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
-import uk.gov.hmcts.reform.sscscorbackend.service.I18nBuilder;
-import uk.gov.hmcts.reform.sscscorbackend.service.PdfService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.I18nBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 
 @SpringBootApplication
 @EnableCircuitBreaker
 @EnableFeignClients(basePackages =
         {
-                "uk.gov.hmcts.reform.sscscorbackend.service",
                 "uk.gov.hmcts.reform.ccd.client",
                 "uk.gov.hmcts.reform.sscs.idam",
                 "uk.gov.hmcts.reform.authorisation",
-                "uk.gov.hmcts.reform.sscs.document"
+                "uk.gov.hmcts.reform.sscs.document",
+                "uk.gov.hmcts.reform.sscscorbackend.thirdparty"
         })
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 @ComponentScan(basePackages = {"uk.gov.hmcts.reform"})

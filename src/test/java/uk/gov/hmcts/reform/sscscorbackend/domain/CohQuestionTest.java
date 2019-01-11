@@ -9,6 +9,9 @@ import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohQuestion;
 import java.util.Optional;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohAnswer;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohQuestion;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohState;
 
 public class CohQuestionTest {
     @Test
