@@ -10,12 +10,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CcdEvent;
-import uk.gov.hmcts.reform.sscscorbackend.domain.onlinehearing.CohEvent;
-import uk.gov.hmcts.reform.sscscorbackend.service.NotificationsService;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
 
 
 public class OnlineHearingControllerTest {

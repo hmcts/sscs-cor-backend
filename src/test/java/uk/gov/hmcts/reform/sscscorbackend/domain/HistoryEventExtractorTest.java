@@ -6,11 +6,12 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohState;
-import static uk.gov.hmcts.reform.sscscorbackend.domain.HistoryEventExtractor.getStateDate;
+import static uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.HistoryEventExtractor.getStateDate;
 
 import java.util.List;
 import java.util.Optional;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohState;
 
 public class HistoryEventExtractorTest {
 

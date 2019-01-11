@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 import uk.gov.hmcts.reform.sscscorbackend.service.EvidenceUploadService;
-import uk.gov.hmcts.reform.sscscorbackend.service.documentmanagement.IllegalFileTypeException;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.IllegalFileTypeException;
 
 public class EvidenceUploadControllerTest {
 

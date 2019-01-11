@@ -12,8 +12,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscscorbackend.domain.*;
-import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
+import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
+import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
+import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.DecisionExtractor;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.*;
 
 @Slf4j
 @Service

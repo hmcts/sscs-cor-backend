@@ -10,10 +10,11 @@ import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.somePdfAppealDetai
 import java.util.Collections;
 import java.util.List;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestionRound;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfSummaryBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.*;
 
 public class PdfSummaryBuilderTest {
     @Test

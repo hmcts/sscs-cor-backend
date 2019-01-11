@@ -11,9 +11,12 @@ import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohConversations;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfSummaryBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohConversations;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Slf4j
 @Service

@@ -17,7 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing.CreateOnlineHearingRequest;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CreateOnlineHearingRequest;
 
 public class CohRequests {
     private final IdamTokens idamTokens;

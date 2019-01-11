@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState;
-import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestionReference;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohQuestionReference;
 
 public class CohStub extends BaseStub {
 

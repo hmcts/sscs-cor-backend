@@ -2,10 +2,14 @@ package uk.gov.hmcts.reform.sscscorbackend.service;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.DecisionExtractor;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohDecision;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohDecisionReply;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohState;
 
 public class DecisionExtractorTest {
     private static final long caseId = 1234321L;
