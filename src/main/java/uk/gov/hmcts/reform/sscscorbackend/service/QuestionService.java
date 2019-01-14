@@ -91,6 +91,11 @@ public class QuestionService {
         }
 
         CohQuestionRound currentQuestionRound = questionRounds.getCohQuestionRound().get(currentQuestionRoundNumber - 1);
+        String currentQuestionRoundState = currentQuestionRound.getQuestionRoundState().getStateName();
+        if ("question_drafted".equals(currentQuestionRoundState) || "question_issue_pending".equals(currentQuestionRoundState)) {
+            return  QuestionRound.emptyQuestionRound();
+        }
+
         String deadlineExpiryDate = getQuestionRoundDeadlineExpiryDate(currentQuestionRound);
         int deadlineExtensionCount = currentQuestionRound.getDeadlineExtensionCount();
         List<QuestionSummary> questions = currentQuestionRound.getQuestionReferences().stream()
