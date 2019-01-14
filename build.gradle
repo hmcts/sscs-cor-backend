@@ -161,7 +161,7 @@ dependencies {
   compile group: 'commons-io', name: 'commons-io', version: '2.6'
 
   compileOnly 'org.projectlombok:lombok:1.18.4'
-  compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
+  compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.3.RELEASE'
   compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.5.0'
   compile group: 'uk.gov.hmcts.reform', name:'sscs-common', version: '0.0.127'
 
