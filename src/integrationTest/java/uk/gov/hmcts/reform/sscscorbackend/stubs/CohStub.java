@@ -52,7 +52,8 @@ public class CohStub extends BaseStub {
             "    \"question_rounds\": [\n" +
             "        {\n" +
             "            \"question_round_number\": \"1\",\n" +
-            "            \"question_references\": {question_references}\n" +
+            "            \"question_references\": {question_references},\n" +
+            "            \"question_round_state\": { \"state_name\": \"question_issued\" }\n" +
             "        }\n" +
             "    ]\n" +
             "}";

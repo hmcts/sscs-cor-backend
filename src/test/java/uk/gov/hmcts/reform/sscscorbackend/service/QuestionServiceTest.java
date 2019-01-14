@@ -92,7 +92,7 @@ public class QuestionServiceTest {
         CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(
                 new CohQuestionRound(singletonList(
                         new CohQuestionReference("someQuestionId", 1, "first question", "first question body", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), null)
-                ), 0)
+                ), 0, someCohState("question_issued"))
         ));
         QuestionSummary questionSummary = createQuestionSummary(cohQuestionRounds, 0, unanswered);
 
@@ -109,7 +109,7 @@ public class QuestionServiceTest {
         CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(
                 new CohQuestionRound(singletonList(
                         new CohQuestionReference("someQuestionId", 1, "first question", "first question body", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), null)
-                ), 0)
+                ), 0, someCohState("question_issued"))
         ));
 
         when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
@@ -139,7 +139,7 @@ public class QuestionServiceTest {
     public void getsAListOfQuestionsInTheCorrectOrderWhenTheyAreReturnedInTheIncorrectOrder() {
         CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(new CohQuestionRound(
                 asList(new CohQuestionReference("questionId2", 2, "second question", "second question body", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted")),
-                        new CohQuestionReference("questionId1", 1, "first question", "first question body", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))), 0)
+                        new CohQuestionReference("questionId1", 1, "first question", "first question body", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))), 0, someCohState("question_issued"))
         ));
         CohQuestionReference firstCohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
                 .getQuestionReferences().get(1);
@@ -160,6 +160,17 @@ public class QuestionServiceTest {
                 new QuestionSummary(secondQuestionId, secondQuestionOrdinal, secondQuestionTitle, draft)
                 )
         );
+    }
+
+    @Test
+    public void getsAnEmptyListOfQuestionsIfTheCurrentRoundHasNotBeenIssued() {
+        CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(new CohQuestionRound(
+                asList(new CohQuestionReference("questionId1", 1, "first question", "first question body", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), null)), 0, someCohState("question_drafted"))
+        ));
+        when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
+
+        assertThat(questionRound.getQuestions(), is(emptyList()));
     }
 
     @Test
