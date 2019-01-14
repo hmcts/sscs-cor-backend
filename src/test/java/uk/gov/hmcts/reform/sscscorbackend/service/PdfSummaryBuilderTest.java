@@ -3,15 +3,17 @@ package uk.gov.hmcts.reform.sscscorbackend.service;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.somePdfAppealDetails;
 
+import java.util.Collections;
 import java.util.List;
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestionRound;
+import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
 
 public class PdfSummaryBuilderTest {
     @Test
@@ -28,16 +30,19 @@ public class PdfSummaryBuilderTest {
         List<CohState> answerHistoryRound1 = singletonList(new CohState("answer_submitted", answer1AnsweredDate));
         List<CohState> answerHistoryRound2 = singletonList(new CohState("answer_submitted", answer2AnsweredDate));
 
-        CohConversations cohConversations = new CohConversations(new CohConversation(asList(
-                createCohQuestion(2, 2, historyRound2, answerHistoryRound2),
-                createCohQuestion(1, 1, historyRound1, answerHistoryRound1),
-                createCohQuestion(2, 1, historyRound2, answerHistoryRound2),
-                createCohQuestion(1, 2, historyRound1, answerHistoryRound1)
-        )));
+        CohConversations cohConversations = new CohConversations(
+                new CohConversation(asList(
+                        createCohQuestion(2, 2, historyRound2, answerHistoryRound2),
+                        createCohQuestion(1, 1, historyRound1, answerHistoryRound1),
+                        createCohQuestion(2, 1, historyRound2, answerHistoryRound2),
+                        createCohQuestion(1, 2, historyRound1, answerHistoryRound1)
+                ),
+                new CohRelisting("Relisting reason")
+        ));
 
         List<PdfQuestionRound> pdfQuestionRounds = new PdfSummaryBuilder().buildPdfSummary(cohConversations, somePdfAppealDetails()).getQuestionRounds();
         
-        assertThat(pdfQuestionRounds, CoreMatchers.is(asList(
+        assertThat(pdfQuestionRounds, is(asList(
                 new PdfQuestionRound(asList(
                         new PdfQuestion("questionHeader-1-1", "questionBody-1-1", "answerText-1-1", "5 June 2018", "5 July 2018"),
                         new PdfQuestion("questionHeader-1-2", "questionBody-1-2", "answerText-1-2", "5 June 2018", "5 July 2018")
@@ -52,11 +57,13 @@ public class PdfSummaryBuilderTest {
     @Test
     public void buildPdfQuestionsWhereRoundHasNotBeenIssued() {
         List<CohState> historyRound1 = emptyList();
-        CohConversations cohConversations = new CohConversations(new CohConversation(singletonList(createCohQuestionWithAnswer(1, 1, historyRound1, null))));
+        CohConversations cohConversations = new CohConversations(new CohConversation(
+                singletonList(createCohQuestionWithAnswer(1, 1, historyRound1, null)),
+                new CohRelisting("Relisting reason")));
 
         List<PdfQuestionRound> pdfQuestionRounds = new PdfSummaryBuilder().buildPdfSummary(cohConversations, somePdfAppealDetails()).getQuestionRounds();
 
-        assertThat(pdfQuestionRounds, CoreMatchers.is(singletonList(
+        assertThat(pdfQuestionRounds, is(singletonList(
                 new PdfQuestionRound(singletonList(
                         new PdfQuestion("questionHeader-1-1", "questionBody-1-1", "", "", "")
                 )))));
@@ -68,14 +75,47 @@ public class PdfSummaryBuilderTest {
 
         List<CohState> historyRound1 = singletonList(new CohState("question_issued", round1IssuedDate));
 
-        CohConversations cohConversations = new CohConversations(new CohConversation(singletonList(createCohQuestionWithAnswer(1, 1, historyRound1, null))));
+        CohConversations cohConversations = new CohConversations(new CohConversation(
+                singletonList(createCohQuestionWithAnswer(1, 1, historyRound1, null)),
+                new CohRelisting("Relisting reason")));
 
         List<PdfQuestionRound> pdfQuestionRounds = new PdfSummaryBuilder().buildPdfSummary(cohConversations, somePdfAppealDetails()).getQuestionRounds();
 
-        assertThat(pdfQuestionRounds, CoreMatchers.is(singletonList(
+        assertThat(pdfQuestionRounds, is(singletonList(
                 new PdfQuestionRound(singletonList(
                         new PdfQuestion("questionHeader-1-1", "questionBody-1-1", "", "5 June 2018", "")
                 )))));
+    }
+
+    @Test
+    public void buildPdfSummaryWithRelistingReason() {
+        String relistingReason = "Relisting reason";
+        PdfSummary pdfSummary = new PdfSummaryBuilder().buildPdfSummary(new CohConversations(
+                new CohConversation(Collections.emptyList(), new CohRelisting(relistingReason))),
+                somePdfAppealDetails()
+        );
+
+        assertThat(pdfSummary.getRelistingReason(), is(relistingReason));
+    }
+
+    @Test
+    public void buildPdfSummaryWithNullRelisting() {
+        PdfSummary pdfSummary = new PdfSummaryBuilder().buildPdfSummary(new CohConversations(
+                        new CohConversation(Collections.emptyList(), null)),
+                somePdfAppealDetails()
+        );
+
+        assertThat(pdfSummary.getRelistingReason(), is(""));
+    }
+
+    @Test
+    public void buildPdfSummaryWithMultiLineRelistingReson() {
+        PdfSummary pdfSummary = new PdfSummaryBuilder().buildPdfSummary(new CohConversations(
+                        new CohConversation(Collections.emptyList(), new CohRelisting("this \\n has multi\\nlines"))),
+                somePdfAppealDetails()
+        );
+
+        assertThat(pdfSummary.getRelistingReason(), is("this \n has multi\nlines"));
     }
 
     private CohQuestion createCohQuestion(int roundNumber, int questionOrdinal, List<CohState> historyRound, List<CohState> historyAnswer) {

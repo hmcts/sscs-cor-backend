@@ -7,6 +7,7 @@ import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.sscscorbackend.service.DecodeJsonUtil.decodeStringWithWhitespace;
 
 import java.util.Comparator;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohAnswer;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohConversations;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohQuestion;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohRelisting;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestionRound;
@@ -28,8 +30,17 @@ public class PdfSummaryBuilder {
     public PdfSummary buildPdfSummary(CohConversations conversations, PdfAppealDetails appealDetails) {
         return new PdfSummary(
                 appealDetails,
+                getRelistingReason(conversations),
                 buildQuestionRounds(conversations)
         );
+    }
+
+    private String getRelistingReason(CohConversations conversations) {
+        CohRelisting relisting = conversations.getConversation().getRelisting();
+        if (relisting != null) {
+            return decodeStringWithWhitespace(relisting.getReason());
+        }
+        return "";
     }
 
     private List<PdfQuestionRound> buildQuestionRounds(CohConversations conversations) {
@@ -65,7 +76,7 @@ public class PdfSummaryBuilder {
     private Function<CohQuestion, PdfQuestion> createPdfQuestion() {
         return question -> new PdfQuestion(
                 question.getQuestionHeaderText(),
-                question.getQuestionBodyText(),
+                decodeStringWithWhitespace(question.getQuestionBodyText()),
                 getAnswer(question),
                 formatDate(question.getIssueDate()),
                 formatDate(question.getSubmittedDate())
@@ -75,6 +86,7 @@ public class PdfSummaryBuilder {
     private String getAnswer(CohQuestion question) {
         return question.getAnswer()
                 .map(CohAnswer::getAnswerText)
+                .map(DecodeJsonUtil::decodeStringWithWhitespace)
                 .orElse("");
     }
 

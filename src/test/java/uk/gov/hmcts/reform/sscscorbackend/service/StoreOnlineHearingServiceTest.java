@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohConversation;
 import uk.gov.hmcts.reform.sscscorbackend.domain.CohConversations;
+import uk.gov.hmcts.reform.sscscorbackend.domain.CohRelisting;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
 
@@ -56,7 +57,10 @@ public class StoreOnlineHearingServiceTest {
 
     @Test
     public void storePdfInCcd() {
-        CohConversations cohConversations = new CohConversations(new CohConversation(emptyList()));
+        CohConversations cohConversations = new CohConversations(new CohConversation(
+                emptyList(),
+                new CohRelisting("Relisting reason"))
+        );
         when(cohService.getConversations(hearingId)).thenReturn(cohConversations);
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
