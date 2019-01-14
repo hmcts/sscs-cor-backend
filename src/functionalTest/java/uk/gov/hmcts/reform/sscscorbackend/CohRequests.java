@@ -168,7 +168,7 @@ public class CohRequests {
             } else if (System.nanoTime() - startTime >= timeout) {
                 throw new RuntimeException(timeoutMessage);
             }
-            Thread.sleep(100L);
+            Thread.sleep(1000L);
         }
     }
 
