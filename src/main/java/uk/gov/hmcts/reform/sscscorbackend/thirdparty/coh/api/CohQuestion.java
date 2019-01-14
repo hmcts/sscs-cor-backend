@@ -17,6 +17,8 @@ public class CohQuestion {
     private final List<CohState> history;
     private final List<CohAnswer> answers;
 
+    // Sonar complains that we have too many arguments but this is a third party api and we have no control over them
+    @java.lang.SuppressWarnings("squid:S00107")
     public CohQuestion(@JsonProperty(value = "online_hearing_id") String onlineHearingId,
                        @JsonProperty(value = "question_round") int questionRound,
                        @JsonProperty(value = "question_id")String questionId,
