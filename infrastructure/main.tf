@@ -87,5 +87,6 @@ module "sscs-core-backend" {
     DOCUMENT_MANAGEMENT_URL = "${local.documentManagementUrl}"
     PDF_API_URL = "${local.pdfService}"
     NOTIFICATIONS_API_URL = "${local.notificationsApiUrl}"
+    ENABLE_DEBUG_ERROR_MESSAGE = "${var.enable_debug_error_message}"
   }
 }

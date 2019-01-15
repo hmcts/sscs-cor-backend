@@ -39,3 +39,8 @@ variable "infrastructure_env" {
   default     = "test"
   description = "Infrastructure environment to point to"
 }
+
+variable "enable_debug_error_message" {
+  default     = "true"
+  description = "Enable stack traces on error messages"
+}
