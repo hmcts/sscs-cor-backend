@@ -92,8 +92,15 @@ public class Application {
 
     @Bean("PreliminaryViewPdfService")
     public PdfService preliminaryViewPdfService(PDFServiceClient pdfServiceClient,
-                                                @Value("${preliminary_view.html.template.path}") String appellantTemplatePath,
+                                                @Value("${preliminary_view.html.template.path}") String templatePath,
                                                 I18nBuilder i18nBuilder) throws IOException {
-        return new PdfService(pdfServiceClient, appellantTemplatePath, i18nBuilder);
+        return new PdfService(pdfServiceClient, templatePath, i18nBuilder);
+    }
+
+    @Bean("QuestionPdfService")
+    public PdfService questionPdfService(PDFServiceClient pdfServiceClient,
+                                                @Value("${question.html.template.path}") String templatePath,
+                                                I18nBuilder i18nBuilder) throws IOException {
+        return new PdfService(pdfServiceClient, templatePath, i18nBuilder);
     }
 }

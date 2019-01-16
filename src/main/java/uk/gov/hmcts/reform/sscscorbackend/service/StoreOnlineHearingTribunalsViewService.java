@@ -1,61 +1,46 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
-import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
+import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Slf4j
 @Service
-public class StoreOnlineHearingTribunalsViewService {
+public class StoreOnlineHearingTribunalsViewService extends BasePdfService<OnlineHearing> {
 
     public static final String TRIBUNALS_VIEW_PDF_PREFIX = "Tribunals view - ";
     private final OnlineHearingService onlineHearingService;
-    private final PdfService pdfService;
     private final OnlineHearingDateReformatter onlineHearingDateReformatter;
-    private final SscsPdfService sscsPdfService;
-    private final CorCcdService ccdService;
-    private final IdamService idamService;
 
     public StoreOnlineHearingTribunalsViewService(OnlineHearingService onlineHearingService,
                                                   @Qualifier("PreliminaryViewPdfService") PdfService pdfService,
                                                   OnlineHearingDateReformatter onlineHearingDateReformatter,
-                                                  SscsPdfService sscsPdfService,
-                                                  CorCcdService ccdService,
-                                                  IdamService idamService) {
+                                                  SscsPdfService sscsPdfService, CcdService ccdService, IdamService idamService,
+                                                  EvidenceManagementService evidenceManagementService) {
+        super(pdfService, sscsPdfService, ccdService, idamService, evidenceManagementService);
         this.onlineHearingService = onlineHearingService;
-        this.pdfService = pdfService;
         this.onlineHearingDateReformatter = onlineHearingDateReformatter;
-        this.sscsPdfService = sscsPdfService;
-        this.ccdService = ccdService;
-        this.idamService = idamService;
     }
 
-    public void storeTribunalsView(Long caseId) {
-        IdamTokens idamTokens = idamService.getIdamTokens();
-        SscsCaseDetails caseDetails = ccdService.getByCaseId(caseId, idamTokens);
-        if (doesNotHaveATribunalView(caseDetails)) {
-            Optional<OnlineHearing> optioanlOnlineHearing = onlineHearingService.loadOnlineHearingFromCoh(caseDetails);
-            OnlineHearing onlineHearing = optioanlOnlineHearing.orElseThrow(() -> new IllegalArgumentException("Cannot find online hearing for case id [" + caseId + "]"));
-            byte[] pdfBytes = pdfService.createPdf(onlineHearingDateReformatter.getReformattedOnlineHearing(onlineHearing));
-            SscsCaseData caseData = caseDetails.getData();
-            sscsPdfService.mergeDocIntoCcd(TRIBUNALS_VIEW_PDF_PREFIX + caseData.getCaseReference() + ".pdf", pdfBytes, caseId, caseData, idamTokens);
-        }
+    @Override
+    protected String documentNameStartsWith() {
+        return TRIBUNALS_VIEW_PDF_PREFIX;
     }
 
-    private boolean doesNotHaveATribunalView(SscsCaseDetails caseDetails) {
-        List<SscsDocument> sscsDocuments = caseDetails.getData().getSscsDocument();
-        return sscsDocuments == null || sscsDocuments.stream()
-                .noneMatch(sscsDocument -> sscsDocument.getValue().getDocumentFileName().startsWith(TRIBUNALS_VIEW_PDF_PREFIX));
+    @Override
+    protected OnlineHearing getPdfContent(SscsCaseDetails caseDetails, String onlineHearingId, PdfAppealDetails appealDetails) {
+        Optional<OnlineHearing> optionalOnlineHearing = onlineHearingService.loadOnlineHearingFromCoh(caseDetails);
+        OnlineHearing onlineHearing = optionalOnlineHearing.orElseThrow(() -> new IllegalArgumentException("Cannot find online hearing for case id [" + caseDetails.getId() + "]"));
+
+        return onlineHearingDateReformatter.getReformattedOnlineHearing(onlineHearing);
     }
 }

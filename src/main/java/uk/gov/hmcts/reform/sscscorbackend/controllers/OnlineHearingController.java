@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
+import uk.gov.hmcts.reform.sscscorbackend.service.StoreQuestionsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
@@ -23,15 +24,19 @@ public class OnlineHearingController {
     private final StoreOnlineHearingService storeOnlineHearingService;
     private final StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService;
     private final NotificationsService notificationsService;
+    private final StoreQuestionsPdfService storeQuestionsPdfService;
 
 
     public OnlineHearingController(@Autowired OnlineHearingService onlineHearingService,
                                    @Autowired StoreOnlineHearingService storeOnlineHearingService,
-                                   @Autowired StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService, NotificationsService notificationsService) {
+                                   @Autowired StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService,
+                                   @Autowired NotificationsService notificationsService,
+                                   @Autowired StoreQuestionsPdfService storeQuestionsPdfService) {
         this.onlineHearingService = onlineHearingService;
         this.storeOnlineHearingService = storeOnlineHearingService;
         this.storeOnlineHearingTribunalsViewService = storeOnlineHearingTribunalsViewService;
         this.notificationsService = notificationsService;
+        this.storeQuestionsPdfService = storeQuestionsPdfService;
     }
 
     @ApiOperation(value = "Create online hearing",
@@ -70,15 +75,18 @@ public class OnlineHearingController {
         }
 
         String onlineHearingId = request.getOnlineHearingId();
-        String caseId = request.getCaseId();
+        Long caseId = Long.valueOf(request.getCaseId());
         log.info("Received event for storing online hearing for case {} and hearing {} ...",
                 caseId, onlineHearingId);
 
         if (request.getEventType().equalsIgnoreCase("decision_issued")) {
-            storeOnlineHearingTribunalsViewService.storeTribunalsView(Long.valueOf(caseId));
+            storeOnlineHearingTribunalsViewService.storePdf(caseId, onlineHearingId);
             notificationsService.send(request);
+        } else if (request.getEventType().equalsIgnoreCase("question_round_issued")) {
+            notificationsService.send(request);
+            storeQuestionsPdfService.storePdf(caseId, onlineHearingId);
         } else {
-            storeOnlineHearingService.storeOnlineHearingInCcd(onlineHearingId, caseId);
+            storeOnlineHearingService.storePdf(caseId, onlineHearingId);
         }
 
         return ResponseEntity.ok("");

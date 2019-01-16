@@ -12,11 +12,13 @@ public class QuestionSummary {
     private final String id;
     private final int questionOrdinal;
     private final String questionHeaderText;
+    private final String questionBodyText;
     private final AnswerState answerState;
 
-    public QuestionSummary(String id, int questionOrdinal, String questionHeaderText, AnswerState answerState) {
+    public QuestionSummary(String id, int questionOrdinal, String questionHeaderText, String questionBodyText, AnswerState answerState) {
         this.id = id;
         this.questionHeaderText = questionHeaderText;
+        this.questionBodyText = questionBodyText;
         this.answerState = answerState;
         this.questionOrdinal = questionOrdinal;
     }
@@ -39,6 +41,12 @@ public class QuestionSummary {
         return questionHeaderText;
     }
 
+    @ApiModelProperty(example = "A question body", required = true)
+    @JsonProperty(value = "question_body_text")
+    public String getQuestionBodyText() {
+        return questionBodyText;
+    }
+
     @ApiModelProperty(required = true)
     @JsonProperty(value = "answer_state")
     public AnswerState getAnswerState() {
@@ -54,20 +62,25 @@ public class QuestionSummary {
             return false;
         }
         QuestionSummary that = (QuestionSummary) o;
-        return Objects.equals(questionHeaderText, that.questionHeaderText);
+        return questionOrdinal == that.questionOrdinal &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(questionHeaderText, that.questionHeaderText) &&
+                Objects.equals(questionBodyText, that.questionBodyText) &&
+                answerState == that.answerState;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(questionHeaderText);
+        return Objects.hash(id, questionOrdinal, questionHeaderText, questionBodyText, answerState);
     }
 
     @Override
     public String toString() {
         return "QuestionSummary{" +
                 "id='" + id + '\'' +
-                ", questionOrdinal='" + questionOrdinal + '\'' +
+                ", questionOrdinal=" + questionOrdinal +
                 ", questionHeaderText='" + questionHeaderText + '\'' +
+                ", questionBodyText='" + questionBodyText + '\'' +
                 ", answerState=" + answerState +
                 '}';
     }
