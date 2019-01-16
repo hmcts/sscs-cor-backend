@@ -20,19 +20,20 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 public class StoreQuestionsPdfServiceTest {
 
     private QuestionService questionService;
+    private String onlineHearingId;
+    private StoreQuestionsPdfService storeQuestionsPdfService;
 
     @Before
     public void setUp() {
         questionService = mock(QuestionService.class);
+        onlineHearingId = "someOnlineHearingId";
+        storeQuestionsPdfService = new StoreQuestionsPdfService(
+                mock(PdfService.class), mock(SscsPdfService.class), mock(CcdService.class), mock(IdamService.class),
+                questionService, mock(EvidenceManagementService.class));
     }
 
     @Test
     public void getPdfQuestionSummary() {
-        StoreQuestionsPdfService storeQuestionsPdfService = new StoreQuestionsPdfService(
-                mock(PdfService.class), mock(SscsPdfService.class), mock(CcdService.class), mock(IdamService.class),
-                questionService, mock(EvidenceManagementService.class));
-
-        String onlineHearingId = "someOnlineHearingId";
         QuestionRound questionRound = DataFixtures.someQuestionRound();
         when(questionService.getQuestions(onlineHearingId)).thenReturn(questionRound);
         PdfAppealDetails appealDetails = mock(PdfAppealDetails.class);
@@ -41,4 +42,11 @@ public class StoreQuestionsPdfServiceTest {
         assertThat(pdfQuestionsSummary, is(new PdfQuestionsSummary(appealDetails, questionRound.getQuestions())));
     }
 
+    @Test
+    public void getPdfQuestionRound() {
+        when(questionService.getCurrentQuestionRound(onlineHearingId)).thenReturn(66);
+        String documentNamePrefix = storeQuestionsPdfService.documentNamePrefix(mock(SscsCaseDetails.class), onlineHearingId);
+
+        assertThat(documentNamePrefix, is("Issued Questions Round 66 - "));
+    }
 }

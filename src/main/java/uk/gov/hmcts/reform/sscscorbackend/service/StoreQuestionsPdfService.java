@@ -27,8 +27,9 @@ public class StoreQuestionsPdfService extends BasePdfService<PdfQuestionsSummary
     }
 
     @Override
-    protected String documentNameStartsWith() {
-        return "Issued Questions - ";
+    protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId) {
+        int currentQuestionRound = questionService.getCurrentQuestionRound(onlineHearingId);
+        return "Issued Questions Round " + currentQuestionRound + " - ";
     }
 
     @Override

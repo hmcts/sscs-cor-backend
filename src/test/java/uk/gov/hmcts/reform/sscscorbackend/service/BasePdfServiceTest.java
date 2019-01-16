@@ -52,7 +52,7 @@ public class BasePdfServiceTest {
         basePdfService = new BasePdfService(pdfService, sscsPdfService, ccdService, idamService, evidenceManagementService) {
 
             @Override
-            protected String documentNameStartsWith() {
+            protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId) {
                 return fileNamePrefix;
             }
 
