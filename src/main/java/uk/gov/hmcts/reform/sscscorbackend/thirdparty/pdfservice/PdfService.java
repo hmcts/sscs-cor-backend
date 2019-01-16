@@ -13,10 +13,10 @@ public class PdfService {
     private final byte[] template;
     private final Map i18n;
 
-    public PdfService(PDFServiceClient pdfServiceClient, String appellantTemplatePath, I18nBuilder i18nBuilder) throws IOException {
+    public PdfService(PDFServiceClient pdfServiceClient, String templatePath, I18nBuilder i18nBuilder) throws IOException {
         this.pdfServiceClient = pdfServiceClient;
 
-        template = getResource(appellantTemplatePath);
+        template = getResource(templatePath);
         i18n = i18nBuilder.build();
     }
 

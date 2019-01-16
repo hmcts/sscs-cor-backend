@@ -61,10 +61,14 @@ public class QuestionServiceTest {
                 .getQuestionReferences().get(1);
         QuestionSummary question1Summary = new QuestionSummary(cohQuestionReference1.getQuestionId(),
                 cohQuestionReference1.getQuestionOrdinal(),
-                cohQuestionReference1.getQuestionHeaderText(), draft);
+                cohQuestionReference1.getQuestionHeaderText(),
+                cohQuestionReference1.getQuestionBodyText(),
+                draft);
         QuestionSummary question2Summary = new QuestionSummary(cohQuestionReference2.getQuestionId(),
                 cohQuestionReference2.getQuestionOrdinal(),
-                cohQuestionReference2.getQuestionHeaderText(), draft);
+                cohQuestionReference2.getQuestionHeaderText(),
+                cohQuestionReference2.getQuestionBodyText(),
+                draft);
         when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
         List<QuestionSummary> questions = questionRound.getQuestions();
@@ -146,18 +150,20 @@ public class QuestionServiceTest {
         String firstQuestionId = firstCohQuestionReference.getQuestionId();
         int firstQuestionOrdinal = firstCohQuestionReference.getQuestionOrdinal();
         String firstQuestionTitle = firstCohQuestionReference.getQuestionHeaderText();
+        String firstQuestionBody = firstCohQuestionReference.getQuestionBodyText();
         CohQuestionReference secondCohQuestionReference = cohQuestionRounds.getCohQuestionRound().get(0)
                 .getQuestionReferences().get(0);
         String secondQuestionId = secondCohQuestionReference.getQuestionId();
         int secondQuestionOrdinal = secondCohQuestionReference.getQuestionOrdinal();
         String secondQuestionTitle = secondCohQuestionReference.getQuestionHeaderText();
+        String secondQuestionBody = secondCohQuestionReference.getQuestionBodyText();
         when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
         List<QuestionSummary> questions = questionRound.getQuestions();
 
         assertThat(questions, contains(
-                new QuestionSummary(firstQuestionId, firstQuestionOrdinal, firstQuestionTitle, draft),
-                new QuestionSummary(secondQuestionId, secondQuestionOrdinal, secondQuestionTitle, draft)
+                new QuestionSummary(firstQuestionId, firstQuestionOrdinal, firstQuestionTitle, firstQuestionBody, draft),
+                new QuestionSummary(secondQuestionId, secondQuestionOrdinal, secondQuestionTitle, secondQuestionBody, draft)
                 )
         );
     }
@@ -327,6 +333,7 @@ public class QuestionServiceTest {
         String id = cohQuestionReference.getQuestionId();
         int questionOrdinal = cohQuestionReference.getQuestionOrdinal();
         String questionHeaderText = cohQuestionReference.getQuestionHeaderText();
-        return new QuestionSummary(id, questionOrdinal, questionHeaderText, answerState);
+        String questionBodyText = cohQuestionReference.getQuestionBodyText();
+        return new QuestionSummary(id, questionOrdinal, questionHeaderText, questionBodyText, answerState);
     }
 }

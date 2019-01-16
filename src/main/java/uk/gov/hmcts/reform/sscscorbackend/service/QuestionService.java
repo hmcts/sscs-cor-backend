@@ -136,6 +136,7 @@ public class QuestionService {
                 cohQuestionReference.getQuestionId(),
                 cohQuestionReference.getQuestionOrdinal(),
                 cohQuestionReference.getQuestionHeaderText(),
+                cohQuestionReference.getQuestionBodyText(),
                 answerState
         );
     }

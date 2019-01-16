@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
+import uk.gov.hmcts.reform.sscscorbackend.service.StoreQuestionsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
@@ -36,7 +37,7 @@ public class OnlineHearingControllerTest {
                 onlineHearingService,
                 storeOnlineHearingService,
                 storeOnlineHearingTribunalsViewService,
-                notificationsService);
+                notificationsService, mock(StoreQuestionsPdfService.class));
     }
 
     @Test
@@ -69,15 +70,15 @@ public class OnlineHearingControllerTest {
     public void testCatchCohEvent() {
         String hearingId = "somehearingid";
 
-        String caseId = "caseId";
+        Long caseId = 12345L;
 
-        CohEvent cohEvent = someCohEvent(caseId, hearingId, "continuous_online_hearing_resolved");
+        CohEvent cohEvent = someCohEvent(caseId.toString(), hearingId, "continuous_online_hearing_resolved");
 
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchCohEvent(cohEvent);
 
         assertThat(stringResponseEntity.getStatusCode(), is(HttpStatus.OK));
         assertThat(stringResponseEntity.getBody(), is(""));
-        verify(storeOnlineHearingService).storeOnlineHearingInCcd(hearingId, caseId);
+        verify(storeOnlineHearingService).storePdf(caseId, hearingId);
     }
 
     @Test
@@ -133,7 +134,22 @@ public class OnlineHearingControllerTest {
 
         assertThat(stringResponseEntity.getStatusCode(), is(HttpStatus.OK));
         assertThat(stringResponseEntity.getBody(), is(""));
-        verify(storeOnlineHearingTribunalsViewService).storeTribunalsView(Long.valueOf(caseId));
+        verify(storeOnlineHearingTribunalsViewService).storePdf(Long.valueOf(caseId), hearingId);
+        verify(notificationsService).send(cohEvent);
+    }
+
+    @Test
+    public void testCatchQuestionRoundIssuedIssuedCohEvent() {
+        String hearingId = "somehearingid";
+
+        String caseId = "1234";
+
+        CohEvent cohEvent = someCohEvent(caseId, hearingId, "question_round_issued");
+
+        ResponseEntity<String> stringResponseEntity = onlineHearingController.catchCohEvent(cohEvent);
+
+        assertThat(stringResponseEntity.getStatusCode(), is(HttpStatus.OK));
+        assertThat(stringResponseEntity.getBody(), is(""));
         verify(notificationsService).send(cohEvent);
     }
 }

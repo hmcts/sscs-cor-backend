@@ -58,6 +58,10 @@ online_hearing_finished:
   html:
     template:
       path: /templates/onlineHearingSummary.html
+question:
+  html:
+    template:
+      path: /templates/questions.html
 
 appeal:
   email:
