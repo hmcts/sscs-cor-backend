@@ -32,7 +32,7 @@ public class StoreOnlineHearingTribunalsViewService extends BasePdfService<Onlin
     }
 
     @Override
-    protected String documentNameStartsWith() {
+    protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId) {
         return TRIBUNALS_VIEW_PDF_PREFIX;
     }
 

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscscorbackend.service;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -38,27 +39,28 @@ public abstract class BasePdfService<E> {
     public byte[] storePdf(Long caseId, String onlineHearingId) {
         IdamTokens idamTokens = idamService.getIdamTokens();
         SscsCaseDetails caseDetails = ccdService.getByCaseId(caseId, idamTokens);
-        if (pdfHasNotAlreadyBeenCreated(caseDetails)) {
+        String documentNamePrefix = documentNamePrefix(caseDetails, onlineHearingId);
+        if (pdfHasNotAlreadyBeenCreated(caseDetails, documentNamePrefix)) {
             log.info("Creating pdf for [" + caseId + "]");
-            return storePdf(caseId, onlineHearingId, idamTokens, caseDetails);
+            return storePdf(caseId, onlineHearingId, idamTokens, caseDetails, documentNamePrefix);
         } else {
             log.info("Loading pdf for [" + caseId + "]");
-            return loadPdf(caseDetails);
+            return loadPdf(caseDetails, documentNamePrefix);
         }
     }
 
-    private byte[] storePdf(Long caseId, String onlineHearingId, IdamTokens idamTokens, SscsCaseDetails caseDetails) {
+    private byte[] storePdf(Long caseId, String onlineHearingId, IdamTokens idamTokens, SscsCaseDetails caseDetails, String documentNamePrefix) {
         PdfAppealDetails pdfAppealDetails = getPdfAppealDetails(caseId, caseDetails);
         byte[] pdfBytes = pdfService.createPdf(getPdfContent(caseDetails, onlineHearingId, pdfAppealDetails));
         SscsCaseData caseData = caseDetails.getData();
-        sscsPdfService.mergeDocIntoCcd(documentNameStartsWith() + caseData.getCaseReference() + ".pdf", pdfBytes, caseId, caseData, idamTokens);
+        sscsPdfService.mergeDocIntoCcd(documentNamePrefix + caseData.getCaseReference() + ".pdf", pdfBytes, caseId, caseData, idamTokens);
 
         return pdfBytes;
     }
 
-    private byte[] loadPdf(SscsCaseDetails caseDetails) {
+    private byte[] loadPdf(SscsCaseDetails caseDetails, String documentNamePrefix) {
         SscsDocument document = caseDetails.getData().getSscsDocument().stream()
-                .filter(sscsDocument -> sscsDocument.getValue().getDocumentFileName().startsWith(documentNameStartsWith()))
+                .filter(documentNameMatches(documentNamePrefix))
                 .findFirst().get();
         String documentUrl = document.getValue().getDocumentLink().getDocumentUrl();
         try {
@@ -68,10 +70,13 @@ public abstract class BasePdfService<E> {
         }
     }
 
-    private boolean pdfHasNotAlreadyBeenCreated(SscsCaseDetails caseDetails) {
+    private boolean pdfHasNotAlreadyBeenCreated(SscsCaseDetails caseDetails, String documentNamePrefix) {
         List<SscsDocument> sscsDocuments = caseDetails.getData().getSscsDocument();
-        return sscsDocuments == null || sscsDocuments.stream()
-                .noneMatch(sscsDocument -> sscsDocument.getValue().getDocumentFileName().startsWith(documentNameStartsWith()));
+        return sscsDocuments == null || sscsDocuments.stream().noneMatch(documentNameMatches(documentNamePrefix));
+    }
+
+    private Predicate<SscsDocument> documentNameMatches(String documentNamePrefix) {
+        return sscsDocument -> sscsDocument.getValue().getDocumentFileName().startsWith(documentNamePrefix);
     }
 
     private PdfAppealDetails getPdfAppealDetails(Long caseId, SscsCaseDetails caseDetails) {
@@ -86,7 +91,7 @@ public abstract class BasePdfService<E> {
         return new PdfAppealDetails(appellantTitle, appellantFirstName, appellantLastName, nino, caseReference);
     }
 
-    protected abstract String documentNameStartsWith();
+    protected abstract String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId);
 
     protected abstract E getPdfContent(SscsCaseDetails caseDetails, String onlineHearingId, PdfAppealDetails appealDetails);
 }
