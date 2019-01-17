@@ -21,7 +21,7 @@ public class OnlineHearingControllerTest extends BaseIntegrationTest {
                 .post("/notify/onlineappeal")
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("online_hearing_id", Matchers.is(ONLINE_HEARING_ID));
+                .body("onlineHearingCreated", Matchers.is(true));
     }
 
     @Test

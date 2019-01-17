@@ -51,12 +51,11 @@ public class OnlineHearingServiceTest {
 
     @Test
     public void createOnlineHearing() {
-        String hearingId = "hearingId";
-        when(cohService.createOnlineHearing(someRequest())).thenReturn("hearingId");
+        when(cohService.createOnlineHearing(someRequest())).thenReturn(true);
 
-        String createdHearingId = underTest.createOnlineHearing(someRequest().getCaseId());
+        boolean createdOnlineHearing = underTest.createOnlineHearing(someRequest().getCaseId());
 
-        assertThat(createdHearingId, is(hearingId));
+        assertThat(createdOnlineHearing, is(true));
     }
 
     @Test
