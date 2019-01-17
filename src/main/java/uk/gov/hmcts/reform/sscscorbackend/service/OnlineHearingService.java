@@ -41,7 +41,7 @@ public class OnlineHearingService {
         this.decisionExtractor = decisionExtractor;
     }
 
-    public String createOnlineHearing(String caseId) {
+    public boolean createOnlineHearing(String caseId) {
         CreateOnlineHearingRequest createOnlineHearingRequest =
                 new CreateOnlineHearingRequest(caseId);
 

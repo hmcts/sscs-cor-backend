@@ -46,9 +46,17 @@ public class CohService {
         return cohClient.getQuestionRounds(idamTokens.getIdamOauth2Token(), idamTokens.getServiceAuthorization(), onlineHearingId);
     }
 
-    public String createOnlineHearing(CreateOnlineHearingRequest createOnlineHearingRequest) {
+    public boolean createOnlineHearing(CreateOnlineHearingRequest createOnlineHearingRequest) {
         IdamTokens idamTokens = idamService.getIdamTokens();
-        return cohClient.createOnlineHearing(idamTokens.getIdamOauth2Token(), idamTokens.getServiceAuthorization(), createOnlineHearingRequest);
+        try {
+            cohClient.createOnlineHearing(idamTokens.getIdamOauth2Token(), idamTokens.getServiceAuthorization(), createOnlineHearingRequest);
+        } catch (FeignException exc) {
+            if (exc.status() == HttpStatus.CONFLICT.value()) {
+                return false;
+            }
+            throw exc;
+        }
+        return true;
     }
 
     public CohOnlineHearings getOnlineHearing(Long caseId) {

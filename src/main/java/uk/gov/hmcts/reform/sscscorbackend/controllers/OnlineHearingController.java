@@ -48,9 +48,9 @@ public class OnlineHearingController {
 
         String caseId = request.getCaseDetails().getCaseId();
 
-        String onlineHearingId = onlineHearingService.createOnlineHearing(caseId);
+        boolean onlineHearingCreated = onlineHearingService.createOnlineHearing(caseId);
 
-        return ResponseEntity.ok(onlineHearingId);
+        return ResponseEntity.ok("{ \"onlineHearingCreated\": " + onlineHearingCreated + " }");
     }
 
     @ApiOperation(value = "Handle COH events",

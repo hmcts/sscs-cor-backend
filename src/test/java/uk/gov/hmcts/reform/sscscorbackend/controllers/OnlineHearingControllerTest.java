@@ -41,18 +41,15 @@ public class OnlineHearingControllerTest {
 
     @Test
     public void testCatchEvent() {
-        String hearingId = "somehearingid";
-
         String caseId = "caseId";
 
         CcdEvent ccdEvent = someCcdEvent(caseId);
 
-        when(onlineHearingService.createOnlineHearing(caseId)).thenReturn(hearingId);
+        when(onlineHearingService.createOnlineHearing(caseId)).thenReturn(true);
 
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchEvent(ccdEvent);
 
         assertThat(stringResponseEntity.getStatusCode(), is(HttpStatus.OK));
-        assertThat(stringResponseEntity.getBody(), is(hearingId));
     }
 
     @Test
@@ -62,8 +59,6 @@ public class OnlineHearingControllerTest {
         String caseId = null;
 
         CcdEvent ccdEvent = someCcdEvent(caseId);
-
-        when(onlineHearingService.createOnlineHearing(caseId)).thenReturn(hearingId);
 
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchEvent(ccdEvent);
 
