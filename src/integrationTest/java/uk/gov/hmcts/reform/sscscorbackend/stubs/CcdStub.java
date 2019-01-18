@@ -78,6 +78,17 @@ public class CcdStub extends BaseStub {
                 .willReturn(okJson(new ObjectMapper().writeValueAsString(CaseDetails.builder().build()))));
     }
 
+    public void stubAddUserToCase(long caseId, String userToAdd) throws JsonProcessingException {
+        wireMock.stubFor(post("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/users")
+                .withRequestBody(equalToJson("{ \"id\": \"" + userToAdd + "\" }"))
+                .willReturn(created()));
+    }
+
+    public void stubRemoveUserFromCase(long caseId, String userToRemove) throws JsonProcessingException {
+        wireMock.stubFor(delete("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/users/" + userToRemove)
+                .willReturn(created()));
+    }
+
     private String createCaseDetails(Long caseId, String caseReference, String firstName, String lastName, String evidenceQuestionId, String evidenceFileName, String evidenceCreatedDate, String evidenceUrl) {
         return caseDetailsJson.replace("{caseId}", caseId.toString())
                 .replace("{caseReference}", caseReference)

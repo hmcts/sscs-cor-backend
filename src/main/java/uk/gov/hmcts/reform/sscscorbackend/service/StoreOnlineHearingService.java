@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -14,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfSummaryBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohConversations;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 public class StoreOnlineHearingService {
     private final CohService cohService;
     private final IdamService idamService;
-    private final CcdService ccdService;
+    private final CorCcdService ccdService;
     private final PdfSummaryBuilder pdfSummaryBuilder;
     private final EvidenceUploadService evidenceUploadService;
     private final SscsPdfService sscsPdfService;
@@ -31,7 +31,7 @@ public class StoreOnlineHearingService {
 
     public StoreOnlineHearingService(CohService cohService,
                                      IdamService idamService,
-                                     CcdService ccdService,
+                                     CorCcdService ccdService,
                                      PdfSummaryBuilder pdfSummaryBuilder,
                                      EvidenceUploadService evidenceUploadService,
                                      SscsPdfService sscsPdfService,

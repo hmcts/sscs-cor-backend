@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Slf4j
@@ -24,13 +24,15 @@ public class StoreOnlineHearingTribunalsViewService {
     private final PdfService pdfService;
     private final OnlineHearingDateReformatter onlineHearingDateReformatter;
     private final SscsPdfService sscsPdfService;
-    private final CcdService ccdService;
+    private final CorCcdService ccdService;
     private final IdamService idamService;
 
     public StoreOnlineHearingTribunalsViewService(OnlineHearingService onlineHearingService,
                                                   @Qualifier("PreliminaryViewPdfService") PdfService pdfService,
                                                   OnlineHearingDateReformatter onlineHearingDateReformatter,
-                                                  SscsPdfService sscsPdfService, CcdService ccdService, IdamService idamService) {
+                                                  SscsPdfService sscsPdfService,
+                                                  CorCcdService ccdService,
+                                                  IdamService idamService) {
         this.onlineHearingService = onlineHearingService;
         this.pdfService = pdfService;
         this.onlineHearingDateReformatter = onlineHearingDateReformatter;

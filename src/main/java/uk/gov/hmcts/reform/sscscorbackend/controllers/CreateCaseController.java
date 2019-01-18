@@ -25,19 +25,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.logging.exception.AlertLevel;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscscorbackend.exception.SscsCorBackendException;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 
 @RestController
 @ConditionalOnProperty("create_ccd_endpoint")
 public class CreateCaseController {
 
-    private final CcdService ccdService;
+    private final CorCcdService ccdService;
     private final IdamService idamService;
 
     public CreateCaseController(
-            @Autowired CcdService ccdService,
+            @Autowired CorCcdService ccdService,
             @Autowired IdamService idamService
     ) {
         this.ccdService = ccdService;

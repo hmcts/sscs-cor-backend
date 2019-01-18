@@ -20,16 +20,16 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.DocumentManagementService;
 
 public class EvidenceUploadServiceTest {
 
     private EvidenceUploadService evidenceUploadService;
-    private CcdService ccdService;
+    private CorCcdService ccdService;
     private OnlineHearingService onlineHearingService;
     private String someOnlineHearingId;
     private String someQuestionId;
@@ -43,7 +43,7 @@ public class EvidenceUploadServiceTest {
 
     @Before
     public void setUp() {
-        ccdService = mock(CcdService.class);
+        ccdService = mock(CorCcdService.class);
         onlineHearingService = mock(OnlineHearingService.class);
         someOnlineHearingId = "someOnlinehearingId";
         someQuestionId = "someQuestionId";

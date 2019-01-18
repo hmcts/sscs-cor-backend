@@ -10,11 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseDetails;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.DecisionExtractor;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.*;
@@ -25,28 +27,36 @@ public class OnlineHearingService {
     private static final String HEARING_TYPE_ONLINE_RESOLUTION = "cor";
 
     private final CohService cohClient;
-    private final CcdService ccdService;
+    private final CorCcdService ccdService;
     private final IdamService idamService;
     private final DecisionExtractor decisionExtractor;
+    private final AmendPanelMembersService amendPanelMembersService;
 
     public OnlineHearingService(
             @Autowired CohService cohService,
-            @Autowired CcdService ccdService,
+            @Autowired CorCcdService ccdService,
             @Autowired IdamService idamService,
-            @Autowired DecisionExtractor decisionExtractor
+            @Autowired DecisionExtractor decisionExtractor,
+            @Autowired AmendPanelMembersService amendPanelMembersService
     ) {
         this.cohClient = cohService;
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.decisionExtractor = decisionExtractor;
+        this.amendPanelMembersService = amendPanelMembersService;
     }
 
-    public boolean createOnlineHearing(String caseId) {
+    public boolean createOnlineHearing(CcdEvent ccdEvent) {
+        CaseDetails newCaseDetails = ccdEvent.getCaseDetails();
+        String caseId = newCaseDetails.getCaseId();
         CreateOnlineHearingRequest createOnlineHearingRequest =
                 new CreateOnlineHearingRequest(caseId);
 
-        //assume need to create it
-        return cohClient.createOnlineHearing(createOnlineHearingRequest);
+        boolean createdOnlineHearing = cohClient.createOnlineHearing(createOnlineHearingRequest);
+
+        amendPanelMembersService.amendPanelMembersPermissions(ccdEvent);
+
+        return createdOnlineHearing;
     }
 
     public Optional<OnlineHearing> getOnlineHearing(String emailAddress) {
