@@ -87,9 +87,10 @@ public class DataFixtures {
     }
 
     public static CcdEvent someCcdEvent(String caseId) {
-        CaseData caseData = new CaseData(null);
+        CaseData caseData = new CaseData("someOnlineHearingId", "assignedToJudge", "assignedToDisabilityMember", "assignedToMedicalMember");
+        CaseData caseDataBefore = new CaseData("someOnlineHearingId", "beforeJudge", "beforeDisabilityMember", "beforeMedicalMember");
 
-        CaseDetails caseDetails = new CaseDetails(caseId, caseData);
+        CaseDetails caseDetails = new CaseDetails(caseId, caseData, caseDataBefore);
         return new CcdEvent(caseDetails);
     }
 

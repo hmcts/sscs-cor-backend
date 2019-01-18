@@ -46,9 +46,7 @@ public class OnlineHearingController {
             return ResponseEntity.badRequest().build();
         }
 
-        String caseId = request.getCaseDetails().getCaseId();
-
-        boolean onlineHearingCreated = onlineHearingService.createOnlineHearing(caseId);
+        boolean onlineHearingCreated = onlineHearingService.createOnlineHearing(request);
 
         return ResponseEntity.ok("{ \"onlineHearingCreated\": " + onlineHearingCreated + " }");
     }

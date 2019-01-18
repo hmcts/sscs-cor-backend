@@ -10,8 +10,10 @@ public class OnlineHearingControllerTest extends BaseIntegrationTest {
     private static final String ONLINE_HEARING_ID = "Online hearing id";
 
     @Test
-    public void createOnlineHearing() {
+    public void createOnlineHearing() throws JsonProcessingException {
         cohStub.stubPostOnlineHearing(ONLINE_HEARING_ID);
+        ccdStub.stubAddUserToCase(123456, "medical");
+        ccdStub.stubAddUserToCase(123456, "disability");
 
         RestAssured.baseURI = "http://localhost:" + applicationPort;
         RestAssured.given()
@@ -65,15 +67,13 @@ public class OnlineHearingControllerTest extends BaseIntegrationTest {
 
     private static final String postOnlineHearingJson = "{\n" +
             "  \"case_details\": {\n" +
-            "    \"id\": \"string\",\n" +
+            "    \"id\": \"123456\",\n" +
             "    \"case_data\": {\n" +
             "        \"onlineHearingId\": \"string\",\n" +
             "        \"hearingType\": \"cor\",\n" +
-            "        \"onlinePanel\": {\n" +
-            "            \"assignedTo\": \"string\",\n" +
-            "            \"medicalMember\": \"string\",\n" +
-            "            \"disabilityQualifiedMember\": \"string\"\n" +
-            "        }\n" +
+            "        \"assignedToJudge\": \"judge\",\n" +
+            "        \"assignedToDisabilityMember\": \"disability\",\n" +
+            "        \"assignedToMedicalMember\": \"medical\"\n" +
             "      }\n" +
             "  }\n" +
             "}";

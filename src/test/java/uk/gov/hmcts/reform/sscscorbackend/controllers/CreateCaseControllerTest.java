@@ -15,19 +15,19 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 
 public class CreateCaseControllerTest {
 
-    private CcdService ccdService;
+    private CorCcdService ccdService;
     private CcdRequestDetails ccdRequestDetails;
     private IdamService idamService;
 
     @Before
     public void setUp() {
-        ccdService = mock(CcdService.class);
+        ccdService = mock(CorCcdService.class);
         ccdRequestDetails = CcdRequestDetails.builder().build();
 
         idamService = mock(IdamService.class);

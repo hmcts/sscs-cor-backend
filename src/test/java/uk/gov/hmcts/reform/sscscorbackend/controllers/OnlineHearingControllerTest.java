@@ -45,7 +45,7 @@ public class OnlineHearingControllerTest {
 
         CcdEvent ccdEvent = someCcdEvent(caseId);
 
-        when(onlineHearingService.createOnlineHearing(caseId)).thenReturn(true);
+        when(onlineHearingService.createOnlineHearing(ccdEvent)).thenReturn(true);
 
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchEvent(ccdEvent);
 
