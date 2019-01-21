@@ -16,17 +16,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.DocumentManagementService;
 
 @Slf4j
 @Service
 public class EvidenceUploadService {
     private final DocumentManagementService documentManagementService;
-    private final CcdService ccdService;
+    private final CorCcdService ccdService;
     private final IdamService idamService;
     private OnlineHearingService onlineHearingService;
 
@@ -34,7 +34,7 @@ public class EvidenceUploadService {
     private static final String UPLOAD_COR_DOCUMENT = "uploadCorDocument";
 
     @Autowired
-    public EvidenceUploadService(DocumentManagementService documentManagementService, CcdService ccdService, IdamService idamService, OnlineHearingService onlineHearingService) {
+    public EvidenceUploadService(DocumentManagementService documentManagementService, CorCcdService ccdService, IdamService idamService, OnlineHearingService onlineHearingService) {
         this.documentManagementService = documentManagementService;
         this.ccdService = ccdService;
         this.idamService = idamService;

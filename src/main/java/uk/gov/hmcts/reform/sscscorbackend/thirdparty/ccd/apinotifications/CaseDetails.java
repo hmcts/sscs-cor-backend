@@ -10,7 +10,8 @@ public class CaseDetails {
     private CaseData caseData;
 
     public CaseDetails(@JsonProperty(value = "id") String caseId,
-                       @JsonProperty(value = "case_data") CaseData caseData) {
+                       @JsonProperty(value = "case_data") CaseData caseData
+    ) {
         this.caseId = caseId;
         this.caseData = caseData;
     }

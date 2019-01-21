@@ -5,6 +5,7 @@ import static java.util.Collections.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 
@@ -13,19 +14,21 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseDetails;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.DecisionExtractor;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.*;
 
 public class OnlineHearingServiceTest {
     private CohService cohService;
-    private CcdService ccdService;
+    private CorCcdService ccdService;
     private DecisionExtractor decisionExtractor;
 
     private OnlineHearingService underTest;
@@ -33,17 +36,19 @@ public class OnlineHearingServiceTest {
     private String someEmailAddress;
     private Long someCaseId;
     private IdamTokens idamTokens;
+    private AmendPanelMembersService amendPanelMembersService;
 
     @Before
     public void setUp() {
         cohService = mock(CohService.class);
-        ccdService = mock(CcdService.class);
+        ccdService = mock(CorCcdService.class);
         decisionExtractor = mock(DecisionExtractor.class);
         idamTokens = IdamTokens.builder().build();
         IdamService idamService = mock(IdamService.class);
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        underTest = new OnlineHearingService(cohService, ccdService, idamService, decisionExtractor);
+        amendPanelMembersService = mock(AmendPanelMembersService.class);
+        underTest = new OnlineHearingService(cohService, ccdService, idamService, decisionExtractor, amendPanelMembersService);
 
         someEmailAddress = "someEmailAddress";
         someCaseId = 1234321L;
@@ -51,12 +56,15 @@ public class OnlineHearingServiceTest {
 
     @Test
     public void createOnlineHearing() {
-        String hearingId = "hearingId";
-        when(cohService.createOnlineHearing(someRequest())).thenReturn("hearingId");
+        CreateOnlineHearingRequest request = someRequest();
+        CcdEvent ccdEvent = new CcdEvent(new CaseDetails(request.getCaseId(), null), new CaseDetails(request.getCaseId(), null));
 
-        String createdHearingId = underTest.createOnlineHearing(someRequest().getCaseId());
+        when(cohService.createOnlineHearing(request)).thenReturn(true);
 
-        assertThat(createdHearingId, is(hearingId));
+        boolean createdOnlineHearing = underTest.createOnlineHearing(ccdEvent);
+
+        assertThat(createdOnlineHearing, is(true));
+        verify(amendPanelMembersService).amendPanelMembersPermissions(ccdEvent);
     }
 
     @Test

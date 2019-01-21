@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
@@ -15,6 +14,7 @@ import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfSummaryBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohConversation;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohConversations;
@@ -30,7 +30,7 @@ public class StoreOnlineHearingServiceTest {
     private static final String CASE_REF = "caseRef";
     private CohService cohService;
     private IdamService idamService;
-    private CcdService ccdService;
+    private CorCcdService ccdService;
     private PdfSummaryBuilder pdfSummaryBuilder;
     private EvidenceUploadService evidenceUploadService;
     private SscsPdfService sscsPdfService;
@@ -43,7 +43,7 @@ public class StoreOnlineHearingServiceTest {
     public void setup() {
         cohService = mock(CohService.class);
         idamService = mock(IdamService.class);
-        ccdService = mock(CcdService.class);
+        ccdService = mock(CorCcdService.class);
         pdfSummaryBuilder = mock(PdfSummaryBuilder.class);
         evidenceUploadService = mock(EvidenceUploadService.class);
         sscsPdfService = mock(SscsPdfService.class);

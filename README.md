@@ -76,7 +76,7 @@ It clears stopped containers correctly. Might consider removing clutter of image
 ```bash
 docker images
 
-docker image rm <image-id>
+docker image rm <image-userId>
 ```
 
 There is no need to remove postgres and java or similar core images.

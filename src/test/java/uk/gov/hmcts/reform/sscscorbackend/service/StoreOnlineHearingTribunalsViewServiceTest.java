@@ -11,11 +11,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 public class StoreOnlineHearingTribunalsViewServiceTest {
@@ -27,7 +27,7 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
     private PdfService pdfService;
     private StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService;
     private SscsPdfService sscsPdfService;
-    private CcdService ccdService;
+    private CorCcdService ccdService;
     private IdamService idamService;
     private IdamTokens idamTokens;
     private SscsCaseDetails sscsCaseDetails;
@@ -41,7 +41,7 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
         sscsPdfService = mock(SscsPdfService.class);
         sscsPdfService = mock(SscsPdfService.class);
         idamService = mock(IdamService.class);
-        ccdService = mock(CcdService.class);
+        ccdService = mock(CorCcdService.class);
         idamTokens = mock(IdamTokens.class);
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
         storeOnlineHearingTribunalsViewService = new StoreOnlineHearingTribunalsViewService(
