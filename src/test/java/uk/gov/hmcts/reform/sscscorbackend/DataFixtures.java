@@ -90,8 +90,9 @@ public class DataFixtures {
         CaseData caseData = new CaseData("someOnlineHearingId", "assignedToJudge", "assignedToDisabilityMember", "assignedToMedicalMember");
         CaseData caseDataBefore = new CaseData("someOnlineHearingId", "beforeJudge", "beforeDisabilityMember", "beforeMedicalMember");
 
-        CaseDetails caseDetails = new CaseDetails(caseId, caseData, caseDataBefore);
-        return new CcdEvent(caseDetails);
+        CaseDetails caseDetails = new CaseDetails(caseId, caseData);
+        CaseDetails caseDetailsBefore = new CaseDetails(caseId, caseDataBefore);
+        return new CcdEvent(caseDetails, caseDetailsBefore);
     }
 
     public static CohEvent someCohEvent(String caseId, String hearingId, String event) {
