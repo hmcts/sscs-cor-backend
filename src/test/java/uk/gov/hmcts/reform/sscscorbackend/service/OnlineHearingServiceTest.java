@@ -57,7 +57,7 @@ public class OnlineHearingServiceTest {
     @Test
     public void createOnlineHearing() {
         CreateOnlineHearingRequest request = someRequest();
-        CcdEvent ccdEvent = new CcdEvent(new CaseDetails(request.getCaseId(), null, null));
+        CcdEvent ccdEvent = new CcdEvent(new CaseDetails(request.getCaseId(), null), new CaseDetails(request.getCaseId(), null));
 
         when(cohService.createOnlineHearing(request)).thenReturn(true);
 

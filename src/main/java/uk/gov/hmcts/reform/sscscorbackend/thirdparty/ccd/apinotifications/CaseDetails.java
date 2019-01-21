@@ -8,16 +8,12 @@ public class CaseDetails {
 
     @JsonProperty(value = "case_data")
     private CaseData caseData;
-    @JsonProperty(value = "case_data_before")
-    private CaseData caseDataBefore;
 
     public CaseDetails(@JsonProperty(value = "id") String caseId,
-                       @JsonProperty(value = "case_data") CaseData caseData,
-                       @JsonProperty(value = "case_data_before") CaseData caseDataBefore
+                       @JsonProperty(value = "case_data") CaseData caseData
     ) {
         this.caseId = caseId;
         this.caseData = caseData;
-        this.caseDataBefore = caseDataBefore;
     }
 
     public String getCaseId() {
@@ -26,9 +22,5 @@ public class CaseDetails {
 
     public CaseData getCaseData() {
         return caseData;
-    }
-
-    public CaseData getCaseDataBefore() {
-        return caseDataBefore;
     }
 }

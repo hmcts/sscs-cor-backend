@@ -25,9 +25,9 @@ public class AmendPanelMembersService {
         CaseData newCase = newCaseDetails.getCaseData();
         List<String> membersToAddPermissionTo = new ArrayList<>(asList(newCase.getAssignedToDisabilityMember(), newCase.getAssignedToMedicalMember()));
         log.info("PANEL MEMBERS New panel members [" + membersToAddPermissionTo + "]");
-        CaseData oldCaseDetails = ccdEvent.getCaseDetails().getCaseDataBefore();
         long caseId = Long.parseLong(newCaseDetails.getCaseId());
-        if (oldCaseDetails != null) {
+        if (ccdEvent.getCaseDetailsBefore() != null && ccdEvent.getCaseDetailsBefore().getCaseData() != null) {
+            CaseData oldCaseDetails = ccdEvent.getCaseDetailsBefore().getCaseData();
             List<String> membersToRemovePermissionsFrom = new ArrayList<>(asList(oldCaseDetails.getAssignedToDisabilityMember(), oldCaseDetails.getAssignedToMedicalMember()));
             log.info("PANEL MEMBERS  Old panel members [" + membersToRemovePermissionsFrom + "]");
             membersToRemovePermissionsFrom.removeAll(membersToAddPermissionTo);

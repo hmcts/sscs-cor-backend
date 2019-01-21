@@ -36,7 +36,7 @@ public class AmendPanelMembersServiceTest {
 
     @Test
     public void willAddPanelMembersForANewCase() {
-        amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData, null)));
+        amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData), null));
 
         verify(corCcdService).addUserToCase(disabilityMember, Long.valueOf(caseId));
         verify(corCcdService).addUserToCase(medicalMember, Long.valueOf(caseId));
@@ -45,7 +45,7 @@ public class AmendPanelMembersServiceTest {
 
     @Test
     public void willNotAddPanelMembersForAnUncahangedCase() {
-        amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData, newCaseData)));
+        amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData), new CaseDetails(caseId, newCaseData)));
 
         verifyNoMoreInteractions(corCcdService);
     }
@@ -53,7 +53,7 @@ public class AmendPanelMembersServiceTest {
     @Test
     public void willAddNewPanelMembersAndRemoveOldOnes() {
         CaseData oldCaseData = new CaseData("onlineHearingId", "oldJudge", oldDisabilityMember, oldMedicalMember);
-        amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData, oldCaseData)));
+        amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData), new CaseDetails(caseId, oldCaseData)));
 
         verify(corCcdService).addUserToCase(disabilityMember, Long.valueOf(caseId));
         verify(corCcdService).addUserToCase(medicalMember, Long.valueOf(caseId));
@@ -65,7 +65,7 @@ public class AmendPanelMembersServiceTest {
     @Test
     public void willChangeJustTheDisabilityMember() {
         CaseData oldCaseData = new CaseData("onlineHearingId", "oldJudge", oldDisabilityMember, medicalMember);
-        amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData, oldCaseData)));
+        amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData), new CaseDetails(caseId, oldCaseData)));
 
         verify(corCcdService).addUserToCase(disabilityMember, Long.valueOf(caseId));
         verify(corCcdService).removeUserFromCase(oldDisabilityMember, Long.valueOf(caseId));
@@ -75,11 +75,10 @@ public class AmendPanelMembersServiceTest {
     @Test
     public void willChangeJustTheMedicalMember() {
         CaseData oldCaseData = new CaseData("onlineHearingId", "oldJudge", disabilityMember, oldMedicalMember);
-        amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData, oldCaseData)));
+        amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData), new CaseDetails(caseId, oldCaseData)));
 
         verify(corCcdService).addUserToCase(medicalMember, Long.valueOf(caseId));
         verify(corCcdService).removeUserFromCase(oldMedicalMember, Long.valueOf(caseId));
         verifyNoMoreInteractions(corCcdService);
     }
-
 }
