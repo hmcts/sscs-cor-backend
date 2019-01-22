@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 public class BasePdfServiceTest {
@@ -68,13 +69,15 @@ public class BasePdfServiceTest {
     public void storePdf() {
         SscsCaseDetails caseDetails = createCaseDetails();
         when(ccdService.getByCaseId(caseId, idamTokens)).thenReturn(caseDetails);
-        byte[] expectedPdfBytes = {2, 5, 6, 0, 1};
+        byte[] expectedPdfBytes = {2, 4, 6, 0, 1};
         when(pdfService.createPdf(pdfContent)).thenReturn(expectedPdfBytes);
 
-        byte[] pdfBytes = basePdfService.storePdf(caseId, someOnlineHearingId);
+        StorePdfResult storePdfResult = basePdfService.storePdf(caseId, someOnlineHearingId);
 
         verify(sscsPdfService).mergeDocIntoCcd(fileNamePrefix + CASE_REF + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), idamTokens);
-        assertThat(pdfBytes, is(expectedPdfBytes));
+        assertThat(storePdfResult.getPdf().getContent(), is(expectedPdfBytes));
+        assertThat(storePdfResult.getPdf().getName(), is(fileNamePrefix + CASE_REF + ".pdf"));
+        assertThat(storePdfResult.getDocument(), is(caseDetails));
     }
 
     @Test
@@ -100,10 +103,12 @@ public class BasePdfServiceTest {
         byte[] expectedPdfBytes = {2, 4, 6, 0, 1};
         when(evidenceManagementService.download(new URI(documentUrl), "sscs")).thenReturn(expectedPdfBytes);
 
-        basePdfService.storePdf(caseId, someOnlineHearingId);
+        StorePdfResult storePdfResult = basePdfService.storePdf(caseId, someOnlineHearingId);
 
         verifyZeroInteractions(sscsPdfService);
-        assertThat(expectedPdfBytes, is(expectedPdfBytes));
+        assertThat(storePdfResult.getPdf().getContent(), is(expectedPdfBytes));
+        assertThat(storePdfResult.getPdf().getName(), is(fileNamePrefix + CASE_REF + ".pdf"));
+        assertThat(storePdfResult.getDocument(), is(sscsCaseDetails));
     }
 
     private SscsCaseDetails createCaseDetails() {
