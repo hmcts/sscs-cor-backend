@@ -11,13 +11,12 @@ import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
+import uk.gov.hmcts.reform.sscscorbackend.service.QuestionRoundIssuedService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
-import uk.gov.hmcts.reform.sscscorbackend.service.StoreQuestionsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
-
 
 public class OnlineHearingControllerTest {
     private OnlineHearingService onlineHearingService;
@@ -25,6 +24,7 @@ public class OnlineHearingControllerTest {
     private StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService;
     private OnlineHearingController onlineHearingController;
     private NotificationsService notificationsService;
+    private QuestionRoundIssuedService questionRoundIssuedService;
 
     @Before
     public void setUp() {
@@ -33,11 +33,13 @@ public class OnlineHearingControllerTest {
         storeOnlineHearingTribunalsViewService = mock(StoreOnlineHearingTribunalsViewService.class);
         notificationsService = mock(NotificationsService.class);
 
+        questionRoundIssuedService = mock(QuestionRoundIssuedService.class);
         onlineHearingController = new OnlineHearingController(
                 onlineHearingService,
                 storeOnlineHearingService,
                 storeOnlineHearingTribunalsViewService,
-                notificationsService, mock(StoreQuestionsPdfService.class));
+                notificationsService,
+                questionRoundIssuedService);
     }
 
     @Test
@@ -150,6 +152,6 @@ public class OnlineHearingControllerTest {
 
         assertThat(stringResponseEntity.getStatusCode(), is(HttpStatus.OK));
         assertThat(stringResponseEntity.getBody(), is(""));
-        verify(notificationsService).send(cohEvent);
+        verify(questionRoundIssuedService).handleQuestionRoundIssued(cohEvent);
     }
 }

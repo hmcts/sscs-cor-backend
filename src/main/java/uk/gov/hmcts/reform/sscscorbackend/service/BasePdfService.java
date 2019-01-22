@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Slf4j
@@ -36,35 +38,43 @@ public abstract class BasePdfService<E> {
         this.evidenceManagementService = evidenceManagementService;
     }
 
-    public byte[] storePdf(Long caseId, String onlineHearingId) {
+    public StorePdfResult storePdf(Long caseId, String onlineHearingId) {
         IdamTokens idamTokens = idamService.getIdamTokens();
         SscsCaseDetails caseDetails = ccdService.getByCaseId(caseId, idamTokens);
         String documentNamePrefix = documentNamePrefix(caseDetails, onlineHearingId);
         if (pdfHasNotAlreadyBeenCreated(caseDetails, documentNamePrefix)) {
             log.info("Creating pdf for [" + caseId + "]");
-            return storePdf(caseId, onlineHearingId, idamTokens, caseDetails, documentNamePrefix);
+            return new StorePdfResult(
+                    storePdf(caseId, onlineHearingId, idamTokens, caseDetails, documentNamePrefix),
+                    caseDetails
+            );
         } else {
             log.info("Loading pdf for [" + caseId + "]");
-            return loadPdf(caseDetails, documentNamePrefix);
+            return new StorePdfResult(loadPdf(caseDetails, documentNamePrefix), caseDetails);
         }
     }
 
-    private byte[] storePdf(Long caseId, String onlineHearingId, IdamTokens idamTokens, SscsCaseDetails caseDetails, String documentNamePrefix) {
+    private Pdf storePdf(Long caseId, String onlineHearingId, IdamTokens idamTokens, SscsCaseDetails caseDetails, String documentNamePrefix) {
         PdfAppealDetails pdfAppealDetails = getPdfAppealDetails(caseId, caseDetails);
         byte[] pdfBytes = pdfService.createPdf(getPdfContent(caseDetails, onlineHearingId, pdfAppealDetails));
         SscsCaseData caseData = caseDetails.getData();
-        sscsPdfService.mergeDocIntoCcd(documentNamePrefix + caseData.getCaseReference() + ".pdf", pdfBytes, caseId, caseData, idamTokens);
+        String pdfName = getPdfName(documentNamePrefix, caseData.getCaseReference());
+        sscsPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens);
 
-        return pdfBytes;
+        return new Pdf(pdfBytes, pdfName);
     }
 
-    private byte[] loadPdf(SscsCaseDetails caseDetails, String documentNamePrefix) {
+    private String getPdfName(String documentNamePrefix, String caseReference) {
+        return documentNamePrefix + caseReference + ".pdf";
+    }
+
+    private Pdf loadPdf(SscsCaseDetails caseDetails, String documentNamePrefix) {
         SscsDocument document = caseDetails.getData().getSscsDocument().stream()
                 .filter(documentNameMatches(documentNamePrefix))
                 .findFirst().get();
         String documentUrl = document.getValue().getDocumentLink().getDocumentUrl();
         try {
-            return evidenceManagementService.download(new URI(documentUrl), "sscs");
+            return new Pdf(evidenceManagementService.download(new URI(documentUrl), "sscs"), getPdfName(documentNamePrefix, caseDetails.getData().getCaseReference()));
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Document uri invalid [" + documentUrl + "]");
         }
