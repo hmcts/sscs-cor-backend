@@ -48,3 +48,7 @@ variable "enable_debug_error_message" {
 variable "enable_select_by_case_id" {
   default     = "false"
 }
+
+variable "dwp_email" {
+  default = "dwp_email@example.com"
+}
