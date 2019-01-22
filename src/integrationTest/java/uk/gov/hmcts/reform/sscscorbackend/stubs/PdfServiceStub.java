@@ -10,8 +10,8 @@ public class PdfServiceStub extends BaseStub {
         super(url);
     }
 
-    public void stubCreatePdf() {
+    public void stubCreatePdf(byte[] pdf) {
         wireMock.stubFor(post("/pdfs")
-                .willReturn(ok(Arrays.toString(new byte[]{1, 2, 3}))));
+                .willReturn(ok(Arrays.toString(pdf))));
     }
 }

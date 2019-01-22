@@ -36,6 +36,8 @@ public abstract class BaseIntegrationTest {
     private String documentStoreUrl;
     @Value("${pdf.api.url}")
     private String pdfServiceUrl;
+    @Value("${appeal.email.port}")
+    private int mailPort;
 
     @LocalServerPort
     protected int applicationPort;
@@ -49,6 +51,7 @@ public abstract class BaseIntegrationTest {
     protected NotificationsStub notificationsStub;
 
     private List<BaseStub> stubs = new ArrayList<>();
+    protected MailStub mailStub;
 
     @Before
     public void setUp() throws Exception {
@@ -66,10 +69,12 @@ public abstract class BaseIntegrationTest {
         stubs.add(notificationsStub);
         pdfServiceStub = new PdfServiceStub(pdfServiceUrl);
         stubs.add(pdfServiceStub);
+        mailStub = new MailStub(mailPort);
     }
 
     @After
     public void shutdownCoh() {
         stubs.forEach(BaseStub::shutdown);
+        mailStub.stop();
     }
 }
