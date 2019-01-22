@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -31,19 +32,22 @@ public class OnlineHearingService {
     private final IdamService idamService;
     private final DecisionExtractor decisionExtractor;
     private final AmendPanelMembersService amendPanelMembersService;
+    private final boolean enableSelectByCaseId;
 
     public OnlineHearingService(
             @Autowired CohService cohService,
             @Autowired CorCcdService ccdService,
             @Autowired IdamService idamService,
             @Autowired DecisionExtractor decisionExtractor,
-            @Autowired AmendPanelMembersService amendPanelMembersService
+            @Autowired AmendPanelMembersService amendPanelMembersService,
+            @Value("${enable_select_by_case_id}") boolean enableSelectByCaseId
     ) {
         this.cohClient = cohService;
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.decisionExtractor = decisionExtractor;
         this.amendPanelMembersService = amendPanelMembersService;
+        this.enableSelectByCaseId = enableSelectByCaseId;
     }
 
     public boolean createOnlineHearing(CcdEvent ccdEvent) {
@@ -60,8 +64,10 @@ public class OnlineHearingService {
     }
 
     public Optional<OnlineHearing> getOnlineHearing(String emailAddress) {
+        String[] splitEmailAddress = emailAddress.split("\\+");
+        String actualEmailAddress = enableSelectByCaseId ? splitEmailAddress[0] : emailAddress;
         List<SscsCaseDetails> cases = ccdService.findCaseBy(
-                ImmutableMap.of("case.subscriptions.appellantSubscription.email", emailAddress),
+                ImmutableMap.of("case.subscriptions.appellantSubscription.email", actualEmailAddress),
                 idamService.getIdamTokens()
         );
 
@@ -73,7 +79,14 @@ public class OnlineHearingService {
         if (corCases.isEmpty()) {
             throw new CaseNotCorException();
         } else if (corCases.size() > 1) {
-            throw new IllegalStateException("Multiple appeals with online hearings found.");
+            if (enableSelectByCaseId && splitEmailAddress.length > 1) {
+                Optional<SscsCaseDetails> caseForId = corCases.stream()
+                        .filter(corCase -> corCase.getId().equals(Long.valueOf(splitEmailAddress[1]))).findFirst();
+
+                return loadOnlineHearingFromCoh(caseForId.orElseThrow(() -> new IllegalStateException("Multiple appeals with online hearings found.")));
+            } else {
+                throw new IllegalStateException("Multiple appeals with online hearings found.");
+            }
         }
 
         return loadOnlineHearingFromCoh(corCases.get(0));
