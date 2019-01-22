@@ -37,6 +37,7 @@ public class OnlineHearingServiceTest {
     private Long someCaseId;
     private IdamTokens idamTokens;
     private AmendPanelMembersService amendPanelMembersService;
+    private IdamService idamService;
 
     @Before
     public void setUp() {
@@ -44,11 +45,11 @@ public class OnlineHearingServiceTest {
         ccdService = mock(CorCcdService.class);
         decisionExtractor = mock(DecisionExtractor.class);
         idamTokens = IdamTokens.builder().build();
-        IdamService idamService = mock(IdamService.class);
+        idamService = mock(IdamService.class);
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         amendPanelMembersService = mock(AmendPanelMembersService.class);
-        underTest = new OnlineHearingService(cohService, ccdService, idamService, decisionExtractor, amendPanelMembersService);
+        underTest = new OnlineHearingService(cohService, ccdService, idamService, decisionExtractor, amendPanelMembersService, false);
 
         someEmailAddress = "someEmailAddress";
         someCaseId = 1234321L;
@@ -83,6 +84,34 @@ public class OnlineHearingServiceTest {
         when(cohService.getOnlineHearing(someCaseId)).thenReturn(cohOnlineHearings);
 
         Optional<OnlineHearing> onlineHearing = underTest.getOnlineHearing(someEmailAddress);
+
+        assertThat(onlineHearing.isPresent(), is(true));
+        String expectedOnlineHearingId = cohOnlineHearings.getOnlineHearings().get(0).getOnlineHearingId();
+        assertThat(onlineHearing.get().getOnlineHearingId(), is(expectedOnlineHearingId));
+        assertThat(onlineHearing.get().getCaseReference(), is(expectedCaseReference));
+        assertThat(onlineHearing.get().getAppellantName(), is(firstName + " " + lastName));
+    }
+
+    @Test
+    public void getsAnOnlineHearingWithCcdId() {
+        underTest = new OnlineHearingService(cohService, ccdService, idamService, decisionExtractor, amendPanelMembersService, true);
+        String expectedCaseReference = "someCaseReference";
+        String firstName = "firstName";
+        String lastName = "lastName";
+
+        SscsCaseDetails caseDetails1 = createCaseDetails(someCaseId, expectedCaseReference, firstName, lastName);
+        long someOtherCaseId = 88888L;
+        SscsCaseDetails caseDetails2 = createCaseDetails(someOtherCaseId, "otherCaseRef", "otherFirstName", "otherLastName");
+        when(ccdService.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress), idamTokens))
+                .thenReturn(asList(
+                        createNonOnlineHearingCaseDetails(22222L, "otherCaseRef", "otherFirstName", "otherLastName"),
+                        caseDetails1,
+                        caseDetails2));
+
+        CohOnlineHearings cohOnlineHearings = someCohOnlineHearings();
+        when(cohService.getOnlineHearing(someCaseId)).thenReturn(cohOnlineHearings);
+
+        Optional<OnlineHearing> onlineHearing = underTest.getOnlineHearing(someEmailAddress + "+" + someCaseId);
 
         assertThat(onlineHearing.isPresent(), is(true));
         String expectedOnlineHearingId = cohOnlineHearings.getOnlineHearings().get(0).getOnlineHearingId();

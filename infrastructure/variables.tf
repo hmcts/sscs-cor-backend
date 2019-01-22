@@ -44,3 +44,7 @@ variable "enable_debug_error_message" {
   default     = "true"
   description = "Enable stack traces on error messages"
 }
+
+variable "enable_select_by_case_id" {
+  default     = "false"
+}
