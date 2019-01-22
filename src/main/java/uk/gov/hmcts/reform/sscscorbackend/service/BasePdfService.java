@@ -71,7 +71,8 @@ public abstract class BasePdfService<E> {
     private Pdf loadPdf(SscsCaseDetails caseDetails, String documentNamePrefix) {
         SscsDocument document = caseDetails.getData().getSscsDocument().stream()
                 .filter(documentNameMatches(documentNamePrefix))
-                .findFirst().get();
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Found PDF with name prefix [" + documentNamePrefix + "] but cannot load it"));
         String documentUrl = document.getValue().getDocumentLink().getDocumentUrl();
         try {
             return new Pdf(evidenceManagementService.download(new URI(documentUrl), "sscs"), getPdfName(documentNamePrefix, caseDetails.getData().getCaseReference()));
