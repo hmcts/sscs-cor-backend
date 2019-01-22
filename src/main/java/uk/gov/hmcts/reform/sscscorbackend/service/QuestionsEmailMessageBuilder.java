@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 
 @Service
 public class QuestionsEmailMessageBuilder {
-    private final String template = "Appellant: {firstName} {lastName}\n\n" +
+    private static final String TEMPLATE = "Appellant: {firstName} {lastName}\n\n" +
             "Appeal reference number: {caseReference}\n\n" +
             "National Insurance number: {nino}\n\n" +
             "The tribunal have sent some questions to the appellant in the above appeal.\n" +
@@ -20,7 +20,7 @@ public class QuestionsEmailMessageBuilder {
         SscsCaseData data = caseDetails.getData();
         Appellant appellant = data.getAppeal().getAppellant();
         Name name = appellant.getName();
-        return template.replace("{firstName}", name.getFirstName())
+        return TEMPLATE.replace("{firstName}", name.getFirstName())
                 .replace("{lastName}", name.getLastName())
                 .replace("{caseReference}", data.getCaseReference())
                 .replace("{nino}", appellant.getIdentity().getNino());
