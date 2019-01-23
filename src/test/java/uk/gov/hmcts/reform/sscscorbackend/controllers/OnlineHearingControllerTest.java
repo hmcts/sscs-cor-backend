@@ -2,7 +2,8 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCcdEvent;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohEvent;
 
@@ -11,35 +12,21 @@ import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
-import uk.gov.hmcts.reform.sscscorbackend.service.QuestionRoundIssuedService;
-import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
-import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
 
 public class OnlineHearingControllerTest {
     private OnlineHearingService onlineHearingService;
-    private StoreOnlineHearingService storeOnlineHearingService;
-    private StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService;
     private OnlineHearingController onlineHearingController;
-    private NotificationsService notificationsService;
-    private QuestionRoundIssuedService questionRoundIssuedService;
+    private CohEventActionMapper cohEventActionMapper;
 
     @Before
     public void setUp() {
         onlineHearingService = mock(OnlineHearingService.class);
-        storeOnlineHearingService = mock(StoreOnlineHearingService.class);
-        storeOnlineHearingTribunalsViewService = mock(StoreOnlineHearingTribunalsViewService.class);
-        notificationsService = mock(NotificationsService.class);
-
-        questionRoundIssuedService = mock(QuestionRoundIssuedService.class);
+        cohEventActionMapper = mock(CohEventActionMapper.class);
         onlineHearingController = new OnlineHearingController(
                 onlineHearingService,
-                storeOnlineHearingService,
-                storeOnlineHearingTribunalsViewService,
-                notificationsService,
-                questionRoundIssuedService);
+                cohEventActionMapper);
     }
 
     @Test
@@ -75,12 +62,12 @@ public class OnlineHearingControllerTest {
         Long caseId = 12345L;
 
         CohEvent cohEvent = someCohEvent(caseId.toString(), hearingId, "continuous_online_hearing_resolved");
+        when(cohEventActionMapper.handle(cohEvent)).thenReturn(true);
 
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchCohEvent(cohEvent);
 
         assertThat(stringResponseEntity.getStatusCode(), is(HttpStatus.OK));
         assertThat(stringResponseEntity.getBody(), is(""));
-        verify(storeOnlineHearingService).storePdf(caseId, hearingId);
     }
 
     @Test
@@ -110,48 +97,17 @@ public class OnlineHearingControllerTest {
         assertThat(stringResponseEntity.getStatusCode(), is(HttpStatus.BAD_REQUEST));
     }
 
-
     @Test
-    public void testCatchCohEventWrongEvent() {
+    public void testCatchCohEventUnhandled() {
         String hearingId = null;
 
         String caseId = "caseId";
 
         CohEvent cohEvent = someCohEvent(caseId, hearingId, "continuous_online_hearing_started");
+        when(cohEventActionMapper.handle(cohEvent)).thenReturn(false);
 
         ResponseEntity<String> stringResponseEntity = onlineHearingController.catchCohEvent(cohEvent);
 
         assertThat(stringResponseEntity.getStatusCode(), is(HttpStatus.BAD_REQUEST));
-    }
-
-    @Test
-    public void testCatchDecisionIssuedCohEvent() {
-        String hearingId = "somehearingid";
-
-        String caseId = "1234";
-
-        CohEvent cohEvent = someCohEvent(caseId, hearingId, "decision_issued");
-
-        ResponseEntity<String> stringResponseEntity = onlineHearingController.catchCohEvent(cohEvent);
-
-        assertThat(stringResponseEntity.getStatusCode(), is(HttpStatus.OK));
-        assertThat(stringResponseEntity.getBody(), is(""));
-        verify(storeOnlineHearingTribunalsViewService).storePdf(Long.valueOf(caseId), hearingId);
-        verify(notificationsService).send(cohEvent);
-    }
-
-    @Test
-    public void testCatchQuestionRoundIssuedIssuedCohEvent() {
-        String hearingId = "somehearingid";
-
-        String caseId = "1234";
-
-        CohEvent cohEvent = someCohEvent(caseId, hearingId, "question_round_issued");
-
-        ResponseEntity<String> stringResponseEntity = onlineHearingController.catchCohEvent(cohEvent);
-
-        assertThat(stringResponseEntity.getStatusCode(), is(HttpStatus.OK));
-        assertThat(stringResponseEntity.getBody(), is(""));
-        verify(questionRoundIssuedService).handleQuestionRoundIssued(cohEvent);
     }
 }

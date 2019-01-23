@@ -8,12 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
-import uk.gov.hmcts.reform.sscscorbackend.service.QuestionRoundIssuedService;
-import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
-import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
 
 
 @Slf4j
@@ -21,22 +17,13 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.Notifications
 public class OnlineHearingController {
 
     private final OnlineHearingService onlineHearingService;
-    private final StoreOnlineHearingService storeOnlineHearingService;
-    private final StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService;
-    private final NotificationsService notificationsService;
-    private final QuestionRoundIssuedService questionRoundIssuedService;
+    private final CohEventActionMapper cohEventActionMapper;
 
 
     public OnlineHearingController(@Autowired OnlineHearingService onlineHearingService,
-                                   @Autowired StoreOnlineHearingService storeOnlineHearingService,
-                                   @Autowired StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService,
-                                   @Autowired NotificationsService notificationsService,
-                                   @Autowired QuestionRoundIssuedService questionRoundIssuedService) {
+                                   @Autowired CohEventActionMapper cohEventActionMapper) {
         this.onlineHearingService = onlineHearingService;
-        this.storeOnlineHearingService = storeOnlineHearingService;
-        this.storeOnlineHearingTribunalsViewService = storeOnlineHearingTribunalsViewService;
-        this.notificationsService = notificationsService;
-        this.questionRoundIssuedService = questionRoundIssuedService;
+        this.cohEventActionMapper = cohEventActionMapper;
     }
 
     @ApiOperation(value = "Create online hearing",
@@ -73,21 +60,18 @@ public class OnlineHearingController {
             //throw a bad request error
             return ResponseEntity.badRequest().build();
         }
+        String eventType = request.getEventType();
 
         String onlineHearingId = request.getOnlineHearingId();
         Long caseId = Long.valueOf(request.getCaseId());
-        log.info("Received event for storing online hearing for case {} and hearing {} ...",
-                caseId, onlineHearingId);
+        log.info("Received event [{}] for case [{}] and hearing [{}]",
+                eventType, caseId, onlineHearingId);
 
-        if (request.getEventType().equalsIgnoreCase("decision_issued")) {
-            storeOnlineHearingTribunalsViewService.storePdf(caseId, onlineHearingId);
-            notificationsService.send(request);
-        } else if (request.getEventType().equalsIgnoreCase("question_round_issued")) {
-            questionRoundIssuedService.handleQuestionRoundIssued(request);
+        if (cohEventActionMapper.handle(request)) {
+            return ResponseEntity.ok("");
         } else {
-            storeOnlineHearingService.storePdf(caseId, onlineHearingId);
+            return ResponseEntity.badRequest().body("Event [" + request.getEventType() + "] not mapped");
         }
-
-        return ResponseEntity.ok("");
     }
+
 }
