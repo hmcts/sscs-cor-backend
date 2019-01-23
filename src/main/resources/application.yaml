@@ -76,4 +76,5 @@ appeal:
     message: ${EMAIL_MESSAGE:Your appeal has been created \nPlease do not respond to this email}
     dwpEmailAddress: ${DWP_EMAIL:dwp@example.com}
 
-enable_debug_error_message: ${ENABLE_DEBUG_ERROR_MESSAGE:true}enable_select_by_case_id: ${ENABLE_SELECT_BY_CASE_ID:false}
+enable_debug_error_message: ${ENABLE_DEBUG_ERROR_MESSAGE:true}
+enable_select_by_case_id: ${ENABLE_SELECT_BY_CASE_ID:false}
