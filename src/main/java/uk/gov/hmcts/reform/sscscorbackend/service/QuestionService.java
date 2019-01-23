@@ -116,6 +116,10 @@ public class QuestionService {
         }
     }
 
+    public int getCurrentQuestionRound(String onlineHearingId) {
+        return cohService.getQuestionRounds(onlineHearingId).getCurrentQuestionRound();
+    }
+
     private String getQuestionRoundDeadlineExpiryDate(CohQuestionRound questionRound) {
         List<CohQuestionReference> questionRefsForRound = questionRound.getQuestionReferences();
         if (questionRefsForRound != null && !questionRefsForRound.isEmpty()) {
@@ -136,6 +140,7 @@ public class QuestionService {
                 cohQuestionReference.getQuestionId(),
                 cohQuestionReference.getQuestionOrdinal(),
                 cohQuestionReference.getQuestionHeaderText(),
+                cohQuestionReference.getQuestionBodyText(),
                 answerState
         );
     }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
+import uk.gov.hmcts.reform.sscscorbackend.service.QuestionRoundIssuedService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
@@ -23,15 +24,19 @@ public class OnlineHearingController {
     private final StoreOnlineHearingService storeOnlineHearingService;
     private final StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService;
     private final NotificationsService notificationsService;
+    private final QuestionRoundIssuedService questionRoundIssuedService;
 
 
     public OnlineHearingController(@Autowired OnlineHearingService onlineHearingService,
                                    @Autowired StoreOnlineHearingService storeOnlineHearingService,
-                                   @Autowired StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService, NotificationsService notificationsService) {
+                                   @Autowired StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService,
+                                   @Autowired NotificationsService notificationsService,
+                                   @Autowired QuestionRoundIssuedService questionRoundIssuedService) {
         this.onlineHearingService = onlineHearingService;
         this.storeOnlineHearingService = storeOnlineHearingService;
         this.storeOnlineHearingTribunalsViewService = storeOnlineHearingTribunalsViewService;
         this.notificationsService = notificationsService;
+        this.questionRoundIssuedService = questionRoundIssuedService;
     }
 
     @ApiOperation(value = "Create online hearing",
@@ -70,15 +75,17 @@ public class OnlineHearingController {
         }
 
         String onlineHearingId = request.getOnlineHearingId();
-        String caseId = request.getCaseId();
+        Long caseId = Long.valueOf(request.getCaseId());
         log.info("Received event for storing online hearing for case {} and hearing {} ...",
                 caseId, onlineHearingId);
 
         if (request.getEventType().equalsIgnoreCase("decision_issued")) {
-            storeOnlineHearingTribunalsViewService.storeTribunalsView(Long.valueOf(caseId));
+            storeOnlineHearingTribunalsViewService.storePdf(caseId, onlineHearingId);
             notificationsService.send(request);
+        } else if (request.getEventType().equalsIgnoreCase("question_round_issued")) {
+            questionRoundIssuedService.handleQuestionRoundIssued(request);
         } else {
-            storeOnlineHearingService.storeOnlineHearingInCcd(onlineHearingId, caseId);
+            storeOnlineHearingService.storePdf(caseId, onlineHearingId);
         }
 
         return ResponseEntity.ok("");
