@@ -105,8 +105,8 @@ public abstract class BaseFunctionTest {
         return httpClientBuilder.build();
     }
 
-    protected void resolveHearing(String hearingId, String caseId) throws IOException {
-        sscsCorBackendRequests.cohHearingResolved(hearingId, caseId);
+    protected void relistHearing(String hearingId, String caseId) throws IOException {
+        sscsCorBackendRequests.cohHearingRelisted(hearingId, caseId);
     }
 
     protected void decisionIssued(String hearingId, String caseId) throws IOException {
