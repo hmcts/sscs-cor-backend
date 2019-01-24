@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -81,23 +80,5 @@ public class AmendPanelMembersServiceTest {
         verify(corCcdService).addUserToCase(medicalMember, Long.valueOf(caseId));
         verify(corCcdService).removeUserFromCase(oldMedicalMember, Long.valueOf(caseId));
         verifyNoMoreInteractions(corCcdService);
-    }
-
-    @Test
-    public void stripOutUserName() {
-        String fixedListValue = "123456|Chris Davidson";
-        assertEquals("123456", amendPanelMembersService.stripOutUserName(fixedListValue));
-    }
-
-    @Test
-    public void stripOutUserNameOldFormat() {
-        String fixedListValue = "123456";
-        assertEquals("123456", amendPanelMembersService.stripOutUserName(fixedListValue));
-    }
-
-    @Test
-    public void stripOutUserNameNull() {
-        String fixedListValue = null;
-        assertEquals(null, amendPanelMembersService.stripOutUserName(fixedListValue));
     }
 }
