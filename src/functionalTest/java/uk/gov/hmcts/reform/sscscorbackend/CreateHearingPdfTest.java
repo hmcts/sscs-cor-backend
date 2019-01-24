@@ -12,7 +12,7 @@ public class CreateHearingPdfTest extends BaseFunctionTest {
         answerQuestion(onlineHearing.getHearingId(), onlineHearing.getQuestionId());
 
         //now trigger our endpoint
-        resolveHearing(onlineHearing.getHearingId(), onlineHearing.getCaseId());
+        relistHearing(onlineHearing.getHearingId(), onlineHearing.getCaseId());
     }
 
     @Test

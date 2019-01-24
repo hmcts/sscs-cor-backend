@@ -128,8 +128,8 @@ public class SscsCorBackendRequests {
         assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
     }
 
-    public void cohHearingResolved(String hearingId, String caseId) throws IOException {
-        cohEvent(hearingId, caseId, "continuous_online_hearing_resolved");
+    public void cohHearingRelisted(String hearingId, String caseId) throws IOException {
+        cohEvent(hearingId, caseId, "continuous_online_hearing_relisted");
     }
 
     public void cohDecisionIssued(String hearingId, String caseId) throws IOException {
