@@ -8,6 +8,8 @@ spring:
     multipart:
       max-file-size: ${MAX_FILE_SIZE:11MB}
       max-request-size: ${MAX_FILE_SIZE:11MB}
+  main:
+    allow-bean-definition-overriding: true
 
 coh:
   url: ${COH_URL:http://localhost:8081}
