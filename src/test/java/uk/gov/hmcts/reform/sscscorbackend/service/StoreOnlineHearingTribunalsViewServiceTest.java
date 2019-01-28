@@ -65,12 +65,18 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
     private SscsCaseData createSscsCaseData() {
         return SscsCaseData.builder()
                 .caseReference(someCaseReference)
-                .generatedNino("someNino")
-                .appeal(Appeal.builder().appellant(Appellant.builder().name(Name.builder()
-                        .title("Mr")
-                        .firstName("Jean")
-                        .lastName("Valjean")
-                        .build()
-                ).build()).build()).build();
+                .appeal(
+                        Appeal.builder().appellant(Appellant.builder()
+                                .name(Name.builder()
+                                        .title("Mr")
+                                    .firstName("Jean")
+                                    .lastName("Valjean")
+                                    .build())
+                                .identity(Identity.builder()
+                                        .nino("someNino")
+                                        .build())
+                            .build())
+                        .build())
+                .build();
     }
 }

@@ -96,7 +96,7 @@ public abstract class BasePdfService<E> {
         String appellantFirstName = caseDetails.getData().getAppeal().getAppellant().getName().getFirstName();
         String appellantLastName = caseDetails.getData().getAppeal().getAppellant().getName().getLastName();
 
-        String nino = caseDetails.getData().getGeneratedNino();
+        String nino = caseDetails.getData().getAppeal().getAppellant().getIdentity().getNino();
         String caseReference = caseDetails.getData().getCaseReference();
 
         return new PdfAppealDetails(appellantTitle, appellantFirstName, appellantLastName, nino, caseReference);

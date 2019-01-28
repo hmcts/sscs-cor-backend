@@ -121,9 +121,11 @@ public class BasePdfServiceTest {
                                                 .firstName(FIRST_NAME)
                                                 .lastName(LAST_NAME)
                                                 .build())
+                                        .identity(Identity.builder()
+                                                .nino(NINO)
+                                                .build())
                                         .build())
                                 .build())
-                        .generatedNino(NINO)
                         .caseReference(CASE_REF)
                         .build())
                 .build();
