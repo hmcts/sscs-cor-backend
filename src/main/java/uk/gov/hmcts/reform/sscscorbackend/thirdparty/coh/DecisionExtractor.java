@@ -10,7 +10,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
@@ -45,9 +44,7 @@ public class DecisionExtractor {
     private static final List<String> mobilityActivities = asList("planningFollowingJourneys", "movingAround");
 
     public Decision extract(long caseId, CohDecision decision, CohDecisionReply appellantReply) {
-        String unescapeJson = StringEscapeUtils.unescapeJava(decision.getDecisionText());
-
-        JSONObject jsonObject = new JSONObject(unescapeJson);
+        JSONObject jsonObject = new JSONObject(decision.getDecisionText());
         JSONObject decisionJson = jsonObject.getJSONObject("decisions_SSCS_benefit_" + caseId);
 
         String startDateString = getDate(decisionJson, "Start");
