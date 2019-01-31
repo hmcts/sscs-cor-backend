@@ -44,7 +44,7 @@ def vaultOverrides = [
 
 withPipeline(type, product, component) {
     //setVaultName('sscs')
-    overrideVaultEnvironments(vaultOverrides)
+    //overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
     enableDockerBuild()
     //enableDeployToAKS()
