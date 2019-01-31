@@ -41,3 +41,18 @@ ccd:
 
   caseManagementWeb:
     enabled: true
+
+
+    importer:
+      definitions:
+      #  - https://raw.githubusercontent.com/hmcts/Probate-CCD-Import-Spreadsheets/master/spreadsheet/back-office/CCD_Probate_V04.32.01-Hlm.xlsx
+      # location incorrect.. its not in b-o, do we need this sheet?   - https://raw.githubusercontent.com/hmcts/Probate-CCD-Import-Spreadsheets/master/spreadsheet/back-office/CCD_Probate_Legacy_V00.01-Dev.xlsx
+      #      - https://github.com/hmcts/Probate-CCD-Import-Spreadsheets/raw/master/spreadsheet/CCD_Probate_V21.02-Dev.xlsx
+      userRoles:
+        - caseworker-sscs
+        - caseworker-sscs-systemupdate
+        - caseworker-sscs-anonymouscitizen
+        - citizen
+        - caseworker-sscs-callagent
+        - caseworker-sscs-judge
+        - caseworker-sscs-panelmember
