@@ -81,10 +81,6 @@
             margin-top: 30px;
         }
 
-        .preserve-format {
-            white-space: pre-wrap;
-        }
-
     </style>
 </head>
 
@@ -147,7 +143,7 @@
                 </dl>
                 {% for question in pdfSummary.questions %}
                     <h2 class="heading-medium">{{ question.question_header_text }}</h2>
-                    <p class="body-text preserve-format">{{ question.question_body_text }}</p>
+                    <p class="body-text">{{ question.question_body_text | raw }}</p>
                 {% endfor %}
 
                 <br/><br/><br/>
@@ -161,7 +157,5 @@
         </div>
     </div>
 </main>
-
 </body>
 </html>
-
