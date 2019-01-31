@@ -24,3 +24,25 @@ java:
     APPINSIGHTS_INSTRUMENTATIONKEY: ${APPINSIGHTS_INSTRUMENTATIONKEY}
     ROOT_LOGGING_LEVEL: INFO
     LOG_OUTPUT: single
+ccd:
+  ingressHost: ${SERVICE_FQDN}
+  ingressIP: ${INGRESS_IP}
+  consulIP: ${CONSUL_LB_IP}
+
+  apiGateway:
+    s2sKey: ${API_GATEWAY_S2S_KEY}
+    idamClientSecret: ${API_GATEWAY_IDAM_SECRET}
+
+  dataStoreApi:
+    s2sKey: ${DATA_STORE_S2S_KEY}
+
+  definitionStoreApi:
+    s2sKey: ${DEFINITION_STORE_S2S_KEY}
+
+  caseManagementWeb:
+    enabled: true
+
+   printApi:
+    # enabled: true # if you need access to the case print service then enable this
+    s2sKey: ${PRINT_S2S_KEY}
+    probateTemplateUrl: http://${SERVICE_NAME}-probate-app
