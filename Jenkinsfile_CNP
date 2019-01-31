@@ -26,10 +26,17 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     ]
 }
 
+def vaultOverrides = [
+        'preview' : 'aat',
+        'spreview': 'saat'
+]
+
 withPipeline(type, product, component) {
     setVaultName('sscs')
+    overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
     enableDockerBuild()
     enableDeployToAKS()
     enableSlackNotifications('#sscs-tech')
+    installCharts()
 }
