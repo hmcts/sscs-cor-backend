@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend.controllers;
+package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -10,15 +10,15 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
 
-public class CohEventActionMapperTest {
+public class CohEventCohEventActionMapperTest {
 
     private CohEventActionMapper cohEventActionMapper;
-    private CohEventActionMapper.Action action;
+    private CohEventAction action;
 
     @Before
     public void setUp() {
-        HashMap<String, CohEventActionMapper.Action> actions = new HashMap<>();
-        action = mock(CohEventActionMapper.Action.class);
+        HashMap<String, CohEventAction> actions = new HashMap<>();
+        action = mock(CohEventAction.class);
         actions.put("someMappedEvent", action);
         cohEventActionMapper = new CohEventActionMapper(actions);
     }

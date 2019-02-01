@@ -1,28 +1,28 @@
-package uk.gov.hmcts.reform.sscscorbackend.controllers;
+package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscscorbackend.service.QuestionRoundIssuedService;
-import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
 
 @Service
 public class CohEventActionMapper {
-    private final Map<String, Action> actions;
+    private final Map<String, CohEventAction> actions;
 
     @Autowired
     public CohEventActionMapper(StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService,
                                 NotificationsService notificationsService,
                                 QuestionRoundIssuedService questionRoundIssuedService,
-                                StoreOnlineHearingService storeOnlineHearingService) {
-        this(buildActionsMap(storeOnlineHearingTribunalsViewService, notificationsService, questionRoundIssuedService, storeOnlineHearingService));
+                                HearingRelistedAction hearingRelistedAction) {
+        this(buildActionsMap(storeOnlineHearingTribunalsViewService, notificationsService, questionRoundIssuedService,
+                hearingRelistedAction));
     }
 
-    CohEventActionMapper(HashMap<String, Action> actions) {
+    CohEventActionMapper(HashMap<String, CohEventAction> actions) {
         this.actions = actions;
     }
 
@@ -42,13 +42,13 @@ public class CohEventActionMapper {
         return false;
     }
 
-    private static HashMap<String, Action> buildActionsMap(
+    private static HashMap<String, CohEventAction> buildActionsMap(
             StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService,
             NotificationsService notificationsService,
             QuestionRoundIssuedService questionRoundIssuedService,
-            StoreOnlineHearingService storeOnlineHearingService
+            HearingRelistedAction hearingRelistedAction
     ) {
-        HashMap<String, Action> actions = new HashMap<>();
+        HashMap<String, CohEventAction> actions = new HashMap<>();
         actions.put("decision_issued", (caseId, onlineHearingId, cohEvent) -> {
             storeOnlineHearingTribunalsViewService.storePdf(caseId, onlineHearingId);
             notificationsService.send(cohEvent);
@@ -56,16 +56,9 @@ public class CohEventActionMapper {
         actions.put("question_round_issued", (caseId, onlineHearingId, cohEvent) ->
             questionRoundIssuedService.handleQuestionRoundIssued(cohEvent)
         );
-        actions.put("continuous_online_hearing_relisted",  (caseId, onlineHearingId, cohEvent) -> {
-            storeOnlineHearingService.storePdf(caseId, onlineHearingId);
-            notificationsService.send(cohEvent);
-        });
+        actions.put("continuous_online_hearing_relisted", hearingRelistedAction);
 
         return actions;
     }
 
-    @FunctionalInterface
-    interface Action {
-        public void handle(Long caseId, String onlineHearingId, CohEvent cohEvent);
-    }
 }
