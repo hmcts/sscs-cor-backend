@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend.service;
+package uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -12,8 +12,6 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohClient;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CreateOnlineHearingRequest;
 
 public class CohServiceTest {
