@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend.service;
+package uk.gov.hmcts.reform.sscscorbackend.service.pdf;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -13,7 +13,6 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestionRound;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfSummaryBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.*;
 
 public class PdfSummaryBuilderTest {

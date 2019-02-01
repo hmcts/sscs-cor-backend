@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.Before;

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend.service;
+package uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
@@ -6,7 +6,6 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.DecisionExtractor;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohDecision;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohDecisionReply;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohState;
