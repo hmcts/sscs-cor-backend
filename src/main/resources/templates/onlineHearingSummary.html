@@ -161,7 +161,7 @@
                 {% for question_round in pdfSummary.questionRounds %}
                     {% for questionReference in question_round.questions %}
                         <h2 class="heading-medium">{{ questionReference.questionTitle }}</h2>
-                        <p class="body-text preserve-format">{{ questionReference.questionBody }}</p>
+                        <p class="body-text">{{ questionReference.questionBody | raw }}</p>
                         <p class="font-small">Issued: {{ questionReference.issuedDate }}</p>
                         <div class="appellants-answer">
                             <h2 class="bold-medium">Answer</h2>
@@ -183,7 +183,5 @@
         </div>
     </div>
 </main>
-
 </body>
 </html>
-
