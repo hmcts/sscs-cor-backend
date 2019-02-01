@@ -14,80 +14,80 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohState;
 public class DecisionExtractorTest {
     private static final long caseId = 1234321L;
     private static final String decisionString = "{  \n" +
-            "   \\\"decisions_SSCS_benefit_1234321\\\":{  \n" +
-            "      \\\"preliminaryView\\\":\\\"yes\\\",\n" +
-            "      \\\"visitedPages\\\":{  \n" +
-            "         \\\"create\\\":true,\n" +
-            "         \\\"preliminary-advanced\\\":true,\n" +
-            "         \\\"set-award-dates\\\":true,\n" +
-            "         \\\"scores\\\":true,\n" +
-            "         \\\"budgeting-decisions\\\":true,\n" +
-            "         \\\"planning-journeys\\\":true\n" +
+            "   \"decisions_SSCS_benefit_1234321\":{  \n" +
+            "      \"preliminaryView\":\"yes\",\n" +
+            "      \"visitedPages\":{  \n" +
+            "         \"create\":true,\n" +
+            "         \"preliminary-advanced\":true,\n" +
+            "         \"set-award-dates\":true,\n" +
+            "         \"scores\":true,\n" +
+            "         \"budgeting-decisions\":true,\n" +
+            "         \"planning-journeys\":true\n" +
             "      },\n" +
-            "      \\\"forDailyLiving\\\":\\\"noAward\\\",\n" +
-            "      \\\"forMobility\\\":\\\"enhancedRate\\\",\n" +
-            "      \\\"compareToDWPAward\\\":\\\"Higher\\\",\n" +
-            "      \\\"awardEndDateDay\\\":\\\"11\\\",\n" +
-            "      \\\"awardEndDateMonth\\\":\\\"12\\\",\n" +
-            "      \\\"awardEndDateYear\\\":\\\"2018\\\",\n" +
-            "      \\\"endDateRadio\\\":\\\"endDate\\\",\n" +
-            "      \\\"preparingFood\\\":false,\n" +
-            "      \\\"takingNutrition\\\":false,\n" +
-            "      \\\"managingTherapy\\\":false,\n" +
-            "      \\\"washingBathing\\\":false,\n" +
-            "      \\\"managingToilet\\\":false,\n" +
-            "      \\\"dressingUndressing\\\":false,\n" +
-            "      \\\"communicatingVerbally\\\":false,\n" +
-            "      \\\"readingAndUnderstanding\\\":false,\n" +
-            "      \\\"engagingWithOtherPeople\\\":false,\n" +
-            "      \\\"makingBudgetingDecisions\\\":true,\n" +
-            "      \\\"planningFollowingJourneys\\\":true,\n" +
-            "      \\\"movingAround\\\":false,\n" +
-            "      \\\"dailyLivingMakingBudgetDecisions\\\":\\\"6\\\",\n" +
-            "      \\\"MobilityPlanningJourneys\\\":\\\"12\\\",\n" +
-            "      \\\"reasonsTribunalView\\\":\\\"There was a reason!\\\",\n" +
-            "      \\\"awardStartDateDay\\\":\\\"1\\\",\n" +
-            "      \\\"awardStartDateMonth\\\":\\\"4\\\",\n" +
-            "      \\\"awardStartDateYear\\\":\\\"2017\\\"\n" +
+            "      \"forDailyLiving\":\"noAward\",\n" +
+            "      \"forMobility\":\"enhancedRate\",\n" +
+            "      \"compareToDWPAward\":\"Higher\",\n" +
+            "      \"awardEndDateDay\":\"11\",\n" +
+            "      \"awardEndDateMonth\":\"12\",\n" +
+            "      \"awardEndDateYear\":\"2018\",\n" +
+            "      \"endDateRadio\":\"endDate\",\n" +
+            "      \"preparingFood\":false,\n" +
+            "      \"takingNutrition\":false,\n" +
+            "      \"managingTherapy\":false,\n" +
+            "      \"washingBathing\":false,\n" +
+            "      \"managingToilet\":false,\n" +
+            "      \"dressingUndressing\":false,\n" +
+            "      \"communicatingVerbally\":false,\n" +
+            "      \"readingAndUnderstanding\":false,\n" +
+            "      \"engagingWithOtherPeople\":false,\n" +
+            "      \"makingBudgetingDecisions\":true,\n" +
+            "      \"planningFollowingJourneys\":true,\n" +
+            "      \"movingAround\":false,\n" +
+            "      \"dailyLivingMakingBudgetDecisions\":\"6\",\n" +
+            "      \"MobilityPlanningJourneys\":\"12\",\n" +
+            "      \"reasonsTribunalView\":\"There was a reason!\",\n" +
+            "      \"awardStartDateDay\":\"1\",\n" +
+            "      \"awardStartDateMonth\":\"4\",\n" +
+            "      \"awardStartDateYear\":\"2017\"\n" +
             "   }\n" +
             "}";
 
     private static final String decisionWithNoEndDateString = "{  \n" +
-            "   \\\"decisions_SSCS_benefit_1234321\\\":{  \n" +
-            "      \\\"preliminaryView\\\":\\\"yes\\\",\n" +
-            "      \\\"visitedPages\\\":{  \n" +
-            "         \\\"create\\\":true,\n" +
-            "         \\\"preliminary-advanced\\\":true,\n" +
-            "         \\\"set-award-dates\\\":true,\n" +
-            "         \\\"scores\\\":true,\n" +
-            "         \\\"budgeting-decisions\\\":true,\n" +
-            "         \\\"planning-journeys\\\":true\n" +
+            "   \"decisions_SSCS_benefit_1234321\":{  \n" +
+            "      \"preliminaryView\":\"yes\",\n" +
+            "      \"visitedPages\":{  \n" +
+            "         \"create\":true,\n" +
+            "         \"preliminary-advanced\":true,\n" +
+            "         \"set-award-dates\":true,\n" +
+            "         \"scores\":true,\n" +
+            "         \"budgeting-decisions\":true,\n" +
+            "         \"planning-journeys\":true\n" +
             "      },\n" +
-            "      \\\"forDailyLiving\\\":\\\"noAward\\\",\n" +
-            "      \\\"forMobility\\\":\\\"enhancedRate\\\",\n" +
-            "      \\\"compareToDWPAward\\\":\\\"Higher\\\",\n" +
-            "      \\\"awardEndDateDay\\\":\\\"null\\\",\n" +
-            "      \\\"awardEndDateMonth\\\":\\\"null\\\",\n" +
-            "      \\\"awardEndDateYear\\\":\\\"null\\\",\n" +
-            "      \\\"endDateRadio\\\":\\\"indefinite\\\",\n" +
-            "      \\\"preparingFood\\\":false,\n" +
-            "      \\\"takingNutrition\\\":false,\n" +
-            "      \\\"managingTherapy\\\":false,\n" +
-            "      \\\"washingBathing\\\":false,\n" +
-            "      \\\"managingToilet\\\":false,\n" +
-            "      \\\"dressingUndressing\\\":false,\n" +
-            "      \\\"communicatingVerbally\\\":false,\n" +
-            "      \\\"readingAndUnderstanding\\\":false,\n" +
-            "      \\\"engagingWithOtherPeople\\\":false,\n" +
-            "      \\\"makingBudgetingDecisions\\\":true,\n" +
-            "      \\\"planningFollowingJourneys\\\":true,\n" +
-            "      \\\"movingAround\\\":false,\n" +
-            "      \\\"dailyLivingMakingBudgetDecisions\\\":\\\"6\\\",\n" +
-            "      \\\"MobilityPlanningJourneys\\\":\\\"12\\\",\n" +
-            "      \\\"reasonsTribunalView\\\":\\\"There was a reason!\\\",\n" +
-            "      \\\"awardStartDateDay\\\":\\\"1\\\",\n" +
-            "      \\\"awardStartDateMonth\\\":\\\"4\\\",\n" +
-            "      \\\"awardStartDateYear\\\":\\\"2017\\\"\n" +
+            "      \"forDailyLiving\":\"noAward\",\n" +
+            "      \"forMobility\":\"enhancedRate\",\n" +
+            "      \"compareToDWPAward\":\"Higher\",\n" +
+            "      \"awardEndDateDay\":\"null\",\n" +
+            "      \"awardEndDateMonth\":\"null\",\n" +
+            "      \"awardEndDateYear\":\"null\",\n" +
+            "      \"endDateRadio\":\"indefinite\",\n" +
+            "      \"preparingFood\":false,\n" +
+            "      \"takingNutrition\":false,\n" +
+            "      \"managingTherapy\":false,\n" +
+            "      \"washingBathing\":false,\n" +
+            "      \"managingToilet\":false,\n" +
+            "      \"dressingUndressing\":false,\n" +
+            "      \"communicatingVerbally\":false,\n" +
+            "      \"readingAndUnderstanding\":false,\n" +
+            "      \"engagingWithOtherPeople\":false,\n" +
+            "      \"makingBudgetingDecisions\":true,\n" +
+            "      \"planningFollowingJourneys\":true,\n" +
+            "      \"movingAround\":false,\n" +
+            "      \"dailyLivingMakingBudgetDecisions\":\"6\",\n" +
+            "      \"MobilityPlanningJourneys\":\"12\",\n" +
+            "      \"reasonsTribunalView\":\"There was a reason!\",\n" +
+            "      \"awardStartDateDay\":\"1\",\n" +
+            "      \"awardStartDateMonth\":\"4\",\n" +
+            "      \"awardStartDateYear\":\"2017\"\n" +
             "   }\n" +
             "}";
     private final String decisionsState = "decisionsState";

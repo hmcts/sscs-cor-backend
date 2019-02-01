@@ -56,9 +56,10 @@ public class CohEventActionMapper {
         actions.put("question_round_issued", (caseId, onlineHearingId, cohEvent) ->
             questionRoundIssuedService.handleQuestionRoundIssued(cohEvent)
         );
-        actions.put("continuous_online_hearing_relisted",  (caseId, onlineHearingId, cohEvent) ->
-            storeOnlineHearingService.storePdf(caseId, onlineHearingId)
-        );
+        actions.put("continuous_online_hearing_relisted",  (caseId, onlineHearingId, cohEvent) -> {
+            storeOnlineHearingService.storePdf(caseId, onlineHearingId);
+            notificationsService.send(cohEvent);
+        });
 
         return actions;
     }
