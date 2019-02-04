@@ -31,8 +31,8 @@ public class OnlineHearingDateReformatter {
                 onlineHearing.getOnlineHearingId(),
                 onlineHearing.getAppellantName(),
                 onlineHearing.getCaseReference(),
-                newDecision
-        );
+                newDecision,
+                onlineHearing.getFinalDecision());
     }
 
     private String reformatDate(String dateString) {
