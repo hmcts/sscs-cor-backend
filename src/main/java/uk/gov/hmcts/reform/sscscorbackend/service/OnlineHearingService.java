@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
+import uk.gov.hmcts.reform.sscscorbackend.domain.FinalDecision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
@@ -146,8 +147,8 @@ public class OnlineHearingService {
                             onlineHearing.getOnlineHearingId(),
                             nameString,
                             sscsCaseDeails.getData().getCaseReference(),
-                            getDecision(onlineHearing.getOnlineHearingId(), sscsCaseDeails.getId())
-                    );
+                            getDecision(onlineHearing.getOnlineHearingId(), sscsCaseDeails.getId()),
+                            new FinalDecision(sscsCaseDeails.getData().getDecisionNotes()));
                 });
     }
 }

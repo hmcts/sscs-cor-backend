@@ -209,6 +209,17 @@ public class OnlineHearingServiceTest {
         assertThat(onlineHearing.isPresent(), is(false));
     }
 
+    @Test
+    public void loadOnlineHearingIncludsFinalDecision() {
+        SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "online");
+
+        when(cohService.getOnlineHearing(someCaseId)).thenReturn(DataFixtures.someCohOnlineHearings());
+        Optional<OnlineHearing> onlineHearing = underTest.loadOnlineHearingFromCoh(sscsCaseDetails);
+
+        assertThat(onlineHearing.isPresent(), is(true));
+        assertThat(onlineHearing.get().getFinalDecision().getReason(), is(sscsCaseDetails.getData().getDecisionNotes()));
+    }
+
     private SscsCaseDetails createCaseDetails(Long caseId, String expectedCaseReference, String firstName, String lastName) {
         return createCaseDetails(caseId, expectedCaseReference, firstName, lastName, "cor");
     }
@@ -228,8 +239,9 @@ public class OnlineHearingServiceTest {
                                                 .build()
                                         ).build()
                                 ).build()
-                        ).build()
-
+                        )
+                        .decisionNotes("decision notes")
+                        .build()
                 ).build();
     }
 
