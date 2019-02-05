@@ -53,7 +53,7 @@ locals {
 
   azureVaultName = "sscs-${local.local_env}"
 
-  createCcdEndpoint = "${(var.env == "preview" || var.env == "spreview" ||  var.env == "aat") ? "true" : "false"}"
+  createCcdEndpoint = "${(var.env == "preview" || var.env == "spreview" ||  var.env == "aat" || var.env == "demo") ? "true" : "false"}"
 
   email_host      = "mta.reform.hmcts.net"
   email_port      = "25"
