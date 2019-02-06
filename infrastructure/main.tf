@@ -53,8 +53,6 @@ locals {
 
   azureVaultName = "sscs-${local.local_env}"
 
-  createCcdEndpoint = "${(var.env == "preview" || var.env == "spreview" ||  var.env == "aat" || var.env == "demo") ? "true" : "false"}"
-
   email_host      = "mta.reform.hmcts.net"
   email_port      = "25"
 }
@@ -85,7 +83,7 @@ module "sscs-core-backend" {
     COH_URL = "${local.cohUrl}"
     CORE_CASE_DATA_URL = "${local.ccdApi}"
 
-    CREATE_CCD_ENDPOINT = "${local.createCcdEndpoint}"
+    CREATE_CCD_ENDPOINT = "${var.createCcdEndpoint}"
 
     DOCUMENT_MANAGEMENT_URL = "${local.documentManagementUrl}"
     PDF_API_URL = "${local.pdfService}"

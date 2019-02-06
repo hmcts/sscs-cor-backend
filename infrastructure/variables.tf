@@ -52,3 +52,7 @@ variable "enable_select_by_case_id" {
 variable "dwp_email" {
   default = "dwp_email@example.com"
 }
+
+variable "createCcdEndpoint" {
+  default     = "false"
+}
