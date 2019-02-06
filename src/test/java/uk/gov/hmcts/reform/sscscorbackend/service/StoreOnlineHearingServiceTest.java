@@ -37,12 +37,12 @@ public class StoreOnlineHearingServiceTest {
 
         underTest = new StoreOnlineHearingService(
                 cohService, mock(IdamService.class), mock(CcdService.class), pdfSummaryBuilder,
-                mock(SscsPdfService.class), mock(PdfService.class),
+                mock(SscsPdfService.class), mock(PdfService.class), "sometemplate",
                 mock(EvidenceManagementService.class));
     }
 
     @Test
-    public void canCreatPdfSummary() {
+    public void canCreatePdfSummary() {
         String someOnlineHearingId = "someOnlineHearingId";
         CohConversations conversations = mock(CohConversations.class);
         PdfAppealDetails pdfAppealDetails = mock(PdfAppealDetails.class);

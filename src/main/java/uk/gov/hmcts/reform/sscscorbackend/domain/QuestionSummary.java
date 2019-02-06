@@ -14,13 +14,15 @@ public class QuestionSummary {
     private final String questionHeaderText;
     private final String questionBodyText;
     private final AnswerState answerState;
+    private final String answer;
 
-    public QuestionSummary(String id, int questionOrdinal, String questionHeaderText, String questionBodyText, AnswerState answerState) {
+    public QuestionSummary(String id, int questionOrdinal, String questionHeaderText, String questionBodyText, AnswerState answerState, String answer) {
         this.id = id;
         this.questionHeaderText = questionHeaderText;
         this.questionBodyText = questionBodyText;
         this.answerState = answerState;
         this.questionOrdinal = questionOrdinal;
+        this.answer = answer;
     }
 
     @ApiModelProperty(example = "question-Id", required = true)
@@ -53,6 +55,12 @@ public class QuestionSummary {
         return answerState;
     }
 
+    @ApiModelProperty(required = false)
+    @JsonProperty(value = "answer")
+    public String getAnswer() {
+        return answer;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -66,12 +74,13 @@ public class QuestionSummary {
                 Objects.equals(id, that.id) &&
                 Objects.equals(questionHeaderText, that.questionHeaderText) &&
                 Objects.equals(questionBodyText, that.questionBodyText) &&
-                answerState == that.answerState;
+                answerState == that.answerState &&
+                Objects.equals(answer, that.answer);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, questionOrdinal, questionHeaderText, questionBodyText, answerState);
+        return Objects.hash(id, questionOrdinal, questionHeaderText, questionBodyText, answerState, answer);
     }
 
     @Override
@@ -82,6 +91,7 @@ public class QuestionSummary {
                 ", questionHeaderText='" + questionHeaderText + '\'' +
                 ", questionBodyText='" + questionBodyText + '\'' +
                 ", answerState=" + answerState +
+                ", answer='" + answer + '\'' +
                 '}';
     }
 }

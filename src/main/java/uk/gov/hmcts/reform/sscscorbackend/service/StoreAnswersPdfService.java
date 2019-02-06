@@ -12,12 +12,13 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Service
-public class StoreQuestionsPdfService extends BasePdfService<PdfQuestionsSummary> {
+public class StoreAnswersPdfService extends BasePdfService<PdfQuestionsSummary> {
+
     private final QuestionService questionService;
 
-    public StoreQuestionsPdfService(
+    public StoreAnswersPdfService(
             PdfService pdfService,
-            @Value("${question.html.template.path}") String templatePath,
+            @Value("${answer.html.template.path}") String templatePath,
             SscsPdfService sscsPdfService,
             CcdService ccdService,
             IdamService idamService,
@@ -30,7 +31,7 @@ public class StoreQuestionsPdfService extends BasePdfService<PdfQuestionsSummary
     @Override
     protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId) {
         int currentQuestionRound = questionService.getCurrentQuestionRound(onlineHearingId);
-        return "Issued Questions Round " + currentQuestionRound + " - ";
+        return "Issued Answers Round " + currentQuestionRound + " - ";
     }
 
     @Override

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend.service.pdf;
+package uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -14,6 +14,7 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.I18nBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 public class PdfServiceTest {
@@ -23,7 +24,7 @@ public class PdfServiceTest {
         I18nBuilder i18nBuilder = mock(I18nBuilder.class);
         HashMap i18n = new HashMap();
         when(i18nBuilder.build()).thenReturn(i18n);
-        PdfService appellantTemplatePath = new PdfService(pdfServiceClient, "/templates/onlineHearingSummary.html", i18nBuilder);
+        PdfService appellantTemplatePath = new PdfService(pdfServiceClient, i18nBuilder);
 
         PdfSummary pdfSummary = DataFixtures.somePdfSummary();
 
@@ -31,7 +32,7 @@ public class PdfServiceTest {
         when(pdfServiceClient.generateFromHtml(any(), eq(ImmutableMap.of("pdfSummary", pdfSummary, "i18n", i18n))))
                 .thenReturn(expectedPdf);
 
-        byte[] pdf = appellantTemplatePath.createPdf(pdfSummary);
+        byte[] pdf = appellantTemplatePath.createPdf(pdfSummary, "/templates/onlineHearingSummary.html");
 
         assertThat(pdf, is(expectedPdf));
     }
