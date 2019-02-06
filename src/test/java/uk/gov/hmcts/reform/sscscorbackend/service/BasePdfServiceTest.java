@@ -39,7 +39,7 @@ public class BasePdfServiceTest {
     private EvidenceManagementService evidenceManagementService;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         pdfService = mock(PdfService.class);
         sscsPdfService = mock(SscsPdfService.class);
         ccdService = mock(CcdService.class);
@@ -50,7 +50,7 @@ public class BasePdfServiceTest {
         pdfContent = new Object();
         fileNamePrefix = "test name";
         evidenceManagementService = mock(EvidenceManagementService.class);
-        basePdfService = new BasePdfService(pdfService, sscsPdfService, ccdService, idamService, evidenceManagementService) {
+        basePdfService = new BasePdfService(pdfService, "sometemplate", sscsPdfService, ccdService, idamService, evidenceManagementService) {
 
             @Override
             protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId) {
@@ -70,7 +70,7 @@ public class BasePdfServiceTest {
         SscsCaseDetails caseDetails = createCaseDetails();
         when(ccdService.getByCaseId(caseId, idamTokens)).thenReturn(caseDetails);
         byte[] expectedPdfBytes = {2, 4, 6, 0, 1};
-        when(pdfService.createPdf(pdfContent)).thenReturn(expectedPdfBytes);
+        when(pdfService.createPdf(pdfContent, "sometemplate")).thenReturn(expectedPdfBytes);
 
         StorePdfResult storePdfResult = basePdfService.storePdf(caseId, someOnlineHearingId);
 

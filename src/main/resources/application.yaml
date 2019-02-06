@@ -64,6 +64,11 @@ question:
   html:
     template:
       path: /templates/questions.html
+answer:
+  html:
+    template:
+      path: /templates/answers.html
+
 
 appeal:
   email:

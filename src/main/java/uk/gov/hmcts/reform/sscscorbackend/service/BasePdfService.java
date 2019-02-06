@@ -21,17 +21,20 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 @Slf4j
 public abstract class BasePdfService<E> {
     private final PdfService pdfService;
+    private final String pdfTemplatePath;
     private final SscsPdfService sscsPdfService;
     private final CcdService ccdService;
     private final IdamService idamService;
     private final EvidenceManagementService evidenceManagementService;
 
     BasePdfService(PdfService pdfService,
+                   String pdfTemplatePath,
                    SscsPdfService sscsPdfService,
                    CcdService ccdService,
                    IdamService idamService,
                    EvidenceManagementService evidenceManagementService) {
         this.pdfService = pdfService;
+        this.pdfTemplatePath = pdfTemplatePath;
         this.sscsPdfService = sscsPdfService;
         this.ccdService = ccdService;
         this.idamService = idamService;
@@ -56,13 +59,27 @@ public abstract class BasePdfService<E> {
 
     private Pdf storePdf(Long caseId, String onlineHearingId, IdamTokens idamTokens, SscsCaseDetails caseDetails, String documentNamePrefix) {
         PdfAppealDetails pdfAppealDetails = getPdfAppealDetails(caseId, caseDetails);
-        byte[] pdfBytes = pdfService.createPdf(getPdfContent(caseDetails, onlineHearingId, pdfAppealDetails));
+        byte[] pdfBytes = pdfService.createPdf(getPdfContent(caseDetails, onlineHearingId, pdfAppealDetails), pdfTemplatePath);
+
+        // writePdf(documentNamePrefix, pdfBytes);
+
         SscsCaseData caseData = caseDetails.getData();
         String pdfName = getPdfName(documentNamePrefix, caseData.getCaseReference());
         sscsPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens);
 
         return new Pdf(pdfBytes, pdfName);
     }
+
+    //    Handy util method when debugging this
+    //    private void writePdf(String documentNamePrefix, byte[] pdfBytes) {
+    //        try {
+    //            String pathname = "/Users/chris/tmp/" + documentNamePrefix + ".pdf";
+    //            System.out.println("Writing file to [" + pathname + "]");
+    //            FileUtils.writeByteArrayToFile(new File(pathname), pdfBytes);
+    //        } catch (IOException e) {
+    //            e.printStackTrace();
+    //        }
+    //    }
 
     private String getPdfName(String documentNamePrefix, String caseReference) {
         return documentNamePrefix + caseReference + ".pdf";
