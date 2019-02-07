@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscscorbackend.exception;
 import static feign.Util.valuesOrEmpty;
 
 import feign.FeignException;
+import feign.Request;
 import feign.Response;
 import feign.Util;
 import java.io.IOException;
@@ -29,6 +30,10 @@ public class CorFeignException extends FeignException {
 
     private static String responseToString(Response response) {
         StringBuilder builder = new StringBuilder("-----------------------------\n");
+        Request request = response.request();
+        if (request != null) {
+            builder.append(request.httpMethod().name() + " " + request.url() + "\n");
+        }
         builder.append("HTTP/1.1 ").append(response.status());
         if (response.reason() != null) {
             builder.append(' ').append(response.reason());
