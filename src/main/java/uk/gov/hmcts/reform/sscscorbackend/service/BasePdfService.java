@@ -61,25 +61,12 @@ public abstract class BasePdfService<E> {
         PdfAppealDetails pdfAppealDetails = getPdfAppealDetails(caseId, caseDetails);
         byte[] pdfBytes = pdfService.createPdf(getPdfContent(caseDetails, onlineHearingId, pdfAppealDetails), pdfTemplatePath);
 
-        // writePdf(documentNamePrefix, pdfBytes);
-
         SscsCaseData caseData = caseDetails.getData();
         String pdfName = getPdfName(documentNamePrefix, caseData.getCaseReference());
         sscsPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens);
 
         return new Pdf(pdfBytes, pdfName);
     }
-
-    //    Handy util method when debugging this
-    //    private void writePdf(String documentNamePrefix, byte[] pdfBytes) {
-    //        try {
-    //            String pathname = "/Users/chris/tmp/" + documentNamePrefix + ".pdf";
-    //            System.out.println("Writing file to [" + pathname + "]");
-    //            FileUtils.writeByteArrayToFile(new File(pathname), pdfBytes);
-    //        } catch (IOException e) {
-    //            e.printStackTrace();
-    //        }
-    //    }
 
     private String getPdfName(String documentNamePrefix, String caseReference) {
         return documentNamePrefix + caseReference + ".pdf";

@@ -21,6 +21,7 @@ public class StoreOnlineHearingService extends BasePdfService<PdfSummary> {
     private final CohService cohService;
     private final PdfSummaryBuilder pdfSummaryBuilder;
 
+    @SuppressWarnings("squid:S00107")
     public StoreOnlineHearingService(CohService cohService,
                                      IdamService idamService,
                                      CcdService ccdService,

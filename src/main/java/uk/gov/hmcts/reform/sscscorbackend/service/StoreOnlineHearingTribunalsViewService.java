@@ -21,6 +21,7 @@ public class StoreOnlineHearingTribunalsViewService extends BasePdfService<Onlin
     private final OnlineHearingService onlineHearingService;
     private final OnlineHearingDateReformatter onlineHearingDateReformatter;
 
+    @SuppressWarnings("squid:S00107")
     public StoreOnlineHearingTribunalsViewService(OnlineHearingService onlineHearingService,
                                                   PdfService pdfService,
                                                   @Value("${preliminary_view.html.template.path}") String templatePath,
