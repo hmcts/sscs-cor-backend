@@ -155,7 +155,7 @@ public class QuestionService {
 
     private String getAnswer(List<CohAnswer> answers) {
         return getFirstAnswer(answers)
-                .map(cohAnswer -> cohAnswer.getAnswerText())
+                .map(CohAnswer::getAnswerText)
                 .orElse("");
     }
 
