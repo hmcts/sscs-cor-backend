@@ -25,6 +25,7 @@ public class CorFeignExceptionTest {
         assertThat(corFeignException.getMessage(), is(
                 "methodName caused an error\n" +
                         "-----------------------------\n" +
+                        "GET url\n" +
                         "HTTP/1.1 200\n" +
                         "header: value1\n" +
                         "\n" +
@@ -50,6 +51,7 @@ public class CorFeignExceptionTest {
         assertThat(corFeignException.getMessage(), is(
                 "methodName caused an error\n" +
                         "-----------------------------\n" +
+                        "GET url\n" +
                         "HTTP/1.1 200\n" +
                         "header1: value1.1\n" +
                         "header1: value1.2\n" +
@@ -74,6 +76,7 @@ public class CorFeignExceptionTest {
         assertThat(corFeignException.getMessage(), is(
                 "methodName caused an error\n" +
                         "-----------------------------\n" +
+                        "GET url\n" +
                         "HTTP/1.1 200\n" +
                         "header: value1\n" +
                         "\n" +
