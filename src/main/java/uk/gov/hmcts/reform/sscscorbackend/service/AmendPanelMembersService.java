@@ -4,12 +4,14 @@ import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
 
+@Slf4j
 @Service
 public class AmendPanelMembersService {
     private final CorCcdService ccdService;
@@ -35,10 +37,12 @@ public class AmendPanelMembersService {
             membersToAddPermissionTo.remove(oldCaseDetails.getAssignedToMedicalMember());
 
             for (String member : membersToRemovePermissionsFrom) {
+                log.info("Remove member with id starting [" + member.substring(0, 3) + "] from case [" + caseId + "]");
                 ccdService.removeUserFromCase(member, caseId);
             }
         }
         for (String member : membersToAddPermissionTo) {
+            log.info("Add member with id starting [" + member.substring(0, 3) + "] to case [" + caseId + "]");
             ccdService.addUserToCase(member, caseId);
         }
     }
