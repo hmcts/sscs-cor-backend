@@ -37,13 +37,17 @@ public class AmendPanelMembersService {
             membersToAddPermissionTo.remove(oldCaseDetails.getAssignedToMedicalMember());
 
             for (String member : membersToRemovePermissionsFrom) {
-                log.info("Remove member with id starting [" + member.substring(0, 3) + "] from case [" + caseId + "]");
-                ccdService.removeUserFromCase(member, caseId);
+                if (member != null) {
+                    log.info("Remove member with id starting [" + member.substring(0, 3) + "] from case [" + caseId + "]");
+                    ccdService.removeUserFromCase(member, caseId);
+                }
             }
         }
         for (String member : membersToAddPermissionTo) {
-            log.info("Add member with id starting [" + member.substring(0, 3) + "] to case [" + caseId + "]");
-            ccdService.addUserToCase(member, caseId);
+            if (member != null) {
+                log.info("Add member with id starting [" + member.substring(0, 3) + "] to case [" + caseId + "]");
+                ccdService.addUserToCase(member, caseId);
+            }
         }
     }
 
