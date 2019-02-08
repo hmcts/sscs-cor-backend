@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 import uk.gov.hmcts.reform.sscscorbackend.service.EvidenceUploadService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.IllegalFileTypeException;
 
+@Slf4j
 @RestController
 @RequestMapping("/continuous-online-hearings")
 public class EvidenceUploadController {
@@ -52,6 +54,7 @@ public class EvidenceUploadController {
             return evidenceOptional.map(ResponseEntity::ok)
                     .orElse(notFound().build());
         } catch (IllegalFileTypeException exc) {
+            log.info("Cannot upload file illegal file type", exc);
             return unprocessableEntity().build();
         }
     }
