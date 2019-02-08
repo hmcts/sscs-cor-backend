@@ -59,6 +59,10 @@ public class OnlineHearingController {
                 || request.getOnlineHearingId() == null
                 || request.getEventType() == null) {
             //throw a bad request error
+            String errorMessage = request == null
+                    ? "null request object" :
+                    String.format("case id [%s] online hearing id [%s] event type [%s]", request.getCaseId(), request.getOnlineHearingId(), request.getEventType());
+            log.info("Bad request to handle COH event " + errorMessage);
             return ResponseEntity.badRequest().build();
         }
         String eventType = request.getEventType();
@@ -71,7 +75,9 @@ public class OnlineHearingController {
         if (cohEventActionMapper.handle(request)) {
             return ResponseEntity.ok("");
         } else {
-            return ResponseEntity.badRequest().body("Event [" + request.getEventType() + "] not mapped");
+            String errorMessage = "Event [" + request.getEventType() + "] not mapped";
+            log.info("Bad request to handle COH event " + errorMessage);
+            return ResponseEntity.badRequest().body(errorMessage);
         }
     }
 
