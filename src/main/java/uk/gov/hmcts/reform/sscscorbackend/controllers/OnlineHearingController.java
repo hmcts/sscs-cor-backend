@@ -68,7 +68,16 @@ public class OnlineHearingController {
         String eventType = request.getEventType();
 
         String onlineHearingId = request.getOnlineHearingId();
-        Long caseId = Long.valueOf(request.getCaseId());
+
+        Long caseId = null;
+        try {
+            caseId = Long.valueOf(request.getCaseId());
+        } catch (NumberFormatException e) {
+            String errorMessage = "Case id received as invalid number: " + request.getCaseId();
+            log.error(errorMessage);
+            return ResponseEntity.badRequest().body(errorMessage);
+        }
+
         log.info("Received event [{}] for case [{}] and hearing [{}]",
                 eventType, caseId, onlineHearingId);
 
