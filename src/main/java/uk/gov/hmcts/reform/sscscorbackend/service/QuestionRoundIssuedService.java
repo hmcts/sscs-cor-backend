@@ -11,16 +11,16 @@ public class QuestionRoundIssuedService {
     private final NotificationsService notificationsService;
     private final StoreQuestionsPdfService storeQuestionsPdfService;
     private final CorEmailService corEmailService;
-    private final QuestionsEmailMessageBuilder questionsEmailMessageBuilder;
+    private final DwpEmailMessageBuilder dwpEmailMessageBuilder;
 
     public QuestionRoundIssuedService(NotificationsService notificationsService,
                                       StoreQuestionsPdfService storeQuestionsPdfService,
                                       CorEmailService corEmailService,
-                                      QuestionsEmailMessageBuilder questionsEmailMessageBuilder) {
+                                      DwpEmailMessageBuilder dwpEmailMessageBuilder) {
         this.notificationsService = notificationsService;
         this.storeQuestionsPdfService = storeQuestionsPdfService;
         this.corEmailService = corEmailService;
-        this.questionsEmailMessageBuilder = questionsEmailMessageBuilder;
+        this.dwpEmailMessageBuilder = dwpEmailMessageBuilder;
     }
 
     public void handleQuestionRoundIssued(CohEvent cohEvent) {
@@ -34,7 +34,7 @@ public class QuestionRoundIssuedService {
         corEmailService.sendPdf(
                 storePdfResult,
                 "Questions issued to the appellant (" + caseReference + ")",
-                questionsEmailMessageBuilder.getMessage(sscsCaseDetails)
+                dwpEmailMessageBuilder.getQuestionMessage(sscsCaseDetails)
         );
     }
 }

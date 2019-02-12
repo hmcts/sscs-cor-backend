@@ -13,7 +13,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
+import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
@@ -29,6 +33,8 @@ public class HearingRelistedActionTest {
     private String onlineHearingId;
     private CohEvent cohEvent;
     private HearingRelistedAction underTest;
+    private CorEmailService corEmailService;
+    private DwpEmailMessageBuilder dwpEmailMessageBuilder;
 
     @Before
     public void setUp() {
@@ -41,8 +47,10 @@ public class HearingRelistedActionTest {
         caseId = 12345L;
         onlineHearingId = "onlineHearingId";
         cohEvent = someCohEvent(caseId.toString(), onlineHearingId, "continuous_online_hearing_relisted");
+        corEmailService = mock(CorEmailService.class);
 
-        underTest = new HearingRelistedAction(storeOnlineHearingService, notificationsService, corCcdService, idamService);
+        dwpEmailMessageBuilder = mock(DwpEmailMessageBuilder.class);
+        underTest = new HearingRelistedAction(storeOnlineHearingService, notificationsService, corCcdService, idamService, corEmailService, dwpEmailMessageBuilder);
     }
 
     @Test
@@ -54,7 +62,9 @@ public class HearingRelistedActionTest {
                                 .build())
                         .build())
                 .build();
-        when(corCcdService.getByCaseId(caseId, idamTokens)).thenReturn(sscsCaseDetails);
+        when(storeOnlineHearingService.storePdf(caseId, onlineHearingId))
+                .thenReturn(new StorePdfResult(mock(Pdf.class), sscsCaseDetails));
+        when(dwpEmailMessageBuilder.getRelistedMessage(sscsCaseDetails)).thenReturn("message body");
 
         underTest.handle(caseId, onlineHearingId, cohEvent);
 
@@ -68,5 +78,6 @@ public class HearingRelistedActionTest {
                 eq("SSCS - appeal updated event"),
                 eq("Update SSCS hearing type"),
                 eq(idamTokens));
+        verify(corEmailService).sendEmail("COR: Hearing required", "message body");
     }
 }

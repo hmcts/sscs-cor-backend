@@ -6,8 +6,8 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
-import uk.gov.hmcts.reform.sscscorbackend.service.AnswersEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
+import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreAnswersPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
@@ -17,9 +17,9 @@ public class AnswerSubmittedEventActionTest {
     public void canSendPdf() {
         CorEmailService corEmailService = mock(CorEmailService.class);
         StoreAnswersPdfService storeAnswersPdfService = mock(StoreAnswersPdfService.class);
-        AnswersEmailMessageBuilder answersEmailMessageBuilder = mock(AnswersEmailMessageBuilder.class);
+        DwpEmailMessageBuilder dwpEmailMessageBuilder = mock(DwpEmailMessageBuilder.class);
 
-        AnswerSubmittedEventAction answerSubmittedEventAction = new AnswerSubmittedEventAction(corEmailService, storeAnswersPdfService, answersEmailMessageBuilder);
+        AnswerSubmittedEventAction answerSubmittedEventAction = new AnswerSubmittedEventAction(corEmailService, storeAnswersPdfService, dwpEmailMessageBuilder);
 
         String someCaseReference = "someCaseReference";
         SscsCaseDetails caseDetails = SscsCaseDetails.builder()
@@ -30,7 +30,7 @@ public class AnswerSubmittedEventActionTest {
         String pdfName = "pdf_name.pdf";
         StorePdfResult storePdfResult = new StorePdfResult(new Pdf(new byte[]{2, 5, 6, 0, 1}, pdfName), caseDetails);
         when(storeAnswersPdfService.storePdf(caseId, onlineHearingId)).thenReturn(storePdfResult);
-        when(answersEmailMessageBuilder.getMessage(caseDetails)).thenReturn("some message");
+        when(dwpEmailMessageBuilder.getAnswerMessage(caseDetails)).thenReturn("some message");
 
         answerSubmittedEventAction.handle(caseId, onlineHearingId, DataFixtures.someCohEvent(caseId + "", onlineHearingId, "some_event"));
 
