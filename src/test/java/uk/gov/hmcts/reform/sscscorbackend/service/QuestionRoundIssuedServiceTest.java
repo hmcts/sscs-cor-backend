@@ -13,24 +13,23 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.Notifications
 
 public class QuestionRoundIssuedServiceTest {
 
-
     private NotificationsService notificationsService;
     private StoreQuestionsPdfService storeQuestionsPdfService;
     private CorEmailService corEmailService;
     private QuestionRoundIssuedService questionRoundIssuedService;
     private Long caseId;
     private String hearingId;
-    private QuestionsEmailMessageBuilder emailMessageBuilder;
+    private DwpEmailMessageBuilder dwpEmailMessageBuilder;
 
     @Before
     public void setUp() {
         notificationsService = mock(NotificationsService.class);
         storeQuestionsPdfService = mock(StoreQuestionsPdfService.class);
         corEmailService = mock(CorEmailService.class);
-        emailMessageBuilder = mock(QuestionsEmailMessageBuilder.class);
+        dwpEmailMessageBuilder = mock(DwpEmailMessageBuilder.class);
         questionRoundIssuedService = new QuestionRoundIssuedService(
                 notificationsService, storeQuestionsPdfService, corEmailService,
-                emailMessageBuilder);
+                dwpEmailMessageBuilder);
         caseId = 123456L;
         hearingId = "someHearingId";
     }
@@ -47,7 +46,7 @@ public class QuestionRoundIssuedServiceTest {
         when(storePdfResult.getDocument()).thenReturn(sscsCaseDetails);
         when(storeQuestionsPdfService.storePdf(caseId, hearingId)).thenReturn(storePdfResult);
         String message = "message";
-        when(emailMessageBuilder.getMessage(sscsCaseDetails)).thenReturn(message);
+        when(dwpEmailMessageBuilder.getQuestionMessage(sscsCaseDetails)).thenReturn(message);
         CohEvent cohEvent = someCohEvent(caseId.toString(), hearingId, "some_event");
 
         questionRoundIssuedService.handleQuestionRoundIssued(cohEvent);

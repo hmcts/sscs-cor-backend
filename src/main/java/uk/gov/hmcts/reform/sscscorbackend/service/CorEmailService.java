@@ -37,4 +37,13 @@ public class CorEmailService {
                 .build());
     }
 
+    public void sendEmail(String subject, String message) {
+        emailService.sendEmail(Email.builder()
+                .from(fromEmailAddress)
+                .to(dwpEmailAddress)
+                .subject(subject)
+                .message(message)
+                .build());
+    }
+
 }

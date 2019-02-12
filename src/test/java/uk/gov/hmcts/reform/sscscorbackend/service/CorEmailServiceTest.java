@@ -50,4 +50,19 @@ public class CorEmailServiceTest {
                 .attachments(singletonList(EmailAttachment.pdf(pdfContent, pdfFileName)))
                 .build());
     }
+
+    @Test
+    public void canSendEmail() {
+        CorEmailService corEmailService = new CorEmailService(emailService, fromEmailAddress, toEmailAddress);
+        String message = "Some message";
+        String subject = "subject";
+        corEmailService.sendEmail(subject, message);
+
+        verify(emailService).sendEmail(Email.builder()
+                .from(fromEmailAddress)
+                .to(toEmailAddress)
+                .subject(subject)
+                .message(message)
+                .build());
+    }
 }
