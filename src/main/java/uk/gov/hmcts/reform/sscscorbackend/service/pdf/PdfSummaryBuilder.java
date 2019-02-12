@@ -16,14 +16,12 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestionRound;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohAnswer;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohConversations;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohQuestion;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohRelisting;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.*;
 
 @Service
 public class PdfSummaryBuilder {
@@ -78,9 +76,17 @@ public class PdfSummaryBuilder {
                 question.getQuestionHeaderText(),
                 decodeStringWithWhitespace(question.getQuestionBodyText()),
                 getAnswer(question),
+                getAnswerState(question),
                 formatDate(question.getIssueDate()),
                 formatDate(question.getSubmittedDate())
         );
+    }
+
+    private AnswerState getAnswerState(CohQuestion question) {
+        return question.getAnswer()
+                .map(CohAnswer::getCurrentAnswerState)
+                .map(answerState -> AnswerState.of(answerState.getStateName()))
+                .orElse(AnswerState.unanswered);
     }
 
     private String getAnswer(CohQuestion question) {

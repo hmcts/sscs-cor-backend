@@ -131,7 +131,7 @@ public class DataFixtures {
                 "relisting reason",
                 singletonList(
                         new PdfQuestionRound(singletonList(
-                                new PdfQuestion("title", "body", "answer", "issueDate", "submittedDate")
+                                new PdfQuestion("title", "body", "answer", AnswerState.submitted, "issueDate", "submittedDate")
                         ))
                 )
         );
