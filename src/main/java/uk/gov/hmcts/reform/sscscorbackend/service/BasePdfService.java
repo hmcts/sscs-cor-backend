@@ -87,7 +87,9 @@ public abstract class BasePdfService<E> {
 
     private boolean pdfHasNotAlreadyBeenCreated(SscsCaseDetails caseDetails, String documentNamePrefix) {
         List<SscsDocument> sscsDocuments = caseDetails.getData().getSscsDocument();
-        return sscsDocuments == null || sscsDocuments.stream().noneMatch(documentNameMatches(documentNamePrefix));
+        return sscsDocuments == null || sscsDocuments.stream()
+                .filter(sscsDocument -> sscsDocument.getValue().getDocumentFileName() != null)
+                .noneMatch(documentNameMatches(documentNamePrefix));
     }
 
     private Predicate<SscsDocument> documentNameMatches(String documentNamePrefix) {
