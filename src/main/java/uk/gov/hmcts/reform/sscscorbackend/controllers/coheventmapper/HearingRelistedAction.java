@@ -7,7 +7,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
+import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
@@ -18,28 +21,35 @@ public class HearingRelistedAction implements CohEventAction {
     private final NotificationsService notificationsService;
     private final CorCcdService corCcdService;
     private final IdamService idamService;
+    private final CorEmailService corEmailService;
+    private final DwpEmailMessageBuilder dwpEmailMessageBuilder;
 
     @Autowired
     public HearingRelistedAction(StoreOnlineHearingService storeOnlineHearingService,
                                  NotificationsService notificationsService,
-                                 CorCcdService corCcdService, IdamService idamService) {
+                                 CorCcdService corCcdService, IdamService idamService,
+                                 CorEmailService corEmailService,
+                                 DwpEmailMessageBuilder dwpEmailMessageBuilder) {
         this.storeOnlineHearingService = storeOnlineHearingService;
         this.notificationsService = notificationsService;
         this.corCcdService = corCcdService;
         this.idamService = idamService;
+        this.corEmailService = corEmailService;
+        this.dwpEmailMessageBuilder = dwpEmailMessageBuilder;
     }
 
     @Override
     public void handle(Long caseId, String onlineHearingId, CohEvent cohEvent) {
-        storeOnlineHearingService.storePdf(caseId, onlineHearingId);
+        StorePdfResult storePdfResult = storeOnlineHearingService.storePdf(caseId, onlineHearingId);
         notificationsService.send(cohEvent);
-        updateCcdCaseToOralHearing(caseId);
+        updateCcdCaseToOralHearing(caseId, storePdfResult);
+        String relistedMessage = dwpEmailMessageBuilder.getRelistedMessage(storePdfResult.getDocument());
+        corEmailService.sendEmail("COR: Hearing required", relistedMessage);
     }
 
-    private void updateCcdCaseToOralHearing(Long caseId) {
+    private void updateCcdCaseToOralHearing(Long caseId, StorePdfResult storePdfResult) {
         IdamTokens idamTokens = idamService.getIdamTokens();
-        SscsCaseDetails sscsCaseDetails = corCcdService.getByCaseId(caseId, idamTokens);
-        SscsCaseData oralCaseData = updateHearingTypeToOral(sscsCaseDetails);
+        SscsCaseData oralCaseData = updateHearingTypeToOral(storePdfResult.getDocument());
         corCcdService.updateCase(
                 oralCaseData,
                 caseId,
