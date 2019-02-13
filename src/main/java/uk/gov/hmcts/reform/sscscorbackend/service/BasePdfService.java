@@ -21,17 +21,20 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 @Slf4j
 public abstract class BasePdfService<E> {
     private final PdfService pdfService;
+    private final String pdfTemplatePath;
     private final SscsPdfService sscsPdfService;
     private final CcdService ccdService;
     private final IdamService idamService;
     private final EvidenceManagementService evidenceManagementService;
 
     BasePdfService(PdfService pdfService,
+                   String pdfTemplatePath,
                    SscsPdfService sscsPdfService,
                    CcdService ccdService,
                    IdamService idamService,
                    EvidenceManagementService evidenceManagementService) {
         this.pdfService = pdfService;
+        this.pdfTemplatePath = pdfTemplatePath;
         this.sscsPdfService = sscsPdfService;
         this.ccdService = ccdService;
         this.idamService = idamService;
@@ -56,7 +59,8 @@ public abstract class BasePdfService<E> {
 
     private Pdf storePdf(Long caseId, String onlineHearingId, IdamTokens idamTokens, SscsCaseDetails caseDetails, String documentNamePrefix) {
         PdfAppealDetails pdfAppealDetails = getPdfAppealDetails(caseId, caseDetails);
-        byte[] pdfBytes = pdfService.createPdf(getPdfContent(caseDetails, onlineHearingId, pdfAppealDetails));
+        byte[] pdfBytes = pdfService.createPdf(getPdfContent(caseDetails, onlineHearingId, pdfAppealDetails), pdfTemplatePath);
+
         SscsCaseData caseData = caseDetails.getData();
         String pdfName = getPdfName(documentNamePrefix, caseData.getCaseReference());
         sscsPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens);
@@ -70,6 +74,7 @@ public abstract class BasePdfService<E> {
 
     private Pdf loadPdf(SscsCaseDetails caseDetails, String documentNamePrefix) {
         SscsDocument document = caseDetails.getData().getSscsDocument().stream()
+                .filter(sscsDocument -> sscsDocument.getValue().getDocumentFileName() != null)
                 .filter(documentNameMatches(documentNamePrefix))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Found PDF with name prefix [" + documentNamePrefix + "] but cannot load it"));
@@ -83,7 +88,9 @@ public abstract class BasePdfService<E> {
 
     private boolean pdfHasNotAlreadyBeenCreated(SscsCaseDetails caseDetails, String documentNamePrefix) {
         List<SscsDocument> sscsDocuments = caseDetails.getData().getSscsDocument();
-        return sscsDocuments == null || sscsDocuments.stream().noneMatch(documentNameMatches(documentNamePrefix));
+        return sscsDocuments == null || sscsDocuments.stream()
+                .filter(sscsDocument -> sscsDocument.getValue().getDocumentFileName() != null)
+                .noneMatch(documentNameMatches(documentNamePrefix));
     }
 
     private Predicate<SscsDocument> documentNameMatches(String documentNamePrefix) {

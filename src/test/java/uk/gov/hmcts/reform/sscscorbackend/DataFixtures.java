@@ -30,7 +30,7 @@ public class DataFixtures {
     }
 
     public static List<QuestionSummary> someQuestionSummaries() {
-        return singletonList(new QuestionSummary("someQuestionId", 1, "someQuestionHeader", "someQuestionBody", draft));
+        return singletonList(new QuestionSummary("someQuestionId", 1, "someQuestionHeader", "someQuestionBody", draft, "someAnswer"));
     }
 
     public static Question someQuestion() {
@@ -131,7 +131,7 @@ public class DataFixtures {
                 "relisting reason",
                 singletonList(
                         new PdfQuestionRound(singletonList(
-                                new PdfQuestion("title", "body", "answer", "issueDate", "submittedDate")
+                                new PdfQuestion("title", "body", "answer", AnswerState.submitted, "issueDate", "submittedDate")
                         ))
                 )
         );

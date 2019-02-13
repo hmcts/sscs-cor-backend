@@ -17,17 +17,17 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionRound;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
-public class StoreQuestionsPdfServiceTest {
+public class StoreAnswersPdfServiceTest {
 
     private QuestionService questionService;
     private String onlineHearingId;
-    private StoreQuestionsPdfService storeQuestionsPdfService;
+    private StoreAnswersPdfService storeQuestionsPdfService;
 
     @Before
     public void setUp() {
         questionService = mock(QuestionService.class);
         onlineHearingId = "someOnlineHearingId";
-        storeQuestionsPdfService = new StoreQuestionsPdfService(
+        storeQuestionsPdfService = new StoreAnswersPdfService(
                 mock(PdfService.class), "sometemplate", mock(SscsPdfService.class), mock(CcdService.class), mock(IdamService.class),
                 questionService, mock(EvidenceManagementService.class));
     }
@@ -47,6 +47,6 @@ public class StoreQuestionsPdfServiceTest {
         when(questionService.getCurrentQuestionRound(onlineHearingId)).thenReturn(66);
         String documentNamePrefix = storeQuestionsPdfService.documentNamePrefix(mock(SscsCaseDetails.class), onlineHearingId);
 
-        assertThat(documentNamePrefix, is("Issued Questions Round 66 - "));
+        assertThat(documentNamePrefix, is("Issued Answers Round 66 - "));
     }
 }

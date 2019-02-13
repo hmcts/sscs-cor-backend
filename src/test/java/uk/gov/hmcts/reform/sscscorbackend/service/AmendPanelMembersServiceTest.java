@@ -43,6 +43,20 @@ public class AmendPanelMembersServiceTest {
     }
 
     @Test
+    public void willAddPanelMembersForWhenACaseIsAmendedToHavePanelMembers() {
+        amendPanelMembersService.amendPanelMembersPermissions(
+                new CcdEvent(
+                        new CaseDetails(caseId, newCaseData),
+                        new CaseDetails(caseId, new CaseData("onlineHearingId", null, null, null))
+                ));
+
+        verify(corCcdService).addUserToCase(disabilityMember, Long.valueOf(caseId));
+        verify(corCcdService).addUserToCase(medicalMember, Long.valueOf(caseId));
+        verifyNoMoreInteractions(corCcdService);
+    }
+
+
+    @Test
     public void willNotAddPanelMembersForAnUncahangedCase() {
         amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData), new CaseDetails(caseId, newCaseData)));
 

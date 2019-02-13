@@ -64,6 +64,11 @@ question:
   html:
     template:
       path: /templates/questions.html
+answer:
+  html:
+    template:
+      path: /templates/answers.html
+
 
 appeal:
   email:
@@ -86,3 +91,6 @@ feign:
     config:
       default:
         errorDecoder: uk.gov.hmcts.reform.sscscorbackend.exception.CorErrorDecoder
+
+logging.level:
+  org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod: DEBUG

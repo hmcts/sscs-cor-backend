@@ -59,19 +59,34 @@ public class OnlineHearingController {
                 || request.getOnlineHearingId() == null
                 || request.getEventType() == null) {
             //throw a bad request error
+            String errorMessage = request == null
+                    ? "null request object" :
+                    String.format("case id [%s] online hearing id [%s] event type [%s]", request.getCaseId(), request.getOnlineHearingId(), request.getEventType());
+            log.info("Bad request to handle COH event " + errorMessage);
             return ResponseEntity.badRequest().build();
         }
         String eventType = request.getEventType();
 
         String onlineHearingId = request.getOnlineHearingId();
-        Long caseId = Long.valueOf(request.getCaseId());
+
+        Long caseId = null;
+        try {
+            caseId = Long.valueOf(request.getCaseId());
+        } catch (NumberFormatException e) {
+            String errorMessage = "Case id received as invalid number: " + request.getCaseId();
+            log.error(errorMessage);
+            return ResponseEntity.badRequest().body(errorMessage);
+        }
+
         log.info("Received event [{}] for case [{}] and hearing [{}]",
                 eventType, caseId, onlineHearingId);
 
         if (cohEventActionMapper.handle(request)) {
             return ResponseEntity.ok("");
         } else {
-            return ResponseEntity.badRequest().body("Event [" + request.getEventType() + "] not mapped");
+            String errorMessage = "Event [" + request.getEventType() + "] not mapped";
+            log.info("Bad request to handle COH event " + errorMessage);
+            return ResponseEntity.badRequest().body(errorMessage);
         }
     }
 

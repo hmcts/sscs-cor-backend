@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.exception;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,9 +12,9 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.logging.exception.AlertLevel;
 
+@Slf4j
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
-    private static final Logger LOG = getLogger(RestResponseEntityExceptionHandler.class);
     private final boolean enableDebugMessage;
 
     public RestResponseEntityExceptionHandler(@Value("${enable_debug_error_message}")boolean enableDebugMessage) {
@@ -26,7 +24,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler(value = { Exception.class })
     protected ResponseEntity<Object> logExceptions(Exception ex, WebRequest request) {
         SscsCorBackendException exc = new SscsCorBackendException(AlertLevel.P3, ex);
-        LOG.error("Unhandled exception", exc);
+        log.error("Unhandled exception", exc);
 
         String body = "An error has occurred" +
                 (enableDebugMessage ? "\n\n" + ExceptionUtils.getStackTrace(ex) : "");

@@ -43,6 +43,7 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
         storeOnlineHearingTribunalsViewService = new StoreOnlineHearingTribunalsViewService(
                 onlineHearingService,
                 pdfService,
+                "sometemplate",
                 onlineHearingDateReformatter,
                 sscsPdfService,
                 ccdService,
