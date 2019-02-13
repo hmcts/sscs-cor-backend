@@ -45,9 +45,9 @@
         }
 
         .appellants-answer {
-          margin-top: 20px;
-          padding: 20px;
-          background-color: #f8f8f8;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f8f8;
         }
 
         .govuk-check-your-answers .cya-question {
@@ -80,7 +80,6 @@
         .sign-and-submit p:last-child {
             margin-top: 30px;
         }
-
         .preserve-format {
             white-space: pre-wrap;
         }
@@ -99,7 +98,7 @@
     <div style="margin: 0px 45px 100px 45px;">
         <div class="grid-row">
             <div class="column-full">
-                <h1 class="heading-large">Online resolution questions and answers</h1>
+                <h1 class="heading-large">Online resolution questions</h1>
                 <br/>
 
                 <dl class="govuk-check-your-answers cya-questions-short">
@@ -136,14 +135,6 @@
                             {{ pdfSummary.appealDetails.nino }}
                         </dd>
                     </div>
-                    <!--<div>
-                      <dt class="cya-question">
-                       Benefit type
-                     </dt>
-                     <dd class="cya-answer">
-                      Personal Independence Payment
-                    </dd>
-                    </div> -->
                     <div>
                         <dt class="cya-question">
                             Appeal reference number
@@ -153,27 +144,15 @@
                         </dd>
                     </div>
                 </dl>
-                <div class="govuk-check-your-answers">
-                    <h2 class="heading-medium">Relisting reason</h2>
-                    <p class="preserve-format">{{ pdfSummary.relistingReason }}</p>
-                </div>
-
-                {% for question_round in pdfSummary.questionRounds %}
-                    {% for questionReference in question_round.questions %}
-                        <h2 class="heading-medium">{{ questionReference.questionTitle }}</h2>
-                        <p class="body-text">{{ questionReference.questionBody | raw }}</p>
-                        <p class="font-small">Issued: {{ questionReference.issuedDate }}</p>
-                        <div class="appellants-answer">
-                            <h2 class="bold-medium">Answer</h2>
-                            {% if questionReference.answerState == 'submitted' %}
-                                <p class="preserve-format">{{ questionReference.answer }}</p>
-                                <br/>
-                                <p class="font-small">Submitted: {{ questionReference.submittedDate }}</p>
-                            {% else %}
-                                <p>No answer submitted</p>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
+                {% for question in pdfSummary.questions %}
+                    <h2 class="heading-medium">{{ question.question_header_text }}</h2>
+                    <p class="body-text">{{ question.question_body_text | raw }}</p>
+                    <h2 class="bold-medium">Answer</h2>
+                    {% if question.answer_state == 'submitted' %}
+                        <p class="preserve-format">{{ question.answer }}</p>
+                    {% else %}
+                        <p>No answer submitted</p>
+                    {% endif %}
                 {% endfor %}
 
                 <br/><br/><br/>

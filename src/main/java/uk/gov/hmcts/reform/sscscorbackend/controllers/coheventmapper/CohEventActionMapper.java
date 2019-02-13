@@ -17,9 +17,10 @@ public class CohEventActionMapper {
     public CohEventActionMapper(StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService,
                                 NotificationsService notificationsService,
                                 QuestionRoundIssuedService questionRoundIssuedService,
-                                HearingRelistedAction hearingRelistedAction) {
+                                HearingRelistedAction hearingRelistedAction,
+                                AnswerSubmittedEventAction answerSubmittedEventAction) {
         this(buildActionsMap(storeOnlineHearingTribunalsViewService, notificationsService, questionRoundIssuedService,
-                hearingRelistedAction));
+                hearingRelistedAction, answerSubmittedEventAction));
     }
 
     CohEventActionMapper(HashMap<String, CohEventAction> actions) {
@@ -46,8 +47,8 @@ public class CohEventActionMapper {
             StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService,
             NotificationsService notificationsService,
             QuestionRoundIssuedService questionRoundIssuedService,
-            HearingRelistedAction hearingRelistedAction
-    ) {
+            HearingRelistedAction hearingRelistedAction,
+            AnswerSubmittedEventAction answerSubmittedEventAction) {
         HashMap<String, CohEventAction> actions = new HashMap<>();
         actions.put("decision_issued", (caseId, onlineHearingId, cohEvent) -> {
             storeOnlineHearingTribunalsViewService.storePdf(caseId, onlineHearingId);
@@ -57,6 +58,7 @@ public class CohEventActionMapper {
             questionRoundIssuedService.handleQuestionRoundIssued(cohEvent)
         );
         actions.put("continuous_online_hearing_relisted", hearingRelistedAction);
+        actions.put("answers_submitted", answerSubmittedEventAction);
 
         return actions;
     }
