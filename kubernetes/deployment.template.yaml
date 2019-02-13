@@ -41,6 +41,11 @@ spec:
           value: "${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}"
         - name: IDAM_OAUTH2_CLIENT_SECRET
           value: "${IDAM_OAUTH2_CLIENT_SECRET}"
+        - name: EMAIL_SERVER_HOST
+          value: "mta.reform.hmcts.net"
+        - name: EMAIL_SERVER_PORT
+          value: "25"
+
         envFrom:
           - configMapRef:
               name: ${SERVICE_NAME}-config
