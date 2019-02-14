@@ -69,7 +69,7 @@ public class OnlineHearingController {
 
         String onlineHearingId = request.getOnlineHearingId();
 
-        Long caseId = null;
+        Long caseId;
         try {
             caseId = Long.valueOf(request.getCaseId());
         } catch (NumberFormatException e) {

@@ -116,4 +116,40 @@ public class DwpEmailMessageBuilderTest {
                 "PIP Benefit Appeals\n" +
                 "HMCTS\n"));
     }
+
+    @Test
+    public void buildDecisionIssued() {
+        SscsCaseDetails caseDetails = SscsCaseDetails.builder()
+                .data(SscsCaseData.builder()
+                        .caseReference("caseReference")
+                        .appeal(Appeal.builder()
+                                .appellant(Appellant.builder()
+                                        .name(Name.builder()
+                                                .firstName("Jean")
+                                                .lastName("Valjean")
+                                                .build())
+                                        .identity(Identity.builder().nino("JV123456").build())
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+
+        String message = new DwpEmailMessageBuilder().getDecisionIssuedMessage(caseDetails);
+
+        assertThat(message, is("Preliminary view offered\n" +
+                "\n" +
+                "Appeal reference number: caseReference\n" +
+                "Appellant name: Jean Valjean\n" +
+                "Appellant NINO: JV123456\n" +
+                "\n" +
+                "Dear DWP\n" +
+                "\n" +
+                "The tribunal panel have reached a view on the above appeal.\n" +
+                "\n" +
+                "The view is attached to this email. Please read it and reply, stating whether you agree or " +
+                "disagree with it. Please provide reasons if you disagree.\n" +
+                "\n" +
+                "PIP Benefit Appeals\n" +
+                "HMCTS\n"));
+    }
 }
