@@ -5,22 +5,19 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscscorbackend.service.QuestionRoundIssuedService;
-import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
 
 @Service
 public class CohEventActionMapper {
     private final Map<String, CohEventAction> actions;
 
     @Autowired
-    public CohEventActionMapper(StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService,
-                                NotificationsService notificationsService,
-                                QuestionRoundIssuedService questionRoundIssuedService,
+    public CohEventActionMapper(QuestionRoundIssuedService questionRoundIssuedService,
                                 HearingRelistedAction hearingRelistedAction,
-                                AnswerSubmittedEventAction answerSubmittedEventAction) {
-        this(buildActionsMap(storeOnlineHearingTribunalsViewService, notificationsService, questionRoundIssuedService,
-                hearingRelistedAction, answerSubmittedEventAction));
+                                AnswerSubmittedEventAction answerSubmittedEventAction,
+                                DecisionIssuedEventAction decisionIssuedEventAction) {
+        this(buildActionsMap(questionRoundIssuedService,
+                hearingRelistedAction, answerSubmittedEventAction, decisionIssuedEventAction));
     }
 
     CohEventActionMapper(HashMap<String, CohEventAction> actions) {
@@ -44,16 +41,12 @@ public class CohEventActionMapper {
     }
 
     private static HashMap<String, CohEventAction> buildActionsMap(
-            StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService,
-            NotificationsService notificationsService,
             QuestionRoundIssuedService questionRoundIssuedService,
             HearingRelistedAction hearingRelistedAction,
-            AnswerSubmittedEventAction answerSubmittedEventAction) {
+            AnswerSubmittedEventAction answerSubmittedEventAction,
+            DecisionIssuedEventAction decisionIssuedEventAction) {
         HashMap<String, CohEventAction> actions = new HashMap<>();
-        actions.put("decision_issued", (caseId, onlineHearingId, cohEvent) -> {
-            storeOnlineHearingTribunalsViewService.storePdf(caseId, onlineHearingId);
-            notificationsService.send(cohEvent);
-        });
+        actions.put("decision_issued", decisionIssuedEventAction);
         actions.put("question_round_issued", (caseId, onlineHearingId, cohEvent) ->
             questionRoundIssuedService.handleQuestionRoundIssued(cohEvent)
         );

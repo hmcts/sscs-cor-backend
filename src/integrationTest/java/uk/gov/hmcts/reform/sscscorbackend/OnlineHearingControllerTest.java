@@ -42,7 +42,7 @@ public class OnlineHearingControllerTest extends BaseIntegrationTest {
     }
 
     @Test
-    public void postCohEvent() throws JsonProcessingException {
+    public void postDecisionIssuedCohEvent() throws JsonProcessingException {
         Long caseId = 169L;
         String hearingId = "someHearingId";
         cohStub.stubGetOnlineHearing(caseId, hearingId);

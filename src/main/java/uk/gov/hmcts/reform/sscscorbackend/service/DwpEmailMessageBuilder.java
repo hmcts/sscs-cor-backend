@@ -21,7 +21,7 @@ public class DwpEmailMessageBuilder {
             "PIP Benefit Appeals\n" +
             "HMCTS\n";
 
-    private static final String HEARING_REQUIRED_TEMPLATE = "Hearing required\n" +
+    private static final String TEMPLATE_WITH_HEADING = "{heading}\n" +
             "\n" +
             TEMPLATE;
 
@@ -29,21 +29,39 @@ public class DwpEmailMessageBuilder {
         String message = "The appellant has submitted additional information in relation to the above appeal. " +
                 "Please see attached.\n\n" +
                 "Please respond to this email if you have any comment.";
-        return buildMessage(caseDetails, message, TEMPLATE);
+        return buildMessage(caseDetails, message);
     }
 
     public String getRelistedMessage(SscsCaseDetails caseDetails) {
         String message = "The tribunal panel have decided that a hearing is required for the above appeal. A hearing will be booked and details will be sent.";
-        return buildMessage(caseDetails, message, HEARING_REQUIRED_TEMPLATE);
+        return buildMessageWithHeading(caseDetails, message, "Hearing required");
     }
 
     public String getQuestionMessage(SscsCaseDetails caseDetails) {
         String message = "The tribunal have sent some questions to the appellant in the above appeal.\n" +
                 "Please see the questions attached.";
-        return buildMessage(caseDetails, message, TEMPLATE);
+        return buildMessage(caseDetails, message);
     }
 
-    private String buildMessage(SscsCaseDetails caseDetails, String message, String template) {
+    public String getDecisionIssuedMessage(SscsCaseDetails caseDetails) {
+        String message = "The tribunal panel have reached a view on the above appeal.\n" +
+                "\n" +
+                "The view is attached to this email. Please read it and reply, stating whether you agree or " +
+                "disagree with it. Please provide reasons if you disagree.";
+        return buildMessageWithHeading(caseDetails, message, "Preliminary view offered");
+    }
+
+    private String buildMessageWithHeading(SscsCaseDetails caseDetails, String message, String heading) {
+        String templateWithHeading = TEMPLATE_WITH_HEADING.replace("{heading}", heading);
+
+        return buildMessageWithTemplate(caseDetails, message, templateWithHeading);
+    }
+
+    private String buildMessage(SscsCaseDetails caseDetails, String message) {
+        return buildMessageWithTemplate(caseDetails, message, TEMPLATE);
+    }
+
+    private String buildMessageWithTemplate(SscsCaseDetails caseDetails, String message, String template) {
         SscsCaseData data = caseDetails.getData();
         Appellant appellant = data.getAppeal().getAppellant();
         Name name = appellant.getName();
