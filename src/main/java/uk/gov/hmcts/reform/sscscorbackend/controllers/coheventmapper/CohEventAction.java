@@ -4,5 +4,5 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEve
 
 @FunctionalInterface
 public interface CohEventAction {
-    public void handle(Long caseId, String onlineHearingId, CohEvent cohEvent);
+    void handle(Long caseId, String onlineHearingId, CohEvent cohEvent);
 }

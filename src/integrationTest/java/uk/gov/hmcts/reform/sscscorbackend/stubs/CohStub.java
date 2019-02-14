@@ -349,4 +349,26 @@ public class CohStub extends BaseStub {
                 )
         );
     }
+
+    public void stubGetConversation(String hearingId) {
+        wireMock.stubFor(get("/continuous-online-hearings/" + hearingId + "/conversations")
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .willReturn(okJson("{\n" +
+                        "    \"online_hearing\": {\n" +
+                        "        \"questions\": [\n" +
+                        "            {\n" +
+                        "                \"question_round\": \"1\",\n" +
+                        "                \"question_ordinal\": \"1\",\n" +
+                        "                \"question_header_text\": \"header text\",\n" +
+                        "                \"question_body_text\": \"body text\",\n" +
+                        "                \"question_id\": \"512d223c-5d00-4521-bea8-74b734136cc5\"\n" +
+                        "            }\n" +
+                        "        ],\n" +
+                        "        \"relisting\": {\n" +
+                        "            \"reason\": \"some relisting reason\"\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "}"))
+        );
+    }
 }
