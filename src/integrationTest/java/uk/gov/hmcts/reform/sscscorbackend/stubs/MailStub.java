@@ -46,4 +46,27 @@ public class MailStub {
             }
         });
     }
+
+    public void hasEmailWithSubject(String subject) {
+        List<SmtpMessage> receivedEmails = smtpServer.getReceivedEmails();
+
+        assertThat(receivedEmails, new TypeSafeMatcher<List<SmtpMessage>>() {
+            @Override
+            protected boolean matchesSafely(List<SmtpMessage> smtpMessages) {
+                return receivedEmails.stream()
+                        .anyMatch(receivedEmail -> subject.equals(receivedEmail.getHeaderValue("Subject")));
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("An email with a subject ").appendValue(subject);
+            }
+
+            @Override
+            protected void describeMismatchSafely(List<SmtpMessage> item, Description mismatchDescription) {
+                List<String> emailSubjects = item.stream().map(email -> email.getHeaderValue("Subject")).collect(toList());
+                mismatchDescription.appendText(" got").appendValue(emailSubjects);
+            }
+        });
+    }
 }
