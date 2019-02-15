@@ -2,16 +2,16 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscscorbackend.service.BasePdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreAnswersPdfService;
+import uk.gov.hmcts.reform.sscscorbackend.service.StorePdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 
 @Service
 public class AnswerSubmittedEventAction implements CohEventAction {
     private final CorEmailService corEmailService;
-    private final BasePdfService storeAnswersPdfService;
+    private final StorePdfService storeAnswersPdfService;
     private final DwpEmailMessageBuilder dwpEmailMessageBuilder;
 
     public AnswerSubmittedEventAction(CorEmailService corEmailService, StoreAnswersPdfService storeAnswersPdfService, DwpEmailMessageBuilder dwpEmailMessageBuilder) {
@@ -32,7 +32,7 @@ public class AnswerSubmittedEventAction implements CohEventAction {
     }
 
     @Override
-    public BasePdfService getPdfService() {
+    public StorePdfService getPdfService() {
         return storeAnswersPdfService;
     }
 

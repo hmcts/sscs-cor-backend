@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionRound;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
-public abstract class AbstractQuestionPdfService extends BasePdfService<PdfQuestionsSummary> {
+public abstract class AbstractQuestionPdfService extends StorePdfService<PdfQuestionsSummary> {
     private final QuestionService questionService;
 
     @SuppressWarnings("squid:S00107")

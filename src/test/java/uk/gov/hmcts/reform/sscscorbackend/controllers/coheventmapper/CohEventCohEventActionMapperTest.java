@@ -9,7 +9,7 @@ import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohEvent;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscscorbackend.service.BasePdfService;
+import uk.gov.hmcts.reform.sscscorbackend.service.StorePdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
@@ -23,7 +23,7 @@ public class CohEventCohEventActionMapperTest {
     private long caseIdLong;
     private String hearingId;
     private StorePdfResult storePdfResult;
-    private BasePdfService basePdfService;
+    private StorePdfService storePdfService;
 
     @Before
     public void setUp() {
@@ -32,10 +32,10 @@ public class CohEventCohEventActionMapperTest {
         hearingId = "hearingId";
         action = mock(CohEventAction.class);
         when(action.eventCanHandle()).thenReturn("someMappedEvent");
-        basePdfService = mock(BasePdfService.class);
+        storePdfService = mock(StorePdfService.class);
         storePdfResult = mock(StorePdfResult.class);
-        when(basePdfService.storePdf(caseIdLong, hearingId)).thenReturn(storePdfResult);
-        when(action.getPdfService()).thenReturn(basePdfService);
+        when(storePdfService.storePdf(caseIdLong, hearingId)).thenReturn(storePdfResult);
+        when(action.getPdfService()).thenReturn(storePdfService);
         List<CohEventAction> actions = singletonList(action);
         notificationService = mock(NotificationsService.class);
         cohEventActionMapper = new CohEventActionMapper(actions, notificationService);
@@ -48,7 +48,7 @@ public class CohEventCohEventActionMapperTest {
         boolean handle = cohEventActionMapper.handle(cohEvent);
 
         verify(action).handle(caseIdLong, hearingId, storePdfResult);
-        verify(basePdfService).storePdf(caseIdLong, hearingId);
+        verify(storePdfService).storePdf(caseIdLong, hearingId);
         verify(notificationService).send(cohEvent);
         assertThat(handle, is(true));
     }
@@ -60,7 +60,7 @@ public class CohEventCohEventActionMapperTest {
         boolean handle = cohEventActionMapper.handle(cohEvent);
 
         verify(action).handle(caseIdLong, hearingId, storePdfResult);
-        verify(basePdfService).storePdf(caseIdLong, hearingId);
+        verify(storePdfService).storePdf(caseIdLong, hearingId);
         verifyZeroInteractions(notificationService);
         assertThat(handle, is(true));
     }
