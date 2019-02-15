@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscscorbackend.service.QuestionRoundIssuedService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
 
 @Service
@@ -12,11 +11,11 @@ public class CohEventActionMapper {
     private final Map<String, CohEventAction> actions;
 
     @Autowired
-    public CohEventActionMapper(QuestionRoundIssuedService questionRoundIssuedService,
+    public CohEventActionMapper(QuestionRoundIssuedEventAction questionRoundIssuedEventAction,
                                 HearingRelistedAction hearingRelistedAction,
                                 AnswerSubmittedEventAction answerSubmittedEventAction,
                                 DecisionIssuedEventAction decisionIssuedEventAction) {
-        this(buildActionsMap(questionRoundIssuedService,
+        this(buildActionsMap(questionRoundIssuedEventAction,
                 hearingRelistedAction, answerSubmittedEventAction, decisionIssuedEventAction));
     }
 
@@ -41,15 +40,13 @@ public class CohEventActionMapper {
     }
 
     private static HashMap<String, CohEventAction> buildActionsMap(
-            QuestionRoundIssuedService questionRoundIssuedService,
+            QuestionRoundIssuedEventAction questionRoundIssuedEventAction,
             HearingRelistedAction hearingRelistedAction,
             AnswerSubmittedEventAction answerSubmittedEventAction,
             DecisionIssuedEventAction decisionIssuedEventAction) {
         HashMap<String, CohEventAction> actions = new HashMap<>();
         actions.put("decision_issued", decisionIssuedEventAction);
-        actions.put("question_round_issued", (caseId, onlineHearingId, cohEvent) ->
-            questionRoundIssuedService.handleQuestionRoundIssued(cohEvent)
-        );
+        actions.put("question_round_issued", questionRoundIssuedEventAction);
         actions.put("continuous_online_hearing_relisted", hearingRelistedAction);
         actions.put("answers_submitted", answerSubmittedEventAction);
 
