@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CreateOnlineHearingRequest;
 
 public class CohRequests {
-    private static final long SECS_TO_WAIT_COH = 60L;
+    private static final long SECS_TO_WAIT_COH = 180L;
     private final IdamTokens idamTokens;
     private String cohBaseUrl;
     private HttpClient cohClient;
