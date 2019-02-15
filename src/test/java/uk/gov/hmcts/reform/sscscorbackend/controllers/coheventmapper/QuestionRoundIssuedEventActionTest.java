@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend.service;
+package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohEvent;
@@ -7,16 +7,19 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
+import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.service.StoreQuestionsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
 
-public class QuestionRoundIssuedServiceTest {
+public class QuestionRoundIssuedEventActionTest {
 
     private NotificationsService notificationsService;
     private StoreQuestionsPdfService storeQuestionsPdfService;
     private CorEmailService corEmailService;
-    private QuestionRoundIssuedService questionRoundIssuedService;
+    private QuestionRoundIssuedEventAction questionRoundIssuedEventAction;
     private Long caseId;
     private String hearingId;
     private DwpEmailMessageBuilder dwpEmailMessageBuilder;
@@ -27,7 +30,7 @@ public class QuestionRoundIssuedServiceTest {
         storeQuestionsPdfService = mock(StoreQuestionsPdfService.class);
         corEmailService = mock(CorEmailService.class);
         dwpEmailMessageBuilder = mock(DwpEmailMessageBuilder.class);
-        questionRoundIssuedService = new QuestionRoundIssuedService(
+        questionRoundIssuedEventAction = new QuestionRoundIssuedEventAction(
                 notificationsService, storeQuestionsPdfService, corEmailService,
                 dwpEmailMessageBuilder);
         caseId = 123456L;
@@ -49,7 +52,7 @@ public class QuestionRoundIssuedServiceTest {
         when(dwpEmailMessageBuilder.getQuestionMessage(sscsCaseDetails)).thenReturn(message);
         CohEvent cohEvent = someCohEvent(caseId.toString(), hearingId, "some_event");
 
-        questionRoundIssuedService.handleQuestionRoundIssued(cohEvent);
+        questionRoundIssuedEventAction.handle(caseId, hearingId, cohEvent);
 
         verify(notificationsService).send(cohEvent);
         verify(corEmailService).sendPdf(storePdfResult, "Questions issued to the appellant (" + caseReference + ")", message);
