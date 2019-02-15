@@ -6,29 +6,23 @@ import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreQuestionsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
 
 @Service
 public class QuestionRoundIssuedEventAction implements CohEventAction {
-    private final NotificationsService notificationsService;
     private final StoreQuestionsPdfService storeQuestionsPdfService;
     private final CorEmailService corEmailService;
     private final DwpEmailMessageBuilder dwpEmailMessageBuilder;
 
-    public QuestionRoundIssuedEventAction(NotificationsService notificationsService,
-                                          StoreQuestionsPdfService storeQuestionsPdfService,
+    public QuestionRoundIssuedEventAction(StoreQuestionsPdfService storeQuestionsPdfService,
                                           CorEmailService corEmailService,
                                           DwpEmailMessageBuilder dwpEmailMessageBuilder) {
-        this.notificationsService = notificationsService;
         this.storeQuestionsPdfService = storeQuestionsPdfService;
         this.corEmailService = corEmailService;
         this.dwpEmailMessageBuilder = dwpEmailMessageBuilder;
     }
 
     @Override
-    public void handle(Long caseId, String onlineHearingId, CohEvent cohEvent) {
-        notificationsService.send(cohEvent);
+    public void handle(Long caseId, String onlineHearingId) {
         StorePdfResult storePdfResult = storeQuestionsPdfService.storePdf(
                 caseId,
                 onlineHearingId

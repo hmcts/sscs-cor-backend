@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohEvent;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,12 +10,8 @@ import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreQuestionsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
 
 public class QuestionRoundIssuedEventActionTest {
-
-    private NotificationsService notificationsService;
     private StoreQuestionsPdfService storeQuestionsPdfService;
     private CorEmailService corEmailService;
     private QuestionRoundIssuedEventAction questionRoundIssuedEventAction;
@@ -26,12 +21,11 @@ public class QuestionRoundIssuedEventActionTest {
 
     @Before
     public void setUp() {
-        notificationsService = mock(NotificationsService.class);
         storeQuestionsPdfService = mock(StoreQuestionsPdfService.class);
         corEmailService = mock(CorEmailService.class);
         dwpEmailMessageBuilder = mock(DwpEmailMessageBuilder.class);
         questionRoundIssuedEventAction = new QuestionRoundIssuedEventAction(
-                notificationsService, storeQuestionsPdfService, corEmailService,
+                storeQuestionsPdfService, corEmailService,
                 dwpEmailMessageBuilder);
         caseId = 123456L;
         hearingId = "someHearingId";
@@ -50,11 +44,9 @@ public class QuestionRoundIssuedEventActionTest {
         when(storeQuestionsPdfService.storePdf(caseId, hearingId)).thenReturn(storePdfResult);
         String message = "message";
         when(dwpEmailMessageBuilder.getQuestionMessage(sscsCaseDetails)).thenReturn(message);
-        CohEvent cohEvent = someCohEvent(caseId.toString(), hearingId, "some_event");
 
-        questionRoundIssuedEventAction.handle(caseId, hearingId, cohEvent);
+        questionRoundIssuedEventAction.handle(caseId, hearingId);
 
-        verify(notificationsService).send(cohEvent);
         verify(corEmailService).sendPdf(storePdfResult, "Questions issued to the appellant (" + caseReference + ")", message);
     }
 }

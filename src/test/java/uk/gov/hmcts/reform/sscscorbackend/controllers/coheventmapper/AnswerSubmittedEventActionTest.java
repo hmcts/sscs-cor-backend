@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreAnswersPdfService;
@@ -32,7 +31,7 @@ public class AnswerSubmittedEventActionTest {
         when(storeAnswersPdfService.storePdf(caseId, onlineHearingId)).thenReturn(storePdfResult);
         when(dwpEmailMessageBuilder.getAnswerMessage(caseDetails)).thenReturn("some message");
 
-        answerSubmittedEventAction.handle(caseId, onlineHearingId, DataFixtures.someCohEvent(caseId + "", onlineHearingId, "some_event"));
+        answerSubmittedEventAction.handle(caseId, onlineHearingId);
 
         verify(corEmailService).sendPdf(storePdfResult, "Appellant has provided information (" + someCaseReference + ")", "some message");
     }
