@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 
 public class HearingRelistedActionTest {
 
-    private StoreOnlineHearingService storeOnlineHearingService;
     private CorCcdService corCcdService;
     private IdamTokens idamTokens;
     private Long caseId;
@@ -32,7 +31,6 @@ public class HearingRelistedActionTest {
 
     @Before
     public void setUp() {
-        storeOnlineHearingService = mock(StoreOnlineHearingService.class);
         corCcdService = mock(CorCcdService.class);
         IdamService idamService = mock(IdamService.class);
         idamTokens = mock(IdamTokens.class);
@@ -42,7 +40,7 @@ public class HearingRelistedActionTest {
         corEmailService = mock(CorEmailService.class);
 
         dwpEmailMessageBuilder = mock(DwpEmailMessageBuilder.class);
-        underTest = new HearingRelistedAction(storeOnlineHearingService, corCcdService, idamService, corEmailService, dwpEmailMessageBuilder);
+        underTest = new HearingRelistedAction(mock(StoreOnlineHearingService.class), corCcdService, idamService, corEmailService, dwpEmailMessageBuilder);
     }
 
     @Test
@@ -54,13 +52,11 @@ public class HearingRelistedActionTest {
                                 .build())
                         .build())
                 .build();
-        when(storeOnlineHearingService.storePdf(caseId, onlineHearingId))
-                .thenReturn(new StorePdfResult(mock(Pdf.class), sscsCaseDetails));
+        StorePdfResult storePdfResult = new StorePdfResult(mock(Pdf.class), sscsCaseDetails);
         when(dwpEmailMessageBuilder.getRelistedMessage(sscsCaseDetails)).thenReturn("message body");
 
-        underTest.handle(caseId, onlineHearingId);
+        underTest.handle(caseId, onlineHearingId, storePdfResult);
 
-        verify(storeOnlineHearingService).storePdf(caseId, onlineHearingId);
         ArgumentMatcher<SscsCaseData> hasOralHearing = data -> data.getAppeal().getHearingType().equals("oral");
         verify(corCcdService).updateCase(
                 argThat(hasOralHearing),

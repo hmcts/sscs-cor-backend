@@ -21,8 +21,7 @@ public class AnswerSubmittedEventAction implements CohEventAction {
     }
 
     @Override
-    public void handle(Long caseId, String onlineHearingId) {
-        StorePdfResult storePdfResult = storeAnswersPdfService.storePdf(caseId, onlineHearingId);
+    public void handle(Long caseId, String onlineHearingId, StorePdfResult storePdfResult) {
         SscsCaseDetails sscsCaseDetails = storePdfResult.getDocument();
         String caseReference = sscsCaseDetails.getData().getCaseReference();
         corEmailService.sendPdf(
@@ -30,6 +29,11 @@ public class AnswerSubmittedEventAction implements CohEventAction {
                 "Appellant has provided information (" + caseReference + ")",
                 dwpEmailMessageBuilder.getAnswerMessage(sscsCaseDetails)
         );
+    }
+
+    @Override
+    public BasePdfService getPdfService() {
+        return storeAnswersPdfService;
     }
 
     @Override

@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.sscscorbackend.service.StoreQuestionsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 
 public class QuestionRoundIssuedEventActionTest {
-    private StoreQuestionsPdfService storeQuestionsPdfService;
     private CorEmailService corEmailService;
     private QuestionRoundIssuedEventAction questionRoundIssuedEventAction;
     private Long caseId;
@@ -21,7 +20,7 @@ public class QuestionRoundIssuedEventActionTest {
 
     @Before
     public void setUp() {
-        storeQuestionsPdfService = mock(StoreQuestionsPdfService.class);
+        StoreQuestionsPdfService storeQuestionsPdfService = mock(StoreQuestionsPdfService.class);
         corEmailService = mock(CorEmailService.class);
         dwpEmailMessageBuilder = mock(DwpEmailMessageBuilder.class);
         questionRoundIssuedEventAction = new QuestionRoundIssuedEventAction(
@@ -41,11 +40,10 @@ public class QuestionRoundIssuedEventActionTest {
                         .build())
                 .build();
         when(storePdfResult.getDocument()).thenReturn(sscsCaseDetails);
-        when(storeQuestionsPdfService.storePdf(caseId, hearingId)).thenReturn(storePdfResult);
         String message = "message";
         when(dwpEmailMessageBuilder.getQuestionMessage(sscsCaseDetails)).thenReturn(message);
 
-        questionRoundIssuedEventAction.handle(caseId, hearingId);
+        questionRoundIssuedEventAction.handle(caseId, hearingId, storePdfResult);
 
         verify(corEmailService).sendPdf(storePdfResult, "Questions issued to the appellant (" + caseReference + ")", message);
     }

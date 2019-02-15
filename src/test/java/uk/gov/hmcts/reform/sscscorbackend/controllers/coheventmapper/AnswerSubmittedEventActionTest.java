@@ -28,12 +28,10 @@ public class AnswerSubmittedEventActionTest {
         String onlineHearingId = "onlineHearingId";
         String pdfName = "pdf_name.pdf";
         StorePdfResult storePdfResult = new StorePdfResult(new Pdf(new byte[]{2, 5, 6, 0, 1}, pdfName), caseDetails);
-        when(storeAnswersPdfService.storePdf(caseId, onlineHearingId)).thenReturn(storePdfResult);
         when(dwpEmailMessageBuilder.getAnswerMessage(caseDetails)).thenReturn("some message");
 
-        answerSubmittedEventAction.handle(caseId, onlineHearingId);
+        answerSubmittedEventAction.handle(caseId, onlineHearingId, storePdfResult);
 
         verify(corEmailService).sendPdf(storePdfResult, "Appellant has provided information (" + someCaseReference + ")", "some message");
     }
-
 }

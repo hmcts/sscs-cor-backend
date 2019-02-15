@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscscorbackend.service.BasePdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreQuestionsPdfService;
@@ -22,18 +23,29 @@ public class QuestionRoundIssuedEventAction implements CohEventAction {
     }
 
     @Override
-    public void handle(Long caseId, String onlineHearingId) {
-        StorePdfResult storePdfResult = storeQuestionsPdfService.storePdf(
-                caseId,
-                onlineHearingId
-        );
+    public void handle(Long caseId, String onlineHearingId, StorePdfResult storePdfResult) {
         SscsCaseDetails sscsCaseDetails = storePdfResult.getDocument();
-        String caseReference = sscsCaseDetails.getData().getCaseReference();
+        sendDwpEmail(storePdfResult, sscsCaseDetails);
+    }
+
+    public BasePdfService getPdfService() {
+        return storeQuestionsPdfService;
+    }
+
+    private void sendDwpEmail(StorePdfResult storePdfResult, SscsCaseDetails sscsCaseDetails) {
         corEmailService.sendPdf(
                 storePdfResult,
-                "Questions issued to the appellant (" + caseReference + ")",
-                dwpEmailMessageBuilder.getQuestionMessage(sscsCaseDetails)
+                getDwpEmailSubject(sscsCaseDetails),
+                getDwpEmailMessage(sscsCaseDetails)
         );
+    }
+
+    private String getDwpEmailMessage(SscsCaseDetails sscsCaseDetails) {
+        return dwpEmailMessageBuilder.getQuestionMessage(sscsCaseDetails);
+    }
+
+    private String getDwpEmailSubject(SscsCaseDetails sscsCaseDetails) {
+        return "Questions issued to the appellant (" + sscsCaseDetails.getData().getCaseReference() + ")";
     }
 
     @Override
