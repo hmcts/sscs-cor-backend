@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
-import uk.gov.hmcts.reform.sscscorbackend.service.BasePdfService;
+import uk.gov.hmcts.reform.sscscorbackend.service.StorePdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 
 public interface CohEventAction {
@@ -8,7 +8,7 @@ public interface CohEventAction {
 
     String eventCanHandle();
 
-    BasePdfService getPdfService();
+    StorePdfService getPdfService();
 
     default boolean notifyAppellant() {
         return true;

@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Slf4j
-public abstract class BasePdfService<E> {
+public abstract class StorePdfService<E> {
     private final PdfService pdfService;
     private final String pdfTemplatePath;
     private final SscsPdfService sscsPdfService;
@@ -27,12 +27,12 @@ public abstract class BasePdfService<E> {
     private final IdamService idamService;
     private final EvidenceManagementService evidenceManagementService;
 
-    BasePdfService(PdfService pdfService,
-                   String pdfTemplatePath,
-                   SscsPdfService sscsPdfService,
-                   CcdService ccdService,
-                   IdamService idamService,
-                   EvidenceManagementService evidenceManagementService) {
+    StorePdfService(PdfService pdfService,
+                    String pdfTemplatePath,
+                    SscsPdfService sscsPdfService,
+                    CcdService ccdService,
+                    IdamService idamService,
+                    EvidenceManagementService evidenceManagementService) {
         this.pdfService = pdfService;
         this.pdfTemplatePath = pdfTemplatePath;
         this.sscsPdfService = sscsPdfService;

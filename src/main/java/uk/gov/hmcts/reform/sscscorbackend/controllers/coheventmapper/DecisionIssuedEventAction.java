@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscscorbackend.service.BasePdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
+import uk.gov.hmcts.reform.sscscorbackend.service.StorePdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 
 @Service
@@ -35,7 +35,7 @@ public class DecisionIssuedEventAction implements CohEventAction {
     }
 
     @Override
-    public BasePdfService getPdfService() {
+    public StorePdfService getPdfService() {
         return storeOnlineHearingTribunalsViewService;
     }
 }

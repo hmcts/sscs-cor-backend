@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
-public class BasePdfServiceTest {
+public class StorePdfServiceTest {
     private static final String TITLE = "title";
     private static final String FIRST_NAME = "firstName";
     private static final String LAST_NAME = "lastName";
@@ -33,7 +33,7 @@ public class BasePdfServiceTest {
     private long caseId;
     private Object pdfContent;
     private String fileNamePrefix;
-    private BasePdfService basePdfService;
+    private StorePdfService storePdfService;
     private IdamTokens idamTokens;
     private String someOnlineHearingId;
     private EvidenceManagementService evidenceManagementService;
@@ -50,7 +50,7 @@ public class BasePdfServiceTest {
         pdfContent = new Object();
         fileNamePrefix = "test name";
         evidenceManagementService = mock(EvidenceManagementService.class);
-        basePdfService = new BasePdfService(pdfService, "sometemplate", sscsPdfService, ccdService, idamService, evidenceManagementService) {
+        storePdfService = new StorePdfService(pdfService, "sometemplate", sscsPdfService, ccdService, idamService, evidenceManagementService) {
 
             @Override
             protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId) {
@@ -72,7 +72,7 @@ public class BasePdfServiceTest {
         byte[] expectedPdfBytes = {2, 4, 6, 0, 1};
         when(pdfService.createPdf(pdfContent, "sometemplate")).thenReturn(expectedPdfBytes);
 
-        StorePdfResult storePdfResult = basePdfService.storePdf(caseId, someOnlineHearingId);
+        StorePdfResult storePdfResult = storePdfService.storePdf(caseId, someOnlineHearingId);
 
         verify(sscsPdfService).mergeDocIntoCcd(fileNamePrefix + CASE_REF + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), idamTokens);
         assertThat(storePdfResult.getPdf().getContent(), is(expectedPdfBytes));
@@ -103,7 +103,7 @@ public class BasePdfServiceTest {
         byte[] expectedPdfBytes = {2, 4, 6, 0, 1};
         when(evidenceManagementService.download(new URI(documentUrl), "sscs")).thenReturn(expectedPdfBytes);
 
-        StorePdfResult storePdfResult = basePdfService.storePdf(caseId, someOnlineHearingId);
+        StorePdfResult storePdfResult = storePdfService.storePdf(caseId, someOnlineHearingId);
 
         verifyZeroInteractions(sscsPdfService);
         assertThat(storePdfResult.getPdf().getContent(), is(expectedPdfBytes));
