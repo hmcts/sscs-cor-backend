@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreAnswersPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
 
 @Service
 public class AnswerSubmittedEventAction implements CohEventAction {
@@ -22,7 +21,7 @@ public class AnswerSubmittedEventAction implements CohEventAction {
     }
 
     @Override
-    public void handle(Long caseId, String onlineHearingId, CohEvent cohEvent) {
+    public void handle(Long caseId, String onlineHearingId) {
         StorePdfResult storePdfResult = storeAnswersPdfService.storePdf(caseId, onlineHearingId);
         SscsCaseDetails sscsCaseDetails = storePdfResult.getDocument();
         String caseReference = sscsCaseDetails.getData().getCaseReference();
@@ -31,5 +30,10 @@ public class AnswerSubmittedEventAction implements CohEventAction {
                 "Appellant has provided information (" + caseReference + ")",
                 dwpEmailMessageBuilder.getAnswerMessage(sscsCaseDetails)
         );
+    }
+
+    @Override
+    public boolean notifyAppellant() {
+        return false;
     }
 }

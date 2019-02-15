@@ -12,13 +12,10 @@ import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
 
 @Service
 public class HearingRelistedAction implements CohEventAction {
     private final StoreOnlineHearingService storeOnlineHearingService;
-    private final NotificationsService notificationsService;
     private final CorCcdService corCcdService;
     private final IdamService idamService;
     private final CorEmailService corEmailService;
@@ -26,12 +23,10 @@ public class HearingRelistedAction implements CohEventAction {
 
     @Autowired
     public HearingRelistedAction(StoreOnlineHearingService storeOnlineHearingService,
-                                 NotificationsService notificationsService,
                                  CorCcdService corCcdService, IdamService idamService,
                                  CorEmailService corEmailService,
                                  DwpEmailMessageBuilder dwpEmailMessageBuilder) {
         this.storeOnlineHearingService = storeOnlineHearingService;
-        this.notificationsService = notificationsService;
         this.corCcdService = corCcdService;
         this.idamService = idamService;
         this.corEmailService = corEmailService;
@@ -39,9 +34,8 @@ public class HearingRelistedAction implements CohEventAction {
     }
 
     @Override
-    public void handle(Long caseId, String onlineHearingId, CohEvent cohEvent) {
+    public void handle(Long caseId, String onlineHearingId) {
         StorePdfResult storePdfResult = storeOnlineHearingService.storePdf(caseId, onlineHearingId);
-        notificationsService.send(cohEvent);
         updateCcdCaseToOralHearing(caseId, storePdfResult);
         String relistedMessage = dwpEmailMessageBuilder.getRelistedMessage(storePdfResult.getDocument());
         corEmailService.sendEmail("COR: Hearing required", relistedMessage);

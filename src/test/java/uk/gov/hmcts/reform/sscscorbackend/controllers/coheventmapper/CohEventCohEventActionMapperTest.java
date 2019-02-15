@@ -9,26 +9,42 @@ import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
 
 public class CohEventCohEventActionMapperTest {
 
     private CohEventActionMapper cohEventActionMapper;
     private CohEventAction action;
+    private NotificationsService notificationService;
 
     @Before
     public void setUp() {
         HashMap<String, CohEventAction> actions = new HashMap<>();
         action = mock(CohEventAction.class);
         actions.put("someMappedEvent", action);
-        cohEventActionMapper = new CohEventActionMapper(actions);
+        notificationService = mock(NotificationsService.class);
+        cohEventActionMapper = new CohEventActionMapper(actions, notificationService);
     }
 
     @Test
-    public void handlesEvent() {
+    public void handlesEventAndShouldSendNotification() {
+        when(action.notifyAppellant()).thenReturn(true);
         CohEvent cohEvent = someCohEvent("1234", "hearingId", "someMappedEvent");
         boolean handle = cohEventActionMapper.handle(cohEvent);
 
-        verify(action).handle(1234L, "hearingId", cohEvent);
+        verify(action).handle(1234L, "hearingId");
+        verify(notificationService).send(cohEvent);
+        assertThat(handle, is(true));
+    }
+
+    @Test
+    public void handlesEventAndShouldNotSendNotification() {
+        when(action.notifyAppellant()).thenReturn(false);
+        CohEvent cohEvent = someCohEvent("1234", "hearingId", "someMappedEvent");
+        boolean handle = cohEventActionMapper.handle(cohEvent);
+
+        verify(action).handle(1234L, "hearingId");
+        verifyZeroInteractions(notificationService);
         assertThat(handle, is(true));
     }
 
