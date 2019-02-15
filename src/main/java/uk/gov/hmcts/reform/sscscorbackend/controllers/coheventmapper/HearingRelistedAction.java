@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscscorbackend.service.BasePdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
@@ -34,8 +35,7 @@ public class HearingRelistedAction implements CohEventAction {
     }
 
     @Override
-    public void handle(Long caseId, String onlineHearingId) {
-        StorePdfResult storePdfResult = storeOnlineHearingService.storePdf(caseId, onlineHearingId);
+    public void handle(Long caseId, String onlineHearingId, StorePdfResult storePdfResult) {
         updateCcdCaseToOralHearing(caseId, storePdfResult);
         String relistedMessage = dwpEmailMessageBuilder.getRelistedMessage(storePdfResult.getDocument());
         corEmailService.sendEmail("COR: Hearing required", relistedMessage);
@@ -64,5 +64,10 @@ public class HearingRelistedAction implements CohEventAction {
     @Override
     public String eventCanHandle() {
         return "continuous_online_hearing_relisted";
+    }
+
+    @Override
+    public BasePdfService getPdfService() {
+        return storeOnlineHearingService;
     }
 }

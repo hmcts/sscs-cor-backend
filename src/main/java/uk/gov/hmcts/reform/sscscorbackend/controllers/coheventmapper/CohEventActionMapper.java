@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
 
@@ -29,8 +30,8 @@ public class CohEventActionMapper {
         if (cohEventAction != null) {
             String onlineHearingId = event.getOnlineHearingId();
             Long caseId = Long.valueOf(event.getCaseId());
-
-            cohEventAction.handle(caseId, onlineHearingId);
+            StorePdfResult storePdfResult = cohEventAction.getPdfService().storePdf(caseId, onlineHearingId);
+            cohEventAction.handle(caseId, onlineHearingId, storePdfResult);
             if (cohEventAction.notifyAppellant()) {
                 notificationService.send(event);
             }

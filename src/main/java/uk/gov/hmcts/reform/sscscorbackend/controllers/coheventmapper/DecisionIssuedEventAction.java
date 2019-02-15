@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscscorbackend.service.BasePdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
@@ -19,8 +20,7 @@ public class DecisionIssuedEventAction implements CohEventAction {
     }
 
     @Override
-    public void handle(Long caseId, String onlineHearingId) {
-        StorePdfResult storePdfResult = storeOnlineHearingTribunalsViewService.storePdf(caseId, onlineHearingId);
+    public void handle(Long caseId, String onlineHearingId, StorePdfResult storePdfResult) {
         String caseReference = storePdfResult.getDocument().getData().getCaseReference();
         emailService.sendPdf(
                 storePdfResult,
@@ -32,5 +32,10 @@ public class DecisionIssuedEventAction implements CohEventAction {
     @Override
     public String eventCanHandle() {
         return "decision_issued";
+    }
+
+    @Override
+    public BasePdfService getPdfService() {
+        return storeOnlineHearingTribunalsViewService;
     }
 }

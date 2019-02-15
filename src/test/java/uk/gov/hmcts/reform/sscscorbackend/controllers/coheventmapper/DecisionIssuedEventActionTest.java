@@ -12,14 +12,13 @@ import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 
 public class DecisionIssuedEventActionTest {
 
-    private StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService;
     private CorEmailService corEmailService;
     private DwpEmailMessageBuilder dwpEmailMessageBuilder;
     private DecisionIssuedEventAction decisionIssuedEventAction;
 
     @Before
     public void setUp() {
-        storeOnlineHearingTribunalsViewService = mock(StoreOnlineHearingTribunalsViewService.class);
+        StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService = mock(StoreOnlineHearingTribunalsViewService.class);
         corEmailService = mock(CorEmailService.class);
         dwpEmailMessageBuilder = mock(DwpEmailMessageBuilder.class);
 
@@ -38,9 +37,8 @@ public class DecisionIssuedEventActionTest {
 
         long caseId = 123L;
         String onlineHearingId = "onlineHearingId";
-        when(storeOnlineHearingTribunalsViewService.storePdf(caseId, onlineHearingId)).thenReturn(storePdfResult);
 
-        decisionIssuedEventAction.handle(caseId, onlineHearingId);
+        decisionIssuedEventAction.handle(caseId, onlineHearingId, storePdfResult);
 
         String subject = "Preliminary view offered (" + storePdfResult.getDocument().getData().getCaseReference() + ")";
         verify(corEmailService).sendPdf(storePdfResult, subject, message);
