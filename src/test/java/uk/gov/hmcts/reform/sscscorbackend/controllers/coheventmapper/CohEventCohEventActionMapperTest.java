@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohEvent;
 
-import java.util.HashMap;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
@@ -19,9 +20,9 @@ public class CohEventCohEventActionMapperTest {
 
     @Before
     public void setUp() {
-        HashMap<String, CohEventAction> actions = new HashMap<>();
         action = mock(CohEventAction.class);
-        actions.put("someMappedEvent", action);
+        when(action.eventCanHandle()).thenReturn("someMappedEvent");
+        List<CohEventAction> actions = singletonList(action);
         notificationService = mock(NotificationsService.class);
         cohEventActionMapper = new CohEventActionMapper(actions, notificationService);
     }
@@ -53,7 +54,8 @@ public class CohEventCohEventActionMapperTest {
         CohEvent cohEvent = someCohEvent("1234", "hearingId", "someUnMappedEvent");
         boolean handle = cohEventActionMapper.handle(cohEvent);
 
-        verifyZeroInteractions(action);
+        verify(action, never()).handle(any(Long.class), any(String.class));
+        verifyZeroInteractions(notificationService);
         assertThat(handle, is(false));
     }
 }

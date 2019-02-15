@@ -35,4 +35,9 @@ public class QuestionRoundIssuedEventAction implements CohEventAction {
                 dwpEmailMessageBuilder.getQuestionMessage(sscsCaseDetails)
         );
     }
+
+    @Override
+    public String eventCanHandle() {
+        return "question_round_issued";
+    }
 }

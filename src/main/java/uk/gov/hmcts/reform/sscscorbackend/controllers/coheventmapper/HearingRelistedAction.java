@@ -60,4 +60,9 @@ public class HearingRelistedAction implements CohEventAction {
                 .appeal(data.getAppeal().toBuilder().hearingType("oral").build())
                 .build();
     }
+
+    @Override
+    public String eventCanHandle() {
+        return "continuous_online_hearing_relisted";
+    }
 }

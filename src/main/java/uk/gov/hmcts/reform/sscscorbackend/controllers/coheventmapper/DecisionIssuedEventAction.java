@@ -28,4 +28,9 @@ public class DecisionIssuedEventAction implements CohEventAction {
                 dwpEmailMessageBuilder.getDecisionIssuedMessage(storePdfResult.getDocument())
         );
     }
+
+    @Override
+    public String eventCanHandle() {
+        return "decision_issued";
+    }
 }

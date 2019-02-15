@@ -33,6 +33,11 @@ public class AnswerSubmittedEventAction implements CohEventAction {
     }
 
     @Override
+    public String eventCanHandle() {
+        return "answers_submitted";
+    }
+
+    @Override
     public boolean notifyAppellant() {
         return false;
     }
