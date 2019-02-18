@@ -43,7 +43,9 @@ public abstract class StorePdfService<E> {
 
     public StorePdfResult storePdf(Long caseId, String onlineHearingId) {
         IdamTokens idamTokens = idamService.getIdamTokens();
+        log.info("Loading case [" + caseId + "]");
         SscsCaseDetails caseDetails = ccdService.getByCaseId(caseId, idamTokens);
+        log.info("Loaded case [" + caseId + "]");
         String documentNamePrefix = documentNamePrefix(caseDetails, onlineHearingId);
         if (pdfHasNotAlreadyBeenCreated(caseDetails, documentNamePrefix)) {
             log.info("Creating pdf for [" + caseId + "]");
