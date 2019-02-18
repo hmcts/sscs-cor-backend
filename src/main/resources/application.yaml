@@ -78,9 +78,9 @@ appeal:
       tls:
         enabled: ${EMAIL_SMTP_TLS_ENABLED:true}
     from: ${EMAIL_FROM:sscs@hmcts.net}
-    to: ${EMAIL_TO:receiver@hmcts.net}
-    subject: ${EMAIL_SUBJECT:Your appeal}
-    message: ${EMAIL_MESSAGE:Your appeal has been created \nPlease do not respond to this email}
+    to: ${EMAIL_TO:NotUsed@hmcts.net}
+    subject: ${EMAIL_SUBJECT:Not Used}
+    message: ${EMAIL_MESSAGE:Not Used}
     dwpEmailAddress: ${DWP_EMAIL:dwp@example.com}
 
 enable_debug_error_message: ${ENABLE_DEBUG_ERROR_MESSAGE:true}

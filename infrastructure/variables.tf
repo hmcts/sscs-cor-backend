@@ -53,6 +53,10 @@ variable "dwp_email" {
   default = "dwp_email@example.com"
 }
 
+variable "email_from_address" {
+  default = "sscs@hmcts.net"
+}
+
 variable "createCcdEndpoint" {
   default     = "false"
 }
