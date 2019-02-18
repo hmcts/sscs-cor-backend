@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
 
+@Slf4j
 @Service
 public class CohEventActionMapper {
     private final List<CohEventAction> actions;
@@ -30,8 +32,11 @@ public class CohEventActionMapper {
         if (cohEventAction != null) {
             String onlineHearingId = event.getOnlineHearingId();
             Long caseId = Long.valueOf(event.getCaseId());
+            log.info("Storing pdf [" + caseId + "]");
             StorePdfResult storePdfResult = cohEventAction.getPdfService().storePdf(caseId, onlineHearingId);
+            log.info("Handle coh event [" + caseId + "]");
             cohEventAction.handle(caseId, onlineHearingId, storePdfResult);
+            log.info("Notify appellant [" + caseId + "]");
             if (cohEventAction.notifyAppellant()) {
                 notificationService.send(event);
             }
