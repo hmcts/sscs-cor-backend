@@ -38,7 +38,7 @@ public class HearingRelistedAction implements CohEventAction {
     public void handle(Long caseId, String onlineHearingId, StorePdfResult storePdfResult) {
         updateCcdCaseToOralHearing(caseId, storePdfResult);
         String relistedMessage = dwpEmailMessageBuilder.getRelistedMessage(storePdfResult.getDocument());
-        corEmailService.sendEmail("COR: Hearing required", relistedMessage);
+        corEmailService.sendEmailToDwp("COR: Hearing required", relistedMessage);
     }
 
     private void updateCcdCaseToOralHearing(Long caseId, StorePdfResult storePdfResult) {

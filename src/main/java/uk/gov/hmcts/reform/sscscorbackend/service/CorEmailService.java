@@ -28,9 +28,9 @@ public class CorEmailService {
         this.dwpEmailAddress = dwpEmailAddress;
     }
 
-    public void sendPdf(StorePdfResult storePdfResult, String subject, String message) {
+    public void sendPdfToDwp(StorePdfResult storePdfResult, String subject, String message) {
         byte[] content = storePdfResult.getPdf().getContent();
-        log.info("Sending email with subject [" + subject + "]");
+        log.info("Sending email and PDf with subject [" + subject + "] to DWP");
         emailService.sendEmail(Email.builder()
                 .from(fromEmailAddress)
                 .to(dwpEmailAddress)
@@ -40,11 +40,21 @@ public class CorEmailService {
                 .build());
     }
 
-    public void sendEmail(String subject, String message) {
-        log.info("Sending email with subject [" + subject + "]");
+    public void sendEmailToDwp(String subject, String message) {
+        log.info("Sending email with subject [" + subject + "] to DWP");
         emailService.sendEmail(Email.builder()
                 .from(fromEmailAddress)
                 .to(dwpEmailAddress)
+                .subject(subject)
+                .message(message)
+                .build());
+    }
+
+    public void sendEmailToCaseworker(String subject, String message) {
+        log.info("Sending email with subject [" + subject + "] to caseworker");
+        emailService.sendEmail(Email.builder()
+                .from(fromEmailAddress)
+                .to(fromEmailAddress)
                 .subject(subject)
                 .message(message)
                 .build());
