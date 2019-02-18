@@ -32,6 +32,6 @@ public class AnswerSubmittedEventActionTest {
 
         answerSubmittedEventAction.handle(caseId, onlineHearingId, storePdfResult);
 
-        verify(corEmailService).sendPdf(storePdfResult, "Appellant has provided information (" + someCaseReference + ")", "some message");
+        verify(corEmailService).sendPdfToDwp(storePdfResult, "Appellant has provided information (" + someCaseReference + ")", "some message");
     }
 }

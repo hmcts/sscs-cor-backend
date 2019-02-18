@@ -40,7 +40,7 @@ public class CorEmailServiceTest {
                 .build();
         String message = "Some message";
         String subject = "subject";
-        corEmailService.sendPdf(new StorePdfResult(new Pdf(pdfContent, pdfFileName), sscsCaseDetails), subject, message);
+        corEmailService.sendPdfToDwp(new StorePdfResult(new Pdf(pdfContent, pdfFileName), sscsCaseDetails), subject, message);
 
         verify(emailService).sendEmail(Email.builder()
                 .from(fromEmailAddress)
@@ -56,7 +56,7 @@ public class CorEmailServiceTest {
         CorEmailService corEmailService = new CorEmailService(emailService, fromEmailAddress, toEmailAddress);
         String message = "Some message";
         String subject = "subject";
-        corEmailService.sendEmail(subject, message);
+        corEmailService.sendEmailToDwp(subject, message);
 
         verify(emailService).sendEmail(Email.builder()
                 .from(fromEmailAddress)

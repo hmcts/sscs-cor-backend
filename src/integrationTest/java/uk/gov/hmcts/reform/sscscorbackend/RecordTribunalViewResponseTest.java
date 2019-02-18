@@ -3,16 +3,27 @@ package uk.gov.hmcts.reform.sscscorbackend;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import io.restassured.RestAssured;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
 public class RecordTribunalViewResponseTest extends BaseIntegrationTest {
 
+    private String hearingId;
+    private Long caseId;
+
+    @Before
+    public void setUp() throws Exception {
+        hearingId = "1";
+        caseId = 123456L;
+    }
+
     @Test
     public void recordAcceptedResponse() {
-        String hearingId = "1";
         String reply = "decision_accepted";
         String reason = "";
+        cohStub.stubGetOnlineHearing(caseId, hearingId);
+        ccdStub.stubFindCaseByCaseId(caseId, "caseReference", "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
         cohStub.stubPostDecisionReply(hearingId, reply, reason);
         RestAssured.baseURI = "http://localhost:" + applicationPort;
         RestAssured.given()
@@ -22,11 +33,13 @@ public class RecordTribunalViewResponseTest extends BaseIntegrationTest {
                 .patch("/continuous-online-hearings/" + hearingId + "/tribunal-view")
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
+
+        mailStub.hasEmailWithSubject("sscs@hmcts.net", "Tribunal view accepted (caseReference)");
+        mailStub.hasEmailWithSubject("dwp@example.com", "Tribunal view accepted (caseReference)");
     }
 
     @Test
     public void recordRejectedResponse() {
-        String hearingId = "1";
         String reply = "decision_rejected";
         String reason = "Reasons for rejecting tribunal's view";
         cohStub.stubPostDecisionReply(hearingId, reply, reason);
@@ -38,11 +51,12 @@ public class RecordTribunalViewResponseTest extends BaseIntegrationTest {
                 .patch("/continuous-online-hearings/" + hearingId + "/tribunal-view")
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
+
+        mailStub.hasNoEmails();
     }
 
     @Test
     public void recordRejectedResponseWithoutReason() {
-        String hearingId = "1";
         String reply = "decision_rejected";
         String reason = "";
         RestAssured.baseURI = "http://localhost:" + applicationPort;

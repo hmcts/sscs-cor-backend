@@ -45,6 +45,6 @@ public class QuestionRoundIssuedEventActionTest {
 
         questionRoundIssuedEventAction.handle(caseId, hearingId, storePdfResult);
 
-        verify(corEmailService).sendPdf(storePdfResult, "Questions issued to the appellant (" + caseReference + ")", message);
+        verify(corEmailService).sendPdfToDwp(storePdfResult, "Questions issued to the appellant (" + caseReference + ")", message);
     }
 }

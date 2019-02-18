@@ -24,7 +24,7 @@ public class AnswerSubmittedEventAction implements CohEventAction {
     public void handle(Long caseId, String onlineHearingId, StorePdfResult storePdfResult) {
         SscsCaseDetails sscsCaseDetails = storePdfResult.getDocument();
         String caseReference = sscsCaseDetails.getData().getCaseReference();
-        corEmailService.sendPdf(
+        corEmailService.sendPdfToDwp(
                 storePdfResult,
                 "Appellant has provided information (" + caseReference + ")",
                 dwpEmailMessageBuilder.getAnswerMessage(sscsCaseDetails)
