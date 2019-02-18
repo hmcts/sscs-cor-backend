@@ -59,10 +59,12 @@ public abstract class StorePdfService<E> {
 
     private Pdf storePdf(Long caseId, String onlineHearingId, IdamTokens idamTokens, SscsCaseDetails caseDetails, String documentNamePrefix) {
         PdfAppealDetails pdfAppealDetails = getPdfAppealDetails(caseId, caseDetails);
+        log.info("Storing pdf for [" + caseId + "]");
         byte[] pdfBytes = pdfService.createPdf(getPdfContent(caseDetails, onlineHearingId, pdfAppealDetails), pdfTemplatePath);
 
         SscsCaseData caseData = caseDetails.getData();
         String pdfName = getPdfName(documentNamePrefix, caseData.getCaseReference());
+        log.info("Adding pdf to ccd for [" + caseId + "]");
         sscsPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens);
 
         return new Pdf(pdfBytes, pdfName);
