@@ -25,6 +25,7 @@ public class CohEventCohEventActionMapperTest {
     private String hearingId;
     private StorePdfResult storePdfResult;
     private StorePdfService storePdfService;
+    private List<CohEventAction> actions;
 
     @Before
     public void setUp() {
@@ -37,9 +38,22 @@ public class CohEventCohEventActionMapperTest {
         storePdfResult = mock(StorePdfResult.class);
         when(storePdfService.storePdf(caseIdLong, hearingId)).thenReturn(storePdfResult);
         when(action.getPdfService()).thenReturn(storePdfService);
-        List<CohEventAction> actions = singletonList(action);
+        actions = singletonList(action);
         notificationService = mock(NotificationsService.class);
-        cohEventActionMapper = new CohEventActionMapper(actions, notificationService);
+        cohEventActionMapper = new CohEventActionMapper(actions, notificationService, true);
+    }
+
+    @Test
+    public void handlesEventAndShouldSendNotificationSynchronous() {
+        cohEventActionMapper = new CohEventActionMapper(actions, notificationService, false);
+        when(action.notifyAppellant()).thenReturn(true);
+        CohEvent cohEvent = someCohEvent(caseId, hearingId, "someMappedEvent");
+        boolean handle = cohEventActionMapper.handle(cohEvent);
+
+        verify(action).handle(caseIdLong, hearingId, storePdfResult);
+        verify(storePdfService).storePdf(caseIdLong, hearingId);
+        verify(notificationService).send(cohEvent);
+        assertThat(handle, is(true));
     }
 
     @Test
