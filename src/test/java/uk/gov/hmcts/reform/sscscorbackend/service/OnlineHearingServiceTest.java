@@ -37,7 +37,7 @@ public class OnlineHearingServiceTest {
     private IdamTokens idamTokens;
     private AmendPanelMembersService amendPanelMembersService;
     private IdamService idamService;
-    private DecisionAcceptedEmailService decisionAcceptedEmailService;
+    private DecisionEmailService decisionEmailService;
 
     @Before
     public void setUp() {
@@ -49,8 +49,8 @@ public class OnlineHearingServiceTest {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         amendPanelMembersService = mock(AmendPanelMembersService.class);
-        decisionAcceptedEmailService = mock(DecisionAcceptedEmailService.class);
-        underTest = new OnlineHearingService(cohService, ccdService, idamService, decisionExtractor, amendPanelMembersService, false, decisionAcceptedEmailService);
+        decisionEmailService = mock(DecisionEmailService.class);
+        underTest = new OnlineHearingService(cohService, ccdService, idamService, decisionExtractor, amendPanelMembersService, false, decisionEmailService);
 
         someEmailAddress = "someEmailAddress";
         someCaseId = 1234321L;
@@ -95,7 +95,7 @@ public class OnlineHearingServiceTest {
 
     @Test
     public void getsAnOnlineHearingWithCcdId() {
-        underTest = new OnlineHearingService(cohService, ccdService, idamService, decisionExtractor, amendPanelMembersService, true, decisionAcceptedEmailService);
+        underTest = new OnlineHearingService(cohService, ccdService, idamService, decisionExtractor, amendPanelMembersService, true, decisionEmailService);
         String expectedCaseReference = "someCaseReference";
         String firstName = "firstName";
         String lastName = "lastName";
@@ -231,26 +231,11 @@ public class OnlineHearingServiceTest {
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().build();
         when(ccdService.getByCaseId(cohOnlineHearing.getCcdCaseId(), idamTokens)).thenReturn(sscsCaseDetails);
 
-        underTest.addDecisionReply(someOnlineHearingId, new TribunalViewResponse(reply, reason));
+        TribunalViewResponse tribunalViewResponse = new TribunalViewResponse(reply, reason);
+        underTest.addDecisionReply(someOnlineHearingId, tribunalViewResponse);
 
         verify(cohService).addDecisionReply(someOnlineHearingId, new CohDecisionReply(reply, reason));
-        verify(decisionAcceptedEmailService).sendEmail(sscsCaseDetails);
-    }
-
-    @Test
-    public void addDecisionReplyAndDoesNotSendEmailIfDecisionRejected() {
-        String someOnlineHearingId = "someOnlineHearingId";
-        String reply = "decision_rejected";
-        String reason = "reason";
-        CohOnlineHearing cohOnlineHearing = someCohOnlineHearing();
-        when(cohService.getOnlineHearing(someOnlineHearingId)).thenReturn(cohOnlineHearing);
-        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().build();
-        when(ccdService.getByCaseId(cohOnlineHearing.getCcdCaseId(), idamTokens)).thenReturn(sscsCaseDetails);
-
-        underTest.addDecisionReply(someOnlineHearingId, new TribunalViewResponse(reply, reason));
-
-        verify(cohService).addDecisionReply(someOnlineHearingId, new CohDecisionReply(reply, reason));
-        verifyZeroInteractions(decisionAcceptedEmailService);
+        verify(decisionEmailService).sendEmail(sscsCaseDetails, tribunalViewResponse);
     }
 
     @Test(expected = IllegalArgumentException.class)

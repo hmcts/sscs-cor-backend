@@ -34,7 +34,7 @@ public class OnlineHearingService {
     private final DecisionExtractor decisionExtractor;
     private final AmendPanelMembersService amendPanelMembersService;
     private final boolean enableSelectByCaseId;
-    private final DecisionAcceptedEmailService decisionAcceptedEmailService;
+    private final DecisionEmailService decisionEmailService;
 
     public OnlineHearingService(
             @Autowired CohService cohService,
@@ -43,14 +43,14 @@ public class OnlineHearingService {
             @Autowired DecisionExtractor decisionExtractor,
             @Autowired AmendPanelMembersService amendPanelMembersService,
             @Value("${enable_select_by_case_id}") boolean enableSelectByCaseId,
-            @Autowired DecisionAcceptedEmailService decisionAcceptedEmailService) {
+            @Autowired DecisionEmailService decisionEmailService) {
         this.cohClient = cohService;
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.decisionExtractor = decisionExtractor;
         this.amendPanelMembersService = amendPanelMembersService;
         this.enableSelectByCaseId = enableSelectByCaseId;
-        this.decisionAcceptedEmailService = decisionAcceptedEmailService;
+        this.decisionEmailService = decisionEmailService;
     }
 
     public boolean createOnlineHearing(CcdEvent ccdEvent) {
@@ -112,12 +112,10 @@ public class OnlineHearingService {
         CohDecisionReply cohDecisionReply = new CohDecisionReply(tribunalViewResponse.getReply(), tribunalViewResponse.getReason());
         cohClient.addDecisionReply(onlineHearingId, cohDecisionReply);
 
-        if (tribunalViewResponse.getReply().equals("decision_accepted")) {
-            Optional<Long> ccdCaseIdOptional = getCcdCaseId(onlineHearingId);
-            Long caseId = ccdCaseIdOptional.orElseThrow(() -> new IllegalArgumentException("Cannot find online hearing id to add decision [" + onlineHearingId + "]"));
-            SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(caseId, idamService.getIdamTokens());
-            decisionAcceptedEmailService.sendEmail(sscsCaseDetails);
-        }
+        Optional<Long> ccdCaseIdOptional = getCcdCaseId(onlineHearingId);
+        Long caseId = ccdCaseIdOptional.orElseThrow(() -> new IllegalArgumentException("Cannot find online hearing id to add decision [" + onlineHearingId + "]"));
+        SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(caseId, idamService.getIdamTokens());
+        decisionEmailService.sendEmail(sscsCaseDetails, tribunalViewResponse);
     }
 
     private CohDecisionReply getAppellantDecisionReply(String onlineHearingId) {

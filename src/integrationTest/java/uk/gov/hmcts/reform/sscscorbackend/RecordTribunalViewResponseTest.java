@@ -42,6 +42,8 @@ public class RecordTribunalViewResponseTest extends BaseIntegrationTest {
     public void recordRejectedResponse() {
         String reply = "decision_rejected";
         String reason = "Reasons for rejecting tribunal's view";
+        cohStub.stubGetOnlineHearing(caseId, hearingId);
+        ccdStub.stubFindCaseByCaseId(caseId, "caseReference", "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
         cohStub.stubPostDecisionReply(hearingId, reply, reason);
         RestAssured.baseURI = "http://localhost:" + applicationPort;
         RestAssured.given()
@@ -52,7 +54,7 @@ public class RecordTribunalViewResponseTest extends BaseIntegrationTest {
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
-        mailStub.hasNoEmails();
+        mailStub.hasEmailWithSubject("sscs@hmcts.net", "Tribunal view rejected (caseReference)");
     }
 
     @Test
