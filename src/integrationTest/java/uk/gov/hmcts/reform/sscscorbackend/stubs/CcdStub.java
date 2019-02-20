@@ -91,7 +91,7 @@ public class CcdStub extends BaseStub {
     }
 
     public void verifyUpdateCaseWithPdf(Long caseId, String caseReference, String pdfName) throws JsonProcessingException {
-        wireMock.verify(postRequestedFor(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true"))
+        verifyAsync(postRequestedFor(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true"))
                 .withRequestBody(matchingJsonPath("$.event.summary", equalTo("SSCS - appeal updated event")))
                 .withRequestBody(matchingJsonPath("$.data.caseReference", equalTo(caseReference)))
                 .withRequestBody(matchingJsonPath("$.data.sscsDocument[0].value.documentFileName", equalTo(pdfName)))
@@ -99,7 +99,7 @@ public class CcdStub extends BaseStub {
     }
 
     public void verifyUpdateCaseToOralHearing(Long caseId, String caseReference) throws JsonProcessingException {
-        wireMock.verify(postRequestedFor(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true"))
+        verifyAsync(postRequestedFor(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true"))
                 .withRequestBody(matchingJsonPath("$.event.summary", equalTo("SSCS - appeal updated event")))
                 .withRequestBody(matchingJsonPath("$.data.caseReference", equalTo(caseReference)))
                 .withRequestBody(matchingJsonPath("$.data.appeal.hearingType", equalTo("oral")))

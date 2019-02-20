@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.Notifications
 
 public class CohEventCohEventActionMapperTest {
 
+    private static final int TIMOUT_FOR_METHOD_CALL_MILLIS = 5000;
     private CohEventActionMapper cohEventActionMapper;
     private CohEventAction action;
     private NotificationsService notificationService;
@@ -47,9 +48,9 @@ public class CohEventCohEventActionMapperTest {
         CohEvent cohEvent = someCohEvent(caseId, hearingId, "someMappedEvent");
         boolean handle = cohEventActionMapper.handle(cohEvent);
 
-        verify(action).handle(caseIdLong, hearingId, storePdfResult);
-        verify(storePdfService).storePdf(caseIdLong, hearingId);
-        verify(notificationService).send(cohEvent);
+        verify(action, timeout(TIMOUT_FOR_METHOD_CALL_MILLIS)).handle(caseIdLong, hearingId, storePdfResult);
+        verify(storePdfService, timeout(TIMOUT_FOR_METHOD_CALL_MILLIS)).storePdf(caseIdLong, hearingId);
+        verify(notificationService, timeout(TIMOUT_FOR_METHOD_CALL_MILLIS)).send(cohEvent);
         assertThat(handle, is(true));
     }
 
@@ -59,10 +60,10 @@ public class CohEventCohEventActionMapperTest {
         CohEvent cohEvent = someCohEvent(caseId, hearingId, "someMappedEvent");
         boolean handle = cohEventActionMapper.handle(cohEvent);
 
-        verify(action).handle(caseIdLong, hearingId, storePdfResult);
-        verify(storePdfService).storePdf(caseIdLong, hearingId);
-        verifyZeroInteractions(notificationService);
         assertThat(handle, is(true));
+        verify(action, timeout(TIMOUT_FOR_METHOD_CALL_MILLIS)).handle(caseIdLong, hearingId, storePdfResult);
+        verify(storePdfService, timeout(TIMOUT_FOR_METHOD_CALL_MILLIS)).storePdf(caseIdLong, hearingId);
+        verifyZeroInteractions(notificationService);
     }
 
     @Test
@@ -70,8 +71,8 @@ public class CohEventCohEventActionMapperTest {
         CohEvent cohEvent = someCohEvent(caseId, hearingId, "someUnMappedEvent");
         boolean handle = cohEventActionMapper.handle(cohEvent);
 
-        verify(action, never()).handle(any(Long.class), any(String.class), any(StorePdfResult.class));
-        verifyZeroInteractions(notificationService);
         assertThat(handle, is(false));
+        verify(action, timeout(TIMOUT_FOR_METHOD_CALL_MILLIS).times(0)).handle(any(Long.class), any(String.class), any(StorePdfResult.class));
+        verifyZeroInteractions(notificationService);
     }
 }
