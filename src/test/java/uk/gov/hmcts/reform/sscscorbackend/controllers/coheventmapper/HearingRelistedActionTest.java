@@ -65,6 +65,6 @@ public class HearingRelistedActionTest {
                 eq("SSCS - appeal updated event"),
                 eq("Update SSCS hearing type"),
                 eq(idamTokens));
-        verify(corEmailService).sendEmail("COR: Hearing required", "message body");
+        verify(corEmailService).sendEmailToDwp("COR: Hearing required", "message body");
     }
 }

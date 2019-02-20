@@ -41,6 +41,6 @@ public class DecisionIssuedEventActionTest {
         decisionIssuedEventAction.handle(caseId, onlineHearingId, storePdfResult);
 
         String subject = "Preliminary view offered (" + storePdfResult.getDocument().getData().getCaseReference() + ")";
-        verify(corEmailService).sendPdf(storePdfResult, subject, message);
+        verify(corEmailService).sendPdfToDwp(storePdfResult, subject, message);
     }
 }

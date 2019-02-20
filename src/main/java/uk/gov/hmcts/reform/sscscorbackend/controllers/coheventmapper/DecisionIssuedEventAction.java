@@ -22,7 +22,7 @@ public class DecisionIssuedEventAction implements CohEventAction {
     @Override
     public void handle(Long caseId, String onlineHearingId, StorePdfResult storePdfResult) {
         String caseReference = storePdfResult.getDocument().getData().getCaseReference();
-        emailService.sendPdf(
+        emailService.sendPdfToDwp(
                 storePdfResult,
                 "Preliminary view offered (" + caseReference + ")",
                 dwpEmailMessageBuilder.getDecisionIssuedMessage(storePdfResult.getDocument())

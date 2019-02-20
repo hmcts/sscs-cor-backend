@@ -51,6 +51,10 @@ public class DwpEmailMessageBuilder {
         return buildMessageWithHeading(caseDetails, message, "Preliminary view offered");
     }
 
+    public String getDecisionAcceptedMessage(SscsCaseDetails caseDetails) {
+        return buildMessage(caseDetails, "The appellant has accepted the tribunal's view.");
+    }
+
     private String buildMessageWithHeading(SscsCaseDetails caseDetails, String message, String heading) {
         String templateWithHeading = TEMPLATE_WITH_HEADING.replace("{heading}", heading);
 
