@@ -28,7 +28,7 @@ public class MailStub {
 
     public void waitForEmailThatMatches(Predicate<SmtpMessage> matches, String expected) {
         List<SmtpMessage> receivedEmails = emptyList();
-        for (int counter = 0; counter < 10; counter++) {
+        for (int counter = 0; counter < 50; counter++) {
             receivedEmails = smtpServer.getReceivedEmails();
             if (receivedEmails.stream().anyMatch(matches)) {
                 return;
