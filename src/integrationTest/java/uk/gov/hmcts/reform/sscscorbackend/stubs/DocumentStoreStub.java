@@ -32,7 +32,7 @@ public class DocumentStoreStub extends BaseStub {
     }
 
     public void verifyUploadFile(byte[] pdfBytes) {
-        wireMock.verify(postRequestedFor(urlEqualTo("/documents"))
+        verifyAsync(postRequestedFor(urlEqualTo("/documents"))
             .withRequestBody(containing(Arrays.toString(pdfBytes)))
         );
     }

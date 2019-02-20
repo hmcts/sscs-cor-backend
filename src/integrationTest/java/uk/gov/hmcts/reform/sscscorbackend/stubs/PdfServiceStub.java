@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend.stubs;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +37,7 @@ public class PdfServiceStub extends BaseStub {
         InputStream in = getClass().getResourceAsStream(pdfTemplate);
         byte[] templateBytes = IOUtils.toByteArray(in);
 
-        wireMock.verify(postRequestedFor(urlEqualTo("/pdfs"))
+        verifyAsync(postRequestedFor(urlEqualTo("/pdfs"))
                 .withRequestBody(matchingJsonPath(caseReferencePath, equalTo(caseReference)))
                 .withRequestBody(matchingJsonPath("$.template", equalTo(new String(templateBytes))))
         );

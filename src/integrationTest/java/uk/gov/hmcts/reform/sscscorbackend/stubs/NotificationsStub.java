@@ -14,7 +14,7 @@ public class NotificationsStub extends BaseStub {
     }
 
     public void verifySendNotification(String cohEvent) {
-        wireMock.verify(postRequestedFor(urlEqualTo("/coh-send"))
+        verifyAsync(postRequestedFor(urlEqualTo("/coh-send"))
                 .withRequestBody(equalToJson(cohEvent))
         );
     }

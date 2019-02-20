@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend.stubs;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
@@ -10,8 +10,9 @@ import com.dumbster.smtp.SmtpMessage;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import org.junit.Assert;
 
 public class MailStub {
 
@@ -25,76 +26,47 @@ public class MailStub {
         smtpServer.stop();
     }
 
+    public void waitForEmailThatMatches(Predicate<SmtpMessage> matches, String expected) {
+        List<SmtpMessage> receivedEmails = emptyList();
+        for (int counter = 0; counter < 10; counter++) {
+            receivedEmails = smtpServer.getReceivedEmails();
+            if (receivedEmails.stream().anyMatch(matches)) {
+                return;
+            }
+            try {
+                Thread.sleep(100L);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        String emails = receivedEmails.stream()
+                .map(email -> "To=\"" + email.getHeaderValue("To") + "\" Subject=\"" + email.getHeaderValue("Subject") + "\"")
+                .collect(Collectors.joining("}\n\t{", "\t{", "}"));
+
+        Assert.fail("Expected an email that matches " + expected + "\n" +
+                " But got " + emails);
+    }
+
     public void hasEmailWithSubjectAndAttachment(String subject, byte[] attachment) {
-        List<SmtpMessage> receivedEmails = smtpServer.getReceivedEmails();
-
-        assertThat(receivedEmails, new TypeSafeMatcher<List<SmtpMessage>>() {
-            @Override
-            protected boolean matchesSafely(List<SmtpMessage> smtpMessages) {
-                return receivedEmails.stream()
-                        .anyMatch(receivedEmail -> subject.equals(receivedEmail.getHeaderValue("Subject")) &&
-                                receivedEmail.getBody().contains(Arrays.toString(attachment)));
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("An email with a subject ").appendValue(subject);
-            }
-
-            @Override
-            protected void describeMismatchSafely(List<SmtpMessage> item, Description mismatchDescription) {
-                List<String> emailSubjects = item.stream().map(email -> email.getHeaderValue("Subject")).collect(toList());
-                mismatchDescription.appendText(" got").appendValue(emailSubjects);
-            }
-        });
+        waitForEmailThatMatches(receivedEmail -> subject.equals(
+            receivedEmail.getHeaderValue("Subject")) && receivedEmail.getBody().contains(Arrays.toString(attachment)),
+            "An email with a subject [" + subject + "] with attachment"
+        );
     }
 
     public void hasEmailWithSubject(String subject) {
-        List<SmtpMessage> receivedEmails = smtpServer.getReceivedEmails();
-
-        assertThat(receivedEmails, new TypeSafeMatcher<List<SmtpMessage>>() {
-            @Override
-            protected boolean matchesSafely(List<SmtpMessage> smtpMessages) {
-                return receivedEmails.stream()
-                        .anyMatch(receivedEmail -> subject.equals(receivedEmail.getHeaderValue("Subject")));
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("An email with a subject ").appendValue(subject);
-            }
-
-            @Override
-            protected void describeMismatchSafely(List<SmtpMessage> item, Description mismatchDescription) {
-                List<String> emailSubjects = item.stream().map(email -> email.getHeaderValue("Subject")).collect(toList());
-                mismatchDescription.appendText(" got").appendValue(emailSubjects);
-            }
-        });
+        waitForEmailThatMatches(
+            receivedEmail -> subject.equals(receivedEmail.getHeaderValue("Subject")),
+            "An email with a subject [" + subject + "]"
+        );
     }
 
     public void hasEmailWithSubject(String toAddress, String subject) {
-        List<SmtpMessage> receivedEmails = smtpServer.getReceivedEmails();
-
-        assertThat(receivedEmails, new TypeSafeMatcher<List<SmtpMessage>>() {
-            @Override
-            protected boolean matchesSafely(List<SmtpMessage> smtpMessages) {
-                return receivedEmails.stream()
-                        .anyMatch(receivedEmail -> subject.equals(receivedEmail.getHeaderValue("Subject")) &&
-                                toAddress.equals(receivedEmail.getHeaderValue("To")));
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("An email being sent to ").appendValue(toAddress)
-                        .appendText("with a subject ").appendValue(subject);
-            }
-
-            @Override
-            protected void describeMismatchSafely(List<SmtpMessage> item, Description mismatchDescription) {
-                List<String> emails = item.stream().map(email -> email.getHeaderValue("To") + " " + email.getHeaderValue("Subject")).collect(toList());
-                mismatchDescription.appendText(" got").appendValue(emails);
-            }
-        });
+        waitForEmailThatMatches(
+            receivedEmail -> subject.equals(receivedEmail.getHeaderValue("Subject")) && toAddress.equals(receivedEmail.getHeaderValue("To")),
+            "An email sent to [" + toAddress + "] with a subject [" + subject + "]"
+        );
     }
 
     public void hasNoEmails() {
