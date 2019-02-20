@@ -10,15 +10,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 public class DwpEmailMessageBuilderTest {
 
     private DwpEmailMessageBuilder dwpEmailMessageBuilder;
+    private SscsCaseDetails caseDetails;
 
     @Before
     public void setUp() throws Exception {
         dwpEmailMessageBuilder = new DwpEmailMessageBuilder();
-    }
-
-    @Test
-    public void buildAnswersContent() {
-        SscsCaseDetails caseDetails = SscsCaseDetails.builder()
+        caseDetails = SscsCaseDetails.builder()
                 .data(SscsCaseData.builder()
                         .caseReference("caseReference")
                         .appeal(Appeal.builder()
@@ -32,7 +29,10 @@ public class DwpEmailMessageBuilderTest {
                                 .build())
                         .build())
                 .build();
+    }
 
+    @Test
+    public void buildAnswersContent() {
         String message = dwpEmailMessageBuilder.getAnswerMessage(caseDetails);
 
         assertThat(message, is("Appeal reference number: caseReference\n" +
@@ -52,22 +52,6 @@ public class DwpEmailMessageBuilderTest {
 
     @Test
     public void buildQuestionContent() {
-        SscsCaseDetails caseDetails = SscsCaseDetails.builder()
-                .data(SscsCaseData.builder()
-                        .caseReference("caseReference")
-                        .appeal(Appeal.builder()
-                                .appellant(Appellant.builder()
-                                        .name(Name.builder()
-                                                .firstName("Jean")
-                                                .lastName("Valjean")
-                                                .build())
-                                        .identity(Identity.builder().nino("JV123456").build())
-                                        .build())
-                                .build())
-                        .build()
-                )
-                .build();
-
         String message = new DwpEmailMessageBuilder().getQuestionMessage(caseDetails);
 
         assertThat(message, is("Appeal reference number: caseReference\n" +
@@ -85,21 +69,6 @@ public class DwpEmailMessageBuilderTest {
 
     @Test
     public void buildRelistingContent() {
-        SscsCaseDetails caseDetails = SscsCaseDetails.builder()
-                .data(SscsCaseData.builder()
-                        .caseReference("caseReference")
-                        .appeal(Appeal.builder()
-                                .appellant(Appellant.builder()
-                                        .name(Name.builder()
-                                                .firstName("Jean")
-                                                .lastName("Valjean")
-                                                .build())
-                                        .identity(Identity.builder().nino("JV123456").build())
-                                        .build())
-                                .build())
-                        .build())
-                .build();
-
         String message = new DwpEmailMessageBuilder().getRelistedMessage(caseDetails);
 
         assertThat(message, is("Hearing required\n" +
@@ -119,21 +88,6 @@ public class DwpEmailMessageBuilderTest {
 
     @Test
     public void buildDecisionIssued() {
-        SscsCaseDetails caseDetails = SscsCaseDetails.builder()
-                .data(SscsCaseData.builder()
-                        .caseReference("caseReference")
-                        .appeal(Appeal.builder()
-                                .appellant(Appellant.builder()
-                                        .name(Name.builder()
-                                                .firstName("Jean")
-                                                .lastName("Valjean")
-                                                .build())
-                                        .identity(Identity.builder().nino("JV123456").build())
-                                        .build())
-                                .build())
-                        .build())
-                .build();
-
         String message = new DwpEmailMessageBuilder().getDecisionIssuedMessage(caseDetails);
 
         assertThat(message, is("Preliminary view offered\n" +
@@ -148,6 +102,41 @@ public class DwpEmailMessageBuilderTest {
                 "\n" +
                 "The view is attached to this email. Please read it and reply, stating whether you agree or " +
                 "disagree with it. Please provide reasons if you disagree.\n" +
+                "\n" +
+                "PIP Benefit Appeals\n" +
+                "HMCTS\n"));
+    }
+
+    @Test
+    public void buildDecisionAccepted() {
+        String message = new DwpEmailMessageBuilder().getDecisionAcceptedMessage(caseDetails);
+
+        assertThat(message, is(
+                "Appeal reference number: caseReference\n" +
+                        "Appellant name: Jean Valjean\n" +
+                        "Appellant NINO: JV123456\n" +
+                        "\n" +
+                        "The appellant has accepted the tribunal's view.\n" +
+                        "\n" +
+                        "PIP Benefit Appeals\n" +
+                        "HMCTS\n"));
+    }
+
+    @Test
+    public void buildDecisionRejected() {
+        String reason = "some reason";
+        String message = new DwpEmailMessageBuilder().getDecisionRejectedMessage(caseDetails, reason);
+
+        assertThat(message, is(
+                "Appeal reference number: caseReference\n" +
+                "Appellant name: Jean Valjean\n" +
+                "Appellant NINO: JV123456\n" +
+                "\n" +
+                "The appellant has rejected the tribunal's view.\n" +
+                "\n" +
+                "Reasons for requesting a hearing:\n" +
+                "\n" +
+                reason + "\n" +
                 "\n" +
                 "PIP Benefit Appeals\n" +
                 "HMCTS\n"));
