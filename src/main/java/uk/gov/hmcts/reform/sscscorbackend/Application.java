@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
@@ -33,7 +34,7 @@ import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 @ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
 @EnableAsync
-public class Application {
+public class Application implements AsyncConfigurer {
 
     public static void main(final String[] args) {
         SpringApplication.run(Application.class, args);
@@ -85,10 +86,11 @@ public class Application {
     }
 
     @Bean
-    public Executor taskExecutor() {
+    @Override
+    public Executor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(2);
+        executor.setMaxPoolSize(4);
         executor.setQueueCapacity(500);
         executor.setThreadNamePrefix("COHEventHandler-");
         executor.initialize();
