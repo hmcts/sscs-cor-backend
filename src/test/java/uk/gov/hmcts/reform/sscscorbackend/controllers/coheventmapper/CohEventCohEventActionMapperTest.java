@@ -9,75 +9,47 @@ import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohEvent;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscscorbackend.service.StorePdfService;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
 
 public class CohEventCohEventActionMapperTest {
 
-    private static final int TIMOUT_FOR_METHOD_CALL_MILLIS = 5000;
     private CohEventActionMapper cohEventActionMapper;
     private CohEventAction action;
-    private NotificationsService notificationService;
     private String caseId;
-    private long caseIdLong;
     private String hearingId;
-    private StorePdfResult storePdfResult;
-    private StorePdfService storePdfService;
     private List<CohEventAction> actions;
+    private CohEventActionRunner cohEventActionRunner;
 
     @Before
     public void setUp() {
         caseId = "1234";
-        caseIdLong = Long.valueOf(caseId);
         hearingId = "hearingId";
         action = mock(CohEventAction.class);
         when(action.eventCanHandle()).thenReturn("someMappedEvent");
-        storePdfService = mock(StorePdfService.class);
-        storePdfResult = mock(StorePdfResult.class);
-        when(storePdfService.storePdf(caseIdLong, hearingId)).thenReturn(storePdfResult);
-        when(action.getPdfService()).thenReturn(storePdfService);
         actions = singletonList(action);
-        notificationService = mock(NotificationsService.class);
-        cohEventActionMapper = new CohEventActionMapper(actions, notificationService, true);
+        cohEventActionRunner = mock(CohEventActionRunner.class);
+        cohEventActionMapper = new CohEventActionMapper(actions, cohEventActionRunner, true);
     }
 
     @Test
-    public void handlesEventAndShouldSendNotificationSynchronous() {
-        cohEventActionMapper = new CohEventActionMapper(actions, notificationService, false);
+    public void handlesEventSynchronously() {
+        cohEventActionMapper = new CohEventActionMapper(actions, cohEventActionRunner, false);
         when(action.notifyAppellant()).thenReturn(true);
         CohEvent cohEvent = someCohEvent(caseId, hearingId, "someMappedEvent");
         boolean handle = cohEventActionMapper.handle(cohEvent);
 
-        verify(action).handle(caseIdLong, hearingId, storePdfResult);
-        verify(storePdfService).storePdf(caseIdLong, hearingId);
-        verify(notificationService).send(cohEvent);
+        verify(cohEventActionRunner).runActionSync(cohEvent, action);
         assertThat(handle, is(true));
     }
 
     @Test
-    public void handlesEventAndShouldSendNotification() {
+    public void handlesEventAsynchronously() {
         when(action.notifyAppellant()).thenReturn(true);
         CohEvent cohEvent = someCohEvent(caseId, hearingId, "someMappedEvent");
         boolean handle = cohEventActionMapper.handle(cohEvent);
 
-        verify(action, timeout(TIMOUT_FOR_METHOD_CALL_MILLIS)).handle(caseIdLong, hearingId, storePdfResult);
-        verify(storePdfService, timeout(TIMOUT_FOR_METHOD_CALL_MILLIS)).storePdf(caseIdLong, hearingId);
-        verify(notificationService, timeout(TIMOUT_FOR_METHOD_CALL_MILLIS)).send(cohEvent);
+        verify(cohEventActionRunner).runActionAsync(cohEvent, action);
         assertThat(handle, is(true));
-    }
-
-    @Test
-    public void handlesEventAndShouldNotSendNotification() {
-        when(action.notifyAppellant()).thenReturn(false);
-        CohEvent cohEvent = someCohEvent(caseId, hearingId, "someMappedEvent");
-        boolean handle = cohEventActionMapper.handle(cohEvent);
-
-        assertThat(handle, is(true));
-        verify(action, timeout(TIMOUT_FOR_METHOD_CALL_MILLIS)).handle(caseIdLong, hearingId, storePdfResult);
-        verify(storePdfService, timeout(TIMOUT_FOR_METHOD_CALL_MILLIS)).storePdf(caseIdLong, hearingId);
-        verifyZeroInteractions(notificationService);
     }
 
     @Test
@@ -86,7 +58,6 @@ public class CohEventCohEventActionMapperTest {
         boolean handle = cohEventActionMapper.handle(cohEvent);
 
         assertThat(handle, is(false));
-        verify(action, timeout(TIMOUT_FOR_METHOD_CALL_MILLIS).times(0)).handle(any(Long.class), any(String.class), any(StorePdfResult.class));
-        verifyZeroInteractions(notificationService);
+        verifyZeroInteractions(cohEventActionRunner);
     }
 }
