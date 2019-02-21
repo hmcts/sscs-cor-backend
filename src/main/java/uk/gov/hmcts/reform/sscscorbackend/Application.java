@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscscorbackend;
 
 import java.util.Properties;
 import java.util.concurrent.Executor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,7 +20,9 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
+import uk.gov.hmcts.reform.logging.exception.AlertLevel;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
+import uk.gov.hmcts.reform.sscscorbackend.exception.SscsCorBackendException;
 
 
 @SpringBootApplication
@@ -34,6 +38,7 @@ import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 @ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
 @EnableAsync
+@Slf4j
 public class Application implements AsyncConfigurer {
 
     public static void main(final String[] args) {
@@ -95,5 +100,13 @@ public class Application implements AsyncConfigurer {
         executor.setThreadNamePrefix("COHEventHandler-");
         executor.initialize();
         return executor;
+    }
+
+    @Override
+    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+        return (ex, method, params) -> {
+            SscsCorBackendException exc = new SscsCorBackendException(AlertLevel.P3, ex);
+            log.error("Unhandled in COH thread exception", exc);
+        };
     }
 }
