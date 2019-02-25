@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 
-
 @SpringBootApplication
 @EnableCircuitBreaker
 @EnableFeignClients(basePackages =

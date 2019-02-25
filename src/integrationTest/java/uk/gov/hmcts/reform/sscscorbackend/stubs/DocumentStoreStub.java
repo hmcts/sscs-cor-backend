@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.sscscorbackend.stubs;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+
+import java.util.Arrays;
 
 public class DocumentStoreStub extends BaseStub {
     public DocumentStoreStub(String url) {
@@ -28,5 +29,11 @@ public class DocumentStoreStub extends BaseStub {
     public void stubUploadFile() {
         wireMock.stubFor(post("/documents")
                 .willReturn(okJson(uploadResponseTemplate)));
+    }
+
+    public void verifyUploadFile(byte[] pdfBytes) {
+        verifyAsync(postRequestedFor(urlEqualTo("/documents"))
+            .withRequestBody(containing(Arrays.toString(pdfBytes)))
+        );
     }
 }

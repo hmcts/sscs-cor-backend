@@ -10,11 +10,15 @@ import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestionRound;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
@@ -134,6 +138,17 @@ public class DataFixtures {
                                 new PdfQuestion("title", "body", "answer", AnswerState.submitted, "issueDate", "submittedDate")
                         ))
                 )
+        );
+    }
+
+    public static StorePdfResult someStorePdfResult() {
+        return new StorePdfResult(
+                new Pdf(new byte[]{2, 4, 6, 0, 1}, "pdfName.pdf"),
+                SscsCaseDetails.builder()
+                        .data(SscsCaseData.builder()
+                                .caseReference("caseReference")
+                                .build())
+                        .build()
         );
     }
 

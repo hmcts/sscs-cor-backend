@@ -12,4 +12,10 @@ public class NotificationsStub extends BaseStub {
                 .withRequestBody(equalToJson(cohEvent))
                 .willReturn(ok()));
     }
+
+    public void verifySendNotification(String cohEvent) {
+        verifyAsync(postRequestedFor(urlEqualTo("/coh-send"))
+                .withRequestBody(equalToJson(cohEvent))
+        );
+    }
 }

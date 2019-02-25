@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohEvent;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,36 +12,35 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
+import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.notifications.NotificationsService;
 
 public class HearingRelistedActionTest {
 
-    private StoreOnlineHearingService storeOnlineHearingService;
-    private NotificationsService notificationsService;
     private CorCcdService corCcdService;
-    private IdamService idamService;
     private IdamTokens idamTokens;
     private Long caseId;
     private String onlineHearingId;
-    private CohEvent cohEvent;
     private HearingRelistedAction underTest;
+    private CorEmailService corEmailService;
+    private DwpEmailMessageBuilder dwpEmailMessageBuilder;
 
     @Before
     public void setUp() {
-        storeOnlineHearingService = mock(StoreOnlineHearingService.class);
-        notificationsService = mock(NotificationsService.class);
         corCcdService = mock(CorCcdService.class);
-        idamService = mock(IdamService.class);
+        IdamService idamService = mock(IdamService.class);
         idamTokens = mock(IdamTokens.class);
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
         caseId = 12345L;
         onlineHearingId = "onlineHearingId";
-        cohEvent = someCohEvent(caseId.toString(), onlineHearingId, "continuous_online_hearing_relisted");
+        corEmailService = mock(CorEmailService.class);
 
-        underTest = new HearingRelistedAction(storeOnlineHearingService, notificationsService, corCcdService, idamService);
+        dwpEmailMessageBuilder = mock(DwpEmailMessageBuilder.class);
+        underTest = new HearingRelistedAction(mock(StoreOnlineHearingService.class), corCcdService, idamService, corEmailService, dwpEmailMessageBuilder);
     }
 
     @Test
@@ -54,12 +52,11 @@ public class HearingRelistedActionTest {
                                 .build())
                         .build())
                 .build();
-        when(corCcdService.getByCaseId(caseId, idamTokens)).thenReturn(sscsCaseDetails);
+        StorePdfResult storePdfResult = new StorePdfResult(mock(Pdf.class), sscsCaseDetails);
+        when(dwpEmailMessageBuilder.getRelistedMessage(sscsCaseDetails)).thenReturn("message body");
 
-        underTest.handle(caseId, onlineHearingId, cohEvent);
+        underTest.handle(caseId, onlineHearingId, storePdfResult);
 
-        verify(storeOnlineHearingService).storePdf(caseId, onlineHearingId);
-        verify(notificationsService).send(cohEvent);
         ArgumentMatcher<SscsCaseData> hasOralHearing = data -> data.getAppeal().getHearingType().equals("oral");
         verify(corCcdService).updateCase(
                 argThat(hasOralHearing),
@@ -68,5 +65,6 @@ public class HearingRelistedActionTest {
                 eq("SSCS - appeal updated event"),
                 eq("Update SSCS hearing type"),
                 eq(idamTokens));
+        verify(corEmailService).sendEmailToDwp("COR: Hearing required", "message body");
     }
 }

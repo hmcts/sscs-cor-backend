@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Slf4j
 @Service
-public class StoreOnlineHearingService extends BasePdfService<PdfSummary> {
+public class StoreOnlineHearingService extends StorePdfService<PdfSummary> {
     private final CohService cohService;
     private final PdfSummaryBuilder pdfSummaryBuilder;
 

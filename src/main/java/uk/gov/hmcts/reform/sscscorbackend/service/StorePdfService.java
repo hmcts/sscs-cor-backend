@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Slf4j
-public abstract class BasePdfService<E> {
+public abstract class StorePdfService<E> {
     private final PdfService pdfService;
     private final String pdfTemplatePath;
     private final SscsPdfService sscsPdfService;
@@ -27,12 +27,12 @@ public abstract class BasePdfService<E> {
     private final IdamService idamService;
     private final EvidenceManagementService evidenceManagementService;
 
-    BasePdfService(PdfService pdfService,
-                   String pdfTemplatePath,
-                   SscsPdfService sscsPdfService,
-                   CcdService ccdService,
-                   IdamService idamService,
-                   EvidenceManagementService evidenceManagementService) {
+    StorePdfService(PdfService pdfService,
+                    String pdfTemplatePath,
+                    SscsPdfService sscsPdfService,
+                    CcdService ccdService,
+                    IdamService idamService,
+                    EvidenceManagementService evidenceManagementService) {
         this.pdfService = pdfService;
         this.pdfTemplatePath = pdfTemplatePath;
         this.sscsPdfService = sscsPdfService;
@@ -43,7 +43,9 @@ public abstract class BasePdfService<E> {
 
     public StorePdfResult storePdf(Long caseId, String onlineHearingId) {
         IdamTokens idamTokens = idamService.getIdamTokens();
+        log.info("Loading case [" + caseId + "]");
         SscsCaseDetails caseDetails = ccdService.getByCaseId(caseId, idamTokens);
+        log.info("Loaded case [" + caseId + "]");
         String documentNamePrefix = documentNamePrefix(caseDetails, onlineHearingId);
         if (pdfHasNotAlreadyBeenCreated(caseDetails, documentNamePrefix)) {
             log.info("Creating pdf for [" + caseId + "]");
@@ -59,10 +61,12 @@ public abstract class BasePdfService<E> {
 
     private Pdf storePdf(Long caseId, String onlineHearingId, IdamTokens idamTokens, SscsCaseDetails caseDetails, String documentNamePrefix) {
         PdfAppealDetails pdfAppealDetails = getPdfAppealDetails(caseId, caseDetails);
+        log.info("Storing pdf for [" + caseId + "]");
         byte[] pdfBytes = pdfService.createPdf(getPdfContent(caseDetails, onlineHearingId, pdfAppealDetails), pdfTemplatePath);
 
         SscsCaseData caseData = caseDetails.getData();
         String pdfName = getPdfName(documentNamePrefix, caseData.getCaseReference());
+        log.info("Adding pdf to ccd for [" + caseId + "]");
         sscsPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens);
 
         return new Pdf(pdfBytes, pdfName);
@@ -74,6 +78,7 @@ public abstract class BasePdfService<E> {
 
     private Pdf loadPdf(SscsCaseDetails caseDetails, String documentNamePrefix) {
         SscsDocument document = caseDetails.getData().getSscsDocument().stream()
+                .filter(sscsDocument -> sscsDocument.getValue().getDocumentFileName() != null)
                 .filter(documentNameMatches(documentNamePrefix))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Found PDF with name prefix [" + documentNamePrefix + "] but cannot load it"));

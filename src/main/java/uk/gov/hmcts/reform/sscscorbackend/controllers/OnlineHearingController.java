@@ -69,7 +69,7 @@ public class OnlineHearingController {
 
         String onlineHearingId = request.getOnlineHearingId();
 
-        Long caseId = null;
+        Long caseId;
         try {
             caseId = Long.valueOf(request.getCaseId());
         } catch (NumberFormatException e) {
@@ -82,6 +82,7 @@ public class OnlineHearingController {
                 eventType, caseId, onlineHearingId);
 
         if (cohEventActionMapper.handle(request)) {
+            log.info("Handled event [{}] for case [{}] and hearing [{}]",eventType, caseId, onlineHearingId);
             return ResponseEntity.ok("");
         } else {
             String errorMessage = "Event [" + request.getEventType() + "] not mapped";

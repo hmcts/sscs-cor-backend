@@ -21,7 +21,10 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestionRound;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.*;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohAnswer;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohConversations;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohQuestion;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohRelisting;
 
 @Service
 public class PdfSummaryBuilder {

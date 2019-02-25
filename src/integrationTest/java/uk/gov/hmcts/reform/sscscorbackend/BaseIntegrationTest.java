@@ -54,7 +54,7 @@ public abstract class BaseIntegrationTest {
     protected MailStub mailStub;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUpStubs() throws Exception {
         cohStub = new CohStub(cohUrl);
         stubs.add(cohStub);
         tokenGeneratorStub = new TokenGeneratorStub(tokenGeneratorUrl);
@@ -73,7 +73,7 @@ public abstract class BaseIntegrationTest {
     }
 
     @After
-    public void shutdownCoh() {
+    public void shutdownStubs() {
         stubs.forEach(BaseStub::shutdown);
         mailStub.stop();
     }

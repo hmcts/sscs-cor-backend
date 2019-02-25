@@ -94,5 +94,6 @@ module "sscs-core-backend" {
     EMAIL_SERVER_HOST      = "${local.email_host}"
     EMAIL_SERVER_PORT      = "${local.email_port}"
     DWP_EMAIL              = "${var.dwp_email}"
+    EMAIL_FROM             = "${var.email_from_address}"
   }
 }

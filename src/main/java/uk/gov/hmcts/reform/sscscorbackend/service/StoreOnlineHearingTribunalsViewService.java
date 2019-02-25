@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Slf4j
 @Service
-public class StoreOnlineHearingTribunalsViewService extends BasePdfService<OnlineHearing> {
+public class StoreOnlineHearingTribunalsViewService extends StorePdfService<OnlineHearing> {
 
     public static final String TRIBUNALS_VIEW_PDF_PREFIX = "Tribunals view - ";
     private final OnlineHearingService onlineHearingService;

@@ -1,8 +1,16 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
+import uk.gov.hmcts.reform.sscscorbackend.service.StorePdfService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 
-@FunctionalInterface
 public interface CohEventAction {
-    public void handle(Long caseId, String onlineHearingId, CohEvent cohEvent);
+    void handle(Long caseId, String onlineHearingId, StorePdfResult storePdfResult);
+
+    String eventCanHandle();
+
+    StorePdfService getPdfService();
+
+    default boolean notifyAppellant() {
+        return true;
+    }
 }

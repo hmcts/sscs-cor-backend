@@ -2,31 +2,47 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscscorbackend.service.*;
+import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
+import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.service.StoreAnswersPdfService;
+import uk.gov.hmcts.reform.sscscorbackend.service.StorePdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
 
 @Service
 public class AnswerSubmittedEventAction implements CohEventAction {
     private final CorEmailService corEmailService;
-    private final BasePdfService storeAnswersPdfService;
-    private final AnswersEmailMessageBuilder answersEmailMessageBuilder;
+    private final StorePdfService storeAnswersPdfService;
+    private final DwpEmailMessageBuilder dwpEmailMessageBuilder;
 
-    public AnswerSubmittedEventAction(CorEmailService corEmailService, StoreAnswersPdfService storeAnswersPdfService, AnswersEmailMessageBuilder answersEmailMessageBuilder) {
+    public AnswerSubmittedEventAction(CorEmailService corEmailService, StoreAnswersPdfService storeAnswersPdfService, DwpEmailMessageBuilder dwpEmailMessageBuilder) {
         this.corEmailService = corEmailService;
         this.storeAnswersPdfService = storeAnswersPdfService;
-        this.answersEmailMessageBuilder = answersEmailMessageBuilder;
+        this.dwpEmailMessageBuilder = dwpEmailMessageBuilder;
     }
 
     @Override
-    public void handle(Long caseId, String onlineHearingId, CohEvent cohEvent) {
-        StorePdfResult storePdfResult = storeAnswersPdfService.storePdf(caseId, onlineHearingId);
+    public void handle(Long caseId, String onlineHearingId, StorePdfResult storePdfResult) {
         SscsCaseDetails sscsCaseDetails = storePdfResult.getDocument();
         String caseReference = sscsCaseDetails.getData().getCaseReference();
-        corEmailService.sendPdf(
+        corEmailService.sendPdfToDwp(
                 storePdfResult,
                 "Appellant has provided information (" + caseReference + ")",
-                answersEmailMessageBuilder.getMessage(sscsCaseDetails)
+                dwpEmailMessageBuilder.getAnswerMessage(sscsCaseDetails)
         );
+    }
+
+    @Override
+    public StorePdfService getPdfService() {
+        return storeAnswersPdfService;
+    }
+
+    @Override
+    public String eventCanHandle() {
+        return "answers_submitted";
+    }
+
+    @Override
+    public boolean notifyAppellant() {
+        return false;
     }
 }
