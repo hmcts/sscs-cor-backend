@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
@@ -26,9 +25,9 @@ public class StoreOnlineHearingTribunalsViewService extends StorePdfService<Onli
                                                   PdfService pdfService,
                                                   @Value("${preliminary_view.html.template.path}") String templatePath,
                                                   OnlineHearingDateReformatter onlineHearingDateReformatter,
-                                                  SscsPdfService sscsPdfService, CcdService ccdService, IdamService idamService,
+                                                  SscsPdfService sscsPdfService, IdamService idamService,
                                                   EvidenceManagementService evidenceManagementService) {
-        super(pdfService, templatePath, sscsPdfService, ccdService, idamService, evidenceManagementService);
+        super(pdfService, templatePath, sscsPdfService, idamService, evidenceManagementService);
         this.onlineHearingService = onlineHearingService;
         this.onlineHearingDateReformatter = onlineHearingDateReformatter;
     }

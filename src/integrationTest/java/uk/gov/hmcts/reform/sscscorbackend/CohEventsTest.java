@@ -2,11 +2,13 @@ package uk.gov.hmcts.reform.sscscorbackend;
 
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohAnswers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.RestAssured;
 import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohQuestionReference;
 
 public class CohEventsTest extends BaseIntegrationTest {
@@ -33,6 +35,7 @@ public class CohEventsTest extends BaseIntegrationTest {
         pdfServiceStub.stubCreatePdf(pdf);
         ccdStub.stubFindCaseByCaseId(caseId, caseReference, "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
         ccdStub.stubUpdateCase(caseId);
+        ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_DECISION_ISSUED.getCcdType());
         String cohEvent = createCohEvent("decision_issued");
         notificationsStub.stubSendNotification(cohEvent);
 
@@ -58,6 +61,7 @@ public class CohEventsTest extends BaseIntegrationTest {
 
         ccdStub.stubFindCaseByCaseId(caseId, caseReference, "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
         ccdStub.stubUpdateCase(caseId);
+        ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_QUESTION_ROUND_ISSUED.getCcdType());
         String cohEvent = createCohEvent("question_round_issued");
         notificationsStub.stubSendNotification(cohEvent);
 
@@ -78,6 +82,7 @@ public class CohEventsTest extends BaseIntegrationTest {
         );
         cohStub.stubGetAllQuestionRounds(hearingId, questionSummary);
         cohStub.stubGetOnlineHearing(caseId, hearingId);
+        ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_ANSWERS_SUBMITTED.getCcdType());
         pdfServiceStub.stubCreatePdf(pdf);
         documentStoreStub.stubUploadFile();
         ccdStub.stubUpdateCase(caseId);
@@ -100,7 +105,8 @@ public class CohEventsTest extends BaseIntegrationTest {
         ccdStub.stubUpdateCase(caseId);
         String cohEvent = createCohEvent("continuous_online_hearing_relisted");
         notificationsStub.stubSendNotification(cohEvent);
-        ccdStub.stubUpdateCaseWithEvent(caseId);
+        ccdStub.stubUpdateCaseWithEvent(caseId, "updateHearingType");
+        ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_ONLINE_HEARING_RELISTED.getCcdType());
 
         makeCohEventRequest(cohEvent);
 
@@ -109,6 +115,54 @@ public class CohEventsTest extends BaseIntegrationTest {
         documentStoreStub.verifyUploadFile(pdf);
         ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "COR Transcript - " + caseReference + ".pdf");
         ccdStub.verifyUpdateCaseToOralHearing(caseId, caseReference);
+    }
+
+    @Test
+    public void questionDealineElapsedCohEvent() throws IOException {
+        testEvent(EventType.COH_QUESTION_DEADLINE_ELAPSED, "question_deadline_elapsed", true);
+    }
+
+    @Test
+    public void questionDealineExtendedCohEvent() throws IOException {
+        testEvent(EventType.COH_QUESTION_DEADLINE_EXTENDED, "question_deadline_extended", false);
+    }
+
+    @Test
+    public void questionDealineExtensionDeniedCohEvent() throws IOException {
+        testEvent(EventType.COH_QUESTION_DEADLINE_EXTENSION_DENIED, "question_deadline_extension_denied", false);
+    }
+
+    @Test
+    public void questionDealineExtensionGrantedCohEvent() throws IOException {
+        testEvent(EventType.COH_QUESTION_DEADLINE_EXTENSION_GRANTED, "question_deadline_extension_granted", false);
+    }
+
+    @Test
+    public void questionDealineRemonderCohEvent() throws IOException {
+        testEvent(EventType.COH_QUESTION_DEADLINE_REMINDER, "question_deadline_reminder", true);
+    }
+
+    @Test
+    public void questionDealineRejectedCohEvent() throws IOException {
+        testEvent(EventType.COH_DECISION_REJECTED, "decision_rejected", false);
+    }
+
+    private void testEvent(EventType eventType, String cohEventType, boolean sendNotification) throws JsonProcessingException {
+        ccdStub.stubFindCaseByCaseId(caseId, caseReference, "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
+        ccdStub.stubUpdateCase(caseId);
+        ccdStub.stubUpdateCaseWithEvent(caseId, eventType.getCcdType());
+        String cohEvent = createCohEvent(cohEventType);
+        if (sendNotification) {
+            notificationsStub.stubSendNotification(cohEvent);
+        }
+
+        makeCohEventRequest(cohEvent);
+
+        ccdStub.verifyUpdateCaseWithEvent(caseId, eventType.getCcdType());
+        if (sendNotification) {
+            notificationsStub.verifySendNotification(cohEvent);
+        }
+        mailStub.hasNoEmails();
     }
 
     private void makeCohEventRequest(String cohEvent) {

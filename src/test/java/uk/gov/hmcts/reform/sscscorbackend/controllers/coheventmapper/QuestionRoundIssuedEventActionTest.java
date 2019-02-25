@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
 
 import org.junit.Before;
@@ -9,7 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreQuestionsPdfService;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 
 public class QuestionRoundIssuedEventActionTest {
     private CorEmailService corEmailService;
@@ -32,19 +34,20 @@ public class QuestionRoundIssuedEventActionTest {
 
     @Test
     public void sendQuestionsToDwp() {
-        StorePdfResult storePdfResult = mock(StorePdfResult.class);
+        CohEventActionContext cohEventActionContext = mock(CohEventActionContext.class);
         String caseReference = "caseRef";
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder()
                 .data(SscsCaseData.builder()
                         .caseReference(caseReference)
                         .build())
                 .build();
-        when(storePdfResult.getDocument()).thenReturn(sscsCaseDetails);
+        when(cohEventActionContext.getDocument()).thenReturn(sscsCaseDetails);
         String message = "message";
         when(dwpEmailMessageBuilder.getQuestionMessage(sscsCaseDetails)).thenReturn(message);
 
-        questionRoundIssuedEventAction.handle(caseId, hearingId, storePdfResult);
+        CohEventActionContext result = questionRoundIssuedEventAction.handle(caseId, hearingId, cohEventActionContext);
 
-        verify(corEmailService).sendPdfToDwp(storePdfResult, "Questions issued to the appellant (" + caseReference + ")", message);
+        verify(corEmailService).sendPdfToDwp(cohEventActionContext, "Questions issued to the appellant (" + caseReference + ")", message);
+        assertThat(result, is(cohEventActionContext));
     }
 }

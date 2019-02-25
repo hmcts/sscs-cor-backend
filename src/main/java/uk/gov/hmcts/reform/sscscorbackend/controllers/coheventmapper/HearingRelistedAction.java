@@ -10,8 +10,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
-import uk.gov.hmcts.reform.sscscorbackend.service.StorePdfService;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 
 @Service
@@ -35,15 +34,23 @@ public class HearingRelistedAction implements CohEventAction {
     }
 
     @Override
-    public void handle(Long caseId, String onlineHearingId, StorePdfResult storePdfResult) {
-        updateCcdCaseToOralHearing(caseId, storePdfResult);
-        String relistedMessage = dwpEmailMessageBuilder.getRelistedMessage(storePdfResult.getDocument());
-        corEmailService.sendEmailToDwp("COR: Hearing required", relistedMessage);
+    public CohEventActionContext createAndStorePdf(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
+        return storeOnlineHearingService.storePdf(caseId, onlineHearingId, caseDetails);
     }
 
-    private void updateCcdCaseToOralHearing(Long caseId, StorePdfResult storePdfResult) {
+    @Override
+    public CohEventActionContext handle(Long caseId, String onlineHearingId, CohEventActionContext cohEventActionContext) {
+        SscsCaseData oralSscsCaseData = updateCcdCaseToOralHearing(caseId, cohEventActionContext);
+        String relistedMessage = dwpEmailMessageBuilder.getRelistedMessage(cohEventActionContext.getDocument());
+        corEmailService.sendEmailToDwp("COR: Hearing required", relistedMessage);
+
+        SscsCaseDetails oralSscsCaseDetails = cohEventActionContext.getDocument().toBuilder().data(oralSscsCaseData).build();
+        return new CohEventActionContext(cohEventActionContext.getPdf(), oralSscsCaseDetails);
+    }
+
+    private SscsCaseData updateCcdCaseToOralHearing(Long caseId, CohEventActionContext cohEventActionContext) {
         IdamTokens idamTokens = idamService.getIdamTokens();
-        SscsCaseData oralCaseData = updateHearingTypeToOral(storePdfResult.getDocument());
+        SscsCaseData oralCaseData = updateHearingTypeToOral(cohEventActionContext.getDocument());
         corCcdService.updateCase(
                 oralCaseData,
                 caseId,
@@ -52,6 +59,7 @@ public class HearingRelistedAction implements CohEventAction {
                 "Update SSCS hearing type",
                 idamTokens
         );
+        return oralCaseData;
     }
 
     private SscsCaseData updateHearingTypeToOral(SscsCaseDetails sscsCaseDetails) {
@@ -62,12 +70,12 @@ public class HearingRelistedAction implements CohEventAction {
     }
 
     @Override
-    public String eventCanHandle() {
+    public String cohEvent() {
         return "continuous_online_hearing_relisted";
     }
 
     @Override
-    public StorePdfService getPdfService() {
-        return storeOnlineHearingService;
+    public EventType getCcdEventType() {
+        return EventType.COH_ONLINE_HEARING_RELISTED;
     }
 }

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -15,8 +17,8 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 
 public class HearingRelistedActionTest {
@@ -52,10 +54,11 @@ public class HearingRelistedActionTest {
                                 .build())
                         .build())
                 .build();
-        StorePdfResult storePdfResult = new StorePdfResult(mock(Pdf.class), sscsCaseDetails);
+        Pdf pdf = mock(Pdf.class);
+        CohEventActionContext cohEventActionContext = new CohEventActionContext(pdf, sscsCaseDetails);
         when(dwpEmailMessageBuilder.getRelistedMessage(sscsCaseDetails)).thenReturn("message body");
 
-        underTest.handle(caseId, onlineHearingId, storePdfResult);
+        CohEventActionContext result = underTest.handle(caseId, onlineHearingId, cohEventActionContext);
 
         ArgumentMatcher<SscsCaseData> hasOralHearing = data -> data.getAppeal().getHearingType().equals("oral");
         verify(corCcdService).updateCase(
@@ -66,5 +69,7 @@ public class HearingRelistedActionTest {
                 eq("Update SSCS hearing type"),
                 eq(idamTokens));
         verify(corEmailService).sendEmailToDwp("COR: Hearing required", "message body");
+        assertThat(result.getPdf(), is(pdf));
+        assertThat(result.getDocument().getData().getAppeal().getHearingType(), is("oral"));
     }
 }
