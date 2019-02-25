@@ -1,12 +1,13 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreAnswersPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StorePdfService;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 
 @Service
 public class AnswerSubmittedEventAction implements CohEventAction {
@@ -21,24 +22,31 @@ public class AnswerSubmittedEventAction implements CohEventAction {
     }
 
     @Override
-    public void handle(Long caseId, String onlineHearingId, StorePdfResult storePdfResult) {
-        SscsCaseDetails sscsCaseDetails = storePdfResult.getDocument();
+    public CohEventActionContext createAndStorePdf(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
+        return storeAnswersPdfService.storePdf(caseId, onlineHearingId, caseDetails);
+    }
+
+    @Override
+    public CohEventActionContext handle(Long caseId, String onlineHearingId, CohEventActionContext cohEventActionContext) {
+        SscsCaseDetails sscsCaseDetails = cohEventActionContext.getDocument();
         String caseReference = sscsCaseDetails.getData().getCaseReference();
         corEmailService.sendPdfToDwp(
-                storePdfResult,
+                cohEventActionContext,
                 "Appellant has provided information (" + caseReference + ")",
                 dwpEmailMessageBuilder.getAnswerMessage(sscsCaseDetails)
         );
+
+        return cohEventActionContext;
     }
 
     @Override
-    public StorePdfService getPdfService() {
-        return storeAnswersPdfService;
-    }
-
-    @Override
-    public String eventCanHandle() {
+    public String cohEvent() {
         return "answers_submitted";
+    }
+
+    @Override
+    public EventType getCcdEventType() {
+        return EventType.COH_ANSWERS_SUBMITTED;
     }
 
     @Override

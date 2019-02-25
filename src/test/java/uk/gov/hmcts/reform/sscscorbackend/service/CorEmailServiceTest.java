@@ -11,8 +11,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.domain.email.Email;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.service.EmailService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 
 public class CorEmailServiceTest {
 
@@ -40,7 +40,7 @@ public class CorEmailServiceTest {
                 .build();
         String message = "Some message";
         String subject = "subject";
-        corEmailService.sendPdfToDwp(new StorePdfResult(new Pdf(pdfContent, pdfFileName), sscsCaseDetails), subject, message);
+        corEmailService.sendPdfToDwp(new CohEventActionContext(new Pdf(pdfContent, pdfFileName), sscsCaseDetails), subject, message);
 
         verify(emailService).sendEmail(Email.builder()
                 .from(fromEmailAddress)

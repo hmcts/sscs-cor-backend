@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
@@ -36,7 +35,7 @@ public class StoreOnlineHearingServiceTest {
         pdfSummaryBuilder = mock(PdfSummaryBuilder.class);
 
         underTest = new StoreOnlineHearingService(
-                cohService, mock(IdamService.class), mock(CcdService.class), pdfSummaryBuilder,
+                cohService, mock(IdamService.class), pdfSummaryBuilder,
                 mock(SscsPdfService.class), mock(PdfService.class), "sometemplate",
                 mock(EvidenceManagementService.class));
     }

@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
-import uk.gov.hmcts.reform.sscscorbackend.service.StorePdfService;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 
 @Service
 public class DecisionIssuedEventAction implements CohEventAction {
@@ -20,22 +21,29 @@ public class DecisionIssuedEventAction implements CohEventAction {
     }
 
     @Override
-    public void handle(Long caseId, String onlineHearingId, StorePdfResult storePdfResult) {
-        String caseReference = storePdfResult.getDocument().getData().getCaseReference();
-        emailService.sendPdfToDwp(
-                storePdfResult,
-                "Preliminary view offered (" + caseReference + ")",
-                dwpEmailMessageBuilder.getDecisionIssuedMessage(storePdfResult.getDocument())
-        );
+    public CohEventActionContext createAndStorePdf(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
+        return storeOnlineHearingTribunalsViewService.storePdf(caseId, onlineHearingId, caseDetails);
     }
 
     @Override
-    public String eventCanHandle() {
+    public CohEventActionContext handle(Long caseId, String onlineHearingId, CohEventActionContext cohEventActionContext) {
+        String caseReference = cohEventActionContext.getDocument().getData().getCaseReference();
+        emailService.sendPdfToDwp(
+                cohEventActionContext,
+                "Preliminary view offered (" + caseReference + ")",
+                dwpEmailMessageBuilder.getDecisionIssuedMessage(cohEventActionContext.getDocument())
+        );
+
+        return cohEventActionContext;
+    }
+
+    @Override
+    public String cohEvent() {
         return "decision_issued";
     }
 
     @Override
-    public StorePdfService getPdfService() {
-        return storeOnlineHearingTribunalsViewService;
+    public EventType getCcdEventType() {
+        return EventType.COH_DECISION_ISSUED;
     }
 }

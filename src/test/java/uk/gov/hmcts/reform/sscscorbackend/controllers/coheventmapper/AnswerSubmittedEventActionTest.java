@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
 
 import org.junit.Test;
@@ -8,8 +10,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreAnswersPdfService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 
 public class AnswerSubmittedEventActionTest {
     @Test
@@ -27,11 +29,12 @@ public class AnswerSubmittedEventActionTest {
         long caseId = 123L;
         String onlineHearingId = "onlineHearingId";
         String pdfName = "pdf_name.pdf";
-        StorePdfResult storePdfResult = new StorePdfResult(new Pdf(new byte[]{2, 5, 6, 0, 1}, pdfName), caseDetails);
+        CohEventActionContext cohEventActionContext = new CohEventActionContext(new Pdf(new byte[]{2, 5, 6, 0, 1}, pdfName), caseDetails);
         when(dwpEmailMessageBuilder.getAnswerMessage(caseDetails)).thenReturn("some message");
 
-        answerSubmittedEventAction.handle(caseId, onlineHearingId, storePdfResult);
+        CohEventActionContext result = answerSubmittedEventAction.handle(caseId, onlineHearingId, cohEventActionContext);
 
-        verify(corEmailService).sendPdfToDwp(storePdfResult, "Appellant has provided information (" + someCaseReference + ")", "some message");
+        verify(corEmailService).sendPdfToDwp(cohEventActionContext, "Appellant has provided information (" + someCaseReference + ")", "some message");
+        assertThat(result, is(cohEventActionContext));
     }
 }

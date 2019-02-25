@@ -8,14 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Slf4j
@@ -23,39 +22,32 @@ public abstract class StorePdfService<E> {
     private final PdfService pdfService;
     private final String pdfTemplatePath;
     private final SscsPdfService sscsPdfService;
-    private final CcdService ccdService;
     private final IdamService idamService;
     private final EvidenceManagementService evidenceManagementService;
 
     StorePdfService(PdfService pdfService,
                     String pdfTemplatePath,
                     SscsPdfService sscsPdfService,
-                    CcdService ccdService,
                     IdamService idamService,
                     EvidenceManagementService evidenceManagementService) {
         this.pdfService = pdfService;
         this.pdfTemplatePath = pdfTemplatePath;
         this.sscsPdfService = sscsPdfService;
-        this.ccdService = ccdService;
         this.idamService = idamService;
         this.evidenceManagementService = evidenceManagementService;
     }
 
-    public StorePdfResult storePdf(Long caseId, String onlineHearingId) {
-        IdamTokens idamTokens = idamService.getIdamTokens();
-        log.info("Loading case [" + caseId + "]");
-        SscsCaseDetails caseDetails = ccdService.getByCaseId(caseId, idamTokens);
-        log.info("Loaded case [" + caseId + "]");
+    public CohEventActionContext storePdf(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
         String documentNamePrefix = documentNamePrefix(caseDetails, onlineHearingId);
         if (pdfHasNotAlreadyBeenCreated(caseDetails, documentNamePrefix)) {
             log.info("Creating pdf for [" + caseId + "]");
-            return new StorePdfResult(
-                    storePdf(caseId, onlineHearingId, idamTokens, caseDetails, documentNamePrefix),
+            return new CohEventActionContext(
+                    storePdf(caseId, onlineHearingId, idamService.getIdamTokens(), caseDetails, documentNamePrefix),
                     caseDetails
             );
         } else {
             log.info("Loading pdf for [" + caseId + "]");
-            return new StorePdfResult(loadPdf(caseDetails, documentNamePrefix), caseDetails);
+            return new CohEventActionContext(loadPdf(caseDetails, documentNamePrefix), caseDetails);
         }
     }
 

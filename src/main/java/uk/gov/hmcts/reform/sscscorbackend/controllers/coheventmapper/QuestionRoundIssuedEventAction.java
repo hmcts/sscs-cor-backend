@@ -1,12 +1,13 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StorePdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreQuestionsPdfService;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 
 @Service
 public class QuestionRoundIssuedEventAction implements CohEventAction {
@@ -23,18 +24,25 @@ public class QuestionRoundIssuedEventAction implements CohEventAction {
     }
 
     @Override
-    public void handle(Long caseId, String onlineHearingId, StorePdfResult storePdfResult) {
-        SscsCaseDetails sscsCaseDetails = storePdfResult.getDocument();
-        sendDwpEmail(storePdfResult, sscsCaseDetails);
+    public CohEventActionContext createAndStorePdf(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
+        return storeQuestionsPdfService.storePdf(caseId, onlineHearingId, caseDetails);
+    }
+
+    @Override
+    public CohEventActionContext handle(Long caseId, String onlineHearingId, CohEventActionContext cohEventActionContext) {
+        SscsCaseDetails sscsCaseDetails = cohEventActionContext.getDocument();
+        sendDwpEmail(cohEventActionContext, sscsCaseDetails);
+
+        return cohEventActionContext;
     }
 
     public StorePdfService getPdfService() {
         return storeQuestionsPdfService;
     }
 
-    private void sendDwpEmail(StorePdfResult storePdfResult, SscsCaseDetails sscsCaseDetails) {
+    private void sendDwpEmail(CohEventActionContext cohEventActionContext, SscsCaseDetails sscsCaseDetails) {
         corEmailService.sendPdfToDwp(
-                storePdfResult,
+                cohEventActionContext,
                 getDwpEmailSubject(sscsCaseDetails),
                 getDwpEmailMessage(sscsCaseDetails)
         );
@@ -49,7 +57,12 @@ public class QuestionRoundIssuedEventAction implements CohEventAction {
     }
 
     @Override
-    public String eventCanHandle() {
+    public String cohEvent() {
         return "question_round_issued";
+    }
+
+    @Override
+    public EventType getCcdEventType() {
+        return EventType.COH_QUESTION_ROUND_ISSUED;
     }
 }
