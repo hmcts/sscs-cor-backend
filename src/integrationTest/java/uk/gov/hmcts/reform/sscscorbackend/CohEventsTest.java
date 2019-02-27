@@ -119,7 +119,26 @@ public class CohEventsTest extends BaseIntegrationTest {
 
     @Test
     public void questionDealineElapsedCohEvent() throws IOException {
-        testEvent(EventType.COH_QUESTION_DEADLINE_ELAPSED, "question_deadline_elapsed", true);
+        ccdStub.stubFindCaseByCaseId(caseId, caseReference, "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
+        CohQuestionReference questionSummary = new CohQuestionReference(
+                "first-id", 1, "first question", "first question body", "2018-01-01", someCohAnswers("answer_drafted")
+        );
+        cohStub.stubGetAllQuestionRounds(hearingId, questionSummary);
+        cohStub.stubGetOnlineHearing(caseId, hearingId);
+        ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_QUESTION_DEADLINE_ELAPSED.getCcdType());
+        pdfServiceStub.stubCreatePdf(pdf);
+        documentStoreStub.stubUploadFile();
+        ccdStub.stubUpdateCase(caseId);
+        String cohEvent = createCohEvent("question_deadline_elapsed");
+        notificationsStub.stubSendNotification(cohEvent);
+
+        makeCohEventRequest(cohEvent);
+
+        mailStub.hasEmailWithSubjectAndAttachment("Appellant has provided information (" + caseReference + ")", pdf);
+        pdfServiceStub.verifyCreateAnswersPdf(caseReference);
+        documentStoreStub.verifyUploadFile(pdf);
+        ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "Issued Answers Deadline Elapsed Round 1 - " + caseReference + ".pdf");
+        notificationsStub.verifySendNotification(cohEvent);
     }
 
     @Test
