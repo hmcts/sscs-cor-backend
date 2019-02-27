@@ -1,19 +1,31 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
+import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.service.StoreAnswersDeadlineElapsedPdfService;
 
 @Service
-public class DeadlineElapsedEventAction implements CohEventAction {
-    @Override
-    public String cohEvent() {
-        return "question_deadline_elapsed";
+public class DeadlineElapsedEventAction extends QuestionRoundEndedAction {
+
+    @Autowired
+    public DeadlineElapsedEventAction(
+            CorEmailService corEmailService,
+            StoreAnswersDeadlineElapsedPdfService storeQuestionsPdfService,
+            DwpEmailMessageBuilder dwpEmailMessageBuilder) {
+        super(storeQuestionsPdfService, corEmailService, dwpEmailMessageBuilder);
     }
 
     @Override
-    public CohEventActionContext handle(Long caseId, String onlineHearingId, CohEventActionContext cohEventActionContext) {
-        return cohEventActionContext;
+    protected String getDwpEmailSubject(String caseReference) {
+        return "Appellant has provided information (" + caseReference + ")";
+    }
+
+    @Override
+    public String cohEvent() {
+        return "question_deadline_elapsed";
     }
 
     @Override
