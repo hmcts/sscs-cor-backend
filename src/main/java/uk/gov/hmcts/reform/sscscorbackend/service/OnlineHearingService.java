@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.FinalDecision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
@@ -69,10 +70,14 @@ public class OnlineHearingService {
     public Optional<OnlineHearing> getOnlineHearing(String emailAddress) {
         String[] splitEmailAddress = emailAddress.split("\\+");
         String actualEmailAddress = enableSelectByCaseId ? splitEmailAddress[0] : emailAddress;
+        IdamTokens idamTokens = idamService.getIdamTokens();
+        log.info("Got idam tokens");
+
         List<SscsCaseDetails> cases = ccdService.findCaseBy(
                 ImmutableMap.of("case.subscriptions.appellantSubscription.email", actualEmailAddress),
-                idamService.getIdamTokens()
+                idamTokens
         );
+        log.info("Found {} cases", cases.size());
 
         if (cases == null || cases.isEmpty()) {
             return Optional.empty();
