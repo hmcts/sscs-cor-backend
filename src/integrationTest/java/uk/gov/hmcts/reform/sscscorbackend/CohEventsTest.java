@@ -36,6 +36,7 @@ public class CohEventsTest extends BaseIntegrationTest {
         ccdStub.stubFindCaseByCaseId(caseId, caseReference, "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
         ccdStub.stubUpdateCase(caseId);
         ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_DECISION_ISSUED.getCcdType());
+        ccdStub.stubGetHistoryEvents(caseId, EventType.SYA_APPEAL_CREATED);
         String cohEvent = createCohEvent("decision_issued");
         notificationsStub.stubSendNotification(cohEvent);
 

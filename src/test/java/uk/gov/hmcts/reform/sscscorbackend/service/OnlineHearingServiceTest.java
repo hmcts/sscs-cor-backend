@@ -7,6 +7,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
 import org.junit.Before;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.api.CcdHistoryEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
@@ -215,10 +217,12 @@ public class OnlineHearingServiceTest {
         SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "online");
 
         when(cohService.getOnlineHearing(someCaseId)).thenReturn(DataFixtures.someCohOnlineHearings());
+        when(ccdService.getHistoryEvents(someCaseId)).thenReturn(singletonList(new CcdHistoryEvent(EventType.FINAL_DECISION.getCcdType())));
         Optional<OnlineHearing> onlineHearing = underTest.loadOnlineHearingFromCoh(sscsCaseDetails);
 
         assertThat(onlineHearing.isPresent(), is(true));
         assertThat(onlineHearing.get().getFinalDecision().getReason(), is(sscsCaseDetails.getData().getDecisionNotes()));
+        assertThat(onlineHearing.get().isHasFinalDecision(), is(true));
     }
 
     @Test
@@ -268,6 +272,7 @@ public class OnlineHearingServiceTest {
                                 ).build()
                         )
                         .decisionNotes("decision notes")
+                        .events(new ArrayList<>())
                         .build()
                 ).build();
     }

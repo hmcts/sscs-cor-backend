@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CreateCcdCaseService;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.api.CcdAddUser;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.api.CcdHistoryEvent;
 
 @Service
 public class CorCcdService extends uk.gov.hmcts.reform.sscs.ccd.service.CcdService {
@@ -53,6 +55,18 @@ public class CorCcdService extends uk.gov.hmcts.reform.sscs.ccd.service.CcdServi
                 ccdRequestDetails.getCaseTypeId(),
                 caseId,
                 userIdToRemove
+        );
+    }
+
+    public List<CcdHistoryEvent> getHistoryEvents(long caseId) {
+        IdamTokens idamTokens = idamService.getIdamTokens();
+        return ccdClient.getHistoryEvents(
+                idamTokens.getIdamOauth2Token(),
+                idamTokens.getServiceAuthorization(),
+                idamTokens.getUserId(),
+                ccdRequestDetails.getJurisdictionId(),
+                ccdRequestDetails.getCaseTypeId(),
+                caseId
         );
     }
 }

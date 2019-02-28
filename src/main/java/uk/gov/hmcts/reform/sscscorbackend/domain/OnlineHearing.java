@@ -13,13 +13,15 @@ public class OnlineHearing {
     private String caseReference;
     private Decision decision;
     private FinalDecision finalDecision;
+    private boolean hasFinalDecision;
 
-    public OnlineHearing(String onlineHearingId, String appellantName, String caseReference, Decision decision, FinalDecision finalDecision) {
+    public OnlineHearing(String onlineHearingId, String appellantName, String caseReference, Decision decision, FinalDecision finalDecision, boolean hasFinalDecision) {
         this.onlineHearingId = onlineHearingId;
         this.appellantName = appellantName;
         this.caseReference = caseReference;
         this.decision = decision;
         this.finalDecision = finalDecision;
+        this.hasFinalDecision = hasFinalDecision;
     }
 
     @ApiModelProperty(example = "ID_1", required = true)
@@ -48,5 +50,10 @@ public class OnlineHearing {
     @JsonProperty(value = "final_decision")
     public FinalDecision getFinalDecision() {
         return finalDecision;
+    }
+
+    @JsonProperty(value = "has_final_decision")
+    public boolean isHasFinalDecision() {
+        return hasFinalDecision;
     }
 }
