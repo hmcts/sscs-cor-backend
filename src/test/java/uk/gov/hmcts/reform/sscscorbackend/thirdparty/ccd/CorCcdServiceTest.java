@@ -1,7 +1,11 @@
 package uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
@@ -12,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.api.CcdAddUser;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.api.CcdHistoryEvent;
 
 public class CorCcdServiceTest {
 
@@ -84,4 +89,18 @@ public class CorCcdServiceTest {
                 userToRemove);
     }
 
+    @Test
+    public void canGetHistoryEvents() {
+        List<CcdHistoryEvent> historyEvents = asList(new CcdHistoryEvent("id"));
+        when(ccdClient.getHistoryEvents(authToken,
+                serviceAuthToken,
+                userId,
+                jurisdictionId,
+                caseTypeId,
+                caseId)).thenReturn(historyEvents);
+
+        List<CcdHistoryEvent> actualHistoryEvents = corCcdService.getHistoryEvents(caseId);
+
+        assertThat(actualHistoryEvents, is(historyEvents));
+    }
 }

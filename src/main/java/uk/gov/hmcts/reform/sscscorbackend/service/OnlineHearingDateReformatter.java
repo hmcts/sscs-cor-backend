@@ -32,7 +32,8 @@ public class OnlineHearingDateReformatter {
                 onlineHearing.getAppellantName(),
                 onlineHearing.getCaseReference(),
                 newDecision,
-                onlineHearing.getFinalDecision());
+                onlineHearing.getFinalDecision(),
+                onlineHearing.isHasFinalDecision());
     }
 
     private String reformatDate(String dateString) {

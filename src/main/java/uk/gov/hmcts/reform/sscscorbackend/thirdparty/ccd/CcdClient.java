@@ -1,11 +1,15 @@
 package uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi.SERVICE_AUTHORIZATION;
 
+import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.api.CcdAddUser;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.api.CcdHistoryEvent;
 
 @FeignClient(
         name = "Ccd",
@@ -32,5 +36,18 @@ public interface CcdClient {
             @PathVariable("caseType") String caseType,
             @PathVariable("caseId") long caseId,
             @PathVariable("idToDelete") String idToDelete
+    );
+
+    @GetMapping(
+            value = "/caseworkers/{userId}/jurisdictions/{jurisdictionId}/case-types/{caseType}/cases/{caseId}/events",
+            headers = CONTENT_TYPE + "=" + APPLICATION_JSON_VALUE
+    )
+    List<CcdHistoryEvent> getHistoryEvents(
+            @RequestHeader(AUTHORIZATION) String authorisation,
+            @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
+            @PathVariable("userId") String userId,
+            @PathVariable("jurisdictionId") String jurisdictionId,
+            @PathVariable("caseType") String caseType,
+            @PathVariable("caseId") long caseId
     );
 }

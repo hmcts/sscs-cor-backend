@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.FinalDecision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.api.CcdHistoryEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
@@ -148,6 +150,7 @@ public class OnlineHearingService {
 
     public Optional<OnlineHearing> loadOnlineHearingFromCoh(SscsCaseDetails sscsCaseDeails) {
         CohOnlineHearings cohOnlineHearings = cohClient.getOnlineHearing(sscsCaseDeails.getId());
+        List<CcdHistoryEvent> historyEvents = ccdService.getHistoryEvents(sscsCaseDeails.getId());
 
         return cohOnlineHearings.getOnlineHearings().stream()
                 .findFirst()
@@ -155,12 +158,15 @@ public class OnlineHearingService {
                     Name name = sscsCaseDeails.getData().getAppeal().getAppellant().getName();
                     String nameString = name.getFirstName() + " " + name.getLastName();
 
+                    boolean hasFinalDecision = historyEvents.stream()
+                                    .anyMatch(event -> EventType.FINAL_DECISION == event.getEventType());
+
                     return new OnlineHearing(
                             onlineHearing.getOnlineHearingId(),
                             nameString,
                             sscsCaseDeails.getData().getCaseReference(),
                             getDecision(onlineHearing.getOnlineHearingId(), sscsCaseDeails.getId()),
-                            new FinalDecision(sscsCaseDeails.getData().getDecisionNotes()));
+                            new FinalDecision(sscsCaseDeails.getData().getDecisionNotes()), hasFinalDecision);
                 });
     }
 }

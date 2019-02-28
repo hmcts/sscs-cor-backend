@@ -8,8 +8,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.matching.RegexPattern;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 
 public class CcdStub extends BaseStub {
 
@@ -119,6 +122,15 @@ public class CcdStub extends BaseStub {
     public void stubRemoveUserFromCase(long caseId, String userToRemove) throws JsonProcessingException {
         wireMock.stubFor(delete("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/users/" + userToRemove)
                 .willReturn(created()));
+    }
+
+    public void stubGetHistoryEvents(Long caseId, EventType... eventTypes) {
+        String responseJson = Arrays.stream(eventTypes)
+                .map(event -> "{\"id\":\"" + event.getCcdType() + "\"}")
+                .collect(Collectors.joining(",", "[", "]"));
+        wireMock.stubFor(get("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events")
+                .willReturn(okJson(responseJson))
+        );
     }
 
     private String createCaseDetails(Long caseId, String caseReference, String firstName, String lastName, String evidenceQuestionId, String evidenceFileName, String evidenceCreatedDate, String evidenceUrl) {
