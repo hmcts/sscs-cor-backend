@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
@@ -24,13 +23,12 @@ public class StoreOnlineHearingService extends StorePdfService<PdfSummary> {
     @SuppressWarnings("squid:S00107")
     public StoreOnlineHearingService(CohService cohService,
                                      IdamService idamService,
-                                     CcdService ccdService,
                                      PdfSummaryBuilder pdfSummaryBuilder,
                                      SscsPdfService sscsPdfService,
                                      PdfService pdfService,
                                      @Value("${online_hearing_finished.html.template.path}") String templatePath,
                                      EvidenceManagementService evidenceManagementService) {
-        super(pdfService, templatePath, sscsPdfService, ccdService, idamService, evidenceManagementService);
+        super(pdfService, templatePath, sscsPdfService, idamService, evidenceManagementService);
         this.cohService = cohService;
         this.pdfSummaryBuilder = pdfSummaryBuilder;
     }

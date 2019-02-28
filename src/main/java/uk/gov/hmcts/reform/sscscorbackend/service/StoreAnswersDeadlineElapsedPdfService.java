@@ -9,12 +9,12 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Service
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class StoreQuestionsPdfService extends AbstractQuestionPdfService {
+public class StoreAnswersDeadlineElapsedPdfService extends AbstractQuestionPdfService {
 
     @SuppressWarnings("squid:S00107")
-    public StoreQuestionsPdfService(
+    public StoreAnswersDeadlineElapsedPdfService(
             PdfService pdfService,
-            @Value("${question.html.template.path}") String templatePath,
+            @Value("${answer.html.template.path}") String templatePath,
             SscsPdfService sscsPdfService,
             IdamService idamService,
             QuestionService questionService,
@@ -24,6 +24,6 @@ public class StoreQuestionsPdfService extends AbstractQuestionPdfService {
 
     @Override
     String documentNamePrefix() {
-        return "Issued Questions Round ";
+        return "Issued Answers Deadline Elapsed Round ";
     }
 }

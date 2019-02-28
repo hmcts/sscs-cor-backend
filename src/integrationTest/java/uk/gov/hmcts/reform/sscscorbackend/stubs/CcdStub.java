@@ -82,15 +82,19 @@ public class CcdStub extends BaseStub {
                 .willReturn(okJson(new ObjectMapper().writeValueAsString(CaseDetails.builder().build()))));
     }
 
-    public void stubUpdateCaseWithEvent(Long caseId) throws JsonProcessingException {
-        wireMock.stubFor(get("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/event-triggers/updateHearingType/token")
+    public void stubUpdateCaseWithEvent(Long caseId, final String eventType) throws JsonProcessingException {
+        wireMock.stubFor(get("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/event-triggers/" + eventType + "/token")
                 .willReturn(okJson(new ObjectMapper().writeValueAsString(StartEventResponse.builder().build()))));
 
         wireMock.stubFor(post("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true")
                 .willReturn(okJson(new ObjectMapper().writeValueAsString(CaseDetails.builder().build()))));
     }
 
-    public void verifyUpdateCaseWithPdf(Long caseId, String caseReference, String pdfName) throws JsonProcessingException {
+    public void verifyUpdateCaseWithEvent(Long caseId, String eventType) {
+        verifyAsync(getRequestedFor(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/event-triggers/" + eventType + "/token")));
+    }
+
+    public void verifyUpdateCaseWithPdf(Long caseId, String caseReference, String pdfName) {
         verifyAsync(postRequestedFor(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true"))
                 .withRequestBody(matchingJsonPath("$.event.summary", equalTo("SSCS - appeal updated event")))
                 .withRequestBody(matchingJsonPath("$.data.caseReference", equalTo(caseReference)))

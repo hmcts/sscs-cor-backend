@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
@@ -23,7 +22,6 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
     private PdfService pdfService;
     private StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService;
     private SscsPdfService sscsPdfService;
-    private CcdService ccdService;
     private IdamTokens idamTokens;
     private SscsCaseDetails sscsCaseDetails;
     private SscsCaseData sscsCaseData;
@@ -37,7 +35,6 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
         sscsPdfService = mock(SscsPdfService.class);
         sscsPdfService = mock(SscsPdfService.class);
         IdamService idamService = mock(IdamService.class);
-        ccdService = mock(CcdService.class);
         idamTokens = mock(IdamTokens.class);
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
         storeOnlineHearingTribunalsViewService = new StoreOnlineHearingTribunalsViewService(
@@ -46,7 +43,6 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
                 "sometemplate",
                 onlineHearingDateReformatter,
                 sscsPdfService,
-                ccdService,
                 idamService,
                 mock(EvidenceManagementService.class));
         someHearingId = "someHearingId";
@@ -57,10 +53,8 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
         sscsCaseData = createSscsCaseData();
         sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
 
-        when(ccdService.getByCaseId(someCaseId, idamTokens)).thenReturn(sscsCaseDetails);
-
         when(onlineHearingService.loadOnlineHearingFromCoh(sscsCaseDetails)).thenReturn(Optional.empty());
-        storeOnlineHearingTribunalsViewService.storePdf(someCaseId, someHearingId);
+        storeOnlineHearingTribunalsViewService.storePdf(someCaseId, someHearingId, sscsCaseDetails);
     }
 
     private SscsCaseData createSscsCaseData() {

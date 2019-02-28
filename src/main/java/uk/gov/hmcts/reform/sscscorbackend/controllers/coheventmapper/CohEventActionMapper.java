@@ -25,7 +25,7 @@ public class CohEventActionMapper {
 
     private CohEventAction getActionFor(CohEvent event) {
         return actions.stream()
-                .filter(action -> action.eventCanHandle().equals(event.getEventType()))
+                .filter(action -> action.cohEvent().equals(event.getEventType()))
                 .findFirst()
                 .orElse(null);
     }

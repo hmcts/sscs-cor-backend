@@ -1,14 +1,19 @@
 package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
-import uk.gov.hmcts.reform.sscscorbackend.service.StorePdfService;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 
 public interface CohEventAction {
-    void handle(Long caseId, String onlineHearingId, StorePdfResult storePdfResult);
+    String cohEvent();
 
-    String eventCanHandle();
+    default CohEventActionContext createAndStorePdf(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
+        return new CohEventActionContext(null, caseDetails);
+    }
 
-    StorePdfService getPdfService();
+    CohEventActionContext handle(Long caseId, String onlineHearingId, CohEventActionContext cohEventActionContext);
+
+    EventType getCcdEventType();
 
     default boolean notifyAppellant() {
         return true;

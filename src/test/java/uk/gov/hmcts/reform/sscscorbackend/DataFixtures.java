@@ -17,8 +17,8 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestionRound;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
@@ -141,8 +141,8 @@ public class DataFixtures {
         );
     }
 
-    public static StorePdfResult someStorePdfResult() {
-        return new StorePdfResult(
+    public static CohEventActionContext someStorePdfResult() {
+        return new CohEventActionContext(
                 new Pdf(new byte[]{2, 4, 6, 0, 1}, "pdfName.pdf"),
                 SscsCaseDetails.builder()
                         .data(SscsCaseData.builder()

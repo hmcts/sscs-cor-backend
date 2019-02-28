@@ -25,7 +25,7 @@ public class CohEventCohEventActionMapperTest {
         caseId = "1234";
         hearingId = "hearingId";
         action = mock(CohEventAction.class);
-        when(action.eventCanHandle()).thenReturn("someMappedEvent");
+        when(action.cohEvent()).thenReturn("someMappedEvent");
         actions = singletonList(action);
         cohEventActionRunner = mock(CohEventActionRunner.class);
         cohEventActionMapper = new CohEventActionMapper(actions, cohEventActionRunner, true);

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
@@ -17,11 +16,10 @@ public abstract class AbstractQuestionPdfService extends StorePdfService<PdfQues
             PdfService pdfService,
             String templatePath,
             SscsPdfService sscsPdfService,
-            CcdService ccdService,
             IdamService idamService,
             QuestionService questionService,
             EvidenceManagementService evidenceManagementService) {
-        super(pdfService, templatePath, sscsPdfService, ccdService, idamService, evidenceManagementService);
+        super(pdfService, templatePath, sscsPdfService, idamService, evidenceManagementService);
         this.questionService = questionService;
     }
 

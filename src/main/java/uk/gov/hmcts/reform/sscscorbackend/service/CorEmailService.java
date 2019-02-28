@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.domain.email.Email;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.service.EmailService;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 
 @Slf4j
 @Service
@@ -28,15 +28,15 @@ public class CorEmailService {
         this.dwpEmailAddress = dwpEmailAddress;
     }
 
-    public void sendPdfToDwp(StorePdfResult storePdfResult, String subject, String message) {
-        byte[] content = storePdfResult.getPdf().getContent();
+    public void sendPdfToDwp(CohEventActionContext cohEventActionContext, String subject, String message) {
+        byte[] content = cohEventActionContext.getPdf().getContent();
         log.info("Sending email and PDf with subject [" + subject + "] to DWP");
         emailService.sendEmail(Email.builder()
                 .from(fromEmailAddress)
                 .to(dwpEmailAddress)
                 .subject(subject)
                 .message(message)
-                .attachments(asList(EmailAttachment.pdf(content, storePdfResult.getPdf().getName())))
+                .attachments(asList(EmailAttachment.pdf(content, cohEventActionContext.getPdf().getName())))
                 .build());
     }
 
@@ -59,5 +59,4 @@ public class CorEmailService {
                 .message(message)
                 .build());
     }
-
 }
