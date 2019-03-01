@@ -48,6 +48,7 @@ public class QuestionController {
             @ApiParam(value = "email address of the appellant", example = "foo@bar.com") @RequestParam("email") String emailAddress) {
         try {
             Optional<OnlineHearing> onlineHearing = onlineHearingService.getOnlineHearing(emailAddress);
+            log.info("Online hearing found: {}", onlineHearing.isPresent());
             return onlineHearing.map(ResponseEntity::ok)
                     .orElse(ResponseEntity.notFound().build());
         } catch (IllegalStateException exc) {
