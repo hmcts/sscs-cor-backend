@@ -47,6 +47,12 @@ public class DecisionExtractor {
         JSONObject jsonObject = new JSONObject(decision.getDecisionText());
         JSONObject decisionJson = jsonObject.getJSONObject("decisions_SSCS_benefit_" + caseId);
 
+        String isPreliminaryView = decisionJson.getString("preliminaryView");
+
+        if (!"yes".equals(isPreliminaryView)) {
+            return null;
+        }
+
         String startDateString = getDate(decisionJson, "Start");
 
         String endDateRadio = decisionJson.getString("endDateRadio");
