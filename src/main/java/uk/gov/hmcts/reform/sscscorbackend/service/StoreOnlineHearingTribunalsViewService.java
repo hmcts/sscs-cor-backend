@@ -19,6 +19,7 @@ public class StoreOnlineHearingTribunalsViewService extends StorePdfService<Onli
     public static final String TRIBUNALS_VIEW_PDF_PREFIX = "Tribunals view - ";
     private final OnlineHearingService onlineHearingService;
     private final OnlineHearingDateReformatter onlineHearingDateReformatter;
+    private final ActivitiesValidator activitiesValidator;
 
     @SuppressWarnings("squid:S00107")
     public StoreOnlineHearingTribunalsViewService(OnlineHearingService onlineHearingService,
@@ -26,10 +27,12 @@ public class StoreOnlineHearingTribunalsViewService extends StorePdfService<Onli
                                                   @Value("${preliminary_view.html.template.path}") String templatePath,
                                                   OnlineHearingDateReformatter onlineHearingDateReformatter,
                                                   SscsPdfService sscsPdfService, IdamService idamService,
-                                                  EvidenceManagementService evidenceManagementService) {
+                                                  EvidenceManagementService evidenceManagementService,
+                                                  ActivitiesValidator activitiesValidator) {
         super(pdfService, templatePath, sscsPdfService, idamService, evidenceManagementService);
         this.onlineHearingService = onlineHearingService;
         this.onlineHearingDateReformatter = onlineHearingDateReformatter;
+        this.activitiesValidator = activitiesValidator;
     }
 
     @Override
@@ -41,6 +44,8 @@ public class StoreOnlineHearingTribunalsViewService extends StorePdfService<Onli
     protected OnlineHearing getPdfContent(SscsCaseDetails caseDetails, String onlineHearingId, PdfAppealDetails appealDetails) {
         Optional<OnlineHearing> optionalOnlineHearing = onlineHearingService.loadOnlineHearingFromCoh(caseDetails);
         OnlineHearing onlineHearing = optionalOnlineHearing.orElseThrow(() -> new IllegalArgumentException("Cannot find online hearing for case id [" + caseDetails.getId() + "]"));
+
+        activitiesValidator.validateWeHaveMappingForActivities(onlineHearing);
 
         return onlineHearingDateReformatter.getReformattedOnlineHearing(onlineHearing);
     }

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+import java.io.IOException;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
+import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
+import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 public class StoreOnlineHearingTribunalsViewServiceTest {
@@ -26,9 +28,10 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
     private SscsCaseDetails sscsCaseDetails;
     private SscsCaseData sscsCaseData;
     private String someHearingId;
+    private ActivitiesValidator activitiesValidator;
 
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         onlineHearingService = mock(OnlineHearingService.class);
         onlineHearingDateReformatter = mock(OnlineHearingDateReformatter.class);
         pdfService = mock(PdfService.class);
@@ -37,6 +40,7 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
         IdamService idamService = mock(IdamService.class);
         idamTokens = mock(IdamTokens.class);
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
+        activitiesValidator = mock(ActivitiesValidator.class);
         storeOnlineHearingTribunalsViewService = new StoreOnlineHearingTribunalsViewService(
                 onlineHearingService,
                 pdfService,
@@ -44,7 +48,8 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
                 onlineHearingDateReformatter,
                 sscsPdfService,
                 idamService,
-                mock(EvidenceManagementService.class));
+                mock(EvidenceManagementService.class),
+                activitiesValidator);
         someHearingId = "someHearingId";
     }
 
@@ -55,6 +60,17 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
 
         when(onlineHearingService.loadOnlineHearingFromCoh(sscsCaseDetails)).thenReturn(Optional.empty());
         storeOnlineHearingTribunalsViewService.storePdf(someCaseId, someHearingId, sscsCaseDetails);
+    }
+
+    @Test
+    public void getPdfContentVerifiesContent() {
+        SscsCaseDetails caseDetails = mock(SscsCaseDetails.class);
+        OnlineHearing onlineHearing = mock(OnlineHearing.class);
+        when(onlineHearingService.loadOnlineHearingFromCoh(caseDetails)).thenReturn(Optional.of(onlineHearing));
+
+        storeOnlineHearingTribunalsViewService.getPdfContent(caseDetails, "hearingId", mock(PdfAppealDetails.class));
+
+        verify(activitiesValidator).validateWeHaveMappingForActivities(onlineHearing);
     }
 
     private SscsCaseData createSscsCaseData() {
