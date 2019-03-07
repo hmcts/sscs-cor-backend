@@ -17,6 +17,15 @@ coh:
 notifications:
   url: ${NOTIFICATIONS_API_URL:http://localhost:8082}
 
+auth:
+  idam:
+    client:
+      baseUrl: ${IDAM_URL:http://localhost:4501}
+  provider:
+    service:
+      client:
+        baseUrl: ${IDAM_S2S_AUTH:http://localhost:4502}
+
 idam:
   url: ${IDAM_URL:http://localhost:4501}
   s2s-auth:

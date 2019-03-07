@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscscorbackend;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-import io.restassured.RestAssured;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -25,8 +24,7 @@ public class RecordTribunalViewResponseTest extends BaseIntegrationTest {
         cohStub.stubGetOnlineHearing(caseId, hearingId);
         ccdStub.stubFindCaseByCaseId(caseId, "caseReference", "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
         cohStub.stubPostDecisionReply(hearingId, reply, reason);
-        RestAssured.baseURI = "http://localhost:" + applicationPort;
-        RestAssured.given()
+        getRequest()
                 .body("{\"reply\":\"" + reply + "\", \"reason\":\"" + reason + "\"}")
                 .when()
                 .contentType(APPLICATION_JSON_VALUE)
@@ -45,8 +43,7 @@ public class RecordTribunalViewResponseTest extends BaseIntegrationTest {
         cohStub.stubGetOnlineHearing(caseId, hearingId);
         ccdStub.stubFindCaseByCaseId(caseId, "caseReference", "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
         cohStub.stubPostDecisionReply(hearingId, reply, reason);
-        RestAssured.baseURI = "http://localhost:" + applicationPort;
-        RestAssured.given()
+        getRequest()
                 .body("{\"reply\":\"" + reply + "\", \"reason\":\"" + reason + "\"}")
                 .when()
                 .contentType(APPLICATION_JSON_VALUE)
@@ -61,8 +58,7 @@ public class RecordTribunalViewResponseTest extends BaseIntegrationTest {
     public void recordRejectedResponseWithoutReason() {
         String reply = "decision_rejected";
         String reason = "";
-        RestAssured.baseURI = "http://localhost:" + applicationPort;
-        RestAssured.given()
+        getRequest()
                 .body("{\"reply\":\"" + reply + "\", \"reason\":\"" + reason + "\"}")
                 .when()
                 .contentType(APPLICATION_JSON_VALUE)
