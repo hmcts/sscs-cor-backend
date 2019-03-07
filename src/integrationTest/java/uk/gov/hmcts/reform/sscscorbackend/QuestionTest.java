@@ -8,7 +8,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohAnswers;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.submitted;
 
-import io.restassured.RestAssured;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 import org.junit.Test;
@@ -36,9 +35,8 @@ public class QuestionTest extends BaseIntegrationTest {
         String evidenceUrl = "http://exmple.com/document/1";
         ccdStub.stubFindCaseByCaseId(CCD_CASE_ID, questionId, fileName, evidenceCreatedDate, evidenceUrl);
 
-        RestAssured.baseURI = "http://localhost:" + applicationPort;
         Evidence expectedEvidence = new Evidence(evidenceUrl, fileName, evidenceCreatedDate);
-        RestAssured.given()
+        getRequest()
                 .when()
                 .get("/continuous-online-hearings/" + hearingId + "/questions/" + questionId)
                 .then()
@@ -54,8 +52,7 @@ public class QuestionTest extends BaseIntegrationTest {
         cohStub.stubCannotFindAnswers(hearingId, questionId);
         cohStub.stubCreateAnswer(hearingId, questionId, newAnswer);
 
-        RestAssured.baseURI = "http://localhost:" + applicationPort;
-        RestAssured.given()
+        getRequest()
                 .body("{\"answer\":\"" + newAnswer + "\"}")
                 .when()
                 .contentType(APPLICATION_JSON_VALUE)
@@ -73,8 +70,7 @@ public class QuestionTest extends BaseIntegrationTest {
         cohStub.stubGetAnswer(hearingId, questionId, "old answer", answerId, "answer_drafted", ZonedDateTime.now());
         cohStub.stubUpdateAnswer(hearingId, questionId, newAnswer, answerId);
 
-        RestAssured.baseURI = "http://localhost:" + applicationPort;
-        RestAssured.given()
+        getRequest()
                 .body("{\"answer\":\"" + newAnswer + "\"}")
                 .when()
                 .contentType(APPLICATION_JSON_VALUE)
@@ -89,8 +85,7 @@ public class QuestionTest extends BaseIntegrationTest {
         String questionId = "2";
         cohStub.stubCannotFindQuestion(hearingId, questionId);
 
-        RestAssured.baseURI = "http://localhost:" + applicationPort;
-        RestAssured.given()
+        getRequest()
                 .when()
                 .get("/continuous-online-hearings/" + hearingId + "/questions/" + questionId)
                 .then()
@@ -106,8 +101,7 @@ public class QuestionTest extends BaseIntegrationTest {
         cohStub.stubGetAnswer(hearingId, questionId, answer, answerId, "answer_drafted", ZonedDateTime.now());
         cohStub.stubUpdateAnswer(hearingId, questionId, answer, answerId, submitted);
 
-        RestAssured.baseURI = "http://localhost:" + applicationPort;
-        RestAssured.given()
+        getRequest()
                 .when()
                 .post("/continuous-online-hearings/" + hearingId + "/questions/" + questionId)
                 .then()
@@ -127,8 +121,7 @@ public class QuestionTest extends BaseIntegrationTest {
         cohStub.stubGetOnlineHearing(caseId, hearingId);
         ccdStub.stubFindCaseByCaseId(caseId, "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
 
-        RestAssured.baseURI = "http://localhost:" + applicationPort;
-        RestAssured.given()
+        getRequest()
                 .when()
                 .patch("/continuous-online-hearings/" + hearingId)
                 .then()
@@ -141,8 +134,7 @@ public class QuestionTest extends BaseIntegrationTest {
         String hearingId = "1";
         cohStub.stubCannotExtendQuestionRoundDeadline(hearingId);
 
-        RestAssured.baseURI = "http://localhost:" + applicationPort;
-        RestAssured.given()
+        getRequest()
                 .when()
                 .patch("/continuous-online-hearings/" + hearingId)
                 .then()

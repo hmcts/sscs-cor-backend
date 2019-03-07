@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
+import io.restassured.RestAssured;
+import io.restassured.specification.RequestSpecification;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
@@ -78,5 +80,12 @@ public abstract class BaseIntegrationTest {
         if (mailStub != null) {
             mailStub.stop();
         }
+    }
+
+    protected RequestSpecification getRequest() {
+        RestAssured.baseURI = "http://localhost:" + applicationPort;
+        return RestAssured.given()
+                .header("authorization", "Bearer someAuthHeader")
+                .header("ServiceAuthorization", "Bearer someServiceAuthHeader");
     }
 }
