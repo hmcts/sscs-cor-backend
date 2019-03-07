@@ -50,7 +50,7 @@ public abstract class BaseFunctionTest {
     public void setUp() throws Exception {
         cohClient = buildClient("USE_COH_PROXY");
         client = buildClient("USE_BACKEND_PROXY");
-        sscsCorBackendRequests = new SscsCorBackendRequests(baseUrl, client);
+        sscsCorBackendRequests = new SscsCorBackendRequests(idamService, baseUrl, client);
         cohRequests = new CohRequests(idamService, cohBaseUrl, cohClient);
     }
 
