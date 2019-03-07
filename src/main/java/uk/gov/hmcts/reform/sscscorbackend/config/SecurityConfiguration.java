@@ -32,6 +32,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/swagger-ui.html", "/swagger-resources/**", "/webjars/**", "/v2/api-docs").anonymous()
                 .antMatchers("/health").anonymous()
                 .antMatchers("/notify/onlinehearing").anonymous()
+                .antMatchers("/case").anonymous()
                 .anyRequest().authenticated();
     }
 }
