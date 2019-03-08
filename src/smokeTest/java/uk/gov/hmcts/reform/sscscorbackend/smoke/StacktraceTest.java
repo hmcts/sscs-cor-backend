@@ -3,10 +3,12 @@ package uk.gov.hmcts.reform.sscscorbackend.smoke;
 import io.restassured.RestAssured;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
+@Ignore
 public class StacktraceTest {
     private static final String BODY_WITHOUT_STACK_TRACE = "An error has occurred";
     @Rule
