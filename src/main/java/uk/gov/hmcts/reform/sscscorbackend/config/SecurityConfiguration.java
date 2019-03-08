@@ -6,16 +6,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceonly.AuthCheckerServiceOnlyFilter;
+import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.AuthCheckerServiceAndUserFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private AuthCheckerServiceOnlyFilter filter;
+    private AuthCheckerServiceAndUserFilter filter;
 
     @Autowired
-    public SecurityConfiguration(AuthCheckerServiceOnlyFilter filter) {
+    public SecurityConfiguration(AuthCheckerServiceAndUserFilter filter) {
         super();
         this.filter = filter;
     }

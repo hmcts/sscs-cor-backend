@@ -9,7 +9,7 @@ public class TokenGeneratorStub extends BaseStub {
 
         stubHealth();
         stubLease();
-        stubDetails();
+        stubServiceAuthDetails();
     }
 
     private void stubLease() {
@@ -18,7 +18,7 @@ public class TokenGeneratorStub extends BaseStub {
                         .withHeader("Content-Type", "text/plain;charset=UTF-8")));
     }
 
-    private void stubDetails() {
+    private void stubServiceAuthDetails() {
         wireMock.stubFor(
                 get(urlEqualTo("/details")).withHeader("Authorization", equalTo("Bearer someServiceAuthHeader")).willReturn(
                         ok("sscs").withHeader("Content-Type", "text/plain;charset=UTF-8")

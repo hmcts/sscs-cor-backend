@@ -86,10 +86,16 @@ public class Application {
     public HttpClient serviceTokenParserHttpClient() {
         String proxyHost = System.getProperty("http.proxyHost");
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        httpClientBuilder = httpClientBuilder.setUserAgent("christest");
         if (proxyHost != null) {
             Integer proxyPort = Integer.parseInt(System.getProperty("http.proxyPort"));
             httpClientBuilder = httpClientBuilder.setProxy(new HttpHost(proxyHost, proxyPort));
         }
         return httpClientBuilder.build();
+    }
+
+    @Bean
+    public HttpClient userTokenParserHttpClient() {
+        return serviceTokenParserHttpClient();
     }
 }
