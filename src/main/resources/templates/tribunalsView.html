@@ -151,39 +151,50 @@
                         </tr>
                         </thead>
                         <tbody class="govuk-table__body">
-                            {% for activity in pdfSummary.decision.activities.daily_living %}
+                            {% if pdfSummary.decision.activities.daily_living is not empty %}
+                                {% for activity in pdfSummary.decision.activities.daily_living %}
+                                    <tr class="govuk-table__row">
+                                        <td class="govuk-table__cell">{{ i18n.tribunalView.activities.dailyLiving[activity.activity].name }}</td>
+                                        <td class="govuk-table__cell">{{ i18n.tribunalView.activities.dailyLiving[activity.activity].scores[activity.selection_key].text | raw }}</td>
+                                        <td class="govuk-table__cell">{{ i18n.tribunalView.activities.dailyLiving[activity.activity].scores[activity.selection_key].score }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
                                 <tr class="govuk-table__row">
-                                    <td class="govuk-table__cell">{{ i18n.tribunalView.activities.dailyLiving[activity.activity].name }}</td>
-                                    <td class="govuk-table__cell">{{ i18n.tribunalView.activities.dailyLiving[activity.activity].scores[activity.selection_key].text | raw }}</td>
-                                    <td class="govuk-table__cell">{{ i18n.tribunalView.activities.dailyLiving[activity.activity].scores[activity.selection_key].score }}</td>
+                                    <td class="govuk-table__cell" colspan="3">The tribunal's view is that no daily living activities apply to your appeal</td>
                                 </tr>
-                            {% endfor %}
+                            {% endif %}
                         </tbody>
                     </table>
-                    <h2 class="govuk-heading-m">Mobility activities and descriptors the tribunal considers to apply</h2>
-                    <table class="govuk-table">
-                        <thead class="govuk-table__head">
-                        <tr class="govuk-table__row">
-                            <th class="govuk-table__header">Activity</th>
-                            <th class="govuk-table__header">Descriptor</th>
-                            <th class="govuk-table__header">Points</th>
-                        </tr>
-                        </thead>
-                        <tbody class="govuk-table__body">
-                            {% for activity in pdfSummary.decision.activities.mobility %}
-                                <tr class="govuk-table__row">
-                                    <td class="govuk-table__cell">{{ i18n.tribunalView.activities.mobility[activity.activity].name }}</td>
-                                    <td class="govuk-table__cell">{{ i18n.tribunalView.activities.mobility[activity.activity].scores[activity.selection_key].text | raw }}</td>
-                                    <td class="govuk-table__cell">{{ i18n.tribunalView.activities.mobility[activity.activity].scores[activity.selection_key].score }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                        <h2 class="govuk-heading-m">Mobility activities and descriptors the tribunal considers to apply</h2>
+                        <table class="govuk-table">
+                            <thead class="govuk-table__head">
+                            <tr class="govuk-table__row">
+                                <th class="govuk-table__header">Activity</th>
+                                <th class="govuk-table__header">Descriptor</th>
+                                <th class="govuk-table__header">Points</th>
+                            </tr>
+                            </thead>
+                            <tbody class="govuk-table__body">
+                                {% if pdfSummary.decision.activities.mobility is not empty %}
+                                    {% for activity in pdfSummary.decision.activities.mobility %}
+                                        <tr class="govuk-table__row">
+                                            <td class="govuk-table__cell">{{ i18n.tribunalView.activities.mobility[activity.activity].name }}</td>
+                                            <td class="govuk-table__cell">{{ i18n.tribunalView.activities.mobility[activity.activity].scores[activity.selection_key].text | raw }}</td>
+                                            <td class="govuk-table__cell">{{ i18n.tribunalView.activities.mobility[activity.activity].scores[activity.selection_key].score }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr class="govuk-table__row">
+                                        <td class="govuk-table__cell" colspan="3">The tribunal's view is that no mobility activities apply to your appeal</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
                 </div>
             </div>
         </div>
     </div>
 </main>
-
 </body>
 </html>

@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
@@ -17,18 +16,19 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Slf4j
 @Service
-public class StoreOnlineHearingService extends BasePdfService<PdfSummary> {
+public class StoreOnlineHearingService extends StorePdfService<PdfSummary> {
     private final CohService cohService;
     private final PdfSummaryBuilder pdfSummaryBuilder;
 
+    @SuppressWarnings("squid:S00107")
     public StoreOnlineHearingService(CohService cohService,
                                      IdamService idamService,
-                                     CcdService ccdService,
                                      PdfSummaryBuilder pdfSummaryBuilder,
                                      SscsPdfService sscsPdfService,
-                                     @Qualifier("QuestionAnswerPdfService") PdfService pdfService,
+                                     PdfService pdfService,
+                                     @Value("${online_hearing_finished.html.template.path}") String templatePath,
                                      EvidenceManagementService evidenceManagementService) {
-        super(pdfService, sscsPdfService, ccdService, idamService, evidenceManagementService);
+        super(pdfService, templatePath, sscsPdfService, idamService, evidenceManagementService);
         this.cohService = cohService;
         this.pdfSummaryBuilder = pdfSummaryBuilder;
     }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
-import java.io.IOException;
 import java.util.Properties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -15,11 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
-import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.I18nBuilder;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
-
 
 @SpringBootApplication
 @EnableCircuitBreaker
@@ -82,25 +77,5 @@ public class Application {
         properties.put("mail.smtp.ssl.trust","*");
         javaMailSender.setJavaMailProperties(properties);
         return javaMailSender;
-    }
-
-    @Bean("QuestionAnswerPdfService")
-    public PdfService questionAnswerPdfService(PDFServiceClient pdfServiceClient,
-                                               @Value("${online_hearing_finished.html.template.path}") String appellantTemplatePath, I18nBuilder i18nBuilder) throws IOException {
-        return new PdfService(pdfServiceClient, appellantTemplatePath, i18nBuilder);
-    }
-
-    @Bean("PreliminaryViewPdfService")
-    public PdfService preliminaryViewPdfService(PDFServiceClient pdfServiceClient,
-                                                @Value("${preliminary_view.html.template.path}") String templatePath,
-                                                I18nBuilder i18nBuilder) throws IOException {
-        return new PdfService(pdfServiceClient, templatePath, i18nBuilder);
-    }
-
-    @Bean("QuestionPdfService")
-    public PdfService questionPdfService(PDFServiceClient pdfServiceClient,
-                                                @Value("${question.html.template.path}") String templatePath,
-                                                I18nBuilder i18nBuilder) throws IOException {
-        return new PdfService(pdfServiceClient, templatePath, i18nBuilder);
     }
 }

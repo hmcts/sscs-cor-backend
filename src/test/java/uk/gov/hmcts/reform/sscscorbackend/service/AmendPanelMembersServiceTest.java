@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +41,20 @@ public class AmendPanelMembersServiceTest {
         verify(corCcdService).addUserToCase(medicalMember, Long.valueOf(caseId));
         verifyNoMoreInteractions(corCcdService);
     }
+
+    @Test
+    public void willAddPanelMembersForWhenACaseIsAmendedToHavePanelMembers() {
+        amendPanelMembersService.amendPanelMembersPermissions(
+                new CcdEvent(
+                        new CaseDetails(caseId, newCaseData),
+                        new CaseDetails(caseId, new CaseData("onlineHearingId", null, null, null))
+                ));
+
+        verify(corCcdService).addUserToCase(disabilityMember, Long.valueOf(caseId));
+        verify(corCcdService).addUserToCase(medicalMember, Long.valueOf(caseId));
+        verifyNoMoreInteractions(corCcdService);
+    }
+
 
     @Test
     public void willNotAddPanelMembersForAnUncahangedCase() {

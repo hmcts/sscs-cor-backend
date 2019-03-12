@@ -8,6 +8,7 @@ import io.restassured.RestAssured;
 import java.io.UnsupportedEncodingException;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 
 public class OnlineHearingTest extends BaseIntegrationTest {
 
@@ -21,6 +22,7 @@ public class OnlineHearingTest extends BaseIntegrationTest {
     @Test
     public void getsOnlineHearing() throws UnsupportedEncodingException, JsonProcessingException {
         ccdStub.stubSearchCaseWithEmailAddress(email, caseId, expectedCaseReference, firstName, lastName);
+        ccdStub.stubGetHistoryEvents(caseId, EventType.FINAL_DECISION);
         cohStub.stubGetOnlineHearing(caseId, expectedOnlineHearingId);
         cohStub.stubGetDecisionNotFound(expectedOnlineHearingId);
         cohStub.stubGetDecisionRepliesNotFound(expectedOnlineHearingId);
@@ -40,6 +42,7 @@ public class OnlineHearingTest extends BaseIntegrationTest {
     @Test
     public void getsOnlineHearingWithDecision() throws UnsupportedEncodingException, JsonProcessingException {
         ccdStub.stubSearchCaseWithEmailAddress(email, caseId, expectedCaseReference, firstName, lastName);
+        ccdStub.stubGetHistoryEvents(caseId, EventType.FINAL_DECISION);
         cohStub.stubGetOnlineHearing(caseId, expectedOnlineHearingId);
         cohStub.stubGetDecisions(expectedOnlineHearingId, caseId);
         cohStub.stubGetDecisionRepliesEmpty(expectedOnlineHearingId);

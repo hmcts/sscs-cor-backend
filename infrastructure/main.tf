@@ -8,10 +8,6 @@ resource "azurerm_resource_group" "rg" {
   location = "${var.location_app}"
 }
 
-provider "vault" {
-  address = "https://vault.reform.hmcts.net:6200"
-}
-
 data "azurerm_key_vault" "sscs_key_vault" {
   name                = "${local.azureVaultName}"
   resource_group_name = "${local.azureVaultName}"
@@ -53,8 +49,6 @@ locals {
 
   azureVaultName = "sscs-${local.local_env}"
 
-  createCcdEndpoint = "${(var.env == "preview" || var.env == "spreview" ||  var.env == "aat") ? "true" : "false"}"
-
   email_host      = "mta.reform.hmcts.net"
   email_port      = "25"
 }
@@ -85,7 +79,7 @@ module "sscs-core-backend" {
     COH_URL = "${local.cohUrl}"
     CORE_CASE_DATA_URL = "${local.ccdApi}"
 
-    CREATE_CCD_ENDPOINT = "${local.createCcdEndpoint}"
+    CREATE_CCD_ENDPOINT = "${var.createCcdEndpoint}"
 
     DOCUMENT_MANAGEMENT_URL = "${local.documentManagementUrl}"
     PDF_API_URL = "${local.pdfService}"
@@ -96,5 +90,6 @@ module "sscs-core-backend" {
     EMAIL_SERVER_HOST      = "${local.email_host}"
     EMAIL_SERVER_PORT      = "${local.email_port}"
     DWP_EMAIL              = "${var.dwp_email}"
+    EMAIL_FROM             = "${var.email_from_address}"
   }
 }

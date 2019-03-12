@@ -3,8 +3,8 @@
 
 properties([
   parameters([
-    string(name: 'PRODUCT_NAME', defaultValue: 'sscs-cor', description: ''),
-    string(name: 'APP', defaultValue: 'sscs-cor-backend', description: ''),
+    string(name: 'PRODUCT_NAME', defaultValue: 'sscs', description: ''),
+    string(name: 'APP', defaultValue: 'cor-backend', description: ''),
     string(name: 'TYPE', defaultValue: 'java', description: ''),
     string(name: 'ENVIRONMENT', defaultValue: 'sandbox', description: 'Environment where code should be build and deployed'),
     choice(name: 'SUBSCRIPTION', choices: 'sandbox\nnonprod\nprod', description: 'Azure subscriptions available to build in')
@@ -18,8 +18,28 @@ def vaultOverrides = [
         'spreview': 'saat'
 ]
 
+List<LinkedHashMap<String, Object>> secrets = [
+        secret('sscs-s2s-secret', 'S2S_SECRET'),
+        secret('idam-sscs-systemupdate-user', 'IDAM_OAUTH2_USER_EMAIL'),
+        secret('idam-sscs-systemupdate-password', 'IDAM_OAUTH2_USER_PASSWORD'),
+        secret('idam-sscs-oauth2-client-secret', 'IDAM_OAUTH2_CLIENT_SECRET'),
+]
+
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [ $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    version: '',
+    envVariable: envVar
+  ]
+}
+
 withParameterizedPipeline(params.TYPE, params.PRODUCT_NAME, params.APP, params.ENVIRONMENT, params.SUBSCRIPTION) {
+  enableSlackNotifications('#sscs-cor-notification')
+  loadVaultSecrets(secrets)
   enableDockerBuild()
   installCharts()
+
 }
 

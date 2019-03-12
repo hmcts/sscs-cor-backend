@@ -10,11 +10,15 @@ import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestionRound;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
@@ -30,7 +34,7 @@ public class DataFixtures {
     }
 
     public static List<QuestionSummary> someQuestionSummaries() {
-        return singletonList(new QuestionSummary("someQuestionId", 1, "someQuestionHeader", "someQuestionBody", draft));
+        return singletonList(new QuestionSummary("someQuestionId", 1, "someQuestionHeader", "someQuestionBody", draft, "someAnswer"));
     }
 
     public static Question someQuestion() {
@@ -109,17 +113,17 @@ public class DataFixtures {
     }
 
     public static OnlineHearing someOnlineHearing() {
-        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", null);
+        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", null, new FinalDecision("final decision"), true);
     }
 
     public static OnlineHearing someOnlineHearingWithDecision() {
         Decision decision = new Decision("decision_issued", now().format(ISO_LOCAL_DATE_TIME), null, null, "startDate", "endDate", null, "decisionReason", null);
-        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", decision);
+        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", decision, new FinalDecision("final decision"), true);
     }
 
     public static OnlineHearing someOnlineHearingWithDecisionAndAppellentReply() {
         Decision decision = new Decision("decision_issued", now().format(ISO_LOCAL_DATE_TIME), "decision_accepted", now().format(ISO_LOCAL_DATE_TIME), "startDate", "endDate", null, "decisionReason", null);
-        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", decision);
+        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", decision, new FinalDecision("final decision"), true);
     }
 
     public static Evidence someEvidence() {
@@ -131,9 +135,20 @@ public class DataFixtures {
                 "relisting reason",
                 singletonList(
                         new PdfQuestionRound(singletonList(
-                                new PdfQuestion("title", "body", "answer", "issueDate", "submittedDate")
+                                new PdfQuestion("title", "body", "answer", AnswerState.submitted, "issueDate", "submittedDate")
                         ))
                 )
+        );
+    }
+
+    public static CohEventActionContext someStorePdfResult() {
+        return new CohEventActionContext(
+                new Pdf(new byte[]{2, 4, 6, 0, 1}, "pdfName.pdf"),
+                SscsCaseDetails.builder()
+                        .data(SscsCaseData.builder()
+                                .caseReference("caseReference")
+                                .build())
+                        .build()
         );
     }
 

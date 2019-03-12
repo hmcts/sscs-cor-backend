@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.CaseNotCorException;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.QuestionService;
 
+@Slf4j
 @RestController
 @RequestMapping("/continuous-online-hearings")
 public class QuestionController {
@@ -46,11 +48,14 @@ public class QuestionController {
             @ApiParam(value = "email address of the appellant", example = "foo@bar.com") @RequestParam("email") String emailAddress) {
         try {
             Optional<OnlineHearing> onlineHearing = onlineHearingService.getOnlineHearing(emailAddress);
+            log.info("Online hearing found: {}", onlineHearing.isPresent());
             return onlineHearing.map(ResponseEntity::ok)
                     .orElse(ResponseEntity.notFound().build());
         } catch (IllegalStateException exc) {
+            log.info("Cannot get online hearing", exc);
             return ResponseEntity.unprocessableEntity().build();
         } catch (CaseNotCorException exc) {
+            log.info("No COR case for email address");
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }

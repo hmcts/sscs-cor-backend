@@ -4,11 +4,10 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
 import org.junit.Before;
@@ -19,7 +18,9 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
+import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.api.CcdHistoryEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
@@ -38,6 +39,7 @@ public class OnlineHearingServiceTest {
     private IdamTokens idamTokens;
     private AmendPanelMembersService amendPanelMembersService;
     private IdamService idamService;
+    private DecisionEmailService decisionEmailService;
 
     @Before
     public void setUp() {
@@ -49,7 +51,8 @@ public class OnlineHearingServiceTest {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         amendPanelMembersService = mock(AmendPanelMembersService.class);
-        underTest = new OnlineHearingService(cohService, ccdService, idamService, decisionExtractor, amendPanelMembersService, false);
+        decisionEmailService = mock(DecisionEmailService.class);
+        underTest = new OnlineHearingService(cohService, ccdService, idamService, decisionExtractor, amendPanelMembersService, false, decisionEmailService);
 
         someEmailAddress = "someEmailAddress";
         someCaseId = 1234321L;
@@ -94,7 +97,7 @@ public class OnlineHearingServiceTest {
 
     @Test
     public void getsAnOnlineHearingWithCcdId() {
-        underTest = new OnlineHearingService(cohService, ccdService, idamService, decisionExtractor, amendPanelMembersService, true);
+        underTest = new OnlineHearingService(cohService, ccdService, idamService, decisionExtractor, amendPanelMembersService, true, decisionEmailService);
         String expectedCaseReference = "someCaseReference";
         String firstName = "firstName";
         String lastName = "lastName";
@@ -209,6 +212,45 @@ public class OnlineHearingServiceTest {
         assertThat(onlineHearing.isPresent(), is(false));
     }
 
+    @Test
+    public void loadOnlineHearingIncludsFinalDecision() {
+        SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "online");
+
+        when(cohService.getOnlineHearing(someCaseId)).thenReturn(DataFixtures.someCohOnlineHearings());
+        when(ccdService.getHistoryEvents(someCaseId)).thenReturn(singletonList(new CcdHistoryEvent(EventType.FINAL_DECISION.getCcdType())));
+        Optional<OnlineHearing> onlineHearing = underTest.loadOnlineHearingFromCoh(sscsCaseDetails);
+
+        assertThat(onlineHearing.isPresent(), is(true));
+        assertThat(onlineHearing.get().getFinalDecision().getReason(), is(sscsCaseDetails.getData().getDecisionNotes()));
+        assertThat(onlineHearing.get().isHasFinalDecision(), is(true));
+    }
+
+    @Test
+    public void addDecisionReplyAndSendEmailIfDecisionAccepted() {
+        String someOnlineHearingId = "someOnlineHearingId";
+        String reply = "decision_accepted";
+        String reason = "reason";
+        CohOnlineHearing cohOnlineHearing = someCohOnlineHearing();
+        when(cohService.getOnlineHearing(someOnlineHearingId)).thenReturn(cohOnlineHearing);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().build();
+        when(ccdService.getByCaseId(cohOnlineHearing.getCcdCaseId(), idamTokens)).thenReturn(sscsCaseDetails);
+
+        TribunalViewResponse tribunalViewResponse = new TribunalViewResponse(reply, reason);
+        underTest.addDecisionReply(someOnlineHearingId, tribunalViewResponse);
+
+        verify(cohService).addDecisionReply(someOnlineHearingId, new CohDecisionReply(reply, reason));
+        verify(decisionEmailService).sendEmail(sscsCaseDetails, tribunalViewResponse);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void addDecisionReplyExceptionWhenHearingIdDoesNotExist() {
+        String someOnlineHearingId = "someOnlineHearingId";
+        when(cohService.getOnlineHearing(someOnlineHearingId)).thenReturn(null);
+
+        underTest.addDecisionReply(someOnlineHearingId, new TribunalViewResponse("decision_accepted", "reason"));
+    }
+
+
     private SscsCaseDetails createCaseDetails(Long caseId, String expectedCaseReference, String firstName, String lastName) {
         return createCaseDetails(caseId, expectedCaseReference, firstName, lastName, "cor");
     }
@@ -228,8 +270,10 @@ public class OnlineHearingServiceTest {
                                                 .build()
                                         ).build()
                                 ).build()
-                        ).build()
-
+                        )
+                        .decisionNotes("decision notes")
+                        .events(new ArrayList<>())
+                        .build()
                 ).build();
     }
 

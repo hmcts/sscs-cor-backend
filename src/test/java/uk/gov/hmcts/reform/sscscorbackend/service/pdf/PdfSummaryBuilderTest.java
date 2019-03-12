@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend.service;
+package uk.gov.hmcts.reform.sscscorbackend.service.pdf;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -10,10 +10,10 @@ import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.somePdfAppealDetai
 import java.util.Collections;
 import java.util.List;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestionRound;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfSummaryBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.*;
 
 public class PdfSummaryBuilderTest {
@@ -45,12 +45,12 @@ public class PdfSummaryBuilderTest {
         
         assertThat(pdfQuestionRounds, is(asList(
                 new PdfQuestionRound(asList(
-                        new PdfQuestion("questionHeader-1-1", "questionBody-1-1", "answerText-1-1", "5 June 2018", "5 July 2018"),
-                        new PdfQuestion("questionHeader-1-2", "questionBody-1-2", "answerText-1-2", "5 June 2018", "5 July 2018")
+                        new PdfQuestion("questionHeader-1-1", "questionBody-1-1", "answerText-1-1", AnswerState.submitted, "5 June 2018", "5 July 2018"),
+                        new PdfQuestion("questionHeader-1-2", "questionBody-1-2", "answerText-1-2", AnswerState.submitted, "5 June 2018", "5 July 2018")
                 )),
                 new PdfQuestionRound(asList(
-                        new PdfQuestion("questionHeader-2-1", "questionBody-2-1", "answerText-2-1", "11 December 2018", "12 December 2018"),
-                        new PdfQuestion("questionHeader-2-2", "questionBody-2-2", "answerText-2-2", "11 December 2018", "12 December 2018")
+                        new PdfQuestion("questionHeader-2-1", "questionBody-2-1", "answerText-2-1", AnswerState.submitted, "11 December 2018", "12 December 2018"),
+                        new PdfQuestion("questionHeader-2-2", "questionBody-2-2", "answerText-2-2", AnswerState.submitted, "11 December 2018", "12 December 2018")
                 ))
         )));
     }
@@ -66,7 +66,7 @@ public class PdfSummaryBuilderTest {
 
         assertThat(pdfQuestionRounds, is(singletonList(
                 new PdfQuestionRound(singletonList(
-                        new PdfQuestion("questionHeader-1-1", "questionBody-1-1", "", "", "")
+                        new PdfQuestion("questionHeader-1-1", "questionBody-1-1", "", AnswerState.unanswered, "", "")
                 )))));
     }
 
@@ -84,7 +84,7 @@ public class PdfSummaryBuilderTest {
 
         assertThat(pdfQuestionRounds, is(singletonList(
                 new PdfQuestionRound(singletonList(
-                        new PdfQuestion("questionHeader-1-1", "questionBody-1-1", "", "5 June 2018", "")
+                        new PdfQuestion("questionHeader-1-1", "questionBody-1-1", "", AnswerState.unanswered, "5 June 2018", "")
                 )))));
     }
 
@@ -124,7 +124,7 @@ public class PdfSummaryBuilderTest {
         return createCohQuestionWithAnswer(roundNumber, questionOrdinal, historyRound, singletonList(new CohAnswer(
                 "answerId-" + suffix,
                 "answerText-" + suffix,
-                null,
+                new CohState("answer_submitted", ""),
                 historyAnswer)
         ));
     }

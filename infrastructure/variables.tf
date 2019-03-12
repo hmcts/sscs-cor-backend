@@ -52,3 +52,11 @@ variable "enable_select_by_case_id" {
 variable "dwp_email" {
   default = "dwp_email@example.com"
 }
+
+variable "email_from_address" {
+  default = "sscs@hmcts.net"
+}
+
+variable "createCcdEndpoint" {
+  default     = "false"
+}

@@ -9,13 +9,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
+import uk.gov.hmcts.reform.sscscorbackend.domain.FinalDecision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.api.CcdHistoryEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
@@ -33,6 +37,7 @@ public class OnlineHearingService {
     private final DecisionExtractor decisionExtractor;
     private final AmendPanelMembersService amendPanelMembersService;
     private final boolean enableSelectByCaseId;
+    private final DecisionEmailService decisionEmailService;
 
     public OnlineHearingService(
             @Autowired CohService cohService,
@@ -40,14 +45,15 @@ public class OnlineHearingService {
             @Autowired IdamService idamService,
             @Autowired DecisionExtractor decisionExtractor,
             @Autowired AmendPanelMembersService amendPanelMembersService,
-            @Value("${enable_select_by_case_id}") boolean enableSelectByCaseId
-    ) {
+            @Value("${enable_select_by_case_id}") boolean enableSelectByCaseId,
+            @Autowired DecisionEmailService decisionEmailService) {
         this.cohClient = cohService;
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.decisionExtractor = decisionExtractor;
         this.amendPanelMembersService = amendPanelMembersService;
         this.enableSelectByCaseId = enableSelectByCaseId;
+        this.decisionEmailService = decisionEmailService;
     }
 
     public boolean createOnlineHearing(CcdEvent ccdEvent) {
@@ -66,10 +72,14 @@ public class OnlineHearingService {
     public Optional<OnlineHearing> getOnlineHearing(String emailAddress) {
         String[] splitEmailAddress = emailAddress.split("\\+");
         String actualEmailAddress = enableSelectByCaseId ? splitEmailAddress[0] : emailAddress;
+        IdamTokens idamTokens = idamService.getIdamTokens();
+        log.info("Got idam tokens");
+
         List<SscsCaseDetails> cases = ccdService.findCaseBy(
                 ImmutableMap.of("case.subscriptions.appellantSubscription.email", actualEmailAddress),
-                idamService.getIdamTokens()
+                idamTokens
         );
+        log.info("Found {} cases", cases.size());
 
         if (cases == null || cases.isEmpty()) {
             return Optional.empty();
@@ -108,6 +118,11 @@ public class OnlineHearingService {
     public void addDecisionReply(String onlineHearingId, TribunalViewResponse tribunalViewResponse) {
         CohDecisionReply cohDecisionReply = new CohDecisionReply(tribunalViewResponse.getReply(), tribunalViewResponse.getReason());
         cohClient.addDecisionReply(onlineHearingId, cohDecisionReply);
+
+        Optional<Long> ccdCaseIdOptional = getCcdCaseId(onlineHearingId);
+        Long caseId = ccdCaseIdOptional.orElseThrow(() -> new IllegalArgumentException("Cannot find online hearing id to add decision [" + onlineHearingId + "]"));
+        SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(caseId, idamService.getIdamTokens());
+        decisionEmailService.sendEmail(sscsCaseDetails, tribunalViewResponse);
     }
 
     private CohDecisionReply getAppellantDecisionReply(String onlineHearingId) {
@@ -135,6 +150,7 @@ public class OnlineHearingService {
 
     public Optional<OnlineHearing> loadOnlineHearingFromCoh(SscsCaseDetails sscsCaseDeails) {
         CohOnlineHearings cohOnlineHearings = cohClient.getOnlineHearing(sscsCaseDeails.getId());
+        List<CcdHistoryEvent> historyEvents = ccdService.getHistoryEvents(sscsCaseDeails.getId());
 
         return cohOnlineHearings.getOnlineHearings().stream()
                 .findFirst()
@@ -142,12 +158,15 @@ public class OnlineHearingService {
                     Name name = sscsCaseDeails.getData().getAppeal().getAppellant().getName();
                     String nameString = name.getFirstName() + " " + name.getLastName();
 
+                    boolean hasFinalDecision = historyEvents.stream()
+                                    .anyMatch(event -> EventType.FINAL_DECISION == event.getEventType());
+
                     return new OnlineHearing(
                             onlineHearing.getOnlineHearingId(),
                             nameString,
                             sscsCaseDeails.getData().getCaseReference(),
-                            getDecision(onlineHearing.getOnlineHearingId(), sscsCaseDeails.getId())
-                    );
+                            getDecision(onlineHearing.getOnlineHearingId(), sscsCaseDeails.getId()),
+                            new FinalDecision(sscsCaseDeails.getData().getDecisionNotes()), hasFinalDecision);
                 });
     }
 }

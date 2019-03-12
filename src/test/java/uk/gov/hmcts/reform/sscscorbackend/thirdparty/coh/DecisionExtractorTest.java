@@ -1,12 +1,12 @@
-package uk.gov.hmcts.reform.sscscorbackend.service;
+package uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.DecisionExtractor;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohDecision;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohDecisionReply;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohState;
@@ -90,6 +90,17 @@ public class DecisionExtractorTest {
             "      \"awardStartDateYear\":\"2017\"\n" +
             "   }\n" +
             "}";
+    private final String finalDecision = "{\n" +
+            "\"decisions_SSCS_benefit_1234321\": {\n" +
+            "\"preliminaryView\": \"no\",\n" +
+            "\"visitedPages\": {\n" +
+            "\"create\": true,\n" +
+            "\"final-decision\": true\n" +
+            "},\n" +
+            "\"decisionNotes\": \"s simply dummy text\"\n" +
+            "}\n" +
+            "}";
+
     private final String decisionsState = "decisionsState";
     private final String decisionsStartDateTime = "decisionsStartDateTime";
     private final String appellantReply = "appellantReply";
@@ -144,5 +155,16 @@ public class DecisionExtractorTest {
                         asList(new Activity("planningFollowingJourneys", "12"))
                 ))
         ));
+    }
+
+    @Test
+    public void canHandleFinalDecisionJson() {
+        CohDecision cohDecision = new CohDecision(
+                "onlineHearingId", "", "", "", finalDecision, new CohState(decisionsState, decisionsStartDateTime)
+        );
+
+        Decision decision = new DecisionExtractor().extract(caseId, cohDecision, cohDecisionReply);
+
+        assertThat(decision, is(nullValue()));
     }
 }

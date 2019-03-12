@@ -8,8 +8,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.matching.RegexPattern;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 
 public class CcdStub extends BaseStub {
 
@@ -82,6 +85,34 @@ public class CcdStub extends BaseStub {
                 .willReturn(okJson(new ObjectMapper().writeValueAsString(CaseDetails.builder().build()))));
     }
 
+    public void stubUpdateCaseWithEvent(Long caseId, final String eventType) throws JsonProcessingException {
+        wireMock.stubFor(get("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/event-triggers/" + eventType + "/token")
+                .willReturn(okJson(new ObjectMapper().writeValueAsString(StartEventResponse.builder().build()))));
+
+        wireMock.stubFor(post("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true")
+                .willReturn(okJson(new ObjectMapper().writeValueAsString(CaseDetails.builder().build()))));
+    }
+
+    public void verifyUpdateCaseWithEvent(Long caseId, String eventType) {
+        verifyAsync(getRequestedFor(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/event-triggers/" + eventType + "/token")));
+    }
+
+    public void verifyUpdateCaseWithPdf(Long caseId, String caseReference, String pdfName) {
+        verifyAsync(postRequestedFor(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true"))
+                .withRequestBody(matchingJsonPath("$.event.summary", equalTo("SSCS - appeal updated event")))
+                .withRequestBody(matchingJsonPath("$.data.caseReference", equalTo(caseReference)))
+                .withRequestBody(matchingJsonPath("$.data.sscsDocument[0].value.documentFileName", equalTo(pdfName)))
+        );
+    }
+
+    public void verifyUpdateCaseToOralHearing(Long caseId, String caseReference) throws JsonProcessingException {
+        verifyAsync(postRequestedFor(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true"))
+                .withRequestBody(matchingJsonPath("$.event.summary", equalTo("SSCS - appeal updated event")))
+                .withRequestBody(matchingJsonPath("$.data.caseReference", equalTo(caseReference)))
+                .withRequestBody(matchingJsonPath("$.data.appeal.hearingType", equalTo("oral")))
+        );
+    }
+
     public void stubAddUserToCase(long caseId, String userToAdd) throws JsonProcessingException {
         wireMock.stubFor(post("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/users")
                 .withRequestBody(equalToJson("{ \"id\": \"" + userToAdd + "\" }"))
@@ -91,6 +122,15 @@ public class CcdStub extends BaseStub {
     public void stubRemoveUserFromCase(long caseId, String userToRemove) throws JsonProcessingException {
         wireMock.stubFor(delete("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/users/" + userToRemove)
                 .willReturn(created()));
+    }
+
+    public void stubGetHistoryEvents(Long caseId, EventType... eventTypes) {
+        String responseJson = Arrays.stream(eventTypes)
+                .map(event -> "{\"id\":\"" + event.getCcdType() + "\"}")
+                .collect(Collectors.joining(",", "[", "]"));
+        wireMock.stubFor(get("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events")
+                .willReturn(okJson(responseJson))
+        );
     }
 
     private String createCaseDetails(Long caseId, String caseReference, String firstName, String lastName, String evidenceQuestionId, String evidenceFileName, String evidenceCreatedDate, String evidenceUrl) {

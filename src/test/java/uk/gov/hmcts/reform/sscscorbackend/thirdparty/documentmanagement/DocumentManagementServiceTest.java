@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend.service;
+package uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement;
 
 import static java.util.Collections.singletonList;
 import static org.mockito.Mockito.*;
@@ -11,9 +11,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.DocumentManagementClient;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.DocumentManagementService;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.IllegalFileTypeException;
 
 public class DocumentManagementServiceTest {
 

@@ -2,10 +2,9 @@ package uk.gov.hmcts.reform.sscscorbackend.service;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
@@ -15,20 +14,25 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Slf4j
 @Service
-public class StoreOnlineHearingTribunalsViewService extends BasePdfService<OnlineHearing> {
+public class StoreOnlineHearingTribunalsViewService extends StorePdfService<OnlineHearing> {
 
     public static final String TRIBUNALS_VIEW_PDF_PREFIX = "Tribunals view - ";
     private final OnlineHearingService onlineHearingService;
     private final OnlineHearingDateReformatter onlineHearingDateReformatter;
+    private final ActivitiesValidator activitiesValidator;
 
+    @SuppressWarnings("squid:S00107")
     public StoreOnlineHearingTribunalsViewService(OnlineHearingService onlineHearingService,
-                                                  @Qualifier("PreliminaryViewPdfService") PdfService pdfService,
+                                                  PdfService pdfService,
+                                                  @Value("${preliminary_view.html.template.path}") String templatePath,
                                                   OnlineHearingDateReformatter onlineHearingDateReformatter,
-                                                  SscsPdfService sscsPdfService, CcdService ccdService, IdamService idamService,
-                                                  EvidenceManagementService evidenceManagementService) {
-        super(pdfService, sscsPdfService, ccdService, idamService, evidenceManagementService);
+                                                  SscsPdfService sscsPdfService, IdamService idamService,
+                                                  EvidenceManagementService evidenceManagementService,
+                                                  ActivitiesValidator activitiesValidator) {
+        super(pdfService, templatePath, sscsPdfService, idamService, evidenceManagementService);
         this.onlineHearingService = onlineHearingService;
         this.onlineHearingDateReformatter = onlineHearingDateReformatter;
+        this.activitiesValidator = activitiesValidator;
     }
 
     @Override
@@ -40,6 +44,8 @@ public class StoreOnlineHearingTribunalsViewService extends BasePdfService<Onlin
     protected OnlineHearing getPdfContent(SscsCaseDetails caseDetails, String onlineHearingId, PdfAppealDetails appealDetails) {
         Optional<OnlineHearing> optionalOnlineHearing = onlineHearingService.loadOnlineHearingFromCoh(caseDetails);
         OnlineHearing onlineHearing = optionalOnlineHearing.orElseThrow(() -> new IllegalArgumentException("Cannot find online hearing for case id [" + caseDetails.getId() + "]"));
+
+        activitiesValidator.validateWeHaveMappingForActivities(onlineHearing);
 
         return onlineHearingDateReformatter.getReformattedOnlineHearing(onlineHearing);
     }

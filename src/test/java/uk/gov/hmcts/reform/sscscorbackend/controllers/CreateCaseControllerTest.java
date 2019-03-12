@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -12,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -22,13 +22,11 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 public class CreateCaseControllerTest {
 
     private CorCcdService ccdService;
-    private CcdRequestDetails ccdRequestDetails;
     private IdamService idamService;
 
     @Before
     public void setUp() {
         ccdService = mock(CorCcdService.class);
-        ccdRequestDetails = CcdRequestDetails.builder().build();
 
         idamService = mock(IdamService.class);
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
@@ -39,7 +37,7 @@ public class CreateCaseControllerTest {
         Long caseId = 123L;
         String caseRef = "someCaseRef";
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().id(caseId).data(SscsCaseData.builder().caseReference(caseRef).build()).build();
-        when(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class))).thenReturn(sscsCaseDetails);
+        when(ccdService.createCase(any(SscsCaseData.class), eq("appealCreated"), eq("SSCS - appeal created event"), eq("Created SSCS"), any(IdamTokens.class))).thenReturn(sscsCaseDetails);
         CreateCaseController createCaseController = new CreateCaseController(ccdService, idamService);
 
         ResponseEntity<Map<String, String>> createCaseResponse = createCaseController.createCase("someEmail", "someMobile");

@@ -141,16 +141,27 @@ public class QuestionService {
                 cohQuestionReference.getQuestionOrdinal(),
                 cohQuestionReference.getQuestionHeaderText(),
                 cohQuestionReference.getQuestionBodyText(),
-                answerState
+                answerState,
+                getAnswer(answers)
         );
     }
 
     private AnswerState getAnswerState(List<CohAnswer> answers) {
-        return ofNullable(answers).orElse(emptyList()).stream()
-                    .findFirst()
+        return getFirstAnswer(answers)
                     .map(cohAnswer -> cohAnswer.getCurrentAnswerState().getStateName())
                     .map(AnswerState::of)
                     .orElse(AnswerState.unanswered);
+    }
+
+    private String getAnswer(List<CohAnswer> answers) {
+        return getFirstAnswer(answers)
+                .map(CohAnswer::getAnswerText)
+                .orElse("");
+    }
+
+    private Optional<CohAnswer> getFirstAnswer(List<CohAnswer> answers) {
+        return ofNullable(answers).orElse(emptyList()).stream()
+                .findFirst();
     }
 
     private AnswerState updateAnswerStateIfEvidencePresent(AnswerState answerState, List<Evidence> evidenceList) {

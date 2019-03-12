@@ -10,16 +10,15 @@ import java.net.URISyntaxException;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StorePdfResult;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
-public class BasePdfServiceTest {
+public class StorePdfServiceTest {
     private static final String TITLE = "title";
     private static final String FIRST_NAME = "firstName";
     private static final String LAST_NAME = "lastName";
@@ -29,20 +28,18 @@ public class BasePdfServiceTest {
 
     private PdfService pdfService;
     private SscsPdfService sscsPdfService;
-    private CcdService ccdService;
     private long caseId;
     private Object pdfContent;
     private String fileNamePrefix;
-    private BasePdfService basePdfService;
+    private StorePdfService storePdfService;
     private IdamTokens idamTokens;
     private String someOnlineHearingId;
     private EvidenceManagementService evidenceManagementService;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         pdfService = mock(PdfService.class);
         sscsPdfService = mock(SscsPdfService.class);
-        ccdService = mock(CcdService.class);
         IdamService idamService = mock(IdamService.class);
         idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -50,7 +47,7 @@ public class BasePdfServiceTest {
         pdfContent = new Object();
         fileNamePrefix = "test name";
         evidenceManagementService = mock(EvidenceManagementService.class);
-        basePdfService = new BasePdfService(pdfService, sscsPdfService, ccdService, idamService, evidenceManagementService) {
+        storePdfService = new StorePdfService(pdfService, "sometemplate", sscsPdfService, idamService, evidenceManagementService) {
 
             @Override
             protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId) {
@@ -68,16 +65,15 @@ public class BasePdfServiceTest {
     @Test
     public void storePdf() {
         SscsCaseDetails caseDetails = createCaseDetails();
-        when(ccdService.getByCaseId(caseId, idamTokens)).thenReturn(caseDetails);
         byte[] expectedPdfBytes = {2, 4, 6, 0, 1};
-        when(pdfService.createPdf(pdfContent)).thenReturn(expectedPdfBytes);
+        when(pdfService.createPdf(pdfContent, "sometemplate")).thenReturn(expectedPdfBytes);
 
-        StorePdfResult storePdfResult = basePdfService.storePdf(caseId, someOnlineHearingId);
+        CohEventActionContext cohEventActionContext = storePdfService.storePdf(caseId, someOnlineHearingId, caseDetails);
 
         verify(sscsPdfService).mergeDocIntoCcd(fileNamePrefix + CASE_REF + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), idamTokens);
-        assertThat(storePdfResult.getPdf().getContent(), is(expectedPdfBytes));
-        assertThat(storePdfResult.getPdf().getName(), is(fileNamePrefix + CASE_REF + ".pdf"));
-        assertThat(storePdfResult.getDocument(), is(caseDetails));
+        assertThat(cohEventActionContext.getPdf().getContent(), is(expectedPdfBytes));
+        assertThat(cohEventActionContext.getPdf().getName(), is(fileNamePrefix + CASE_REF + ".pdf"));
+        assertThat(cohEventActionContext.getDocument(), is(caseDetails));
     }
 
     @Test
@@ -99,16 +95,15 @@ public class BasePdfServiceTest {
                         .build()
                 ).build()).build()).build();
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-        when(ccdService.getByCaseId(caseId, idamTokens)).thenReturn(sscsCaseDetails);
         byte[] expectedPdfBytes = {2, 4, 6, 0, 1};
         when(evidenceManagementService.download(new URI(documentUrl), "sscs")).thenReturn(expectedPdfBytes);
 
-        StorePdfResult storePdfResult = basePdfService.storePdf(caseId, someOnlineHearingId);
+        CohEventActionContext cohEventActionContext = storePdfService.storePdf(caseId, someOnlineHearingId, sscsCaseDetails);
 
         verifyZeroInteractions(sscsPdfService);
-        assertThat(storePdfResult.getPdf().getContent(), is(expectedPdfBytes));
-        assertThat(storePdfResult.getPdf().getName(), is(fileNamePrefix + CASE_REF + ".pdf"));
-        assertThat(storePdfResult.getDocument(), is(sscsCaseDetails));
+        assertThat(cohEventActionContext.getPdf().getContent(), is(expectedPdfBytes));
+        assertThat(cohEventActionContext.getPdf().getName(), is(fileNamePrefix + CASE_REF + ".pdf"));
+        assertThat(cohEventActionContext.getDocument(), is(sscsCaseDetails));
     }
 
     private SscsCaseDetails createCaseDetails() {
