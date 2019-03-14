@@ -10,8 +10,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
-import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
@@ -21,18 +21,18 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 public abstract class StorePdfService<E> {
     private final PdfService pdfService;
     private final String pdfTemplatePath;
-    private final SscsPdfService sscsPdfService;
+    private final CcdPdfService ccdPdfService;
     private final IdamService idamService;
     private final EvidenceManagementService evidenceManagementService;
 
     StorePdfService(PdfService pdfService,
                     String pdfTemplatePath,
-                    SscsPdfService sscsPdfService,
+                    CcdPdfService ccdPdfService,
                     IdamService idamService,
                     EvidenceManagementService evidenceManagementService) {
         this.pdfService = pdfService;
         this.pdfTemplatePath = pdfTemplatePath;
-        this.sscsPdfService = sscsPdfService;
+        this.ccdPdfService = ccdPdfService;
         this.idamService = idamService;
         this.evidenceManagementService = evidenceManagementService;
     }
@@ -59,7 +59,7 @@ public abstract class StorePdfService<E> {
         SscsCaseData caseData = caseDetails.getData();
         String pdfName = getPdfName(documentNamePrefix, caseData.getCaseReference());
         log.info("Adding pdf to ccd for [" + caseId + "]");
-        sscsPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens);
+        ccdPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens);
 
         return new Pdf(pdfBytes, pdfName);
     }

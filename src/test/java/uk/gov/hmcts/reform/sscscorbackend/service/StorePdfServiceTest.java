@@ -12,8 +12,8 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
-import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
@@ -27,7 +27,7 @@ public class StorePdfServiceTest {
 
 
     private PdfService pdfService;
-    private SscsPdfService sscsPdfService;
+    private CcdPdfService sscsPdfService;
     private long caseId;
     private Object pdfContent;
     private String fileNamePrefix;
@@ -39,7 +39,7 @@ public class StorePdfServiceTest {
     @Before
     public void setUp() {
         pdfService = mock(PdfService.class);
-        sscsPdfService = mock(SscsPdfService.class);
+        sscsPdfService = mock(CcdPdfService.class);
         IdamService idamService = mock(IdamService.class);
         idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
