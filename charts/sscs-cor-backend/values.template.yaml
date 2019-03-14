@@ -24,38 +24,3 @@ java:
     APPINSIGHTS_INSTRUMENTATIONKEY: ${APPINSIGHTS_INSTRUMENTATIONKEY}
     ROOT_LOGGING_LEVEL: INFO
     LOG_OUTPUT: single
-
-ccd:
-  ingressHost: ${SERVICE_FQDN}
-  ingressIP: ${INGRESS_IP}
-  consulIP: ${CONSUL_LB_IP}
-  apiGateway:
-    s2sKey: ${API_GATEWAY_S2S_KEY}
-    idamClientSecret: ${API_GATEWAY_IDAM_SECRET}
-  userProfileApi:
-    authorisedServices: ccd_data,ccd_definition,sscs
-  dataStoreApi:
-    s2sKey: ${DATA_STORE_S2S_KEY}
-    s2sAuthorisedServices: sscs,ccd_gw
-  definitionStoreApi:
-    s2sKey: ${DEFINITION_STORE_S2S_KEY}
-    s2sAuthorisedServices: ccd_data,sscs,ccd_gw
-  caseManagementWeb:
-    enabled: true
-  adminWeb:
-    enabled: true
-    s2sKey: ${ADMIN_S2S_KEY}
-    idamClientSecret: ${ADMIN_WEB_IDAM_SECRET}
-  importer:
-    image:
-    definitionFilename: 
-    definitions:
-      -
-    userRoles:
-      - caseworker-sscs
-      - caseworker-sscs-systemupdate
-      - caseworker-sscs-anonymouscitizen
-      - citizen
-      - caseworker-sscs-callagent
-      - caseworker-sscs-judge
-      - caseworker-sscs-panelmember
