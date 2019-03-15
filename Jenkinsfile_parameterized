@@ -13,6 +13,11 @@ properties([
   pipelineTriggers([[$class: 'GitHubPushTrigger']])
 ])
 
+def vaultOverrides = [
+        'preview' : 'aat',
+        'spreview': 'saat'
+]
+
 List<LinkedHashMap<String, Object>> secrets = [
         secret('sscs-s2s-secret', 'S2S_SECRET'),
         secret('idam-sscs-systemupdate-user', 'IDAM_OAUTH2_USER_EMAIL'),
@@ -33,5 +38,8 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 withParameterizedPipeline(params.TYPE, params.PRODUCT_NAME, params.APP, params.ENVIRONMENT, params.SUBSCRIPTION) {
   enableSlackNotifications('#sscs-cor-notification')
   loadVaultSecrets(secrets)
+  enableDockerBuild()
+  installCharts()
+
 }
 
