@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
-import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfSummaryBuilder;
@@ -24,11 +24,11 @@ public class StoreOnlineHearingService extends StorePdfService<PdfSummary> {
     public StoreOnlineHearingService(CohService cohService,
                                      IdamService idamService,
                                      PdfSummaryBuilder pdfSummaryBuilder,
-                                     SscsPdfService sscsPdfService,
+                                     CcdPdfService ccdPdfService,
                                      PdfService pdfService,
                                      @Value("${online_hearing_finished.html.template.path}") String templatePath,
                                      EvidenceManagementService evidenceManagementService) {
-        super(pdfService, templatePath, sscsPdfService, idamService, evidenceManagementService);
+        super(pdfService, templatePath, ccdPdfService, idamService, evidenceManagementService);
         this.cohService = cohService;
         this.pdfSummaryBuilder = pdfSummaryBuilder;
     }

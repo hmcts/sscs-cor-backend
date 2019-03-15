@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
-import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
@@ -26,10 +26,10 @@ public class StoreOnlineHearingTribunalsViewService extends StorePdfService<Onli
                                                   PdfService pdfService,
                                                   @Value("${preliminary_view.html.template.path}") String templatePath,
                                                   OnlineHearingDateReformatter onlineHearingDateReformatter,
-                                                  SscsPdfService sscsPdfService, IdamService idamService,
+                                                  CcdPdfService ccdPdfService, IdamService idamService,
                                                   EvidenceManagementService evidenceManagementService,
                                                   ActivitiesValidator activitiesValidator) {
-        super(pdfService, templatePath, sscsPdfService, idamService, evidenceManagementService);
+        super(pdfService, templatePath, ccdPdfService, idamService, evidenceManagementService);
         this.onlineHearingService = onlineHearingService;
         this.onlineHearingDateReformatter = onlineHearingDateReformatter;
         this.activitiesValidator = activitiesValidator;

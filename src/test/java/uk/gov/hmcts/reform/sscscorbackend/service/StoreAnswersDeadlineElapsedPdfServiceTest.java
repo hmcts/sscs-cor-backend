@@ -9,8 +9,8 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
-import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
 import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionRound;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
@@ -27,7 +27,7 @@ public class StoreAnswersDeadlineElapsedPdfServiceTest {
         questionService = mock(QuestionService.class);
         onlineHearingId = "someOnlineHearingId";
         storeQuestionsPdfService = new StoreAnswersDeadlineElapsedPdfService(
-                mock(PdfService.class), "sometemplate", mock(SscsPdfService.class), mock(IdamService.class),
+                mock(PdfService.class), "sometemplate", mock(CcdPdfService.class), mock(IdamService.class),
                 questionService, mock(EvidenceManagementService.class));
     }
 

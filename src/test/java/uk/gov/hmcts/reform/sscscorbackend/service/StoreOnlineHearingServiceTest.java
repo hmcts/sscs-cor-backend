@@ -9,8 +9,8 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
-import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfSummaryBuilder;
@@ -36,7 +36,7 @@ public class StoreOnlineHearingServiceTest {
 
         underTest = new StoreOnlineHearingService(
                 cohService, mock(IdamService.class), pdfSummaryBuilder,
-                mock(SscsPdfService.class), mock(PdfService.class), "sometemplate",
+                mock(CcdPdfService.class), mock(PdfService.class), "sometemplate",
                 mock(EvidenceManagementService.class));
     }
 
