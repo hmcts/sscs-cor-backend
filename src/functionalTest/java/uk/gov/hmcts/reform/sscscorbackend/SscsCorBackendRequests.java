@@ -13,6 +13,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
@@ -120,9 +121,42 @@ public class SscsCorBackendRequests {
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
     }
 
+    public void uploadHearingEvidence(String hearingId, String fileName) throws IOException {
+        HttpEntity data = MultipartEntityBuilder.create()
+                .setContentType(ContentType.MULTIPART_FORM_DATA)
+                .addBinaryBody("file",
+                        this.getClass().getClassLoader().getResourceAsStream(fileName),
+                        ContentType.IMAGE_PNG,
+                        fileName)
+                .build();
+
+        HttpResponse response = client.execute(put(baseUrl + "/continuous-online-hearings/" + hearingId + "/evidence")
+                .setEntity(data)
+                .build());
+        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+    }
+
+    public JSONArray getDraftHearingEvidence(String hearingId) throws IOException {
+        HttpResponse response = client.execute(get(baseUrl + "/continuous-online-hearings/" + hearingId + "/evidence")
+                .build());
+        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+
+        String responseBody = EntityUtils.toString(response.getEntity());
+
+        return new JSONArray(responseBody);
+    }
+
     public void deleteEvidence(String hearingId, String questionId, String evidenceId) throws IOException {
         HttpResponse getQuestionResponse = client.execute(delete(
                 baseUrl + "/continuous-online-hearings/" + hearingId + "/questions/" + questionId + "/evidence/" + evidenceId
+        ).build());
+
+        assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+    }
+
+    public void deleteHearingEvidence(String hearingId, String evidenceId) throws IOException {
+        HttpResponse getQuestionResponse = client.execute(delete(
+                baseUrl + "/continuous-online-hearings/" + hearingId + "/evidence/" + evidenceId
         ).build());
 
         assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
