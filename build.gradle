@@ -174,8 +174,8 @@ dependencies {
   //Remove when our dependencies pull in this version or later
   compile 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
   integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
-  integrationTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.4.0'
-  functionalTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.2'
+  integrationTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.4.1'
+  functionalTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.4.1'
 
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
   testCompile group: 'junit', name: 'junit', version: versions.junit
