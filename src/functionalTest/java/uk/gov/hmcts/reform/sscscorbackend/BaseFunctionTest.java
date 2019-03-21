@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 @SpringBootTest(classes = Application.class)
 @TestPropertySource(properties = {
         "idam.s2s-auth.url=http://rpe-service-auth-provider-aat.service.core-compute-aat.internal",
-        "idam.url=https://preprod-idamapi.reform.hmcts.net:3511",
+        "idam.url=http://idam-api.aat.platform.hmcts.net",
         "idam.oauth2.redirectUrl=https://evidence-sharing-preprod.sscs.reform.hmcts.net",
         "coh.url=http://coh-cor-aat.service.core-compute-aat.internal"
 })
