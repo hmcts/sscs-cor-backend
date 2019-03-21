@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 public class StoreOnlineHearingTribunalsViewServiceTest {
@@ -58,7 +59,7 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
         sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
 
         when(onlineHearingService.loadOnlineHearingFromCoh(sscsCaseDetails)).thenReturn(Optional.empty());
-        storeOnlineHearingTribunalsViewService.storePdf(someCaseId, someHearingId, sscsCaseDetails);
+        storeOnlineHearingTribunalsViewService.storePdf(someCaseId, someHearingId, new PdfData(sscsCaseDetails));
     }
 
     @Test
@@ -67,7 +68,7 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
         OnlineHearing onlineHearing = mock(OnlineHearing.class);
         when(onlineHearingService.loadOnlineHearingFromCoh(caseDetails)).thenReturn(Optional.of(onlineHearing));
 
-        storeOnlineHearingTribunalsViewService.getPdfContent(caseDetails, "hearingId", mock(PdfAppealDetails.class));
+        storeOnlineHearingTribunalsViewService.getPdfContent(new PdfData(caseDetails), "hearingId", mock(PdfAppealDetails.class));
 
         verify(activitiesValidator).validateWeHaveMappingForActivities(onlineHearing);
     }

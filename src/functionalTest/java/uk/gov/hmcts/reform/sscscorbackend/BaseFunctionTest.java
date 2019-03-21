@@ -61,7 +61,7 @@ public abstract class BaseFunctionTest {
         return emailAddress;
     }
 
-    protected OnlineHearing createHearingWithQuestion(boolean ccdCaseRequired) throws IOException, InterruptedException {
+    protected OnlineHearing createHearing(boolean ccdCaseRequired) throws IOException {
         String hearingId;
         String emailAddress = null;
         String caseId = null;
@@ -72,9 +72,14 @@ public abstract class BaseFunctionTest {
         } else {
             hearingId = cohRequests.createHearing();
         }
-        String questionId = cohRequests.createQuestion(hearingId);
-        cohRequests.issueQuestionRound(hearingId);
-        return new OnlineHearing(emailAddress, hearingId, questionId, caseId);
+        return new OnlineHearing(emailAddress, hearingId, null, caseId);
+    }
+
+    protected OnlineHearing createHearingWithQuestion(boolean ccdCaseRequired) throws IOException, InterruptedException {
+        OnlineHearing onlineHearing = createHearing(ccdCaseRequired);
+        String questionId = cohRequests.createQuestion(onlineHearing.getHearingId());
+        cohRequests.issueQuestionRound(onlineHearing.getHearingId());
+        return new OnlineHearing(onlineHearing.getEmailAddress(), onlineHearing.getHearingId(), questionId, onlineHearing.getCaseId());
     }
 
     protected void answerQuestion(String hearingId, String questionId) throws IOException {

@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.DocumentManagementService;
@@ -71,14 +70,9 @@ public class EvidenceUploadService {
     }
 
     private <E> Optional<Evidence> uploadEvidence(String onlineHearingId, MultipartFile file, DocumentExtract<E> documentExtract, Function<Document, E> createNewDocument) {
-        return onlineHearingService.getCcdCaseId(onlineHearingId)
-                .map(ccdCaseId -> {
+        return onlineHearingService.getCcdCase(onlineHearingId)
+                .map(caseDetails -> {
                     Document document = uploadDocument(file);
-                    log.info("Upload document for case {} ...", ccdCaseId);
-                    IdamTokens idamTokens = idamService.getIdamTokens();
-                    log.info("Adding document to case {} ...", ccdCaseId);
-
-                    SscsCaseDetails caseDetails = getSscsCaseDetails(ccdCaseId, idamTokens);
 
                     List<E> currentDocuments = documentExtract.getDocuments().apply(caseDetails.getData());
                     ArrayList<E> newDocuments = (currentDocuments == null) ? new ArrayList<>() : new ArrayList<>(currentDocuments);
@@ -87,7 +81,7 @@ public class EvidenceUploadService {
                     documentExtract.setDocuments().accept(caseDetails.getData(), newDocuments);
 
 
-                    ccdService.updateCase(caseDetails.getData(), ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamTokens);
+                    ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
 
                     return new Evidence(document.links.self.href, document.originalDocumentName, getCreatedDate(document));
                 });
@@ -101,12 +95,10 @@ public class EvidenceUploadService {
     }
 
     public boolean submitHearingEvidence(String onlineHearingId) {
-        return onlineHearingService.getCcdCaseId(onlineHearingId)
-                .map(ccdCaseId -> {
+        return onlineHearingService.getCcdCase(onlineHearingId)
+                .map(caseDetails -> {
+                    Long ccdCaseId = caseDetails.getId();
                     log.info("Submitting draft document for case [" + ccdCaseId + "]");
-
-                    IdamTokens idamTokens = idamService.getIdamTokens();
-                    SscsCaseDetails caseDetails = getSscsCaseDetails(ccdCaseId, idamTokens);
 
                     SscsCaseData sscsCaseData = caseDetails.getData();
                     List<SscsDocument> draftSscsDocument = sscsCaseData.getDraftSscsDocument();
@@ -118,7 +110,7 @@ public class EvidenceUploadService {
                     sscsCaseData.setSscsDocument(newSscsDocumentsList);
                     sscsCaseData.setDraftSscsDocument(Collections.emptyList());
 
-                    ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamTokens);
+                    ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
 
                     return true;
                 })
@@ -142,13 +134,8 @@ public class EvidenceUploadService {
     }
 
     private Optional<LoadedEvidence> loadEvidence(String onlineHearingId) {
-        return onlineHearingService.getCcdCaseId(onlineHearingId)
-                .map(ccdCaseId -> {
-                    IdamTokens idamTokens = idamService.getIdamTokens();
-                    SscsCaseDetails caseDetails = getSscsCaseDetails(ccdCaseId, idamTokens);
-
-                    return new LoadedEvidence(caseDetails);
-                });
+        return onlineHearingService.getCcdCase(onlineHearingId)
+                .map(LoadedEvidence::new);
     }
 
     public boolean deleteQuestionEvidence(String onlineHearingId, String evidenceId) {
@@ -160,10 +147,8 @@ public class EvidenceUploadService {
     }
 
     private <E> boolean deleteEvidence(String onlineHearingId, String evidenceId, DocumentExtract<E> documentExtract) {
-        return onlineHearingService.getCcdCaseId(onlineHearingId)
-                .map(ccdCaseId -> {
-                    IdamTokens idamTokens = idamService.getIdamTokens();
-                    SscsCaseDetails caseDetails = getSscsCaseDetails(ccdCaseId, idamTokens);
+        return onlineHearingService.getCcdCase(onlineHearingId)
+                .map(caseDetails -> {
                     List<E> documents = documentExtract.getDocuments().apply(caseDetails.getData());
 
                     if (documents != null) {
@@ -172,7 +157,7 @@ public class EvidenceUploadService {
                                 .collect(toList());
                         documentExtract.setDocuments().accept(caseDetails.getData(), newDocuments);
 
-                        ccdService.updateCase(caseDetails.getData(), ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence deleted", UPDATED_SSCS, idamTokens);
+                        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), UPLOAD_COR_DOCUMENT, "SSCS - cor evidence deleted", UPDATED_SSCS, idamService.getIdamTokens());
 
                         documentManagementService.delete(evidenceId);
                     }
@@ -220,15 +205,6 @@ public class EvidenceUploadService {
         public Function<SscsDocument, SscsDocumentDetails> findDocument() {
             return SscsDocument::getValue;
         }
-    }
-
-    private SscsCaseDetails getSscsCaseDetails(Long optionalCcdCaseId, IdamTokens idamTokens) {
-        SscsCaseDetails caseDetails = ccdService.getByCaseId(optionalCcdCaseId, idamTokens);
-
-        if (caseDetails == null) {
-            throw new IllegalStateException("Online hearing for ccdCaseId [" + optionalCcdCaseId + "] found but cannot find the case in CCD");
-        }
-        return caseDetails;
     }
 
     private static class LoadedEvidence {

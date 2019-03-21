@@ -15,10 +15,11 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Slf4j
-public abstract class StorePdfService<E> {
+public abstract class StorePdfService<E, D extends PdfData> {
     private final PdfService pdfService;
     private final String pdfTemplatePath;
     private final CcdPdfService ccdPdfService;
@@ -37,12 +38,13 @@ public abstract class StorePdfService<E> {
         this.evidenceManagementService = evidenceManagementService;
     }
 
-    public CohEventActionContext storePdf(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
+    public CohEventActionContext storePdf(Long caseId, String onlineHearingId, D data) {
+        SscsCaseDetails caseDetails = data.getCaseDetails();
         String documentNamePrefix = documentNamePrefix(caseDetails, onlineHearingId);
         if (pdfHasNotAlreadyBeenCreated(caseDetails, documentNamePrefix)) {
             log.info("Creating pdf for [" + caseId + "]");
             return new CohEventActionContext(
-                    storePdf(caseId, onlineHearingId, idamService.getIdamTokens(), caseDetails, documentNamePrefix),
+                    storePdf(caseId, onlineHearingId, idamService.getIdamTokens(), data, documentNamePrefix),
                     caseDetails
             );
         } else {
@@ -51,10 +53,11 @@ public abstract class StorePdfService<E> {
         }
     }
 
-    private Pdf storePdf(Long caseId, String onlineHearingId, IdamTokens idamTokens, SscsCaseDetails caseDetails, String documentNamePrefix) {
+    private Pdf storePdf(Long caseId, String onlineHearingId, IdamTokens idamTokens, D data, String documentNamePrefix) {
+        SscsCaseDetails caseDetails = data.getCaseDetails();
         PdfAppealDetails pdfAppealDetails = getPdfAppealDetails(caseId, caseDetails);
         log.info("Storing pdf for [" + caseId + "]");
-        byte[] pdfBytes = pdfService.createPdf(getPdfContent(caseDetails, onlineHearingId, pdfAppealDetails), pdfTemplatePath);
+        byte[] pdfBytes = pdfService.createPdf(getPdfContent(data, onlineHearingId, pdfAppealDetails), pdfTemplatePath);
 
         SscsCaseData caseData = caseDetails.getData();
         String pdfName = getPdfName(documentNamePrefix, caseData.getCaseReference());
@@ -107,5 +110,5 @@ public abstract class StorePdfService<E> {
 
     protected abstract String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId);
 
-    protected abstract E getPdfContent(SscsCaseDetails caseDetails, String onlineHearingId, PdfAppealDetails appealDetails);
+    protected abstract E getPdfContent(D data, String onlineHearingId, PdfAppealDetails appealDetails);
 }
