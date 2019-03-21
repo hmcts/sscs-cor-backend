@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfSummaryBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohConversations;
@@ -16,7 +17,7 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Slf4j
 @Service
-public class StoreOnlineHearingService extends StorePdfService<PdfSummary> {
+public class StoreOnlineHearingService extends StorePdfService<PdfSummary, PdfData> {
     private final CohService cohService;
     private final PdfSummaryBuilder pdfSummaryBuilder;
 
@@ -39,7 +40,7 @@ public class StoreOnlineHearingService extends StorePdfService<PdfSummary> {
     }
 
     @Override
-    protected PdfSummary getPdfContent(SscsCaseDetails caseDetails, String onlineHearingId, PdfAppealDetails appealDetails) {
+    protected PdfSummary getPdfContent(PdfData caseDetails, String onlineHearingId, PdfAppealDetails appealDetails) {
         CohConversations conversations = cohService.getConversations(onlineHearingId);
         return pdfSummaryBuilder.buildPdfSummary(conversations, appealDetails);
 

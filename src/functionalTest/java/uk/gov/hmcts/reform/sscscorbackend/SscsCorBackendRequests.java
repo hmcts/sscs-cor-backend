@@ -178,4 +178,15 @@ public class SscsCorBackendRequests {
 
         assertThat(resolveHearingResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
     }
+
+    public void uploadAppellantStatement(String hearingId, String statement) throws IOException {
+        String uri = baseUrl + "/continuous-online-hearings/" + hearingId + "/statement";
+        HttpResponse getQuestionResponse = client.execute(post(
+                uri)
+                .setEntity(new StringEntity("{\"body\":\"" + statement + "\"}", APPLICATION_JSON))
+                .build()
+        );
+
+        assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+    }
 }

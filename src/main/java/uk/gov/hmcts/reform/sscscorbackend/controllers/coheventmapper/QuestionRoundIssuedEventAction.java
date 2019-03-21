@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StorePdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreQuestionsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
 
 @Service
 public class QuestionRoundIssuedEventAction implements CohEventAction {
@@ -25,7 +26,7 @@ public class QuestionRoundIssuedEventAction implements CohEventAction {
 
     @Override
     public CohEventActionContext createAndStorePdf(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
-        return storeQuestionsPdfService.storePdf(caseId, onlineHearingId, caseDetails);
+        return storeQuestionsPdfService.storePdf(caseId, onlineHearingId, new PdfData(caseDetails));
     }
 
     @Override

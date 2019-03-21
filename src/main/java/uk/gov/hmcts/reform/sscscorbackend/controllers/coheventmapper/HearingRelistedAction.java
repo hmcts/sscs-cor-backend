@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 
 @Service
@@ -35,7 +36,7 @@ public class HearingRelistedAction implements CohEventAction {
 
     @Override
     public CohEventActionContext createAndStorePdf(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
-        return storeOnlineHearingService.storePdf(caseId, onlineHearingId, caseDetails);
+        return storeOnlineHearingService.storePdf(caseId, onlineHearingId, new PdfData(caseDetails));
     }
 
     @Override
