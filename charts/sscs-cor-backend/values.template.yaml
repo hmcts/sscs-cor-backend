@@ -13,7 +13,7 @@ java:
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
     IDAM_OAUTH2_CLIENT_SECRET: ${IDAM_OAUTH2_CLIENT_SECRET}
     IDAM_OAUTH2_REDIRECT_URL: https://sscs-case-loader-sandbox.service.core-compute-sandbox.internal
-    IDAM_URL: https://preprod-idamapi.reform.hmcts.net:3511
+    IDAM_URL: https://idam-api.aat.platform.hmcts.net
     IDAM_SSCS_URL: https://evidence-sharing-preprod.sscs.reform.hmcts.net
     CREATE_CCD_ENDPOINT: true
     ENABLE_DEBUG_ERROR_MESSAGE: true
