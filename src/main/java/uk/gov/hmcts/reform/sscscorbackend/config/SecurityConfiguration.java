@@ -22,17 +22,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .sessionManagement()
+        http.sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilter(filter)
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/swagger-ui.html", "/swagger-resources/**", "/webjars/**", "/v2/api-docs").anonymous()
-                .antMatchers("/health").anonymous()
-                .antMatchers("/notify/onlinehearing").anonymous()
-                .antMatchers("/case").anonymous()
-                .anyRequest().authenticated();
+                .antMatchers("/continuous-online-hearings/**").authenticated();
     }
 }
