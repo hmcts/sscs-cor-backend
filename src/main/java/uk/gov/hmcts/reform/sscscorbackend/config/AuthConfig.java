@@ -10,10 +10,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
 import uk.gov.hmcts.reform.auth.checker.core.service.Service;
 import uk.gov.hmcts.reform.auth.checker.core.user.User;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.AuthCheckerServiceAndUserFilter;
 
 @Configuration
 public class AuthConfig {
@@ -23,7 +23,7 @@ public class AuthConfig {
             @Qualifier("serviceRequestAuthorizer") RequestAuthorizer<Service> serviceRequestAuthorizer,
             RequestAuthorizer<User> userRequestAuthorizer) {
         AuthCheckerServiceAndUserFilter filter
-                = new AuthCheckerServiceAndUserFilter(serviceRequestAuthorizer, userRequestAuthorizer);
+                = new AuthCheckerServiceAndUserFilter(serviceRequestAuthorizer, userRequestAuthorizer, new AntPathRequestMatcher("/continuous-online-hearings/**"));
 
         filter.setAuthenticationManager(authenticationManager);
 
