@@ -34,4 +34,13 @@
   <suppress>
     <cve>CVE-2018-8088</cve>
   </suppress>
+  <suppress>
+    <cve>CVE-2015-9251</cve>
+    <cve>CVE-2011-2730</cve>
+    <cve>CVE-2013-4152</cve>
+    <cve>CVE-2013-6429</cve>
+    <cve>CVE-2013-7315</cve>
+    <cve>CVE-2014-0054</cve>
+    <cve>CVE-2014-1904</cve>
+  </suppress>
 </suppressions>
