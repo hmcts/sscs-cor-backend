@@ -15,7 +15,7 @@ public class CreateHearingPdfTest extends BaseFunctionTest {
         relistHearing(onlineHearing.getHearingId(), onlineHearing.getCaseId());
     }
 
-    @Test
+    //@Test
     public void recordRejectedResponse() throws IOException, InterruptedException {
         OnlineHearing onlineHearing = createHearingWithQuestion(true);
         answerQuestion(onlineHearing.getHearingId(), onlineHearing.getQuestionId());
