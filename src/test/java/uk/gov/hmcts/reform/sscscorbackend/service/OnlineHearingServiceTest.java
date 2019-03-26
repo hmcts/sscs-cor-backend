@@ -249,6 +249,7 @@ public class OnlineHearingServiceTest {
     @Test
     public void loadOnlineHearingIncludsFinalDecision() {
         SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "online");
+        sscsCaseDetails.getData().setIsCorDecision("YES");
 
         when(cohService.getOnlineHearing(someCaseId)).thenReturn(DataFixtures.someCohOnlineHearings());
         when(ccdService.getHistoryEvents(someCaseId)).thenReturn(singletonList(new CcdHistoryEvent(EventType.FINAL_DECISION.getCcdType())));
