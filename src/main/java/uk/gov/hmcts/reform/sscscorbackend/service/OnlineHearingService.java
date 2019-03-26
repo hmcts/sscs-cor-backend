@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -170,9 +169,8 @@ public class OnlineHearingService {
                 .map(onlineHearing -> {
                     Name name = sscsCaseDeails.getData().getAppeal().getAppellant().getName();
                     String nameString = name.getFirstName() + " " + name.getLastName();
-
-                    boolean hasFinalDecision = historyEvents.stream()
-                                    .anyMatch(event -> EventType.FINAL_DECISION == event.getEventType());
+                    
+                    boolean hasFinalDecision = sscsCaseDeails.getData().isCorDecision();
 
                     return new OnlineHearing(
                             onlineHearing.getOnlineHearingId(),
