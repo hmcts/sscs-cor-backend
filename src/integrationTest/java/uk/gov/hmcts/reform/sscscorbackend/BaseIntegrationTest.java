@@ -75,6 +75,8 @@ public abstract class BaseIntegrationTest {
     @After
     public void shutdownStubs() {
         stubs.forEach(BaseStub::shutdown);
-        mailStub.stop();
+        if (mailStub != null) {
+            mailStub.stop();
+        }
     }
 }
