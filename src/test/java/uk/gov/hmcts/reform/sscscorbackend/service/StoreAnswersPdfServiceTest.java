@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
 import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionRound;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 public class StoreAnswersPdfServiceTest {
@@ -36,7 +37,7 @@ public class StoreAnswersPdfServiceTest {
         QuestionRound questionRound = DataFixtures.someQuestionRound();
         when(questionService.getQuestions(onlineHearingId)).thenReturn(questionRound);
         PdfAppealDetails appealDetails = mock(PdfAppealDetails.class);
-        PdfQuestionsSummary pdfQuestionsSummary = storeQuestionsPdfService.getPdfContent(mock(SscsCaseDetails.class), onlineHearingId, appealDetails);
+        PdfQuestionsSummary pdfQuestionsSummary = storeQuestionsPdfService.getPdfContent(mock(PdfData.class), onlineHearingId, appealDetails);
 
         assertThat(pdfQuestionsSummary, is(new PdfQuestionsSummary(appealDetails, questionRound.getQuestions())));
     }

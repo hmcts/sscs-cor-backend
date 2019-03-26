@@ -6,9 +6,10 @@ import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionRound;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
-public abstract class AbstractQuestionPdfService extends StorePdfService<PdfQuestionsSummary> {
+public abstract class AbstractQuestionPdfService extends StorePdfService<PdfQuestionsSummary, PdfData> {
     private final QuestionService questionService;
 
     @SuppressWarnings("squid:S00107")
@@ -32,7 +33,7 @@ public abstract class AbstractQuestionPdfService extends StorePdfService<PdfQues
     abstract String documentNamePrefix();
 
     @Override
-    protected PdfQuestionsSummary getPdfContent(SscsCaseDetails caseDetails, String onlineHearingId, PdfAppealDetails appealDetails) {
+    protected PdfQuestionsSummary getPdfContent(PdfData data, String onlineHearingId, PdfAppealDetails appealDetails) {
         QuestionRound questions = questionService.getQuestions(onlineHearingId);
         return new PdfQuestionsSummary(appealDetails, questions.getQuestions());
     }

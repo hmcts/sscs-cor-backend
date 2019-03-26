@@ -10,11 +10,12 @@ import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Slf4j
 @Service
-public class StoreOnlineHearingTribunalsViewService extends StorePdfService<OnlineHearing> {
+public class StoreOnlineHearingTribunalsViewService extends StorePdfService<OnlineHearing, PdfData> {
 
     public static final String TRIBUNALS_VIEW_PDF_PREFIX = "Tribunals view - ";
     private final OnlineHearingService onlineHearingService;
@@ -41,7 +42,8 @@ public class StoreOnlineHearingTribunalsViewService extends StorePdfService<Onli
     }
 
     @Override
-    protected OnlineHearing getPdfContent(SscsCaseDetails caseDetails, String onlineHearingId, PdfAppealDetails appealDetails) {
+    protected OnlineHearing getPdfContent(PdfData data, String onlineHearingId, PdfAppealDetails appealDetails) {
+        SscsCaseDetails caseDetails = data.getCaseDetails();
         Optional<OnlineHearing> optionalOnlineHearing = onlineHearingService.loadOnlineHearingFromCoh(caseDetails);
         OnlineHearing onlineHearing = optionalOnlineHearing.orElseThrow(() -> new IllegalArgumentException("Cannot find online hearing for case id [" + caseDetails.getId() + "]"));
 

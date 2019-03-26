@@ -115,6 +115,19 @@ public class OnlineHearingService {
         return (onlineHearing != null) ? Optional.of(onlineHearing.getCcdCaseId()) : Optional.empty();
     }
 
+    public Optional<SscsCaseDetails> getCcdCase(String onlineHearingId) {
+        return getCcdCaseId(onlineHearingId).map(caseId -> {
+            IdamTokens idamTokens = idamService.getIdamTokens();
+            SscsCaseDetails caseDetails = ccdService.getByCaseId(caseId, idamTokens);
+
+            if (caseDetails == null) {
+                throw new IllegalStateException("Online hearing for ccdCaseId [" + caseId + "] found but cannot find the case in CCD");
+            }
+
+            return caseDetails;
+        });
+    }
+
     public void addDecisionReply(String onlineHearingId, TribunalViewResponse tribunalViewResponse) {
         CohDecisionReply cohDecisionReply = new CohDecisionReply(tribunalViewResponse.getReply(), tribunalViewResponse.getReason());
         cohClient.addDecisionReply(onlineHearingId, cohDecisionReply);

@@ -51,7 +51,6 @@ public class EvidenceUploadServiceTest {
         someEvidenceId = "someEvidenceId";
 
         someCcdCaseId = 123L;
-        when(onlineHearingService.getCcdCaseId(someOnlineHearingId)).thenReturn(Optional.of(someCcdCaseId));
 
         IdamService idamService = mock(IdamService.class);
         idamTokens = mock(IdamTokens.class);
@@ -76,7 +75,7 @@ public class EvidenceUploadServiceTest {
     public void uploadsEvidenceAndAddsItToDraftSscsDocumentsInCcd() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
         final int originalNumberOfSscsDocuments = sscsCaseDetails.getData().getDraftSscsDocument().size();
-        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
+        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftHearingEvidence(someOnlineHearingId, file);
 
@@ -96,7 +95,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void submitsEvidenceAddsDraftSscsDocumentsToSscsDocumentsInCcdWhenThereAreNoSscsDocuments() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
-        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
+        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         boolean submittedEvidence = evidenceUploadService.submitHearingEvidence(someOnlineHearingId);
 
@@ -126,7 +125,7 @@ public class EvidenceUploadServiceTest {
         sscsCaseDetails.getData().setSscsDocument(list);
 
         final int originalNumberOfSscsDocuments = sscsCaseDetails.getData().getSscsDocument().size();
-        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
+        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         boolean submittedEvidence = evidenceUploadService.submitHearingEvidence(someOnlineHearingId);
 
@@ -144,7 +143,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void uploadsEvidenceWhenThereAreNotAlreadySscsDocumentsInCcd() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
-        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
+        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftHearingEvidence(someOnlineHearingId, file);
 
@@ -164,26 +163,18 @@ public class EvidenceUploadServiceTest {
     @Test
     public void uploadEvidenceForAHearingThatDoesNotExist() {
         String nonExistentHearingId = "nonExistentHearingId";
-        when(onlineHearingService.getCcdCaseId(nonExistentHearingId)).thenReturn(Optional.empty());
+        when(onlineHearingService.getCcdCase(nonExistentHearingId)).thenReturn(Optional.empty());
 
         Optional<Evidence> evidence = evidenceUploadService.uploadDraftHearingEvidence(nonExistentHearingId, file);
 
         assertThat(evidence.isPresent(), is(false));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void uploadEvidenceForACaseThatDoesNotExistInCcd() {
-        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(null);
-
-        evidenceUploadService.uploadDraftHearingEvidence(someOnlineHearingId, file);
-    }
-
-
     @Test
     public void uploadsEvidenceToQuestionAndAddsItToCorDocumentsInCcd() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
         final int originalNumberOfCorDocuments = sscsCaseDetails.getData().getCorDocument().size();
-        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
+        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         Optional<Evidence> evidenceOptional = evidenceUploadService.uploadQuestionEvidence(someOnlineHearingId, someQuestionId, file);
 
@@ -203,7 +194,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void uploadsEvidenceToQuestionWhenThereAreNotAlreadyCorDocumentsInCcd() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
-        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
+        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         Optional<Evidence> evidenceOptional = evidenceUploadService.uploadQuestionEvidence(someOnlineHearingId, someQuestionId, file);
 
@@ -223,24 +214,17 @@ public class EvidenceUploadServiceTest {
     @Test
     public void uploadEvidenceToQuestionForAHearingThatDoesNotExist() {
         String nonExistentHearingId = "nonExistentHearingId";
-        when(onlineHearingService.getCcdCaseId(nonExistentHearingId)).thenReturn(Optional.empty());
+        when(onlineHearingService.getCcdCase(nonExistentHearingId)).thenReturn(Optional.empty());
 
         Optional<Evidence> evidence = evidenceUploadService.uploadQuestionEvidence(nonExistentHearingId, someQuestionId, file);
 
         assertThat(evidence.isPresent(), is(false));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void uploadEvidenceToQuestionForACaseThatDoesNotExistInCcd() {
-        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(null);
-
-        evidenceUploadService.uploadQuestionEvidence(someOnlineHearingId, someQuestionId, file);
-    }
-
     @Test
     public void listEvidence() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
-        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
+        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
 
         List<Evidence> evidenceList = evidenceUploadService.listQuestionEvidence(someOnlineHearingId, someQuestionId);
@@ -252,7 +236,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void listEvidenceWhenNoEvidenceHasBeenUploaded() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
-        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
+        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         List<Evidence> evidenceList = evidenceUploadService.listQuestionEvidence(someOnlineHearingId, someQuestionId);
 
@@ -262,7 +246,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void listEvidenceWhenEvidenceHasOnlyBeenUploadedForOtherQuestions() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails("someOtherQuestionId", fileName, documentUrl, evidenceCreatedOn);
-        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
+        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         List<Evidence> evidenceList = evidenceUploadService.listQuestionEvidence(someOnlineHearingId, someQuestionId);
 
@@ -272,24 +256,17 @@ public class EvidenceUploadServiceTest {
     @Test
     public void listEvidenceForAHearingThatDoesNotExist() {
         String nonExistentHearingId = "nonExistentHearingId";
-        when(onlineHearingService.getCcdCaseId(nonExistentHearingId)).thenReturn(Optional.empty());
+        when(onlineHearingService.getCcdCase(nonExistentHearingId)).thenReturn(Optional.empty());
 
         List<Evidence> evidenceList = evidenceUploadService.listQuestionEvidence(nonExistentHearingId, someQuestionId);
 
         assertThat(evidenceList, is(emptyList()));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void listEvidenceForACaseThatDoesNotExistInCcd() {
-        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(null);
-
-        evidenceUploadService.listQuestionEvidence(someOnlineHearingId, someQuestionId);
-    }
-
     @Test
     public void deleteEvidenceFromCcd() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
-        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
+        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(someOnlineHearingId, someEvidenceId);
 
@@ -307,7 +284,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void deleteEvidenceIfCaseHadNoEvidence() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
-        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
+        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(someOnlineHearingId, someEvidenceId);
 
@@ -318,7 +295,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void deleteEvidenceForAHearingThatDoesNotExist() {
         String nonExistentHearingId = "nonExistentHearingId";
-        when(onlineHearingService.getCcdCaseId(nonExistentHearingId)).thenReturn(Optional.empty());
+        when(onlineHearingService.getCcdCase(nonExistentHearingId)).thenReturn(Optional.empty());
 
         boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(nonExistentHearingId, someEvidenceId);
 
@@ -328,7 +305,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void deleteEvidenceForQuestionFromCcd() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
-        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
+        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         boolean hearingFound = evidenceUploadService.deleteQuestionEvidence(someOnlineHearingId, someEvidenceId);
 
@@ -346,7 +323,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void deleteEvidenceForQuestionIfCaseHadNoCohEvidence() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
-        when(ccdService.getByCaseId(someCcdCaseId, idamTokens)).thenReturn(sscsCaseDetails);
+        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         boolean hearingFound = evidenceUploadService.deleteQuestionEvidence(someOnlineHearingId, someEvidenceId);
 
@@ -357,7 +334,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void deleteEvidenceForQuestionForAHearingThatDoesNotExist() {
         String nonExistentHearingId = "nonExistentHearingId";
-        when(onlineHearingService.getCcdCaseId(nonExistentHearingId)).thenReturn(Optional.empty());
+        when(onlineHearingService.getCcdCase(nonExistentHearingId)).thenReturn(Optional.empty());
 
         boolean hearingFound = evidenceUploadService.deleteQuestionEvidence(nonExistentHearingId, someEvidenceId);
 
@@ -422,6 +399,7 @@ public class EvidenceUploadServiceTest {
 
     private SscsCaseDetails createSscsCaseDetails(String someQuestionId, String fileName, String documentUrl, Date evidenceCreatedOn) {
         return SscsCaseDetails.builder()
+                .id(someCcdCaseId)
                 .data(SscsCaseData.builder()
                         .corDocument(singletonList(CorDocument.builder()
                                 .value(CorDocumentDetails.builder()
@@ -449,7 +427,7 @@ public class EvidenceUploadServiceTest {
     }
 
     private SscsCaseDetails createSscsCaseDetailsWithoutCcdDocuments() {
-        return SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build();
+        return SscsCaseDetails.builder().id(someCcdCaseId).data(SscsCaseData.builder().build()).build();
     }
 
     private String convertCreatedOnDate(Date date) {

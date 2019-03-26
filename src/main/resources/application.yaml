@@ -68,6 +68,10 @@ answer:
   html:
     template:
       path: /templates/answers.html
+personalStatement:
+  html:
+    template:
+      path: /templates/personalStatement.html
 
 
 appeal:
