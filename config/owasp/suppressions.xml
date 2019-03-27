@@ -46,4 +46,7 @@
   <suppress>
     <cve>CVE-2018-1000539</cve>
   </suppress>
+  <suppress>
+    <cve>CVE-2018-1258</cve>
+  </suppress>
 </suppressions>
