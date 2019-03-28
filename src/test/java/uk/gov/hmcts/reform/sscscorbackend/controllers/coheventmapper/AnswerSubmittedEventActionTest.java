@@ -8,7 +8,7 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
-import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.service.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreAnswersPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
@@ -18,9 +18,9 @@ public class AnswerSubmittedEventActionTest {
     public void canSendPdf() {
         CorEmailService corEmailService = mock(CorEmailService.class);
         StoreAnswersPdfService storeAnswersPdfService = mock(StoreAnswersPdfService.class);
-        DwpEmailMessageBuilder dwpEmailMessageBuilder = mock(DwpEmailMessageBuilder.class);
+        EmailMessageBuilder emailMessageBuilder = mock(EmailMessageBuilder.class);
 
-        AnswerSubmittedEventAction answerSubmittedEventAction = new AnswerSubmittedEventAction(corEmailService, storeAnswersPdfService, dwpEmailMessageBuilder);
+        AnswerSubmittedEventAction answerSubmittedEventAction = new AnswerSubmittedEventAction(corEmailService, storeAnswersPdfService, emailMessageBuilder);
 
         String someCaseReference = "someCaseReference";
         SscsCaseDetails caseDetails = SscsCaseDetails.builder()
@@ -30,7 +30,7 @@ public class AnswerSubmittedEventActionTest {
         String onlineHearingId = "onlineHearingId";
         String pdfName = "pdf_name.pdf";
         CohEventActionContext cohEventActionContext = new CohEventActionContext(new Pdf(new byte[]{2, 5, 6, 0, 1}, pdfName), caseDetails);
-        when(dwpEmailMessageBuilder.getAnswerMessage(caseDetails)).thenReturn("some message");
+        when(emailMessageBuilder.getAnswerMessage(caseDetails)).thenReturn("some message");
 
         CohEventActionContext result = answerSubmittedEventAction.handle(caseId, onlineHearingId, cohEventActionContext);
 
