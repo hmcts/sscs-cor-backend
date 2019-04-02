@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
-import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.service.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StorePdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreQuestionsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
@@ -14,14 +14,14 @@ import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
 public class QuestionRoundIssuedEventAction implements CohEventAction {
     private final StoreQuestionsPdfService storeQuestionsPdfService;
     private final CorEmailService corEmailService;
-    private final DwpEmailMessageBuilder dwpEmailMessageBuilder;
+    private final EmailMessageBuilder emailMessageBuilder;
 
     public QuestionRoundIssuedEventAction(StoreQuestionsPdfService storeQuestionsPdfService,
                                           CorEmailService corEmailService,
-                                          DwpEmailMessageBuilder dwpEmailMessageBuilder) {
+                                          EmailMessageBuilder emailMessageBuilder) {
         this.storeQuestionsPdfService = storeQuestionsPdfService;
         this.corEmailService = corEmailService;
-        this.dwpEmailMessageBuilder = dwpEmailMessageBuilder;
+        this.emailMessageBuilder = emailMessageBuilder;
     }
 
     @Override
@@ -50,7 +50,7 @@ public class QuestionRoundIssuedEventAction implements CohEventAction {
     }
 
     private String getDwpEmailMessage(SscsCaseDetails sscsCaseDetails) {
-        return dwpEmailMessageBuilder.getQuestionMessage(sscsCaseDetails);
+        return emailMessageBuilder.getQuestionMessage(sscsCaseDetails);
     }
 
     private String getDwpEmailSubject(SscsCaseDetails sscsCaseDetails) {

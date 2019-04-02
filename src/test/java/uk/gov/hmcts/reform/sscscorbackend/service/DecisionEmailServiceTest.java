@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
 public class DecisionEmailServiceTest {
 
     private CorEmailService corEmailService;
-    private DwpEmailMessageBuilder dwpEmailMessageBuilder;
+    private EmailMessageBuilder emailMessageBuilder;
     private DecisionEmailService decisionEmailService;
     private String messageBody;
     private String caseReference;
@@ -20,8 +20,8 @@ public class DecisionEmailServiceTest {
     @Before
     public void setUp() {
         corEmailService = mock(CorEmailService.class);
-        dwpEmailMessageBuilder = mock(DwpEmailMessageBuilder.class);
-        decisionEmailService = new DecisionEmailService(corEmailService, dwpEmailMessageBuilder);
+        emailMessageBuilder = mock(EmailMessageBuilder.class);
+        decisionEmailService = new DecisionEmailService(corEmailService, emailMessageBuilder);
         messageBody = "message body";
         caseReference = "caseReference";
         caseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().caseReference(caseReference).build()).build();
@@ -30,7 +30,7 @@ public class DecisionEmailServiceTest {
     @Test
     public void sendsDwpAndCaseworkerEmailWhenDecisionAccepted() {
         SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().caseReference(caseReference).build()).build();
-        when(dwpEmailMessageBuilder.getDecisionAcceptedMessage(caseDetails)).thenReturn(messageBody);
+        when(emailMessageBuilder.getDecisionAcceptedMessage(caseDetails)).thenReturn(messageBody);
         TribunalViewResponse tribunalViewResponse = new TribunalViewResponse("decision_accepted", "reason");
 
         decisionEmailService.sendEmail(caseDetails, tribunalViewResponse);
@@ -45,7 +45,7 @@ public class DecisionEmailServiceTest {
     public void sendsCaseworkerEmailWhenDecisionRejected() {
         String reason = "reason";
         TribunalViewResponse tribunalViewResponse = new TribunalViewResponse("decision_rejected", reason);
-        when(dwpEmailMessageBuilder.getDecisionRejectedMessage(caseDetails, reason)).thenReturn(messageBody);
+        when(emailMessageBuilder.getDecisionRejectedMessage(caseDetails, reason)).thenReturn(messageBody);
 
         decisionEmailService.sendEmail(caseDetails, tribunalViewResponse);
 

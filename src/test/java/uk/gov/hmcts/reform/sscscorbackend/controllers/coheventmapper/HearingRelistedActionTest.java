@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
-import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.service.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
@@ -29,7 +29,7 @@ public class HearingRelistedActionTest {
     private String onlineHearingId;
     private HearingRelistedAction underTest;
     private CorEmailService corEmailService;
-    private DwpEmailMessageBuilder dwpEmailMessageBuilder;
+    private EmailMessageBuilder emailMessageBuilder;
 
     @Before
     public void setUp() {
@@ -41,8 +41,8 @@ public class HearingRelistedActionTest {
         onlineHearingId = "onlineHearingId";
         corEmailService = mock(CorEmailService.class);
 
-        dwpEmailMessageBuilder = mock(DwpEmailMessageBuilder.class);
-        underTest = new HearingRelistedAction(mock(StoreOnlineHearingService.class), corCcdService, idamService, corEmailService, dwpEmailMessageBuilder);
+        emailMessageBuilder = mock(EmailMessageBuilder.class);
+        underTest = new HearingRelistedAction(mock(StoreOnlineHearingService.class), corCcdService, idamService, corEmailService, emailMessageBuilder);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class HearingRelistedActionTest {
                 .build();
         Pdf pdf = mock(Pdf.class);
         CohEventActionContext cohEventActionContext = new CohEventActionContext(pdf, sscsCaseDetails);
-        when(dwpEmailMessageBuilder.getRelistedMessage(sscsCaseDetails)).thenReturn("message body");
+        when(emailMessageBuilder.getRelistedMessage(sscsCaseDetails)).thenReturn("message body");
 
         CohEventActionContext result = underTest.handle(caseId, onlineHearingId, cohEventActionContext);
 

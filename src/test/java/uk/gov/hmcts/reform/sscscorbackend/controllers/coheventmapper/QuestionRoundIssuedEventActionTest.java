@@ -9,7 +9,7 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
-import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.service.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreQuestionsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 
@@ -18,16 +18,16 @@ public class QuestionRoundIssuedEventActionTest {
     private QuestionRoundIssuedEventAction questionRoundIssuedEventAction;
     private Long caseId;
     private String hearingId;
-    private DwpEmailMessageBuilder dwpEmailMessageBuilder;
+    private EmailMessageBuilder emailMessageBuilder;
 
     @Before
     public void setUp() {
         StoreQuestionsPdfService storeQuestionsPdfService = mock(StoreQuestionsPdfService.class);
         corEmailService = mock(CorEmailService.class);
-        dwpEmailMessageBuilder = mock(DwpEmailMessageBuilder.class);
+        emailMessageBuilder = mock(EmailMessageBuilder.class);
         questionRoundIssuedEventAction = new QuestionRoundIssuedEventAction(
                 storeQuestionsPdfService, corEmailService,
-                dwpEmailMessageBuilder);
+                emailMessageBuilder);
         caseId = 123456L;
         hearingId = "someHearingId";
     }
@@ -43,7 +43,7 @@ public class QuestionRoundIssuedEventActionTest {
                 .build();
         when(cohEventActionContext.getDocument()).thenReturn(sscsCaseDetails);
         String message = "message";
-        when(dwpEmailMessageBuilder.getQuestionMessage(sscsCaseDetails)).thenReturn(message);
+        when(emailMessageBuilder.getQuestionMessage(sscsCaseDetails)).thenReturn(message);
 
         CohEventActionContext result = questionRoundIssuedEventAction.handle(caseId, hearingId, cohEventActionContext);
 
