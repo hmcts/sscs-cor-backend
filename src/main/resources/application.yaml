@@ -17,6 +17,15 @@ coh:
 notifications:
   url: ${NOTIFICATIONS_API_URL:http://localhost:8082}
 
+auth:
+  idam:
+    client:
+      baseUrl: ${IDAM_URL:http://localhost:4501}
+  provider:
+    service:
+      client:
+        baseUrl: ${IDAM_S2S_AUTH:http://localhost:4502}
+
 idam:
   url: ${IDAM_URL:http://localhost:4501}
   s2s-auth:
@@ -68,6 +77,10 @@ answer:
   html:
     template:
       path: /templates/answers.html
+personalStatement:
+  html:
+    template:
+      path: /templates/personalStatement.html
 
 
 appeal:
@@ -85,7 +98,7 @@ appeal:
 
 enable_debug_error_message: ${ENABLE_DEBUG_ERROR_MESSAGE:true}
 enable_select_by_case_id: ${ENABLE_SELECT_BY_CASE_ID:false}
-enable_coh_event_thread_pool: ${ENABLE_COH_EVENT_THREAD_POOL:false}
+enable_coh_event_thread_pool: ${ENABLE_COH_EVENT_THREAD_POOL:true}
 
 feign:
   client:

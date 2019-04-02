@@ -7,12 +7,12 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfSummaryBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohConversations;
@@ -49,7 +49,7 @@ public class StoreOnlineHearingServiceTest {
         PdfSummary expectedPdfSummary = mock(PdfSummary.class);
         when(pdfSummaryBuilder.buildPdfSummary(conversations, pdfAppealDetails)).thenReturn(expectedPdfSummary);
 
-        PdfSummary pdfSummary = underTest.getPdfContent(mock(SscsCaseDetails.class), someOnlineHearingId, pdfAppealDetails);
+        PdfSummary pdfSummary = underTest.getPdfContent(mock(PdfData.class), someOnlineHearingId, pdfAppealDetails);
 
         assertThat(pdfSummary, is(expectedPdfSummary));
     }

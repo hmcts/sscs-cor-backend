@@ -5,7 +5,6 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohAnswers;
 
-import io.restassured.RestAssured;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohQuestionReference;
@@ -26,9 +25,7 @@ public class ListQuestionsTest extends BaseIntegrationTest {
         cohStub.stubGetOnlineHearing(caseId, hearingId);
         ccdStub.stubFindCaseByCaseId(caseId, "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
 
-        RestAssured.baseURI = "http://localhost:" + applicationPort;
-        RestAssured.given()
-                .when()
+        getRequest().when()
                 .get("/continuous-online-hearings/" + hearingId)
                 .then()
                 .statusCode(HttpStatus.OK.value())

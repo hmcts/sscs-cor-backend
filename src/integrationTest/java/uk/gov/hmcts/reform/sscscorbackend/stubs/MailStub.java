@@ -73,4 +73,12 @@ public class MailStub {
         List<SmtpMessage> receivedEmails = smtpServer.getReceivedEmails();
         assertThat(receivedEmails, is(empty()));
     }
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        new MailStub(1025);
+
+        while (true) {
+            Thread.sleep(50000L);
+        }
+    }
 }

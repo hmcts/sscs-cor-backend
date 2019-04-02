@@ -7,11 +7,12 @@ import java.io.IOException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class EvidenceUploadTest extends BaseFunctionTest {
     @Test
-    public void uploadThenDeleteEvidence() throws IOException, InterruptedException, JSONException {
+    public void uploadThenDeleteEvidenceToQuestion() throws IOException, InterruptedException, JSONException {
         OnlineHearing hearingWithQuestion = createHearingWithQuestion(true);
 
         JSONObject questionResponse = sscsCorBackendRequests.getQuestion(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId());
@@ -31,5 +32,28 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         sscsCorBackendRequests.deleteEvidence(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId(), evidenceId);
         questionResponse = sscsCorBackendRequests.getQuestion(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId());
         assertThat(questionResponse.has("evidence"), is(false));
+    }
+
+    @Ignore
+    @Test
+    public void uploadThenDeleteEvidenceToHearing() throws IOException, InterruptedException, JSONException {
+        OnlineHearing hearingWithQuestion = createHearing(true);
+
+        JSONArray draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(hearingWithQuestion.getHearingId());
+        assertThat(draftHearingEvidence.length(), is(0));
+
+        String fileName = "evidence.png";
+        sscsCorBackendRequests.uploadHearingEvidence(hearingWithQuestion.getHearingId(), fileName);
+
+
+        draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(hearingWithQuestion.getHearingId());
+        assertThat(draftHearingEvidence.length(), is(1));
+        assertThat(draftHearingEvidence.getJSONObject(0).getString("file_name"), is(fileName));
+
+        String evidenceId = draftHearingEvidence.getJSONObject(0).getString("id");
+
+        sscsCorBackendRequests.deleteHearingEvidence(hearingWithQuestion.getHearingId(), evidenceId);
+        draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(hearingWithQuestion.getHearingId());
+        assertThat(draftHearingEvidence.length(), is(0));
     }
 }

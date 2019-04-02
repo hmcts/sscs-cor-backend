@@ -173,6 +173,40 @@ public class OnlineHearingServiceTest {
         assertThat(ccdCaseId.get(), is(cohOnlineHearing.getCcdCaseId()));
     }
 
+    @Test
+    public void getsACcdCaseFromAHearing() {
+        String onlineHearingId = "someOnlineHearingId";
+        CohOnlineHearing cohOnlineHearing = someCohOnlineHearing();
+        when(cohService.getOnlineHearing(onlineHearingId)).thenReturn(cohOnlineHearing);
+        SscsCaseDetails caseDetails = createCaseDetails(someCaseId, "someCaseReference", "firstName", "lastName");
+        when(ccdService.getByCaseId(cohOnlineHearing.getCcdCaseId(), idamTokens)).thenReturn(caseDetails);
+
+        Optional<SscsCaseDetails> sscsCaseDetails = underTest.getCcdCase(onlineHearingId);
+
+        assertThat(sscsCaseDetails.isPresent(), is(true));
+        assertThat(sscsCaseDetails.get(), is(caseDetails));
+    }
+
+    @Test
+    public void getsACcdCaseButCannotFindHearing() {
+        String onlineHearingId = "someOnlineHearingId";
+        when(cohService.getOnlineHearing(onlineHearingId)).thenReturn(null);
+
+        Optional<SscsCaseDetails> sscsCaseDetails = underTest.getCcdCase(onlineHearingId);
+
+        assertThat(sscsCaseDetails.isPresent(), is(false));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void cannotACcdCaseFromAHearing() {
+        String onlineHearingId = "someOnlineHearingId";
+        CohOnlineHearing cohOnlineHearing = someCohOnlineHearing();
+        when(cohService.getOnlineHearing(onlineHearingId)).thenReturn(cohOnlineHearing);
+        when(ccdService.getByCaseId(cohOnlineHearing.getCcdCaseId(), idamTokens)).thenReturn(null);
+
+        underTest.getCcdCase(onlineHearingId);
+    }
+
     @Test(expected = IllegalStateException.class)
     public void exceptionWhenGettingAHearingIfThereIsMoreThanOneCaseWithAnOnlinePanel() {
         SscsCaseDetails caseDetails1 = createCaseDetails(someCaseId, "someCaseReference", "firstName", "lastName");
@@ -215,6 +249,7 @@ public class OnlineHearingServiceTest {
     @Test
     public void loadOnlineHearingIncludsFinalDecision() {
         SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "online");
+        sscsCaseDetails.getData().setIsCorDecision("YES");
 
         when(cohService.getOnlineHearing(someCaseId)).thenReturn(DataFixtures.someCohOnlineHearings());
         when(ccdService.getHistoryEvents(someCaseId)).thenReturn(singletonList(new CcdHistoryEvent(EventType.FINAL_DECISION.getCcdType())));

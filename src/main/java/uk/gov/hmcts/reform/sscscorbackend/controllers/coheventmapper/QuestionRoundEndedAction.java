@@ -2,24 +2,25 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
-import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.service.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StorePdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
 
 public abstract class QuestionRoundEndedAction implements CohEventAction {
-    protected final StorePdfService storePdfService;
+    protected final StorePdfService<?, PdfData> storePdfService;
     protected final CorEmailService corEmailService;
-    protected final DwpEmailMessageBuilder dwpEmailMessageBuilder;
+    protected final EmailMessageBuilder emailMessageBuilder;
 
-    public QuestionRoundEndedAction(StorePdfService storeQuestionsPdfService, CorEmailService corEmailService, DwpEmailMessageBuilder dwpEmailMessageBuilder) {
+    public QuestionRoundEndedAction(StorePdfService<?, PdfData> storeQuestionsPdfService, CorEmailService corEmailService, EmailMessageBuilder emailMessageBuilder) {
         this.storePdfService = storeQuestionsPdfService;
         this.corEmailService = corEmailService;
-        this.dwpEmailMessageBuilder = dwpEmailMessageBuilder;
+        this.emailMessageBuilder = emailMessageBuilder;
     }
 
     @Override
     public CohEventActionContext createAndStorePdf(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
-        return storePdfService.storePdf(caseId, onlineHearingId, caseDetails);
+        return storePdfService.storePdf(caseId, onlineHearingId, new PdfData(caseDetails));
     }
 
     @Override
@@ -29,7 +30,7 @@ public abstract class QuestionRoundEndedAction implements CohEventAction {
         corEmailService.sendPdfToDwp(
                 cohEventActionContext,
                 getDwpEmailSubject(caseReference),
-                dwpEmailMessageBuilder.getAnswerMessage(sscsCaseDetails)
+                emailMessageBuilder.getAnswerMessage(sscsCaseDetails)
         );
 
         return cohEventActionContext;

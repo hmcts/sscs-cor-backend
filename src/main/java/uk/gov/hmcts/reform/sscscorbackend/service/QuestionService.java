@@ -29,7 +29,7 @@ public class QuestionService {
         CohQuestion question = cohService.getQuestion(onlineHearingId, questionId);
         if (question != null) {
             List<CohAnswer> answers = cohService.getAnswers(onlineHearingId, questionId);
-            List<Evidence> evidence = evidenceUploadService.listEvidence(onlineHearingId, questionId);
+            List<Evidence> evidence = evidenceUploadService.listQuestionEvidence(onlineHearingId, questionId);
             if (answers != null && !answers.isEmpty()) {
                 return new Question(question.getOnlineHearingId(),
                         question.getQuestionId(),
@@ -83,7 +83,7 @@ public class QuestionService {
 
     public QuestionRound getQuestions(String onlineHearingId) {
         CohQuestionRounds questionRounds = cohService.getQuestionRounds(onlineHearingId);
-        Map<String, List<Evidence>> evidencePerQuestion = evidenceUploadService.listEvidence(onlineHearingId);
+        Map<String, List<Evidence>> evidencePerQuestion = evidenceUploadService.listQuestionEvidence(onlineHearingId);
 
         int currentQuestionRoundNumber = questionRounds.getCurrentQuestionRound();
         if (currentQuestionRoundNumber == 0) {

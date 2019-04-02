@@ -7,14 +7,14 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
-public class DwpEmailMessageBuilderTest {
+public class EmailMessageBuilderTest {
 
-    private DwpEmailMessageBuilder dwpEmailMessageBuilder;
+    private EmailMessageBuilder emailMessageBuilder;
     private SscsCaseDetails caseDetails;
 
     @Before
     public void setUp() throws Exception {
-        dwpEmailMessageBuilder = new DwpEmailMessageBuilder();
+        emailMessageBuilder = new EmailMessageBuilder();
         caseDetails = SscsCaseDetails.builder()
                 .data(SscsCaseData.builder()
                         .caseReference("caseReference")
@@ -33,7 +33,7 @@ public class DwpEmailMessageBuilderTest {
 
     @Test
     public void buildAnswersContent() {
-        String message = dwpEmailMessageBuilder.getAnswerMessage(caseDetails);
+        String message = emailMessageBuilder.getAnswerMessage(caseDetails);
 
         assertThat(message, is("Appeal reference number: caseReference\n" +
                 "Appellant name: Jean Valjean\n" +
@@ -52,7 +52,7 @@ public class DwpEmailMessageBuilderTest {
 
     @Test
     public void buildQuestionContent() {
-        String message = new DwpEmailMessageBuilder().getQuestionMessage(caseDetails);
+        String message = new EmailMessageBuilder().getQuestionMessage(caseDetails);
 
         assertThat(message, is("Appeal reference number: caseReference\n" +
                 "Appellant name: Jean Valjean\n" +
@@ -69,7 +69,7 @@ public class DwpEmailMessageBuilderTest {
 
     @Test
     public void buildRelistingContent() {
-        String message = new DwpEmailMessageBuilder().getRelistedMessage(caseDetails);
+        String message = new EmailMessageBuilder().getRelistedMessage(caseDetails);
 
         assertThat(message, is("Hearing required\n" +
                 "\n" +
@@ -88,7 +88,7 @@ public class DwpEmailMessageBuilderTest {
 
     @Test
     public void buildDecisionIssued() {
-        String message = new DwpEmailMessageBuilder().getDecisionIssuedMessage(caseDetails);
+        String message = new EmailMessageBuilder().getDecisionIssuedMessage(caseDetails);
 
         assertThat(message, is("Preliminary view offered\n" +
                 "\n" +
@@ -109,7 +109,7 @@ public class DwpEmailMessageBuilderTest {
 
     @Test
     public void buildDecisionAccepted() {
-        String message = new DwpEmailMessageBuilder().getDecisionAcceptedMessage(caseDetails);
+        String message = new EmailMessageBuilder().getDecisionAcceptedMessage(caseDetails);
 
         assertThat(message, is(
                 "Appeal reference number: caseReference\n" +
@@ -125,7 +125,7 @@ public class DwpEmailMessageBuilderTest {
     @Test
     public void buildDecisionRejected() {
         String reason = "some reason";
-        String message = new DwpEmailMessageBuilder().getDecisionRejectedMessage(caseDetails, reason);
+        String message = new EmailMessageBuilder().getDecisionRejectedMessage(caseDetails, reason);
 
         assertThat(message, is(
                 "Appeal reference number: caseReference\n" +

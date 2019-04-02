@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 
 @Service
-public class DwpEmailMessageBuilder {
+public class EmailMessageBuilder {
     private static final String HEADER_TEMPLATE = "Appeal reference number: {caseReference}\n" +
             "Appellant name: {firstName} {lastName}\n" +
             "Appellant NINO: {nino}\n";

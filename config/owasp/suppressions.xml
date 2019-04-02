@@ -43,4 +43,14 @@
     <cve>CVE-2014-0054</cve>
     <cve>CVE-2014-1904</cve>
   </suppress>
+  <suppress>
+    <cve>CVE-2018-1000539</cve>
+  </suppress>
+  <suppress>
+    <cve>CVE-2018-1258</cve>
+  </suppress>
+  <suppress>
+    <notes>We don't use Jetty for the app only wiremock does for the tests so ignore</notes>
+    <cve>CVE-2018-12545</cve>
+  </suppress>
 </suppressions>

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.restassured.RestAssured;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -15,8 +14,7 @@ public class OnlineHearingControllerTest extends BaseIntegrationTest {
         ccdStub.stubAddUserToCase(123456, "medical");
         ccdStub.stubAddUserToCase(123456, "disability");
 
-        RestAssured.baseURI = "http://localhost:" + applicationPort;
-        RestAssured.given()
+        getRequest()
                 .contentType("application/json")
                 .body(postOnlineHearingJson)
                 .when()
@@ -28,8 +26,7 @@ public class OnlineHearingControllerTest extends BaseIntegrationTest {
 
     @Test
     public void get400WhenNoPanel() {
-        RestAssured.baseURI = "http://localhost:" + applicationPort;
-        RestAssured.given()
+        getRequest()
                 .contentType("application/json")
                 .body(postOnlineHearingNoPanelJson)
                 .when()

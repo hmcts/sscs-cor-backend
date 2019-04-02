@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 public class StorePdfServiceTest {
@@ -25,13 +26,12 @@ public class StorePdfServiceTest {
     private static final String NINO = "nino";
     private static final String CASE_REF = "caseRef";
 
-
     private PdfService pdfService;
     private CcdPdfService sscsPdfService;
     private long caseId;
     private Object pdfContent;
     private String fileNamePrefix;
-    private StorePdfService storePdfService;
+    private StorePdfService<?, PdfData> storePdfService;
     private IdamTokens idamTokens;
     private String someOnlineHearingId;
     private EvidenceManagementService evidenceManagementService;
@@ -47,7 +47,7 @@ public class StorePdfServiceTest {
         pdfContent = new Object();
         fileNamePrefix = "test name";
         evidenceManagementService = mock(EvidenceManagementService.class);
-        storePdfService = new StorePdfService(pdfService, "sometemplate", sscsPdfService, idamService, evidenceManagementService) {
+        storePdfService = new StorePdfService<Object, PdfData>(pdfService, "sometemplate", sscsPdfService, idamService, evidenceManagementService) {
 
             @Override
             protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId) {
@@ -55,7 +55,7 @@ public class StorePdfServiceTest {
             }
 
             @Override
-            protected Object getPdfContent(SscsCaseDetails caseDetails, String onlineHearingId, PdfAppealDetails appealDetails) {
+            protected Object getPdfContent(PdfData caseDetails, String onlineHearingId, PdfAppealDetails appealDetails) {
                 return pdfContent;
             }
         };
@@ -68,7 +68,7 @@ public class StorePdfServiceTest {
         byte[] expectedPdfBytes = {2, 4, 6, 0, 1};
         when(pdfService.createPdf(pdfContent, "sometemplate")).thenReturn(expectedPdfBytes);
 
-        CohEventActionContext cohEventActionContext = storePdfService.storePdf(caseId, someOnlineHearingId, caseDetails);
+        CohEventActionContext cohEventActionContext = storePdfService.storePdf(caseId, someOnlineHearingId, new PdfData(caseDetails));
 
         verify(sscsPdfService).mergeDocIntoCcd(fileNamePrefix + CASE_REF + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), idamTokens);
         assertThat(cohEventActionContext.getPdf().getContent(), is(expectedPdfBytes));
@@ -98,7 +98,7 @@ public class StorePdfServiceTest {
         byte[] expectedPdfBytes = {2, 4, 6, 0, 1};
         when(evidenceManagementService.download(new URI(documentUrl), "sscs")).thenReturn(expectedPdfBytes);
 
-        CohEventActionContext cohEventActionContext = storePdfService.storePdf(caseId, someOnlineHearingId, sscsCaseDetails);
+        CohEventActionContext cohEventActionContext = storePdfService.storePdf(caseId, someOnlineHearingId, new PdfData(sscsCaseDetails));
 
         verifyZeroInteractions(sscsPdfService);
         assertThat(cohEventActionContext.getPdf().getContent(), is(expectedPdfBytes));

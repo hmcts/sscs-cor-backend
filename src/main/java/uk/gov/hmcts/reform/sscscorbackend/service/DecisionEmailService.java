@@ -7,24 +7,24 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
 @Service
 public class DecisionEmailService {
     private final CorEmailService corEmailService;
-    private final DwpEmailMessageBuilder dwpEmailMessageBuilder;
+    private final EmailMessageBuilder emailMessageBuilder;
 
     public DecisionEmailService(
             CorEmailService corEmailService,
-            DwpEmailMessageBuilder dwpEmailMessageBuilder
+            EmailMessageBuilder emailMessageBuilder
     ) {
         this.corEmailService = corEmailService;
-        this.dwpEmailMessageBuilder = dwpEmailMessageBuilder;
+        this.emailMessageBuilder = emailMessageBuilder;
     }
 
     public void sendEmail(SscsCaseDetails caseDetails, TribunalViewResponse tribunalViewResponse) {
         if (tribunalViewResponse.getReply().equals("decision_accepted")) {
-            String decisionIssuedMessage = dwpEmailMessageBuilder.getDecisionAcceptedMessage(caseDetails);
+            String decisionIssuedMessage = emailMessageBuilder.getDecisionAcceptedMessage(caseDetails);
             String subject = "Tribunal view accepted (" + caseDetails.getData().getCaseReference() + ")";
             corEmailService.sendEmailToCaseworker(subject, decisionIssuedMessage);
             corEmailService.sendEmailToDwp(subject, decisionIssuedMessage);
         } else {
-            String decisionIssuedMessage = dwpEmailMessageBuilder.getDecisionRejectedMessage(caseDetails, tribunalViewResponse.getReason());
+            String decisionIssuedMessage = emailMessageBuilder.getDecisionRejectedMessage(caseDetails, tribunalViewResponse.getReason());
             String subject = "Tribunal view rejected (" + caseDetails.getData().getCaseReference() + ")";
             corEmailService.sendEmailToCaseworker(subject, decisionIssuedMessage);
         }

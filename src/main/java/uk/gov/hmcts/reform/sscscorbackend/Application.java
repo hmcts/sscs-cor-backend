@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
 import java.util.Properties;
+import org.apache.http.HttpHost;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -77,5 +80,22 @@ public class Application {
         properties.put("mail.smtp.ssl.trust","*");
         javaMailSender.setJavaMailProperties(properties);
         return javaMailSender;
+    }
+
+    @Bean
+    public HttpClient serviceTokenParserHttpClient() {
+        String proxyHost = System.getProperty("http.proxyHost");
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        httpClientBuilder = httpClientBuilder.setUserAgent("christest");
+        if (proxyHost != null) {
+            Integer proxyPort = Integer.parseInt(System.getProperty("http.proxyPort"));
+            httpClientBuilder = httpClientBuilder.setProxy(new HttpHost(proxyHost, proxyPort));
+        }
+        return httpClientBuilder.build();
+    }
+
+    @Bean
+    public HttpClient userTokenParserHttpClient() {
+        return serviceTokenParserHttpClient();
     }
 }

@@ -4,7 +4,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.restassured.RestAssured;
 import java.io.UnsupportedEncodingException;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -27,8 +26,7 @@ public class OnlineHearingTest extends BaseIntegrationTest {
         cohStub.stubGetDecisionNotFound(expectedOnlineHearingId);
         cohStub.stubGetDecisionRepliesNotFound(expectedOnlineHearingId);
 
-        RestAssured.baseURI = "http://localhost:" + applicationPort;
-        RestAssured.given()
+        getRequest()
                 .when()
                 .get("/continuous-online-hearings?email=" + email)
                 .then()
@@ -47,8 +45,7 @@ public class OnlineHearingTest extends BaseIntegrationTest {
         cohStub.stubGetDecisions(expectedOnlineHearingId, caseId);
         cohStub.stubGetDecisionRepliesEmpty(expectedOnlineHearingId);
 
-        RestAssured.baseURI = "http://localhost:" + applicationPort;
-        RestAssured.given()
+        getRequest()
                 .when()
                 .get("/continuous-online-hearings?email=" + email)
                 .then()

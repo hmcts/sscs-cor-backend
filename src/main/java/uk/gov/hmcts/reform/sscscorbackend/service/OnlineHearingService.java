@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -19,7 +18,6 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.FinalDecision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.api.CcdHistoryEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
@@ -115,6 +113,19 @@ public class OnlineHearingService {
         return (onlineHearing != null) ? Optional.of(onlineHearing.getCcdCaseId()) : Optional.empty();
     }
 
+    public Optional<SscsCaseDetails> getCcdCase(String onlineHearingId) {
+        return getCcdCaseId(onlineHearingId).map(caseId -> {
+            IdamTokens idamTokens = idamService.getIdamTokens();
+            SscsCaseDetails caseDetails = ccdService.getByCaseId(caseId, idamTokens);
+
+            if (caseDetails == null) {
+                throw new IllegalStateException("Online hearing for ccdCaseId [" + caseId + "] found but cannot find the case in CCD");
+            }
+
+            return caseDetails;
+        });
+    }
+
     public void addDecisionReply(String onlineHearingId, TribunalViewResponse tribunalViewResponse) {
         CohDecisionReply cohDecisionReply = new CohDecisionReply(tribunalViewResponse.getReply(), tribunalViewResponse.getReason());
         cohClient.addDecisionReply(onlineHearingId, cohDecisionReply);
@@ -150,16 +161,14 @@ public class OnlineHearingService {
 
     public Optional<OnlineHearing> loadOnlineHearingFromCoh(SscsCaseDetails sscsCaseDeails) {
         CohOnlineHearings cohOnlineHearings = cohClient.getOnlineHearing(sscsCaseDeails.getId());
-        List<CcdHistoryEvent> historyEvents = ccdService.getHistoryEvents(sscsCaseDeails.getId());
 
         return cohOnlineHearings.getOnlineHearings().stream()
                 .findFirst()
                 .map(onlineHearing -> {
                     Name name = sscsCaseDeails.getData().getAppeal().getAppellant().getName();
                     String nameString = name.getFirstName() + " " + name.getLastName();
-
-                    boolean hasFinalDecision = historyEvents.stream()
-                                    .anyMatch(event -> EventType.FINAL_DECISION == event.getEventType());
+                    
+                    boolean hasFinalDecision = sscsCaseDeails.getData().isCorDecision();
 
                     return new OnlineHearing(
                             onlineHearing.getOnlineHearingId(),

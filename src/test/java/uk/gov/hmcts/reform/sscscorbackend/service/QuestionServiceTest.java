@@ -121,7 +121,7 @@ public class QuestionServiceTest {
         when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
         HashMap<String, List<Evidence>> evidenceToQuestionsMap = new HashMap<>();
         evidenceToQuestionsMap.put(questionId, asList(someEvidence()));
-        when(evidenceUploadService.listEvidence(onlineHearingId)).thenReturn(evidenceToQuestionsMap);
+        when(evidenceUploadService.listQuestionEvidence(onlineHearingId)).thenReturn(evidenceToQuestionsMap);
 
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
         List<QuestionSummary> questions = questionRound.getQuestions();
@@ -188,7 +188,7 @@ public class QuestionServiceTest {
         when(cohService.getQuestion(onlineHearingId, questionId)).thenReturn(cohQuestion);
         when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(singletonList(cohAnswer));
         List<Evidence> evidenceList = singletonList(someEvidence());
-        when(evidenceUploadService.listEvidence(onlineHearingId, questionId)).thenReturn(evidenceList);
+        when(evidenceUploadService.listQuestionEvidence(onlineHearingId, questionId)).thenReturn(evidenceList);
 
         Question question = underTest.getQuestion(onlineHearingId, questionId);
 
@@ -208,7 +208,7 @@ public class QuestionServiceTest {
     public void getsAQuestionWithoutAnAnswer() {
         when(cohService.getQuestion(onlineHearingId, questionId)).thenReturn(cohQuestion);
         when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(emptyList());
-        when(evidenceUploadService.listEvidence(onlineHearingId, questionId)).thenReturn(emptyList());
+        when(evidenceUploadService.listQuestionEvidence(onlineHearingId, questionId)).thenReturn(emptyList());
 
         Question question = underTest.getQuestion(onlineHearingId, questionId);
 
@@ -229,7 +229,7 @@ public class QuestionServiceTest {
         when(cohService.getQuestion(onlineHearingId, questionId)).thenReturn(cohQuestion);
         when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(emptyList());
         List<Evidence> evidenceList = singletonList(someEvidence());
-        when(evidenceUploadService.listEvidence(onlineHearingId, questionId)).thenReturn(evidenceList);
+        when(evidenceUploadService.listQuestionEvidence(onlineHearingId, questionId)).thenReturn(evidenceList);
 
         Question question = underTest.getQuestion(onlineHearingId, questionId);
 
