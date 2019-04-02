@@ -165,7 +165,7 @@ dependencies {
   compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.7.0'
   compile group: 'uk.gov.hmcts.reform', name:'sscs-common', version: '0.0.154'
 
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '0.0.112'
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '0.1.1'
   compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '4.0.2'
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging-spring', version: '5.0.1'
   compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.3'
