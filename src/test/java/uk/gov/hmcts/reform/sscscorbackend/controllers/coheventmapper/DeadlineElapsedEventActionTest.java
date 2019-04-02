@@ -8,7 +8,7 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
-import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.service.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreAnswersDeadlineElapsedPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
@@ -18,9 +18,9 @@ public class DeadlineElapsedEventActionTest {
     public void canSendPdf() {
         CorEmailService corEmailService = mock(CorEmailService.class);
         StoreAnswersDeadlineElapsedPdfService storeAnswersPdfService = mock(StoreAnswersDeadlineElapsedPdfService.class);
-        DwpEmailMessageBuilder dwpEmailMessageBuilder = mock(DwpEmailMessageBuilder.class);
+        EmailMessageBuilder emailMessageBuilder = mock(EmailMessageBuilder.class);
 
-        DeadlineElapsedEventAction deadlineElapsedEventAction = new DeadlineElapsedEventAction(corEmailService, storeAnswersPdfService, dwpEmailMessageBuilder);
+        DeadlineElapsedEventAction deadlineElapsedEventAction = new DeadlineElapsedEventAction(corEmailService, storeAnswersPdfService, emailMessageBuilder);
 
         String someCaseReference = "someCaseReference";
         SscsCaseDetails caseDetails = SscsCaseDetails.builder()
@@ -30,7 +30,7 @@ public class DeadlineElapsedEventActionTest {
         String onlineHearingId = "onlineHearingId";
         String pdfName = "pdf_name.pdf";
         CohEventActionContext cohEventActionContext = new CohEventActionContext(new Pdf(new byte[]{2, 5, 6, 0, 1}, pdfName), caseDetails);
-        when(dwpEmailMessageBuilder.getAnswerMessage(caseDetails)).thenReturn("some message");
+        when(emailMessageBuilder.getAnswerMessage(caseDetails)).thenReturn("some message");
 
         CohEventActionContext result = deadlineElapsedEventAction.handle(caseId, onlineHearingId, cohEventActionContext);
 

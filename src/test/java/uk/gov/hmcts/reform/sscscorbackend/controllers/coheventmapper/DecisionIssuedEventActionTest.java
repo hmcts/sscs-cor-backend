@@ -8,26 +8,26 @@ import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someStorePdfResult
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
-import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.service.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 
 public class DecisionIssuedEventActionTest {
 
     private CorEmailService corEmailService;
-    private DwpEmailMessageBuilder dwpEmailMessageBuilder;
+    private EmailMessageBuilder emailMessageBuilder;
     private DecisionIssuedEventAction decisionIssuedEventAction;
 
     @Before
     public void setUp() {
         StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService = mock(StoreOnlineHearingTribunalsViewService.class);
         corEmailService = mock(CorEmailService.class);
-        dwpEmailMessageBuilder = mock(DwpEmailMessageBuilder.class);
+        emailMessageBuilder = mock(EmailMessageBuilder.class);
 
         decisionIssuedEventAction = new DecisionIssuedEventAction(
                 storeOnlineHearingTribunalsViewService,
                 corEmailService,
-                dwpEmailMessageBuilder
+                emailMessageBuilder
         );
     }
 
@@ -35,7 +35,7 @@ public class DecisionIssuedEventActionTest {
     public void canHandleEvent() {
         String message = "someMessage";
         CohEventActionContext cohEventActionContext = someStorePdfResult();
-        when(dwpEmailMessageBuilder.getDecisionIssuedMessage(cohEventActionContext.getDocument())).thenReturn(message);
+        when(emailMessageBuilder.getDecisionIssuedMessage(cohEventActionContext.getDocument())).thenReturn(message);
 
         long caseId = 123L;
         String onlineHearingId = "onlineHearingId";

@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
-import uk.gov.hmcts.reform.sscscorbackend.service.DwpEmailMessageBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.service.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreAnswersDeadlineElapsedPdfService;
 
 @Service
@@ -14,8 +14,8 @@ public class DeadlineElapsedEventAction extends QuestionRoundEndedAction {
     public DeadlineElapsedEventAction(
             CorEmailService corEmailService,
             StoreAnswersDeadlineElapsedPdfService storeQuestionsPdfService,
-            DwpEmailMessageBuilder dwpEmailMessageBuilder) {
-        super(storeQuestionsPdfService, corEmailService, dwpEmailMessageBuilder);
+            EmailMessageBuilder emailMessageBuilder) {
+        super(storeQuestionsPdfService, corEmailService, emailMessageBuilder);
     }
 
     @Override
