@@ -34,8 +34,8 @@ public class CohEventsTest extends BaseIntegrationTest {
         documentStoreStub.stubUploadFile();
         pdfServiceStub.stubCreatePdf(pdf);
         ccdStub.stubFindCaseByCaseId(caseId, caseReference, "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
-        ccdStub.stubUpdateCase(caseId);
-        ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_DECISION_ISSUED.getCcdType());
+        ccdStub.stubUpdateCase(caseId, caseReference);
+        ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_DECISION_ISSUED.getCcdType(), caseReference);
         ccdStub.stubGetHistoryEvents(caseId, EventType.SYA_APPEAL_CREATED);
         String cohEvent = createCohEvent("decision_issued");
         notificationsStub.stubSendNotification(cohEvent);
@@ -61,8 +61,8 @@ public class CohEventsTest extends BaseIntegrationTest {
         documentStoreStub.stubUploadFile();
 
         ccdStub.stubFindCaseByCaseId(caseId, caseReference, "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
-        ccdStub.stubUpdateCase(caseId);
-        ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_QUESTION_ROUND_ISSUED.getCcdType());
+        ccdStub.stubUpdateCase(caseId, caseReference);
+        ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_QUESTION_ROUND_ISSUED.getCcdType(), caseReference);
         String cohEvent = createCohEvent("question_round_issued");
         notificationsStub.stubSendNotification(cohEvent);
 
@@ -83,10 +83,10 @@ public class CohEventsTest extends BaseIntegrationTest {
         );
         cohStub.stubGetAllQuestionRounds(hearingId, questionSummary);
         cohStub.stubGetOnlineHearing(caseId, hearingId);
-        ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_ANSWERS_SUBMITTED.getCcdType());
+        ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_ANSWERS_SUBMITTED.getCcdType(), caseReference);
         pdfServiceStub.stubCreatePdf(pdf);
         documentStoreStub.stubUploadFile();
-        ccdStub.stubUpdateCase(caseId);
+        ccdStub.stubUpdateCase(caseId, caseReference);
         String cohEvent = createCohEvent("answers_submitted");
 
         makeCohEventRequest(cohEvent);
@@ -103,11 +103,11 @@ public class CohEventsTest extends BaseIntegrationTest {
         cohStub.stubGetConversation(hearingId);
         pdfServiceStub.stubCreatePdf(pdf);
         documentStoreStub.stubUploadFile();
-        ccdStub.stubUpdateCase(caseId);
+        ccdStub.stubUpdateCase(caseId, caseReference);
         String cohEvent = createCohEvent("continuous_online_hearing_relisted");
         notificationsStub.stubSendNotification(cohEvent);
-        ccdStub.stubUpdateCaseWithEvent(caseId, "updateHearingType");
-        ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_ONLINE_HEARING_RELISTED.getCcdType());
+        ccdStub.stubUpdateCaseWithEvent(caseId, "updateHearingType", caseReference);
+        ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_ONLINE_HEARING_RELISTED.getCcdType(), caseReference);
 
         makeCohEventRequest(cohEvent);
 
@@ -126,10 +126,10 @@ public class CohEventsTest extends BaseIntegrationTest {
         );
         cohStub.stubGetAllQuestionRounds(hearingId, questionSummary);
         cohStub.stubGetOnlineHearing(caseId, hearingId);
-        ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_QUESTION_DEADLINE_ELAPSED.getCcdType());
+        ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_QUESTION_DEADLINE_ELAPSED.getCcdType(), caseReference);
         pdfServiceStub.stubCreatePdf(pdf);
         documentStoreStub.stubUploadFile();
-        ccdStub.stubUpdateCase(caseId);
+        ccdStub.stubUpdateCase(caseId, caseReference);
         String cohEvent = createCohEvent("question_deadline_elapsed");
         notificationsStub.stubSendNotification(cohEvent);
 
@@ -169,8 +169,8 @@ public class CohEventsTest extends BaseIntegrationTest {
 
     private void testEvent(EventType eventType, String cohEventType, boolean sendNotification) throws JsonProcessingException {
         ccdStub.stubFindCaseByCaseId(caseId, caseReference, "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
-        ccdStub.stubUpdateCase(caseId);
-        ccdStub.stubUpdateCaseWithEvent(caseId, eventType.getCcdType());
+        ccdStub.stubUpdateCase(caseId, caseReference);
+        ccdStub.stubUpdateCaseWithEvent(caseId, eventType.getCcdType(), caseReference);
         String cohEvent = createCohEvent(cohEventType);
         if (sendNotification) {
             notificationsStub.stubSendNotification(cohEvent);

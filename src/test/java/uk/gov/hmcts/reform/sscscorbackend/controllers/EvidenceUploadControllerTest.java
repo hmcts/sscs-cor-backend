@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
+import uk.gov.hmcts.reform.sscscorbackend.domain.EvidenceDescription;
 import uk.gov.hmcts.reform.sscscorbackend.service.EvidenceUploadService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.IllegalFileTypeException;
 
@@ -145,18 +146,20 @@ public class EvidenceUploadControllerTest {
 
     @Test
     public void submitEvidence() {
-        when(evidenceUploadService.submitHearingEvidence(someOnlineHearingId)).thenReturn(true);
+        EvidenceDescription description = new EvidenceDescription("some description");
+        when(evidenceUploadService.submitHearingEvidence(someOnlineHearingId, description)).thenReturn(true);
 
-        ResponseEntity responseEntity = evidenceUploadController.submitEvidence(someOnlineHearingId);
+        ResponseEntity responseEntity = evidenceUploadController.submitEvidence(someOnlineHearingId, description);
 
         assertThat(responseEntity.getStatusCode(), is(NO_CONTENT));
     }
 
     @Test
     public void submitEvidenceWhenHearingDoesNotExist() {
-        when(evidenceUploadService.submitHearingEvidence(someOnlineHearingId)).thenReturn(false);
+        EvidenceDescription description = new EvidenceDescription("some description");
+        when(evidenceUploadService.submitHearingEvidence(someOnlineHearingId, description)).thenReturn(false);
 
-        ResponseEntity responseEntity = evidenceUploadController.submitEvidence(someOnlineHearingId);
+        ResponseEntity responseEntity = evidenceUploadController.submitEvidence(someOnlineHearingId, description);
 
         assertThat(responseEntity.getStatusCode(), is(NOT_FOUND));
     }

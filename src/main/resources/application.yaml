@@ -81,6 +81,10 @@ personalStatement:
   html:
     template:
       path: /templates/personalStatement.html
+evidenceDescription:
+  html:
+    template:
+      path: /templates/evidenceDescription.html
 
 
 appeal:
