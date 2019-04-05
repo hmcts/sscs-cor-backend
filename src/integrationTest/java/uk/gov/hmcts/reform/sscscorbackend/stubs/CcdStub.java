@@ -10,7 +10,6 @@ import com.github.tomakehurst.wiremock.matching.RegexPattern;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 
@@ -77,20 +76,20 @@ public class CcdStub extends BaseStub {
         );
     }
 
-    public void stubUpdateCase(Long caseId) throws JsonProcessingException {
+    public void stubUpdateCase(Long caseId, String caseReference) throws JsonProcessingException {
         wireMock.stubFor(get("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/event-triggers/uploadDocument/token")
                 .willReturn(okJson(new ObjectMapper().writeValueAsString(StartEventResponse.builder().build()))));
 
         wireMock.stubFor(post("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true")
-                .willReturn(okJson(new ObjectMapper().writeValueAsString(CaseDetails.builder().build()))));
+                .willReturn(okJson(createCaseDetails(caseId, caseReference, "firstName", "lastName", "evidenceQuestionId", "evidenceFileName", "evidenceCreatedDate", "evidenceUrl"))));
     }
 
-    public void stubUpdateCaseWithEvent(Long caseId, final String eventType) throws JsonProcessingException {
+    public void stubUpdateCaseWithEvent(Long caseId, final String eventType, String caseReference) throws JsonProcessingException {
         wireMock.stubFor(get("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/event-triggers/" + eventType + "/token")
                 .willReturn(okJson(new ObjectMapper().writeValueAsString(StartEventResponse.builder().build()))));
 
         wireMock.stubFor(post("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true")
-                .willReturn(okJson(new ObjectMapper().writeValueAsString(CaseDetails.builder().build()))));
+                .willReturn(okJson(createCaseDetails(caseId, caseReference, "firstName", "lastName", "evidenceQuestionId", "evidenceFileName", "evidenceCreatedDate", "evidenceUrl"))));
     }
 
     public void verifyUpdateCaseWithEvent(Long caseId, String eventType) {

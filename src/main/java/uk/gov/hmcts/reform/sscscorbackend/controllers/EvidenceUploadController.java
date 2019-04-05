@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
+import uk.gov.hmcts.reform.sscscorbackend.domain.EvidenceDescription;
 import uk.gov.hmcts.reform.sscscorbackend.service.EvidenceUploadService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.IllegalFileTypeException;
 
@@ -154,7 +155,8 @@ public class EvidenceUploadController {
     @ApiOperation(value = "Submit COR evidence",
             notes = "Submits the evidence that has already been uploaded in a draft state. This means it will be " +
                     "visible in CCD by a caseworker and JUI by the pannel members. You need to have an appeal in CCD " +
-                    "and an online hearing in COH that references the appeal in CCD."
+                    "and an online hearing in COH that references the appeal in CCD. Will create a cover sheet for the " +
+                    "evidence uploaded containing the file names and a description from the appellant."
     )
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Evidence has been submitted to the appeal"),
@@ -166,9 +168,10 @@ public class EvidenceUploadController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     public ResponseEntity submitEvidence(
-            @PathVariable("onlineHearingId") String onlineHearingId
+            @PathVariable("onlineHearingId") String onlineHearingId,
+            @RequestBody EvidenceDescription description
     ) {
-        boolean evidenceSubmitted = evidenceUploadService.submitHearingEvidence(onlineHearingId);
+        boolean evidenceSubmitted = evidenceUploadService.submitHearingEvidence(onlineHearingId, description);
         return evidenceSubmitted ? ResponseEntity.noContent().build() : notFound().build();
     }
 }

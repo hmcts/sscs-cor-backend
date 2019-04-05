@@ -18,6 +18,9 @@ import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
+import uk.gov.hmcts.reform.sscscorbackend.domain.EvidenceDescription;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.EvidenceDescriptionPdfData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.DocumentManagementService;
 
@@ -27,7 +30,8 @@ public class EvidenceUploadService {
     private final DocumentManagementService documentManagementService;
     private final CorCcdService ccdService;
     private final IdamService idamService;
-    private OnlineHearingService onlineHearingService;
+    private final OnlineHearingService onlineHearingService;
+    private final StoreEvidenceDescriptionService storeEvidenceDescriptionService;
 
     private static final String UPDATED_SSCS = "Updated SSCS";
     private static final String UPLOAD_COR_DOCUMENT = "uploadCorDocument";
@@ -36,11 +40,12 @@ public class EvidenceUploadService {
     private static final QuestionDocumentExtractor questionDocumentExtractor = new QuestionDocumentExtractor();
 
     @Autowired
-    public EvidenceUploadService(DocumentManagementService documentManagementService, CorCcdService ccdService, IdamService idamService, OnlineHearingService onlineHearingService) {
+    public EvidenceUploadService(DocumentManagementService documentManagementService, CorCcdService ccdService, IdamService idamService, OnlineHearingService onlineHearingService, StoreEvidenceDescriptionService storeEvidenceDescriptionService) {
         this.documentManagementService = documentManagementService;
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.onlineHearingService = onlineHearingService;
+        this.storeEvidenceDescriptionService = storeEvidenceDescriptionService;
     }
 
     public Optional<Evidence> uploadDraftHearingEvidence(String onlineHearingId, MultipartFile file) {
@@ -94,19 +99,23 @@ public class EvidenceUploadService {
                 .get(0);
     }
 
-    public boolean submitHearingEvidence(String onlineHearingId) {
+    public boolean submitHearingEvidence(String onlineHearingId, EvidenceDescription description) {
         return onlineHearingService.getCcdCase(onlineHearingId)
                 .map(caseDetails -> {
                     Long ccdCaseId = caseDetails.getId();
                     log.info("Submitting draft document for case [" + ccdCaseId + "]");
 
                     SscsCaseData sscsCaseData = caseDetails.getData();
-                    List<SscsDocument> draftSscsDocument = sscsCaseData.getDraftSscsDocument();
 
+                    EvidenceDescriptionPdfData data = new EvidenceDescriptionPdfData(caseDetails, description, getFileNames(sscsCaseData));
+                    CohEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(ccdCaseId, onlineHearingId, data);
+
+                    List<SscsDocument> draftSscsDocument = storePdfContext.getDocument().getData().getDraftSscsDocument();
                     List<SscsDocument> newSscsDocumentsList = union(
-                            emptyIfNull(sscsCaseData.getSscsDocument()),
+                            emptyIfNull(storePdfContext.getDocument().getData().getSscsDocument()),
                             emptyIfNull(draftSscsDocument)
                     );
+
                     sscsCaseData.setSscsDocument(newSscsDocumentsList);
                     sscsCaseData.setDraftSscsDocument(Collections.emptyList());
 
@@ -115,6 +124,12 @@ public class EvidenceUploadService {
                     return true;
                 })
                 .orElse(false);
+    }
+
+    private List<String> getFileNames(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getDraftSscsDocument().stream()
+                .map(document -> document.getValue().getDocumentFileName())
+                .collect(toList());
     }
 
     public List<Evidence> listDraftHearingEvidence(String onlineHearingId) {
