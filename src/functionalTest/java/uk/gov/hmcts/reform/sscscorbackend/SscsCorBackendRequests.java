@@ -6,6 +6,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -17,6 +18,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -185,6 +187,14 @@ public class SscsCorBackendRequests {
         HttpResponse getQuestionResponse = postRequest(uri, new StringEntity("{\"body\":\"" + statement + "\"}", APPLICATION_JSON));
 
         assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+    }
+
+    public String getCoversheet(String hearingId) throws IOException {
+        CloseableHttpResponse getCoverSheetResponse = getRequest("/continuous-online-hearings/" + hearingId + "/evidence/coversheet");
+
+        assertThat(getCoverSheetResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+        Header fileNameHeader = getCoverSheetResponse.getFirstHeader("Content-Disposition");
+        return ContentDisposition.parse(fileNameHeader.getValue()).getFilename();
     }
 
     private RequestBuilder addHeaders(RequestBuilder requestBuilder) {

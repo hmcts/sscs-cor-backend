@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscscorbackend.service;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -24,7 +25,7 @@ public class StoreOnlineHearingTribunalsViewService extends StorePdfService<Onli
 
     @SuppressWarnings("squid:S00107")
     public StoreOnlineHearingTribunalsViewService(OnlineHearingService onlineHearingService,
-                                                  PdfService pdfService,
+                                                  @Qualifier("oldPdfService") PdfService pdfService,
                                                   @Value("${preliminary_view.html.template.path}") String templatePath,
                                                   OnlineHearingDateReformatter onlineHearingDateReformatter,
                                                   CcdPdfService ccdPdfService, IdamService idamService,

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscscorbackend.service;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -21,7 +22,7 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
 
     @Autowired
     public StoreAppellantStatementService(
-            PdfService pdfService,
+            @Qualifier("oldPdfService") PdfService pdfService,
             @Value("${personalStatement.html.template.path}")String pdfTemplatePath,
             CcdPdfService ccdPdfService,
             IdamService idamService,

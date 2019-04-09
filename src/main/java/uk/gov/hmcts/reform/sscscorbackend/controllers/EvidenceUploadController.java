@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 import uk.gov.hmcts.reform.sscscorbackend.domain.EvidenceDescription;
+import uk.gov.hmcts.reform.sscscorbackend.service.CoversheetService;
 import uk.gov.hmcts.reform.sscscorbackend.service.EvidenceUploadService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.IllegalFileTypeException;
 
@@ -26,10 +28,14 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.IllegalF
 @RequestMapping("/continuous-online-hearings")
 public class EvidenceUploadController {
     private final EvidenceUploadService evidenceUploadService;
+    private final CoversheetService coversheetService;
 
     @Autowired
-    public EvidenceUploadController(EvidenceUploadService evidenceUploadService) {
+    public EvidenceUploadController(
+            EvidenceUploadService evidenceUploadService,
+            CoversheetService coversheetService) {
         this.evidenceUploadService = evidenceUploadService;
+        this.coversheetService = coversheetService;
     }
 
     @ApiOperation(value = "Upload COR evidence",
@@ -173,5 +179,29 @@ public class EvidenceUploadController {
     ) {
         boolean evidenceSubmitted = evidenceUploadService.submitHearingEvidence(onlineHearingId, description);
         return evidenceSubmitted ? ResponseEntity.noContent().build() : notFound().build();
+    }
+
+    @ApiOperation(value = "Get evidence cover sheet",
+            notes = "Generates a PDF file that can be printed out and added as a cover sheet to evidence that is to be " +
+                    "posted in."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "A PDF cover sheet"),
+            @ApiResponse(code = 404, message = "No online hearing found with online hearing id")
+    })
+    @GetMapping(
+            value = "{onlineHearingId}/evidence/coversheet",
+            produces = MediaType.APPLICATION_PDF_VALUE
+    )
+    public ResponseEntity<ByteArrayResource> getCoverSheet(
+            @PathVariable("onlineHearingId") String onlineHearingId
+    ) {
+        Optional<byte[]> coverSheet = coversheetService.createCoverSheet(onlineHearingId);
+        return coverSheet.map(pdfBytes ->
+                ResponseEntity.ok()
+                        .header("Content-Disposition", "inline; filename=evidence_cover_sheet.pdf")
+                        .contentType(MediaType.APPLICATION_PDF)
+                        .body(new ByteArrayResource(pdfBytes))
+        ).orElse(ResponseEntity.notFound().build());
     }
 }

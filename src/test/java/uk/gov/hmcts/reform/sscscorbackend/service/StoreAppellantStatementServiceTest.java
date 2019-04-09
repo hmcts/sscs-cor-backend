@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.OldPdfService;
 
 public class StoreAppellantStatementServiceTest {
 
@@ -23,7 +23,7 @@ public class StoreAppellantStatementServiceTest {
     @Before
     public void setUp() {
         storeAppellantStatementService = new StoreAppellantStatementService(
-                mock(PdfService.class),
+                mock(OldPdfService.class),
                 "templatePath",
                 mock(CcdPdfService.class),
                 mock(IdamService.class),
