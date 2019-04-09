@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.OldPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 public class StoreOnlineHearingTribunalsViewServiceTest {
@@ -35,7 +36,7 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
     public void setUp() throws IOException {
         onlineHearingService = mock(OnlineHearingService.class);
         onlineHearingDateReformatter = mock(OnlineHearingDateReformatter.class);
-        pdfService = mock(PdfService.class);
+        pdfService = mock(OldPdfService.class);
         ccdPdfService = mock(CcdPdfService.class);
         IdamService idamService = mock(IdamService.class);
         idamTokens = mock(IdamTokens.class);

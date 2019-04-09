@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -13,7 +14,7 @@ public class StoreQuestionsPdfService extends AbstractQuestionPdfService {
 
     @SuppressWarnings("squid:S00107")
     public StoreQuestionsPdfService(
-            PdfService pdfService,
+            @Qualifier("oldPdfService") PdfService pdfService,
             @Value("${question.html.template.path}") String templatePath,
             CcdPdfService ccdPdfService,
             IdamService idamService,
