@@ -11,7 +11,6 @@ import static org.mockito.Mockito.*;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +23,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
+import uk.gov.hmcts.reform.sscscorbackend.domain.EvidenceDescription;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.EvidenceDescriptionPdfData;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.DocumentManagementService;
 
@@ -41,6 +44,8 @@ public class EvidenceUploadServiceTest {
     private MultipartFile file;
     private final Date evidenceCreatedOn = new Date();
     private String someEvidenceId;
+    private StoreEvidenceDescriptionService storeEvidenceDescriptionService;
+    private EvidenceDescription someDescription;
 
     @Before
     public void setUp() {
@@ -52,17 +57,20 @@ public class EvidenceUploadServiceTest {
 
         someCcdCaseId = 123L;
 
+        someDescription = new EvidenceDescription("some description");
+
         IdamService idamService = mock(IdamService.class);
         idamTokens = mock(IdamTokens.class);
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         DocumentManagementService documentManagementService = mock(DocumentManagementService.class);
+        storeEvidenceDescriptionService = mock(StoreEvidenceDescriptionService.class);
         evidenceUploadService = new EvidenceUploadService(
                 documentManagementService,
                 ccdService,
                 idamService,
-                onlineHearingService
-        );
+                onlineHearingService,
+                storeEvidenceDescriptionService);
         fileName = "someFileName.txt";
         documentUrl = "http://example.com/document/" + someEvidenceId;
         file = mock(MultipartFile.class);
@@ -96,8 +104,13 @@ public class EvidenceUploadServiceTest {
     public void submitsEvidenceAddsDraftSscsDocumentsToSscsDocumentsInCcdWhenThereAreNoSscsDocuments() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
         when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+        when(storeEvidenceDescriptionService.storePdf(
+                someCcdCaseId,
+                someOnlineHearingId,
+                new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
+        )).thenReturn(new CohEventActionContext(mock(Pdf.class), sscsCaseDetails));
 
-        boolean submittedEvidence = evidenceUploadService.submitHearingEvidence(someOnlineHearingId);
+        boolean submittedEvidence = evidenceUploadService.submitHearingEvidence(someOnlineHearingId, someDescription);
 
         assertThat(submittedEvidence, is(true));
         verify(ccdService).updateCase(
@@ -107,6 +120,11 @@ public class EvidenceUploadServiceTest {
                 eq("SSCS - cor evidence uploaded"),
                 eq("Updated SSCS"),
                 eq(idamTokens)
+        );
+        verify(storeEvidenceDescriptionService).storePdf(
+                someCcdCaseId,
+                someOnlineHearingId,
+                new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
         );
     }
 
@@ -126,8 +144,13 @@ public class EvidenceUploadServiceTest {
 
         final int originalNumberOfSscsDocuments = sscsCaseDetails.getData().getSscsDocument().size();
         when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+        when(storeEvidenceDescriptionService.storePdf(
+                someCcdCaseId,
+                someOnlineHearingId,
+                new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
+        )).thenReturn(new CohEventActionContext(mock(Pdf.class), sscsCaseDetails));
 
-        boolean submittedEvidence = evidenceUploadService.submitHearingEvidence(someOnlineHearingId);
+        boolean submittedEvidence = evidenceUploadService.submitHearingEvidence(someOnlineHearingId, someDescription);
 
         assertThat(submittedEvidence, is(true));
         verify(ccdService).updateCase(
@@ -137,6 +160,12 @@ public class EvidenceUploadServiceTest {
                 eq("SSCS - cor evidence uploaded"),
                 eq("Updated SSCS"),
                 eq(idamTokens)
+        );
+
+        verify(storeEvidenceDescriptionService).storePdf(
+                someCcdCaseId,
+                someOnlineHearingId,
+                new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
         );
     }
 
@@ -349,7 +378,7 @@ public class EvidenceUploadServiceTest {
         document.links.self.href = documentUrl;
         document.originalDocumentName = fileName;
         UploadResponse.Embedded embedded = mock(UploadResponse.Embedded.class);
-        when(embedded.getDocuments()).thenReturn(Collections.singletonList(document));
+        when(embedded.getDocuments()).thenReturn(singletonList(document));
         UploadResponse uploadResponse = mock(UploadResponse.class);
         when(uploadResponse.getEmbedded()).thenReturn(embedded);
         return uploadResponse;

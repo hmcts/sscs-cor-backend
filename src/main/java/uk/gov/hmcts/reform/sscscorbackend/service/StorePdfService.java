@@ -43,17 +43,14 @@ public abstract class StorePdfService<E, D extends PdfData> {
         String documentNamePrefix = documentNamePrefix(caseDetails, onlineHearingId);
         if (pdfHasNotAlreadyBeenCreated(caseDetails, documentNamePrefix)) {
             log.info("Creating pdf for [" + caseId + "]");
-            return new CohEventActionContext(
-                    storePdf(caseId, onlineHearingId, idamService.getIdamTokens(), data, documentNamePrefix),
-                    caseDetails
-            );
+            return storePdf(caseId, onlineHearingId, idamService.getIdamTokens(), data, documentNamePrefix);
         } else {
             log.info("Loading pdf for [" + caseId + "]");
             return new CohEventActionContext(loadPdf(caseDetails, documentNamePrefix), caseDetails);
         }
     }
 
-    private Pdf storePdf(Long caseId, String onlineHearingId, IdamTokens idamTokens, D data, String documentNamePrefix) {
+    private CohEventActionContext storePdf(Long caseId, String onlineHearingId, IdamTokens idamTokens, D data, String documentNamePrefix) {
         SscsCaseDetails caseDetails = data.getCaseDetails();
         PdfAppealDetails pdfAppealDetails = getPdfAppealDetails(caseId, caseDetails);
         log.info("Storing pdf for [" + caseId + "]");
@@ -62,9 +59,9 @@ public abstract class StorePdfService<E, D extends PdfData> {
         SscsCaseData caseData = caseDetails.getData();
         String pdfName = getPdfName(documentNamePrefix, caseData.getCaseReference());
         log.info("Adding pdf to ccd for [" + caseId + "]");
-        ccdPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens);
+        SscsCaseData sscsCaseData = ccdPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens);
 
-        return new Pdf(pdfBytes, pdfName);
+        return new CohEventActionContext(new Pdf(pdfBytes, pdfName), data.getCaseDetails().toBuilder().data(sscsCaseData).build());
     }
 
     private String getPdfName(String documentNamePrefix, String caseReference) {
@@ -85,7 +82,7 @@ public abstract class StorePdfService<E, D extends PdfData> {
         }
     }
 
-    private boolean pdfHasNotAlreadyBeenCreated(SscsCaseDetails caseDetails, String documentNamePrefix) {
+    protected boolean pdfHasNotAlreadyBeenCreated(SscsCaseDetails caseDetails, String documentNamePrefix) {
         List<SscsDocument> sscsDocuments = caseDetails.getData().getSscsDocument();
         return sscsDocuments == null || sscsDocuments.stream()
                 .filter(sscsDocument -> sscsDocument.getValue().getDocumentFileName() != null)
