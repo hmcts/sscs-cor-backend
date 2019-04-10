@@ -33,8 +33,7 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         questionResponse = sscsCorBackendRequests.getQuestion(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId());
         assertThat(questionResponse.has("evidence"), is(false));
     }
-
-    @Ignore
+    
     @Test
     public void uploadThenDeleteEvidenceToHearing() throws IOException, InterruptedException, JSONException {
         OnlineHearing hearingWithQuestion = createHearing(true);
