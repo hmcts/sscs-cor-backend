@@ -48,6 +48,7 @@ public abstract class BaseFunctionTest {
 
     @Before
     public void setUp() throws Exception {
+        System.out.println("TEST_URL:" + baseUrl);
         cohClient = buildClient("USE_COH_PROXY");
         client = buildClient("USE_BACKEND_PROXY");
         sscsCorBackendRequests = new SscsCorBackendRequests(idamService, baseUrl, client);

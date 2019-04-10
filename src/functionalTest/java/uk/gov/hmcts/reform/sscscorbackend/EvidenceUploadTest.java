@@ -7,7 +7,6 @@ import java.io.IOException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class EvidenceUploadTest extends BaseFunctionTest {
@@ -34,7 +33,6 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         assertThat(questionResponse.has("evidence"), is(false));
     }
 
-    @Ignore
     @Test
     public void uploadThenDeleteEvidenceToHearing() throws IOException, InterruptedException, JSONException {
         OnlineHearing hearingWithQuestion = createHearing(true);
