@@ -27,8 +27,6 @@ public class CohRequests {
 
     public CohRequests(IdamService idamService, String cohBaseUrl, HttpClient cohClient) {
         idamTokens = idamService.getIdamTokens();
-        System.out.println("Authorization: " + idamTokens.getIdamOauth2Token());
-        System.out.println("ServiceAuthorization: " + idamTokens.getServiceAuthorization());
         this.cohBaseUrl = cohBaseUrl;
         this.cohClient = cohClient;
     }
