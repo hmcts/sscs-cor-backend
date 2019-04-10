@@ -41,7 +41,7 @@ locals {
 
   s2sCnpUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
   cohUrl    = "http://coh-cor-${local.local_env}.service.${local.local_ase}.internal"
-  ccdApi    = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
+  ccdApi    = "https://ccd-data-store-api-pr-431.service.core-compute-preview.internal"
   idam_url  = "https://idam-api.aat.platform.hmcts.net"
   documentManagementUrl = "http://dm-store-${local.local_env}.service.${local.local_ase}.internal"
   pdfService    = "http://cmc-pdf-service-${local.local_env}.service.${local.local_ase}.internal"
