@@ -7,7 +7,6 @@ import java.io.IOException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class EvidenceUploadTest extends BaseFunctionTest {
