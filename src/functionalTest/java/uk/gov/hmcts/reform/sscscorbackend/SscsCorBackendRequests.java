@@ -134,15 +134,12 @@ public class SscsCorBackendRequests {
                         fileName)
                 .build();
 
-        HttpResponse response = client.execute(put(baseUrl + "/continuous-online-hearings/" + hearingId + "/evidence")
-                .setEntity(data)
-                .build());
+        HttpResponse response = putRequest("/continuous-online-hearings/" + hearingId + "/evidence", data);
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
     }
 
     public JSONArray getDraftHearingEvidence(String hearingId) throws IOException {
-        HttpResponse response = client.execute(get(baseUrl + "/continuous-online-hearings/" + hearingId + "/evidence")
-                .build());
+        HttpResponse response = getRequest("/continuous-online-hearings/" + hearingId + "/evidence");
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
 
         String responseBody = EntityUtils.toString(response.getEntity());
@@ -208,7 +205,7 @@ public class SscsCorBackendRequests {
                 .build());
     }
 
-    private CloseableHttpResponse putRequest(String url, StringEntity body) throws IOException {
+    private CloseableHttpResponse putRequest(String url, HttpEntity body) throws IOException {
         return client.execute(addHeaders(put(baseUrl + url))
                 .setEntity(body)
                 .build());
