@@ -13,3 +13,7 @@ output "idam_s2s_auth" {
 output "coh_url" {
   value = "http://coh-cor-aat.service.core-compute-aat.internal"
 }
+
+output "pdf_service_access_key" {
+  value = "${data.azurerm_key_vault_secret.pdf_service_access_key.value}"
+}
