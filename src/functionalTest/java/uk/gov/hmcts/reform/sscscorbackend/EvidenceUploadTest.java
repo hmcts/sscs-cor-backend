@@ -34,7 +34,6 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         assertThat(questionResponse.has("evidence"), is(false));
     }
 
-    @Ignore
     @Test
     public void uploadThenDeleteEvidenceToHearing() throws IOException, InterruptedException, JSONException {
         OnlineHearing hearingWithQuestion = createHearing(true);

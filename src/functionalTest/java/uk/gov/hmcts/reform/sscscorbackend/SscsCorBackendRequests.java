@@ -132,14 +132,14 @@ public class SscsCorBackendRequests {
                         fileName)
                 .build();
 
-        HttpResponse response = client.execute(put(baseUrl + "/continuous-online-hearings/" + hearingId + "/evidence")
-                .setEntity(data)
+        HttpResponse response = client.execute(addHeaders(put(baseUrl + "/continuous-online-hearings/" + hearingId + "/evidence")
+                .setEntity(data))
                 .build());
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
     }
 
     public JSONArray getDraftHearingEvidence(String hearingId) throws IOException {
-        HttpResponse response = client.execute(get(baseUrl + "/continuous-online-hearings/" + hearingId + "/evidence")
+        HttpResponse response = client.execute(addHeaders(get(baseUrl + "/continuous-online-hearings/" + hearingId + "/evidence"))
                 .build());
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
 
