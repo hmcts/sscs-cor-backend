@@ -45,6 +45,8 @@ spec:
           value: "mta.reform.hmcts.net"
         - name: EMAIL_SERVER_PORT
           value: "25"
+        - name: PDF_SERVICE_ACCESS_KEY
+          value: "${PDF_SERVICE_ACCESS_KEY}"
 
         envFrom:
           - configMapRef:
