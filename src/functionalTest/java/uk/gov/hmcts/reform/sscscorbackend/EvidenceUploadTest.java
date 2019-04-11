@@ -54,4 +54,12 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(hearingWithQuestion.getHearingId());
         assertThat(draftHearingEvidence.length(), is(0));
     }
+
+    @Test
+    public void getEvidenceCoverSheet() throws IOException {
+        OnlineHearing hearing = createHearing(true);
+
+        String coversheet = sscsCorBackendRequests.getCoversheet(hearing.getHearingId());
+        assertThat(coversheet, is("evidence_cover_sheet.pdf"));
+    }
 }

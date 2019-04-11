@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -14,7 +15,7 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 @Service
 public class StoreEvidenceDescriptionService extends StorePdfService<PdfEvidenceDescription, EvidenceDescriptionPdfData> {
     StoreEvidenceDescriptionService(
-            PdfService pdfService,
+            @Qualifier("oldPdfService") PdfService pdfService,
             @Value("${evidenceDescription.html.template.path}")String pdfTemplatePath,
             CcdPdfService ccdPdfService,
             IdamService idamService,

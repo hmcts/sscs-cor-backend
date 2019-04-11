@@ -227,7 +227,8 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscscorbackend/service/EvidenceUploadService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscscorbackend/service/OnlineHearingService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscscorbackend/service/pdf/EvidenceDescriptionPdfData.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscscorbackend/domain/pdf/PdfEvidenceDescription.java"
+                "src/main/java/uk/gov/hmcts/reform/sscscorbackend/domain/pdf/PdfEvidenceDescription.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscscorbackend/service/PdfCoverSheet.java"
     }
 }
 

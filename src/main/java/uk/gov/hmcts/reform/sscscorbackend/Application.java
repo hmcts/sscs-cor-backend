@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
+import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
 
 @SpringBootApplication
 @EnableCircuitBreaker
@@ -97,5 +98,14 @@ public class Application {
     @Bean
     public HttpClient userTokenParserHttpClient() {
         return serviceTokenParserHttpClient();
+    }
+
+    @Bean
+    public DocmosisPdfGenerationService docmosisPdfGenerationService(
+            @Value("${pdf-service.uri}") String pdfServiceEndpoint,
+            @Value("${pdf-service.accessKey}") String pdfServiceAccessKey,
+            RestTemplate restTemplate
+    ) {
+        return new DocmosisPdfGenerationService(pdfServiceEndpoint, pdfServiceAccessKey, restTemplate);
     }
 }

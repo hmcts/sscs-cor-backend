@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.OldPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 public class StorePdfServiceTest {
@@ -38,7 +39,7 @@ public class StorePdfServiceTest {
 
     @Before
     public void setUp() {
-        pdfService = mock(PdfService.class);
+        pdfService = mock(OldPdfService.class);
         sscsPdfService = mock(CcdPdfService.class);
         IdamService idamService = mock(IdamService.class);
         idamTokens = IdamTokens.builder().build();
