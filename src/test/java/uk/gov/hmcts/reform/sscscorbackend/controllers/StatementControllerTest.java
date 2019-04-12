@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import org.junit.Before;
@@ -12,37 +12,33 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Statement;
-import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
-import uk.gov.hmcts.reform.sscscorbackend.service.StoreAppellantStatementService;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.AppellantStatementPdfData;
+import uk.gov.hmcts.reform.sscscorbackend.service.AppellantStatementService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 
 public class StatementControllerTest {
 
     private String onlineHearingId;
-    private OnlineHearingService onlineHearingService;
     private long caseId;
     private Statement statement;
     private SscsCaseDetails sscsCaseDetails;
-    private StoreAppellantStatementService storeAppellantStatementService;
     private StatementController statementController;
+    private AppellantStatementService appellantStatementService;
 
     @Before
     public void setUp() {
         onlineHearingId = "someOnlineHearingId";
-        onlineHearingService = mock(OnlineHearingService.class);
         caseId = 12345L;
         statement = new Statement("someStatement");
         sscsCaseDetails = SscsCaseDetails.builder().id(caseId).build();
-        storeAppellantStatementService = mock(StoreAppellantStatementService.class);
-        statementController = new StatementController(storeAppellantStatementService, onlineHearingService);
+
+        appellantStatementService = mock(AppellantStatementService.class);
+        statementController = new StatementController(appellantStatementService);
     }
 
     @Test
     public void canUploadAStatement() {
-        when(onlineHearingService.getCcdCase(onlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
-        when(storeAppellantStatementService.storePdf(eq(caseId), eq(onlineHearingId), eq(new AppellantStatementPdfData(sscsCaseDetails, statement))))
-                .thenReturn(mock(CohEventActionContext.class));
+        when(appellantStatementService.handleAppellantStatement(onlineHearingId, statement))
+                .thenReturn(Optional.of(mock(CohEventActionContext.class)));
 
         ResponseEntity responseEntity = statementController.uploadStatement(onlineHearingId, statement);
 
@@ -50,12 +46,12 @@ public class StatementControllerTest {
     }
 
     @Test
-    public void cannotUploadAStatementIf() {
-        when(onlineHearingService.getCcdCase(onlineHearingId)).thenReturn(Optional.empty());
+    public void cannotUploadAStatementIfOnlineHearingNotFound() {
+        when(appellantStatementService.handleAppellantStatement(onlineHearingId, statement))
+                .thenReturn(Optional.empty());
 
         ResponseEntity responseEntity = statementController.uploadStatement(onlineHearingId, statement);
 
         assertThat(responseEntity.getStatusCode(), is(HttpStatus.NOT_FOUND));
-        verifyZeroInteractions(storeAppellantStatementService);
     }
 }

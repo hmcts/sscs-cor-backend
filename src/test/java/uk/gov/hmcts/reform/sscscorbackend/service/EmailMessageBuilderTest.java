@@ -141,4 +141,19 @@ public class EmailMessageBuilderTest {
                 "PIP Benefit Appeals\n" +
                 "HMCTS\n"));
     }
+
+    @Test
+    public void buildAppellantStatement() {
+        String message = new EmailMessageBuilder().getAppellantStatementMessage(caseDetails);
+
+        assertThat(message, is(
+                "Appeal reference number: caseReference\n" +
+                "Appellant name: Jean Valjean\n" +
+                "Appellant NINO: JV123456\n" +
+                "\n" +
+                "The appellant has added a statement to their appeal.\n" +
+                "\n" +
+                "PIP Benefit Appeals\n" +
+                "HMCTS\n"));
+    }
 }
