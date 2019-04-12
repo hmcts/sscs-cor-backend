@@ -171,4 +171,8 @@ public class DataFixtures {
                 )
         );
     }
+
+    public static Statement someStatement() {
+        return new Statement("Some Statement body");
+    }
 }
