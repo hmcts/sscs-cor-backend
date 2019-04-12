@@ -53,4 +53,8 @@
     <notes>We don't use Jetty for the app only wiremock does for the tests so ignore</notes>
     <cve>CVE-2018-12545</cve>
   </suppress>
+  <suppress>
+    <notes>Do not use the JavaScript or CoffeeScript gradle plugin</notes>
+    <cve>CVE-2019-11065</cve>
+  </suppress>
 </suppressions>
