@@ -23,7 +23,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.reform.logging.exception.AlertLevel;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscscorbackend.exception.SscsCorBackendException;
@@ -109,7 +108,7 @@ public class CreateCaseController {
                                     ).build()
                     ).build();
         } catch (IOException e) {
-            throw new SscsCorBackendException(AlertLevel.P4, e);
+            throw new SscsCorBackendException(e);
         }
 
         return sscsCaseData;
