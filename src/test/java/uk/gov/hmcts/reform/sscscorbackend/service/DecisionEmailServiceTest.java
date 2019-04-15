@@ -16,12 +16,14 @@ public class DecisionEmailServiceTest {
     private String messageBody;
     private String caseReference;
     private SscsCaseDetails caseDetails;
+    private JuiUrlGenerator juiUrlGenerator;
 
     @Before
     public void setUp() {
         corEmailService = mock(CorEmailService.class);
         emailMessageBuilder = mock(EmailMessageBuilder.class);
-        decisionEmailService = new DecisionEmailService(corEmailService, emailMessageBuilder);
+        juiUrlGenerator = mock(JuiUrlGenerator.class);
+        decisionEmailService = new DecisionEmailService(corEmailService, emailMessageBuilder, juiUrlGenerator);
         messageBody = "message body";
         caseReference = "caseReference";
         caseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().caseReference(caseReference).build()).build();
@@ -43,9 +45,11 @@ public class DecisionEmailServiceTest {
 
     @Test
     public void sendsCaseworkerEmailWhenDecisionRejected() {
+        String juiUrl = "someUrl";
+        when(juiUrlGenerator.generateUrl(caseDetails)).thenReturn(juiUrl);
         String reason = "reason";
         TribunalViewResponse tribunalViewResponse = new TribunalViewResponse("decision_rejected", reason);
-        when(emailMessageBuilder.getDecisionRejectedMessage(caseDetails, reason)).thenReturn(messageBody);
+        when(emailMessageBuilder.getDecisionRejectedMessage(caseDetails, reason, juiUrl)).thenReturn(messageBody);
 
         decisionEmailService.sendEmail(caseDetails, tribunalViewResponse);
 

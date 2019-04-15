@@ -98,5 +98,7 @@ module "sscs-core-backend" {
     EMAIL_FROM             = "${var.email_from_address}"
 
     PDF_SERVICE_ACCESS_KEY = "${data.azurerm_key_vault_secret.docmosis-api-key.value}"
+
+    JUI_BASE_URL  = "${var.jui_base_url}"
   }
 }
