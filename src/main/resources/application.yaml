@@ -120,3 +120,4 @@ pdf-service:
   uri: ${PDF_SERVICE_BASE_URL:https://docmosis-development.platform.hmcts.net/rs/render}
   accessKey: ${PDF_SERVICE_ACCESS_KEY:setMe}
 
+juiBaseUrl: "${JUI_BASE_URL:https://jui-webapp-aat.service.core-compute-aat.internal}"

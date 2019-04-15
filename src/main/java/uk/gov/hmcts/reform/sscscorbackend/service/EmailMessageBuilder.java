@@ -62,10 +62,11 @@ public class EmailMessageBuilder {
         return buildMessage(caseDetails, "The appellant has accepted the tribunal's view.");
     }
 
-    public String getDecisionRejectedMessage(SscsCaseDetails caseDetails, String reason) {
+    public String getDecisionRejectedMessage(SscsCaseDetails caseDetails, String reason, String juiUrl) {
         return buildMessage(caseDetails, "The appellant has rejected the tribunal's view.\n" +
                 "\n" +
-                "Reasons for requesting a hearing:\n\n" + reason);
+                "Reasons for requesting a hearing:\n\n" + reason + "\n\n" +
+                juiUrl);
     }
 
     public String getAppellantStatementMessage(SscsCaseDetails sscsCaseDetails) {
