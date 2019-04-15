@@ -153,7 +153,7 @@ public class DataFixtures {
     }
 
     public static PdfAppealDetails somePdfAppealDetails() {
-        return new PdfAppealDetails("someTitle", "someFirstName", "someSurname", "someNino", "someCaseRef");
+        return new PdfAppealDetails("someTitle", "someFirstName", "someSurname", "someNino", "someCaseRef", "someDate");
     }
 
     public static Decision someDecision() {
