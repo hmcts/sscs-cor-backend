@@ -153,7 +153,7 @@ public class DataFixtures {
     }
 
     public static PdfAppealDetails somePdfAppealDetails() {
-        return new PdfAppealDetails("someTitle", "someFirstName", "someSurname", "someNino", "someCaseRef");
+        return new PdfAppealDetails("someTitle", "someFirstName", "someSurname", "someNino", "someCaseRef", "someDate");
     }
 
     public static Decision someDecision() {
@@ -170,5 +170,9 @@ public class DataFixtures {
                         asList(new Activity("mobilityActivity1", "2.1"), new Activity("mobilityActivity2", "7.5")), asList(new Activity("dailyActivity1", "3.2"), new Activity("dailyActivity2", "4"))
                 )
         );
+    }
+
+    public static Statement someStatement() {
+        return new Statement("Some Statement body");
     }
 }

@@ -1,20 +1,20 @@
 package uk.gov.hmcts.reform.sscscorbackend.domain.pdf;
 
-import java.util.Objects;
-
 public class PdfAppealDetails {
     private final String title;
     private final String firstName;
     private final String surname;
     private final String nino;
     private final String caseReference;
+    private final String dateCreated;
 
-    public PdfAppealDetails(String title, String firstName, String surname, String nino, String caseReference) {
+    public PdfAppealDetails(String title, String firstName, String surname, String nino, String caseReference, String dateCreated) {
         this.title = title;
         this.firstName = firstName;
         this.surname = surname;
         this.nino = nino;
         this.caseReference = caseReference;
+        this.dateCreated = dateCreated;
     }
 
     public String getTitle() {
@@ -37,6 +37,10 @@ public class PdfAppealDetails {
         return caseReference;
     }
 
+    public String getDateCreated() {
+        return dateCreated;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -45,17 +49,36 @@ public class PdfAppealDetails {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+
         PdfAppealDetails that = (PdfAppealDetails) o;
-        return Objects.equals(title, that.title) &&
-                Objects.equals(firstName, that.firstName) &&
-                Objects.equals(surname, that.surname) &&
-                Objects.equals(nino, that.nino) &&
-                Objects.equals(caseReference, that.caseReference);
+
+        if (title != null ? !title.equals(that.title) : that.title != null) {
+            return false;
+        }
+        if (firstName != null ? !firstName.equals(that.firstName) : that.firstName != null) {
+            return false;
+        }
+        if (surname != null ? !surname.equals(that.surname) : that.surname != null) {
+            return false;
+        }
+        if (nino != null ? !nino.equals(that.nino) : that.nino != null) {
+            return false;
+        }
+        if (caseReference != null ? !caseReference.equals(that.caseReference) : that.caseReference != null) {
+            return false;
+        }
+        return dateCreated != null ? dateCreated.equals(that.dateCreated) : that.dateCreated == null;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, firstName, surname, nino, caseReference);
+        int result = title != null ? title.hashCode() : 0;
+        result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
+        result = 31 * result + (surname != null ? surname.hashCode() : 0);
+        result = 31 * result + (nino != null ? nino.hashCode() : 0);
+        result = 31 * result + (caseReference != null ? caseReference.hashCode() : 0);
+        result = 31 * result + (dateCreated != null ? dateCreated.hashCode() : 0);
+        return result;
     }
 
     @Override
@@ -66,6 +89,7 @@ public class PdfAppealDetails {
                 ", surname='" + surname + '\'' +
                 ", nino='" + nino + '\'' +
                 ", caseReference='" + caseReference + '\'' +
+                ", dateCreated='" + dateCreated + '\'' +
                 '}';
     }
 }

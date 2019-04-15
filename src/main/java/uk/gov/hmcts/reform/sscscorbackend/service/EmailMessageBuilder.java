@@ -68,6 +68,14 @@ public class EmailMessageBuilder {
                 "Reasons for requesting a hearing:\n\n" + reason);
     }
 
+    public String getAppellantStatementMessage(SscsCaseDetails sscsCaseDetails) {
+        return buildMessageWithHeading(
+                sscsCaseDetails,
+                "The appellant has written a statement online and submitted it to the tribunal. Their statement is attached.",
+                "Additional evidence submitted"
+        );
+    }
+
     private String buildMessageWithHeading(SscsCaseDetails caseDetails, String message, String heading) {
         String templateWithHeading = TEMPLATE_WITH_HEADING.replace("{heading}", heading);
 

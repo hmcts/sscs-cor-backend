@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscscorbackend.service.pdf.DecodeJsonUtil.decodeStringWithWhitespace;
+import static uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfDateUtil.reformatDate;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
@@ -34,12 +32,5 @@ public class OnlineHearingDateReformatter {
                 newDecision,
                 onlineHearing.getFinalDecision(),
                 onlineHearing.isHasFinalDecision());
-    }
-
-    private String reformatDate(String dateString) {
-        if (isNotBlank(dateString)) {
-            return LocalDate.parse(dateString).format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
-        }
-        return dateString;
     }
 }
