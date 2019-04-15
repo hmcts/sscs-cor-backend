@@ -33,6 +33,11 @@ data "azurerm_key_vault_secret" "idam-sscs-oauth2-client-secret" {
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
+data "azurerm_key_vault_secret" "docmosis-api-key" {
+  name = "docmosis-api-key"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
+}
+
 locals {
   ase_name = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
 
@@ -91,5 +96,9 @@ module "sscs-core-backend" {
     EMAIL_SERVER_PORT      = "${local.email_port}"
     DWP_EMAIL              = "${var.dwp_email}"
     EMAIL_FROM             = "${var.email_from_address}"
+
+    PDF_SERVICE_ACCESS_KEY = "${data.azurerm_key_vault_secret.docmosis-api-key.value}"
+
+    JUI_BASE_URL  = "${var.jui_base_url}"
   }
 }

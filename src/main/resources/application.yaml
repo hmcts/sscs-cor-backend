@@ -85,6 +85,9 @@ evidenceDescription:
   html:
     template:
       path: /templates/evidenceDescription.html
+evidenceCoverSheet:
+  docmosis:
+    template: TB-SCS-GNO-ENG-00012.doc
 
 
 appeal:
@@ -112,3 +115,9 @@ feign:
 
 logging.level:
   org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod: DEBUG
+
+pdf-service:
+  uri: ${PDF_SERVICE_BASE_URL:https://docmosis-development.platform.hmcts.net/rs/render}
+  accessKey: ${PDF_SERVICE_ACCESS_KEY:setMe}
+
+juiBaseUrl: "${JUI_BASE_URL:https://jui-webapp-aat.service.core-compute-aat.internal}"

@@ -45,6 +45,10 @@ spec:
           value: "mta.reform.hmcts.net"
         - name: EMAIL_SERVER_PORT
           value: "25"
+        - name: PDF_SERVICE_ACCESS_KEY
+          value: "${PDF_SERVICE_ACCESS_KEY}"
+        - name: JUI_BASE_URL
+          value: "https://jui-webapp-aat.service.core-compute-aat.internal"
 
         envFrom:
           - configMapRef:

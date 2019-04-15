@@ -7,7 +7,6 @@ import java.io.IOException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class EvidenceUploadTest extends BaseFunctionTest {
@@ -34,9 +33,8 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         assertThat(questionResponse.has("evidence"), is(false));
     }
 
-    @Ignore
     @Test
-    public void uploadThenDeleteEvidenceToHearing() throws IOException, InterruptedException, JSONException {
+    public void uploadThenDeleteEvidenceToHearing() throws IOException, JSONException {
         OnlineHearing hearingWithQuestion = createHearing(true);
 
         JSONArray draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(hearingWithQuestion.getHearingId());
@@ -55,5 +53,13 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         sscsCorBackendRequests.deleteHearingEvidence(hearingWithQuestion.getHearingId(), evidenceId);
         draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(hearingWithQuestion.getHearingId());
         assertThat(draftHearingEvidence.length(), is(0));
+    }
+
+    @Test
+    public void getEvidenceCoverSheet() throws IOException {
+        OnlineHearing hearing = createHearing(true);
+
+        String coversheet = sscsCorBackendRequests.getCoversheet(hearing.getHearingId());
+        assertThat(coversheet, is("evidence_cover_sheet.pdf"));
     }
 }

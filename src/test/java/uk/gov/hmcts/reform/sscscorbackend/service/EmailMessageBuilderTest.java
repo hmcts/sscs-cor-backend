@@ -125,7 +125,7 @@ public class EmailMessageBuilderTest {
     @Test
     public void buildDecisionRejected() {
         String reason = "some reason";
-        String message = new EmailMessageBuilder().getDecisionRejectedMessage(caseDetails, reason);
+        String message = new EmailMessageBuilder().getDecisionRejectedMessage(caseDetails, reason, "someUrl");
 
         assertThat(message, is(
                 "Appeal reference number: caseReference\n" +
@@ -137,6 +137,25 @@ public class EmailMessageBuilderTest {
                 "Reasons for requesting a hearing:\n" +
                 "\n" +
                 reason + "\n" +
+                "\n" +
+                "someUrl\n" +
+                "\n" +
+                "PIP Benefit Appeals\n" +
+                "HMCTS\n"));
+    }
+
+    @Test
+    public void buildAppellantStatement() {
+        String message = new EmailMessageBuilder().getAppellantStatementMessage(caseDetails);
+
+        assertThat(message, is(
+                "Additional evidence submitted\n" +
+                "\n" +
+                "Appeal reference number: caseReference\n" +
+                "Appellant name: Jean Valjean\n" +
+                "Appellant NINO: JV123456\n" +
+                "\n" +
+                "The appellant has written a statement online and submitted it to the tribunal. Their statement is attached.\n" +
                 "\n" +
                 "PIP Benefit Appeals\n" +
                 "HMCTS\n"));

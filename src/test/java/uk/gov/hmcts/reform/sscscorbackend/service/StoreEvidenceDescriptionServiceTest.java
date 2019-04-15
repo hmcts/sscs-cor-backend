@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.EvidenceDescription;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfEvidenceDescription;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.EvidenceDescriptionPdfData;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.OldPdfService;
 
 public class StoreEvidenceDescriptionServiceTest {
     private StoreEvidenceDescriptionService storeEvidenceDescriptionService;
@@ -25,7 +25,7 @@ public class StoreEvidenceDescriptionServiceTest {
     @Before
     public void setUp() throws Exception {
         storeEvidenceDescriptionService = new StoreEvidenceDescriptionService(
-                mock(PdfService.class),
+                mock(OldPdfService.class),
                 "template_path",
                 mock(CcdPdfService.class),
                 mock(IdamService.class),

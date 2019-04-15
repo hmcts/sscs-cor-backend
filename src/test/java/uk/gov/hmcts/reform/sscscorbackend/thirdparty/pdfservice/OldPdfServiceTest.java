@@ -16,14 +16,14 @@ import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.I18nBuilder;
 
-public class PdfServiceTest {
+public class OldPdfServiceTest {
     @Test
     public void createsPdf() throws IOException {
         PDFServiceClient pdfServiceClient = mock(PDFServiceClient.class);
         I18nBuilder i18nBuilder = mock(I18nBuilder.class);
         HashMap i18n = new HashMap();
         when(i18nBuilder.build()).thenReturn(i18n);
-        PdfService appellantTemplatePath = new PdfService(pdfServiceClient, i18nBuilder);
+        PdfService appellantTemplatePath = new OldPdfService(pdfServiceClient, i18nBuilder);
 
         PdfSummary pdfSummary = DataFixtures.somePdfSummary();
 

@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfSummaryBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohConversations;
-import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.OldPdfService;
 
 public class StoreOnlineHearingServiceTest {
 
@@ -36,7 +36,7 @@ public class StoreOnlineHearingServiceTest {
 
         underTest = new StoreOnlineHearingService(
                 cohService, mock(IdamService.class), pdfSummaryBuilder,
-                mock(CcdPdfService.class), mock(PdfService.class), "sometemplate",
+                mock(CcdPdfService.class), mock(OldPdfService.class), "sometemplate",
                 mock(EvidenceManagementService.class));
     }
 

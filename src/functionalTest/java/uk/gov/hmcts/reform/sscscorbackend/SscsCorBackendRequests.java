@@ -6,6 +6,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -17,6 +18,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -132,15 +134,12 @@ public class SscsCorBackendRequests {
                         fileName)
                 .build();
 
-        HttpResponse response = client.execute(put(baseUrl + "/continuous-online-hearings/" + hearingId + "/evidence")
-                .setEntity(data)
-                .build());
+        HttpResponse response = putRequest("/continuous-online-hearings/" + hearingId + "/evidence", data);
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
     }
 
     public JSONArray getDraftHearingEvidence(String hearingId) throws IOException {
-        HttpResponse response = client.execute(get(baseUrl + "/continuous-online-hearings/" + hearingId + "/evidence")
-                .build());
+        HttpResponse response = getRequest("/continuous-online-hearings/" + hearingId + "/evidence");
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
 
         String responseBody = EntityUtils.toString(response.getEntity());
@@ -187,6 +186,14 @@ public class SscsCorBackendRequests {
         assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
     }
 
+    public String getCoversheet(String hearingId) throws IOException {
+        CloseableHttpResponse getCoverSheetResponse = getRequest("/continuous-online-hearings/" + hearingId + "/evidence/coversheet");
+
+        assertThat(getCoverSheetResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+        Header fileNameHeader = getCoverSheetResponse.getFirstHeader("Content-Disposition");
+        return ContentDisposition.parse(fileNameHeader.getValue()).getFilename();
+    }
+
     private RequestBuilder addHeaders(RequestBuilder requestBuilder) {
         return requestBuilder
                 .setHeader(HttpHeaders.AUTHORIZATION, idamTokens.getIdamOauth2Token())
@@ -198,7 +205,7 @@ public class SscsCorBackendRequests {
                 .build());
     }
 
-    private CloseableHttpResponse putRequest(String url, StringEntity body) throws IOException {
+    private CloseableHttpResponse putRequest(String url, HttpEntity body) throws IOException {
         return client.execute(addHeaders(put(baseUrl + url))
                 .setEntity(body)
                 .build());

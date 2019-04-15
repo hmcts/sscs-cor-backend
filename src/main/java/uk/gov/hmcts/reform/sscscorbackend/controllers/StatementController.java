@@ -9,21 +9,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Statement;
-import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
-import uk.gov.hmcts.reform.sscscorbackend.service.StoreAppellantStatementService;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.AppellantStatementPdfData;
+import uk.gov.hmcts.reform.sscscorbackend.service.AppellantStatementService;
 
 @Slf4j
 @RestController
 @RequestMapping("/continuous-online-hearings")
 public class StatementController {
-    private final StoreAppellantStatementService storeAppellantStatementService;
-    private final OnlineHearingService onlineHearingService;
+    private final AppellantStatementService appellantStatementService;
 
     @Autowired
-    public StatementController(StoreAppellantStatementService storeAppellantStatementService, OnlineHearingService onlineHearingService) {
-        this.storeAppellantStatementService = storeAppellantStatementService;
-        this.onlineHearingService = onlineHearingService;
+    public StatementController(AppellantStatementService appellantStatementService) {
+        this.appellantStatementService = appellantStatementService;
     }
 
     @ApiOperation(value = "Upload COR personal statement",
@@ -42,9 +38,9 @@ public class StatementController {
             @PathVariable("onlineHearingId") String onlineHearingId,
             @RequestBody Statement statement) {
 
-        return onlineHearingService.getCcdCase(onlineHearingId).map(caseDetails -> {
-            storeAppellantStatementService.storePdf(caseDetails.getId(), onlineHearingId, new AppellantStatementPdfData(caseDetails, statement));
-            return ResponseEntity.noContent().build();
-        }).orElse(ResponseEntity.notFound().build());
+        return appellantStatementService
+                .handleAppellantStatement(onlineHearingId, statement)
+                .map(handled -> ResponseEntity.noContent().build())
+                .orElse(ResponseEntity.notFound().build());
     }
 }

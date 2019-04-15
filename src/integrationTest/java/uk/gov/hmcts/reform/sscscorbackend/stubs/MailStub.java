@@ -24,6 +24,20 @@ public class MailStub {
 
     public void stop() {
         smtpServer.stop();
+        printEmail();
+    }
+
+    public void printEmail() {
+        if (System.getenv("SHOW_EMAILS") != null) {
+            smtpServer.getReceivedEmails().forEach(message -> {
+                System.out.println("-------------- Received Email --------------");
+                System.out.println("To: " + message.getHeaderValue("To"));
+                System.out.println("Subject: " + message.getHeaderValue("Subject"));
+                System.out.println();
+                System.out.println(message.getBody());
+                System.out.println("-------------- End Of Email --------------");
+            });
+        }
     }
 
     public void waitForEmailThatMatches(Predicate<SmtpMessage> matches, String expected) {

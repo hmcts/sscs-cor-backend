@@ -10,12 +10,16 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.*;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 import uk.gov.hmcts.reform.sscscorbackend.domain.EvidenceDescription;
+import uk.gov.hmcts.reform.sscscorbackend.service.CoversheetService;
 import uk.gov.hmcts.reform.sscscorbackend.service.EvidenceUploadService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.IllegalFileTypeException;
 
@@ -27,11 +31,13 @@ public class EvidenceUploadControllerTest {
     private String someQuestionId;
     private String someEvidenceId;
     private Evidence evidence;
+    private CoversheetService coversheetService;
 
     @Before
     public void setUp() {
         evidenceUploadService = mock(EvidenceUploadService.class);
-        evidenceUploadController = new EvidenceUploadController(evidenceUploadService);
+        coversheetService = mock(CoversheetService.class);
+        evidenceUploadController = new EvidenceUploadController(evidenceUploadService, coversheetService);
         someOnlineHearingId = "someOnlineHearingId";
         someQuestionId = "someQuestionId";
         someEvidenceId = "someEvidenceId";
@@ -173,5 +179,25 @@ public class EvidenceUploadControllerTest {
 
         assertThat(listResponseEntity.getStatusCode(), is(OK));
         assertThat(listResponseEntity.getBody(), is(expectedEvidence));
+    }
+
+    @Test
+    public void getCoversheet() {
+        byte[] coversheetPdf = {2, 4, 6, 0, 1};
+        when(coversheetService.createCoverSheet(someOnlineHearingId)).thenReturn(Optional.of(coversheetPdf));
+        ResponseEntity<ByteArrayResource> response = evidenceUploadController.getCoverSheet(someOnlineHearingId);
+
+        assertThat(response.getStatusCode(), is(OK));
+        assertThat(response.getHeaders().getContentType(), is(MediaType.APPLICATION_PDF));
+        assertThat(response.getHeaders().getContentDisposition().getFilename(), is("evidence_cover_sheet.pdf"));
+        assertThat(response.getBody().getByteArray(), is(coversheetPdf));
+    }
+
+    @Test
+    public void getCoversheetWhenHearingDoesNotExist() {
+        when(coversheetService.createCoverSheet(someOnlineHearingId)).thenReturn(Optional.empty());
+        ResponseEntity<ByteArrayResource> response = evidenceUploadController.getCoverSheet(someOnlineHearingId);
+
+        assertThat(response.getStatusCode(), is(NOT_FOUND));
     }
 }
