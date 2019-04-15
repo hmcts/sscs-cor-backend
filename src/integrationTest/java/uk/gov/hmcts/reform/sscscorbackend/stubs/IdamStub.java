@@ -25,7 +25,7 @@ public class IdamStub extends BaseStub {
         String authorizeCode = "someCode";
         Authorize authorize = Authorize.builder().code(authorizeCode).build();
         String authorizeJson = objectMapper.writeValueAsString(authorize);
-        String redirectUrl = URLEncoder.encode(idamRedirectUrl, StandardCharsets.UTF_8.name());
+        String redirectUrl = URLEncoder.encode(idamRedirectUrl, StandardCharsets.UTF_8.name()).replaceAll("%3A", ":");
         wireMock.stubFor(post(urlEqualTo("/oauth2/authorize?" +
                 "response_type=code&" +
                 "client_id=" + clientId + "&" +
