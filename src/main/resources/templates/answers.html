@@ -143,6 +143,14 @@
                             {{ pdfSummary.appealDetails.caseReference }}
                         </dd>
                     </div>
+                    <div>
+                        <dt class="cya-question">
+                            Date created
+                        </dt>
+                        <dd class="cya-answer">
+                            {{ pdfSummary.appealDetails.dateCreated }}
+                        </dd>
+                    </div>
                 </dl>
                 {% for question in pdfSummary.questions %}
                     <h2 class="heading-medium">{{ question.question_header_text }}</h2>

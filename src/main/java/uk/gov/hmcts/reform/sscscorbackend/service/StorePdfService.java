@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
+import static java.time.LocalDate.now;
+import static uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfDateUtil.reformatDate;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -101,8 +104,9 @@ public abstract class StorePdfService<E, D extends PdfData> {
 
         String nino = caseDetails.getData().getAppeal().getAppellant().getIdentity().getNino();
         String caseReference = caseDetails.getData().getCaseReference();
+        String dateCreated = reformatDate(now());
 
-        return new PdfAppealDetails(appellantTitle, appellantFirstName, appellantLastName, nino, caseReference);
+        return new PdfAppealDetails(appellantTitle, appellantFirstName, appellantLastName, nino, caseReference, dateCreated);
     }
 
     protected abstract String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId);
