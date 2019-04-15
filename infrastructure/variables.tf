@@ -60,3 +60,7 @@ variable "email_from_address" {
 variable "createCcdEndpoint" {
   default     = "false"
 }
+
+variable "jui_base_url" {
+  type = "string"
+}

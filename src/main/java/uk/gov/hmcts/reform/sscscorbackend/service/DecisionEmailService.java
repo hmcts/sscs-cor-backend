@@ -8,13 +8,15 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
 public class DecisionEmailService {
     private final CorEmailService corEmailService;
     private final EmailMessageBuilder emailMessageBuilder;
+    private final JuiUrlGenerator juiUrlGenerator;
 
     public DecisionEmailService(
             CorEmailService corEmailService,
-            EmailMessageBuilder emailMessageBuilder
-    ) {
+            EmailMessageBuilder emailMessageBuilder,
+            JuiUrlGenerator juiUrlGenerator) {
         this.corEmailService = corEmailService;
         this.emailMessageBuilder = emailMessageBuilder;
+        this.juiUrlGenerator = juiUrlGenerator;
     }
 
     public void sendEmail(SscsCaseDetails caseDetails, TribunalViewResponse tribunalViewResponse) {
@@ -24,7 +26,8 @@ public class DecisionEmailService {
             corEmailService.sendEmailToCaseworker(subject, decisionIssuedMessage);
             corEmailService.sendEmailToDwp(subject, decisionIssuedMessage);
         } else {
-            String decisionIssuedMessage = emailMessageBuilder.getDecisionRejectedMessage(caseDetails, tribunalViewResponse.getReason());
+            String juiUrl = juiUrlGenerator.generateUrl(caseDetails);
+            String decisionIssuedMessage = emailMessageBuilder.getDecisionRejectedMessage(caseDetails, tribunalViewResponse.getReason(), juiUrl);
             String subject = "Tribunal view rejected (" + caseDetails.getData().getCaseReference() + ")";
             corEmailService.sendEmailToCaseworker(subject, decisionIssuedMessage);
         }
