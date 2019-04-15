@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import uk.gov.hmcts.reform.logging.exception.AlertLevel;
 
 @Slf4j
 @ControllerAdvice
@@ -23,7 +22,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
     @ExceptionHandler(value = { Exception.class })
     protected ResponseEntity<Object> logExceptions(Exception ex, WebRequest request) {
-        SscsCorBackendException exc = new SscsCorBackendException(AlertLevel.P3, ex);
+        SscsCorBackendException exc = new SscsCorBackendException(ex);
         log.error("Unhandled exception", exc);
 
         String body = "An error has occurred" +

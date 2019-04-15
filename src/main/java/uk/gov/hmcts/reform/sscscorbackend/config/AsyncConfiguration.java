@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import uk.gov.hmcts.reform.logging.exception.AlertLevel;
 import uk.gov.hmcts.reform.sscscorbackend.exception.SscsCorBackendException;
 
 @Configuration
@@ -31,7 +30,7 @@ public class AsyncConfiguration implements AsyncConfigurer {
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return (ex, method, params) -> {
-            SscsCorBackendException exc = new SscsCorBackendException(AlertLevel.P3, ex);
+            SscsCorBackendException exc = new SscsCorBackendException(ex);
             log.error("Unhandled in COH thread exception", exc);
         };
     }
