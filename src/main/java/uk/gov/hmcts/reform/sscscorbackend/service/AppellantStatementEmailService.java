@@ -16,7 +16,7 @@ public class AppellantStatementEmailService {
     public void sendEmail(CohEventActionContext cohEventActionContext) {
         String message = emailMessageBuilder.getAppellantStatementMessage(cohEventActionContext.getDocument());
 
-        String subject = "Appellant statement (" + cohEventActionContext.getDocument().getData().getCaseReference() + ")";
+        String subject = "COR: Additional evidence submitted (" + cohEventActionContext.getDocument().getData().getCaseReference() + ")";
         corEmailService.sendPdfToDwp(cohEventActionContext, subject, message);
     }
 }

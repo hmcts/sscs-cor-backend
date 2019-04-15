@@ -69,7 +69,11 @@ public class EmailMessageBuilder {
     }
 
     public String getAppellantStatementMessage(SscsCaseDetails sscsCaseDetails) {
-        return buildMessage(sscsCaseDetails, "The appellant has added a statement to their appeal.");
+        return buildMessageWithHeading(
+                sscsCaseDetails,
+                "The appellant has written a statement online and submitted it to the tribunal. Their statement is attached.",
+                "Additional evidence submitted"
+        );
     }
 
     private String buildMessageWithHeading(SscsCaseDetails caseDetails, String message, String heading) {

@@ -147,11 +147,13 @@ public class EmailMessageBuilderTest {
         String message = new EmailMessageBuilder().getAppellantStatementMessage(caseDetails);
 
         assertThat(message, is(
+                "Additional evidence submitted\n" +
+                "\n" +
                 "Appeal reference number: caseReference\n" +
                 "Appellant name: Jean Valjean\n" +
                 "Appellant NINO: JV123456\n" +
                 "\n" +
-                "The appellant has added a statement to their appeal.\n" +
+                "The appellant has written a statement online and submitted it to the tribunal. Their statement is attached.\n" +
                 "\n" +
                 "PIP Benefit Appeals\n" +
                 "HMCTS\n"));
