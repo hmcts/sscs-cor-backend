@@ -10,8 +10,7 @@ public class AppellantStatementTest extends BaseIntegrationTest {
     private final Long caseId = 123L;
     private final String hearingId = "hearingId";
     private String caseReference = "caseReference";
-
-
+    
     @Test
     public void recordRejectedResponse() throws JsonProcessingException {
         cohStub.stubGetOnlineHearing(caseId, hearingId);
@@ -30,6 +29,6 @@ public class AppellantStatementTest extends BaseIntegrationTest {
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
-        mailStub.hasEmailWithSubjectAndAttachment("Appellant statement (caseReference)", pdf);
+        mailStub.hasEmailWithSubjectAndAttachment("COR: Additional evidence submitted (caseReference)", pdf);
     }
 }

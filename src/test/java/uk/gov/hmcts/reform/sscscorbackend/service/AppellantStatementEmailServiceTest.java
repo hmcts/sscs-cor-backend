@@ -35,7 +35,7 @@ public class AppellantStatementEmailServiceTest {
 
         appellantStatementEmailService.sendEmail(cohEventActionContext);
 
-        verify(corEmailService).sendPdfToDwp(cohEventActionContext, "Appellant statement (" + caseRef + ")", message);
+        verify(corEmailService).sendPdfToDwp(cohEventActionContext, "COR: Additional evidence submitted (" + caseRef + ")", message);
     }
 
 }
