@@ -62,7 +62,7 @@ public abstract class StorePdfService<E, D extends PdfData> {
         SscsCaseData caseData = caseDetails.getData();
         String pdfName = getPdfName(documentNamePrefix, caseData.getCaseReference());
         log.info("Adding pdf to ccd for [" + caseId + "]");
-        SscsCaseData sscsCaseData = ccdPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens);
+        SscsCaseData sscsCaseData = ccdPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens, "Other evidence");
 
         return new CohEventActionContext(new Pdf(pdfBytes, pdfName), data.getCaseDetails().toBuilder().data(sscsCaseData).build());
     }
