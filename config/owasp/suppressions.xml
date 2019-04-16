@@ -67,4 +67,9 @@
     <cve>CVE-2011-2732</cve>
     <cve>CVE-2012-5055</cve>
   </suppress>
+  <suppress>
+    <notes>We don't use netty so ignoring</notes>
+    <cve>CVE-2014-3488</cve>
+    <cve>CVE-2015-2156</cve>
+  </suppress>
 </suppressions>
