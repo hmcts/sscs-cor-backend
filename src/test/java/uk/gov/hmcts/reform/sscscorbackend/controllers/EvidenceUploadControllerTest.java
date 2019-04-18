@@ -77,7 +77,7 @@ public class EvidenceUploadControllerTest {
     @Test
     public void canUploadEvidenceToQuestion() {
         MultipartFile file = mock(MultipartFile.class);
-        when(evidenceUploadService.uploadQuestionEvidence(someOnlineHearingId, someQuestionId, file)).thenReturn(of(evidence));
+        when(evidenceUploadService.uploadDraftQuestionEvidence(someOnlineHearingId, someQuestionId, file)).thenReturn(of(evidence));
 
         ResponseEntity<Evidence> evidenceResponseEntity = evidenceUploadController.uploadEvidence(
                 someOnlineHearingId, someQuestionId, file
@@ -89,7 +89,7 @@ public class EvidenceUploadControllerTest {
     @Test
     public void cannotUploadEvidenceToQuestionWhenOnlineHearingDoesNotExist() {
         MultipartFile file = mock(MultipartFile.class);
-        when(evidenceUploadService.uploadQuestionEvidence(someOnlineHearingId, someQuestionId, file)).thenReturn(empty());
+        when(evidenceUploadService.uploadDraftQuestionEvidence(someOnlineHearingId, someQuestionId, file)).thenReturn(empty());
 
         ResponseEntity<Evidence> evidenceResponseEntity = evidenceUploadController.uploadEvidence(
                 someOnlineHearingId, someQuestionId, file
@@ -101,7 +101,7 @@ public class EvidenceUploadControllerTest {
     @Test
     public void cannotUploadDocumentsToQuestionThatDocumentStoreDoesNotSupport() {
         MultipartFile file = mock(MultipartFile.class);
-        when(evidenceUploadService.uploadQuestionEvidence(someOnlineHearingId, someQuestionId, file)).thenThrow(new IllegalFileTypeException("someFile.bad"));
+        when(evidenceUploadService.uploadDraftQuestionEvidence(someOnlineHearingId, someQuestionId, file)).thenThrow(new IllegalFileTypeException("someFile.bad"));
 
         ResponseEntity<Evidence> evidenceResponseEntity = evidenceUploadController.uploadEvidence(
                 someOnlineHearingId, someQuestionId, file

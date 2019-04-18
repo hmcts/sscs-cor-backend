@@ -52,7 +52,7 @@ public class EvidenceUploadService {
         return uploadEvidence(onlineHearingId, file, draftHearingDocumentExtractor, document -> new SscsDocument(createNewDocumentDetails(document)));
     }
 
-    public Optional<Evidence> uploadQuestionEvidence(String onlineHearingId, String questionId, MultipartFile file) {
+    public Optional<Evidence> uploadDraftQuestionEvidence(String onlineHearingId, String questionId, MultipartFile file) {
         return uploadEvidence(onlineHearingId, file, questionDocumentExtractor, document -> new CorDocument(new CorDocumentDetails(createNewDocumentDetails(document), questionId)));
     }
 
@@ -126,6 +126,34 @@ public class EvidenceUploadService {
                 .orElse(false);
     }
 
+    public boolean submitQuestionEvidence(String onlineHearingId, String questionId) {
+        return onlineHearingService.getCcdCase(onlineHearingId)
+                .map(caseDetails -> {
+                    Long ccdCaseId = caseDetails.getId();
+                    log.info("Submitting draft document for case [" + ccdCaseId + "] and question [" + questionId + "]");
+
+                    SscsCaseData sscsCaseData = caseDetails.getData();
+
+
+                    List<CorDocument> draftCorDocument = sscsCaseData.getDraftCorDocument();
+
+                    if (draftCorDocument != null && !draftCorDocument.isEmpty()) {
+                        Map<Boolean, List<CorDocument>> draftCorDocumentsForQuestionId = draftCorDocument.stream()
+                                .collect(partitioningBy(corDocument -> corDocument.getValue().getQuestionId().equals(questionId)));
+
+                        List<CorDocument> newCorDocumentList = union(
+                                emptyIfNull(sscsCaseData.getCorDocument()),
+                                emptyIfNull(draftCorDocumentsForQuestionId.get(true))
+                        );
+                        sscsCaseData.setCorDocument(newCorDocumentList);
+                        sscsCaseData.setDraftCorDocument(draftCorDocumentsForQuestionId.get(false));
+                        ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
+                    }
+                    return true;
+                })
+                .orElse(false);
+    }
+
     private List<String> getFileNames(SscsCaseData sscsCaseData) {
         return sscsCaseData.getDraftSscsDocument().stream()
                 .map(document -> document.getValue().getDocumentFileName())
@@ -143,9 +171,19 @@ public class EvidenceUploadService {
     }
 
     public Map<String, List<Evidence>> listQuestionEvidence(String onlineHearingId) {
-        return loadEvidence(onlineHearingId)
+        Optional<LoadedEvidence> loadedEvidence = loadEvidence(onlineHearingId);
+
+        Map<String, List<Evidence>> draftEvidence = loadedEvidence
+                .map(LoadedEvidence::getDraftQuestionEvidence)
+                .orElse(emptyMap());
+        Map<String, List<Evidence>> evidence = loadedEvidence
                 .map(LoadedEvidence::getQuestionEvidence)
                 .orElse(emptyMap());
+        HashMap<String, List<Evidence>> combinedEvidence = new HashMap<>();
+        combinedEvidence.putAll(draftEvidence);
+        combinedEvidence.putAll(evidence);
+
+        return combinedEvidence;
     }
 
     private Optional<LoadedEvidence> loadEvidence(String onlineHearingId) {
@@ -191,12 +229,12 @@ public class EvidenceUploadService {
     private static class QuestionDocumentExtractor implements DocumentExtract<CorDocument> {
         @Override
         public Function<SscsCaseData, List<CorDocument>> getDocuments() {
-            return SscsCaseData::getCorDocument;
+            return SscsCaseData::getDraftCorDocument;
         }
 
         @Override
         public BiConsumer<SscsCaseData, List<CorDocument>> setDocuments() {
-            return SscsCaseData::setCorDocument;
+            return SscsCaseData::setDraftCorDocument;
         }
 
         @Override

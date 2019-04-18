@@ -288,6 +288,7 @@ public class QuestionServiceTest {
 
         assertThat(hasBeenSubmitted, is(true));
         verify(cohService).updateAnswer(onlineHearingId, questionId, answerId, new CohUpdateAnswer(submitted.getCohAnswerState(), answer));
+        verify(evidenceUploadService).submitQuestionEvidence(onlineHearingId, questionId);
     }
 
     @Test
