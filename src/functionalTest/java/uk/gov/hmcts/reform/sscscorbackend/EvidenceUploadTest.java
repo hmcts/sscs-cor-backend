@@ -34,6 +34,28 @@ public class EvidenceUploadTest extends BaseFunctionTest {
     }
 
     @Test
+    public void uploadThenEvidenceThenSubmitQuestion() throws IOException, InterruptedException, JSONException {
+        OnlineHearing hearingWithQuestion = createHearingWithQuestion(true);
+
+        JSONObject questionResponse = sscsCorBackendRequests.getQuestion(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId());
+        assertThat(questionResponse.has("evidence"), is(false));
+
+        String fileName = "evidence.png";
+        sscsCorBackendRequests.uploadEvidence(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId(), fileName);
+
+
+        questionResponse = sscsCorBackendRequests.getQuestion(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId());
+        JSONArray evidence = questionResponse.getJSONArray("evidence");
+        assertThat(evidence.length(), is(1));
+        assertThat(evidence.getJSONObject(0).getString("file_name"), is(fileName));
+
+        sscsCorBackendRequests.answerQuestion(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId(), "some answer");
+        sscsCorBackendRequests.submitAnswer(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId());
+        questionResponse = sscsCorBackendRequests.getQuestion(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId());
+        assertThat(questionResponse.has("evidence"), is(true));
+    }
+
+    @Test
     public void uploadThenDeleteEvidenceToHearing() throws IOException, JSONException {
         OnlineHearing hearingWithQuestion = createHearing(true);
 
