@@ -82,7 +82,7 @@ public class EvidenceUploadController {
             @PathVariable("questionId") String questionId,
             @RequestParam("file") MultipartFile file
     ) {
-        return uploadEvidence(() -> evidenceUploadService.uploadQuestionEvidence(onlineHearingId, questionId, file));
+        return uploadEvidence(() -> evidenceUploadService.uploadDraftQuestionEvidence(onlineHearingId, questionId, file));
     }
 
     private ResponseEntity<Evidence> uploadEvidence(Supplier<Optional<Evidence>> uploadEvidence) {

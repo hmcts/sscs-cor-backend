@@ -33,7 +33,7 @@ public class CcdStub extends BaseStub {
             "        },\n" +
             "        \"benefitType\": { \"code\": \"PIP\" }\n" +
             "      },\n" +
-            "      \"corDocument\": [\n" +
+            "      \"draftCorDocument\": [\n" +
             "        {\n" +
             "          \"value\": {\n" +
             "            \"document\": {\n" +

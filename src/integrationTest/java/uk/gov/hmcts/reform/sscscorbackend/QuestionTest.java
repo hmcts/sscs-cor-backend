@@ -8,6 +8,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohAnswers;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.submitted;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 import org.junit.Test;
@@ -93,13 +94,17 @@ public class QuestionTest extends BaseIntegrationTest {
     }
 
     @Test
-    public void submitAnAnswerToAQuestion() {
+    public void submitAnAnswerToAQuestion() throws JsonProcessingException {
         String hearingId = "1";
         String questionId = "1";;
         String answerId = UUID.randomUUID().toString();
         String answer = "answer";
+        long caseId = 123L;
         cohStub.stubGetAnswer(hearingId, questionId, answer, answerId, "answer_drafted", ZonedDateTime.now());
         cohStub.stubUpdateAnswer(hearingId, questionId, answer, answerId, submitted);
+        cohStub.stubGetOnlineHearing(caseId, hearingId);
+        ccdStub.stubFindCaseByCaseId(caseId, "1", "someEvidence", "01-01-2010", "http://evidenceUrl");
+        ccdStub.stubUpdateCaseWithEvent(caseId, "uploadCorDocument", "caseRef");
 
         getRequest()
                 .when()
