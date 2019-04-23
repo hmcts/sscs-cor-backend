@@ -75,6 +75,7 @@ public class QuestionService {
                     CohUpdateAnswer updatedAnswer = new CohUpdateAnswer(AnswerState.submitted.getCohAnswerState(), answer.getAnswerText());
                     String answerId = answers.get(0).getAnswerId();
                     cohService.updateAnswer(onlineHearingId, questionId, answerId, updatedAnswer);
+                    evidenceUploadService.submitQuestionEvidence(onlineHearingId, questionId);
 
                     return true;
                 })

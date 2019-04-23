@@ -72,4 +72,8 @@
     <cve>CVE-2014-3488</cve>
     <cve>CVE-2015-2156</cve>
   </suppress>
+  <suppress>
+    <notes>We don't use the CGI Servlet</notes>
+    <cve>CVE-2019-0232</cve>
+  </suppress>
 </suppressions>
