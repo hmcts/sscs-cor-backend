@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.AdditionalMatchers.and;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -14,12 +15,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
 import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
 
 public class HearingRelistedActionTest {
 
@@ -30,6 +33,7 @@ public class HearingRelistedActionTest {
     private HearingRelistedAction underTest;
     private CorEmailService corEmailService;
     private EmailMessageBuilder emailMessageBuilder;
+    private CohService cohService;
 
     @Before
     public void setUp() {
@@ -42,7 +46,8 @@ public class HearingRelistedActionTest {
         corEmailService = mock(CorEmailService.class);
 
         emailMessageBuilder = mock(EmailMessageBuilder.class);
-        underTest = new HearingRelistedAction(mock(StoreOnlineHearingService.class), corCcdService, idamService, corEmailService, emailMessageBuilder);
+        cohService = mock(CohService.class);
+        underTest = new HearingRelistedAction(mock(StoreOnlineHearingService.class), corCcdService, idamService, corEmailService, emailMessageBuilder, cohService);
     }
 
     @Test
@@ -57,12 +62,15 @@ public class HearingRelistedActionTest {
         Pdf pdf = mock(Pdf.class);
         CohEventActionContext cohEventActionContext = new CohEventActionContext(pdf, sscsCaseDetails);
         when(emailMessageBuilder.getRelistedMessage(sscsCaseDetails)).thenReturn("message body");
+        String relistingReason = "relisting reason";
+        when(cohService.getConversations(onlineHearingId)).thenReturn(DataFixtures.someCohConversations(relistingReason));
 
         CohEventActionContext result = underTest.handle(caseId, onlineHearingId, cohEventActionContext);
 
-        ArgumentMatcher<SscsCaseData> hasOralHearing = data -> data.getAppeal().getHearingType().equals("oral");
+        ArgumentMatcher<SscsCaseData> hasOralHearing = data -> "oral".equals(data.getAppeal().getHearingType());
+        ArgumentMatcher<SscsCaseData> hasRelistingReason = data -> relistingReason.equals(data.getRelistingReason());
         verify(corCcdService).updateCase(
-                argThat(hasOralHearing),
+                and(argThat(hasOralHearing), argThat(hasRelistingReason)),
                 eq(caseId),
                 eq("updateHearingType"),
                 eq("SSCS - appeal updated event"),

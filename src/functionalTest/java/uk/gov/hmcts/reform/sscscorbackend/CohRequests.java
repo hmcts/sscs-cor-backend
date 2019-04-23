@@ -4,6 +4,7 @@ import static org.apache.http.client.methods.RequestBuilder.*;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static uk.gov.hmcts.reform.sscscorbackend.BaseFunctionTest.waitUntil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -126,6 +127,14 @@ public class CohRequests {
         return decisionReplyId;
     }
 
+    public void setRelistingReason(String hearingId, String relistingReason) throws IOException {
+        String url = cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/relist";
+        makePutRequest(cohClient, url, "{" +
+                "   \"reason\": \"" + relistingReason + "\"," +
+                "   \"state\": \"issued\"" +
+                "}", HttpStatus.ACCEPTED);
+    }
+
     private Supplier<Boolean> roundIssued(String hearingId) {
         return () -> {
             try {
@@ -160,19 +169,6 @@ public class CohRequests {
         };
     }
 
-    private static void waitUntil(Supplier<Boolean> condition, long timeoutInSeconds, String timeoutMessage) throws InterruptedException {
-        long timeout = timeoutInSeconds * 1000L * 1000000L;
-        long startTime = System.nanoTime();
-        while (true) {
-            if (condition.get()) {
-                break;
-            } else if (System.nanoTime() - startTime >= timeout) {
-                throw new RuntimeException(timeoutMessage);
-            }
-            Thread.sleep(1000L);
-        }
-    }
-
     private String makePostRequest(HttpClient client, String uri, String body, String responseValue) throws IOException {
         HttpResponse httpResponse = client.execute(post(uri)
                 .setHeader(HttpHeaders.AUTHORIZATION, idamTokens.getIdamOauth2Token())
@@ -187,13 +183,18 @@ public class CohRequests {
     }
 
     private void makePutRequest(HttpClient client, String uri, String body) throws IOException {
+        HttpStatus expectedStatus = HttpStatus.OK;
+        makePutRequest(client, uri, body, expectedStatus);
+    }
+
+    private void makePutRequest(HttpClient client, String uri, String body, HttpStatus expectedStatus) throws IOException {
         HttpResponse httpResponse = client.execute(put(uri)
                 .setHeader(HttpHeaders.AUTHORIZATION, idamTokens.getIdamOauth2Token())
                 .setHeader("ServiceAuthorization", idamTokens.getServiceAuthorization())
                 .setEntity(new StringEntity(body, APPLICATION_JSON))
                 .build());
 
-        assertThat(httpResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(expectedStatus.value()));
     }
 
     private JSONObject makeGetRequest(HttpClient client, String uri, String responseValue) throws IOException {
