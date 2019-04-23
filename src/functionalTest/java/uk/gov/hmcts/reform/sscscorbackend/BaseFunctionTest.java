@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
+import static java.lang.Long.valueOf;
 import static org.apache.http.conn.ssl.SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.function.Supplier;
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -19,7 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
@@ -27,7 +32,8 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
         "idam.s2s-auth.url=http://rpe-service-auth-provider-aat.service.core-compute-aat.internal",
         "idam.url=http://idam-api.aat.platform.hmcts.net",
         "idam.oauth2.redirectUrl=https://evidence-sharing-preprod.sscs.reform.hmcts.net",
-        "coh.url=http://coh-cor-aat.service.core-compute-aat.internal"
+        "coh.url=http://coh-cor-aat.service.core-compute-aat.internal",
+        "core_case_data.api.url=http://ccd-data-store-api-aat.service.core-compute-aat.internal"
 })
 public abstract class BaseFunctionTest {
     private final String baseUrl = System.getenv("TEST_URL");
@@ -45,6 +51,8 @@ public abstract class BaseFunctionTest {
 
     @Autowired
     private IdamService idamService;
+    @Autowired
+    protected CorCcdService corCcdService;
 
     @Before
     public void setUp() throws Exception {
@@ -116,5 +124,30 @@ public abstract class BaseFunctionTest {
 
     protected void decisionIssued(String hearingId, String caseId) throws IOException {
         sscsCorBackendRequests.cohDecisionIssued(hearingId, caseId);
+    }
+
+    protected SscsCaseDetails getCaseDetails(String caseId) {
+        return corCcdService.getByCaseId(valueOf(caseId), idamService.getIdamTokens());
+    }
+
+    protected void waitForCcdEvent(String caseId, EventType eventType) throws InterruptedException {
+        waitUntil(() -> corCcdService.getHistoryEvents(valueOf(caseId)).stream()
+                        .anyMatch(event -> EventType.COH_ONLINE_HEARING_RELISTED.equals(event.getEventType())),
+                10,
+                "CCD does not have [" + eventType.name() + "] event for case [" + caseId + "]"
+        );
+    }
+
+    public static void waitUntil(Supplier<Boolean> condition, long timeoutInSeconds, String timeoutMessage) throws InterruptedException {
+        long timeout = timeoutInSeconds * 1000L * 1000000L;
+        long startTime = System.nanoTime();
+        while (true) {
+            if (condition.get()) {
+                break;
+            } else if (System.nanoTime() - startTime >= timeout) {
+                throw new RuntimeException(timeoutMessage);
+            }
+            Thread.sleep(1000L);
+        }
     }
 }

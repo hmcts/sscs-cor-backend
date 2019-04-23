@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
+import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohConversations;
 
 @Service
 public class HearingRelistedAction implements CohEventAction {
@@ -21,17 +23,19 @@ public class HearingRelistedAction implements CohEventAction {
     private final IdamService idamService;
     private final CorEmailService corEmailService;
     private final EmailMessageBuilder emailMessageBuilder;
+    private final CohService cohService;
 
     @Autowired
     public HearingRelistedAction(StoreOnlineHearingService storeOnlineHearingService,
                                  CorCcdService corCcdService, IdamService idamService,
                                  CorEmailService corEmailService,
-                                 EmailMessageBuilder emailMessageBuilder) {
+                                 EmailMessageBuilder emailMessageBuilder, CohService cohService) {
         this.storeOnlineHearingService = storeOnlineHearingService;
         this.corCcdService = corCcdService;
         this.idamService = idamService;
         this.corEmailService = corEmailService;
         this.emailMessageBuilder = emailMessageBuilder;
+        this.cohService = cohService;
     }
 
     @Override
@@ -41,7 +45,7 @@ public class HearingRelistedAction implements CohEventAction {
 
     @Override
     public CohEventActionContext handle(Long caseId, String onlineHearingId, CohEventActionContext cohEventActionContext) {
-        SscsCaseData oralSscsCaseData = updateCcdCaseToOralHearing(caseId, cohEventActionContext);
+        SscsCaseData oralSscsCaseData = updateCcdCaseToOralHearing(caseId, onlineHearingId, cohEventActionContext);
         String relistedMessage = emailMessageBuilder.getRelistedMessage(cohEventActionContext.getDocument());
         corEmailService.sendEmailToDwp("COR: Hearing required", relistedMessage);
 
@@ -49,9 +53,10 @@ public class HearingRelistedAction implements CohEventAction {
         return new CohEventActionContext(cohEventActionContext.getPdf(), oralSscsCaseDetails);
     }
 
-    private SscsCaseData updateCcdCaseToOralHearing(Long caseId, CohEventActionContext cohEventActionContext) {
+    private SscsCaseData updateCcdCaseToOralHearing(Long caseId, String onlineHearingId, CohEventActionContext cohEventActionContext) {
         IdamTokens idamTokens = idamService.getIdamTokens();
-        SscsCaseData oralCaseData = updateHearingTypeToOral(cohEventActionContext.getDocument());
+        SscsCaseDetails sscsCaseDetails = updateRelistingReason(onlineHearingId, cohEventActionContext.getDocument());
+        SscsCaseData oralCaseData = updateHearingTypeToOral(sscsCaseDetails);
         corCcdService.updateCase(
                 oralCaseData,
                 caseId,
@@ -61,6 +66,14 @@ public class HearingRelistedAction implements CohEventAction {
                 idamTokens
         );
         return oralCaseData;
+    }
+
+    private SscsCaseDetails updateRelistingReason(String onlineHearingId, SscsCaseDetails sscsCaseDetails) {
+        CohConversations conversations = cohService.getConversations(onlineHearingId);
+        String relistingReason = conversations.getConversation().getRelisting().getReason();
+        sscsCaseDetails.getData().setRelistingReason(relistingReason);
+
+        return sscsCaseDetails;
     }
 
     private SscsCaseData updateHearingTypeToOral(SscsCaseDetails sscsCaseDetails) {
