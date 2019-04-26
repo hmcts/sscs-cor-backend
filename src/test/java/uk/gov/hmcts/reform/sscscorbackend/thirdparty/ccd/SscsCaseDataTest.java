@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend.service.ccd.domain;
+package uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
