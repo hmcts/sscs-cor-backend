@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend.service.onlinehearing;
+package uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.api;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
