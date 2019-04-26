@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
+package uk.gov.hmcts.reform.sscscorbackend.coheventmapper;
 
 import static java.lang.Long.valueOf;
 import static org.mockito.Mockito.*;
@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscscorbackend.coheventmapper.actions.CohEventAction;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;

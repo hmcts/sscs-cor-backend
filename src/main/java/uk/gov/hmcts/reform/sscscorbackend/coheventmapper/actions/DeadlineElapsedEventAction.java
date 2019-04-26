@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
+package uk.gov.hmcts.reform.sscscorbackend.coheventmapper.actions;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

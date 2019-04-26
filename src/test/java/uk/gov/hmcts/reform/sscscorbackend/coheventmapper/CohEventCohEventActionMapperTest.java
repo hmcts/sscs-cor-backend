@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
+package uk.gov.hmcts.reform.sscscorbackend.coheventmapper;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohEvent;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscscorbackend.coheventmapper.actions.CohEventAction;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
 
 public class CohEventCohEventActionMapperTest {
