@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend.service;
+package uk.gov.hmcts.reform.sscscorbackend.service.email;
 
 import static java.util.Arrays.asList;
 

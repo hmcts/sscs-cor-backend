@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.FinalDecision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
+import uk.gov.hmcts.reform.sscscorbackend.service.email.DecisionEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
