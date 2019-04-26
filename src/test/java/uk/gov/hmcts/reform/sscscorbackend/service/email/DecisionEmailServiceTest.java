@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend.service;
+package uk.gov.hmcts.reform.sscscorbackend.service.email;
 
 import static org.mockito.Mockito.*;
 
@@ -7,6 +7,7 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
+import uk.gov.hmcts.reform.sscscorbackend.service.JuiUrlGenerator;
 
 public class DecisionEmailServiceTest {
 

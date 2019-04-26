@@ -4,6 +4,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Statement;
+import uk.gov.hmcts.reform.sscscorbackend.service.email.AppellantStatementEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.AppellantStatementPdfData;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 

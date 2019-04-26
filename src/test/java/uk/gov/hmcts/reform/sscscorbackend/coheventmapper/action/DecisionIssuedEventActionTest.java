@@ -8,8 +8,8 @@ import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someStorePdfResult
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.coheventmapper.actions.DecisionIssuedEventAction;
-import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
-import uk.gov.hmcts.reform.sscscorbackend.service.EmailMessageBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
+import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 

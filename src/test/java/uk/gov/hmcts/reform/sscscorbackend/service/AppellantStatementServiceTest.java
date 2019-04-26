@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscscorbackend.service.email.AppellantStatementEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.AppellantStatementPdfData;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 

@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.sscscorbackend.coheventmapper.actions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
-import uk.gov.hmcts.reform.sscscorbackend.service.EmailMessageBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
+import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StoreAnswersDeadlineElapsedPdfService;
 
 @Service

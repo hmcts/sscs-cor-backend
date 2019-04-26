@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend.service;
+package uk.gov.hmcts.reform.sscscorbackend.service.email;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;

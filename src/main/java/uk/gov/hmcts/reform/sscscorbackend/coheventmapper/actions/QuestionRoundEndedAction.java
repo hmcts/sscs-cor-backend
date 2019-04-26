@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscscorbackend.coheventmapper.actions;
 
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscscorbackend.service.CorEmailService;
-import uk.gov.hmcts.reform.sscscorbackend.service.EmailMessageBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
+import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.StorePdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
