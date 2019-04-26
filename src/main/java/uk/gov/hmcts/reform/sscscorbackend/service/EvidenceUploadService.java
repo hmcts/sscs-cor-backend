@@ -20,7 +20,8 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 import uk.gov.hmcts.reform.sscscorbackend.domain.EvidenceDescription;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.EvidenceDescriptionPdfData;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreEvidenceDescriptionService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.EvidenceDescriptionPdfData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.DocumentManagementService;
 

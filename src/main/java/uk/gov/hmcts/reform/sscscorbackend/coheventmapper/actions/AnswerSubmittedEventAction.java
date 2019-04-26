@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
-import uk.gov.hmcts.reform.sscscorbackend.service.StoreAnswersPdfService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreAnswersPdfService;
 
 @Service
 public class AnswerSubmittedEventAction extends QuestionRoundEndedAction {

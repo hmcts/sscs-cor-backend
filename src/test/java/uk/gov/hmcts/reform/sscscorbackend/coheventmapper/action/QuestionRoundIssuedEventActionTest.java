@@ -11,8 +11,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.coheventmapper.actions.QuestionRoundIssuedEventAction;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
-import uk.gov.hmcts.reform.sscscorbackend.service.StoreQuestionsPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreQuestionsPdfService;
 
 public class QuestionRoundIssuedEventActionTest {
     private CorEmailService corEmailService;

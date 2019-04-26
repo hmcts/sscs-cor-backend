@@ -7,7 +7,7 @@ import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.reform.sscscorbackend.service.pdf.DecodeJsonUtil.decodeStringWithWhitespace;
+import static uk.gov.hmcts.reform.sscscorbackend.util.DecodeJsonUtil.decodeStringWithWhitespace;
 
 import java.util.Comparator;
 import java.util.List;
@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohAnswer;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohConversations;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohRelisting;
+import uk.gov.hmcts.reform.sscscorbackend.util.DecodeJsonUtil;
 
 @Service
 public class PdfSummaryBuilder {

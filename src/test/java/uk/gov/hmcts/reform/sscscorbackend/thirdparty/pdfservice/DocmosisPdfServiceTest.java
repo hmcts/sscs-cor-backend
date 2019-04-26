@@ -10,7 +10,7 @@ import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
-import uk.gov.hmcts.reform.sscscorbackend.service.PdfCoverSheet;
+import uk.gov.hmcts.reform.sscscorbackend.service.coversheet.PdfCoverSheet;
 
 public class DocmosisPdfServiceTest {
 

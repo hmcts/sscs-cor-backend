@@ -6,7 +6,6 @@ import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
 
 public class EmailMessageBuilderTest {
 

@@ -10,8 +10,8 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.coheventmapper.actions.DecisionIssuedEventAction;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
-import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreOnlineHearingTribunalsViewService;
 
 public class DecisionIssuedEventActionTest {
 

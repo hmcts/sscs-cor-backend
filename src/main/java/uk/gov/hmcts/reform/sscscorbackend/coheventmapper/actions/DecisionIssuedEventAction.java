@@ -5,9 +5,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
-import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingTribunalsViewService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.PdfData;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreOnlineHearingTribunalsViewService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.PdfData;
 
 @Service
 public class DecisionIssuedEventAction implements CohEventAction {

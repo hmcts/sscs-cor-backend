@@ -19,9 +19,9 @@ import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
 import uk.gov.hmcts.reform.sscscorbackend.coheventmapper.actions.HearingRelistedAction;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
-import uk.gov.hmcts.reform.sscscorbackend.service.StoreOnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreOnlineHearingService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.Pdf;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
 
