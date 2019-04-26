@@ -5,8 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Statement;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.AppellantStatementEmailService;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.AppellantStatementPdfData;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreAppellantStatementService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.AppellantStatementPdfData;
 
 @Service
 public class AppellantStatementService {

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.service.pdf;
 
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.Pdf;
 
 public class CohEventActionContext {
     private final Pdf pdf;

@@ -10,9 +10,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.coheventmapper.actions.DeadlineElapsedEventAction;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
-import uk.gov.hmcts.reform.sscscorbackend.service.StoreAnswersDeadlineElapsedPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreAnswersDeadlineElapsedPdfService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.Pdf;
 
 public class DeadlineElapsedEventActionTest {
     @Test

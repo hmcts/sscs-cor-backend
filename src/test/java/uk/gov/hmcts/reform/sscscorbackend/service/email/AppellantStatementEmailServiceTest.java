@@ -7,7 +7,7 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.Pdf;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.Pdf;
 
 public class AppellantStatementEmailServiceTest {
 

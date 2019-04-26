@@ -7,7 +7,7 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
-import uk.gov.hmcts.reform.sscscorbackend.service.JuiUrlGenerator;
+import uk.gov.hmcts.reform.sscscorbackend.util.JuiUrlGenerator;
 
 public class DecisionEmailServiceTest {
 

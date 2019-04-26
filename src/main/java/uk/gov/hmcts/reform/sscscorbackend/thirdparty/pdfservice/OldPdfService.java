@@ -8,7 +8,7 @@ import java.util.Map;
 import org.apache.poi.util.IOUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.I18nBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.util.I18nBuilder;
 
 @Service
 public class OldPdfService implements PdfService {

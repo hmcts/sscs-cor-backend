@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscscorbackend.service.email;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
-import uk.gov.hmcts.reform.sscscorbackend.service.JuiUrlGenerator;
+import uk.gov.hmcts.reform.sscscorbackend.util.JuiUrlGenerator;
 
 @Service
 public class DecisionEmailService {
