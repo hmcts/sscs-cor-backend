@@ -1,10 +1,11 @@
-package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
+package uk.gov.hmcts.reform.sscscorbackend.coheventmapper;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscscorbackend.coheventmapper.actions.CohEventAction;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEvent;
 
 @Slf4j

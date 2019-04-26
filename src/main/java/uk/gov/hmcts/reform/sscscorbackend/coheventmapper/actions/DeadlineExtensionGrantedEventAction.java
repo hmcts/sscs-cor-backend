@@ -1,14 +1,14 @@
-package uk.gov.hmcts.reform.sscscorbackend.controllers.coheventmapper;
+package uk.gov.hmcts.reform.sscscorbackend.coheventmapper.actions;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 
 @Service
-public class DecisionRejectedEventAction implements CohEventAction {
+public class DeadlineExtensionGrantedEventAction implements CohEventAction {
     @Override
     public String cohEvent() {
-        return "decision_rejected";
+        return "question_deadline_extension_granted";
     }
 
     @Override
@@ -18,11 +18,12 @@ public class DecisionRejectedEventAction implements CohEventAction {
 
     @Override
     public EventType getCcdEventType() {
-        return EventType.COH_DECISION_REJECTED;
+        return EventType.COH_QUESTION_DEADLINE_EXTENSION_GRANTED;
     }
 
     @Override
     public boolean notifyAppellant() {
         return false;
     }
+
 }
