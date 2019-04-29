@@ -12,6 +12,7 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +47,7 @@ public class QuestionServiceTest {
         CohQuestionRounds cohQuestionRounds = someUnpublishedCohQuestionRounds();
 
         when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
-        QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId, true);
         List<QuestionSummary> questions = questionRound.getQuestions();
 
         assertThat(questions, is(emptyList()));
@@ -72,11 +73,47 @@ public class QuestionServiceTest {
                 draft,
                 cohQuestionReference2.getAnswers().get(0).getAnswerText());
         when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
-        QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId, true);
         List<QuestionSummary> questions = questionRound.getQuestions();
 
         assertThat(questions.get(0), is(question1Summary));
         assertThat(questions.get(1), is(question2Summary));
+    }
+
+    @Test
+    public void getsAListOfPendingQuestions() {
+        List<CohQuestionReference> cohQuestionReferenceList = Arrays.asList(
+                new CohQuestionReference("someQuestionId1", 1, "first question", "first question body",  now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))
+        );
+        CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(new CohQuestionRound(cohQuestionReferenceList, 0, someCohState("question_issue_pending"))));
+        CohQuestionReference cohQuestionReference1 = cohQuestionRounds.getCohQuestionRound().get(0)
+                .getQuestionReferences().get(0);
+        QuestionSummary question1Summary = new QuestionSummary(cohQuestionReference1.getQuestionId(),
+                cohQuestionReference1.getQuestionOrdinal(),
+                cohQuestionReference1.getQuestionHeaderText(),
+                cohQuestionReference1.getQuestionBodyText(),
+                draft,
+                cohQuestionReference1.getAnswers().get(0).getAnswerText());
+
+        when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId, false);
+        List<QuestionSummary> questions = questionRound.getQuestions();
+
+        assertThat(questions.get(0), is(question1Summary));
+    }
+
+    @Test
+    public void doesNotGetsAListOfPendingQuestions() {
+        List<CohQuestionReference> cohQuestionReferenceList = Arrays.asList(
+                new CohQuestionReference("someQuestionId1", 1, "first question", "first question body",  now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))
+        );
+        CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(new CohQuestionRound(cohQuestionReferenceList, 0, someCohState("question_issue_pending"))));
+
+        when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId, true);
+        List<QuestionSummary> questions = questionRound.getQuestions();
+
+        assertThat(questions.size(), is(0));
     }
 
     @Test
@@ -87,7 +124,7 @@ public class QuestionServiceTest {
         CohQuestionReference cohQuestion2Reference = cohQuestionRounds.getCohQuestionRound().get(0)
                 .getQuestionReferences().get(1);
         when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
-        QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId, true);
 
         assertThat(questionRound.getDeadlineExpiryDate(), is(cohQuestion1Reference.getDeadlineExpiryDate()));
         assertThat(questionRound.getDeadlineExpiryDate(), not(cohQuestion2Reference.getDeadlineExpiryDate()));
@@ -104,7 +141,7 @@ public class QuestionServiceTest {
 
         when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
 
-        QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId, true);
         List<QuestionSummary> questions = questionRound.getQuestions();
 
         assertThat(questions, contains(questionSummary));
@@ -123,7 +160,7 @@ public class QuestionServiceTest {
         evidenceToQuestionsMap.put(questionId, asList(someEvidence()));
         when(evidenceUploadService.listQuestionEvidence(onlineHearingId)).thenReturn(evidenceToQuestionsMap);
 
-        QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId, true);
         List<QuestionSummary> questions = questionRound.getQuestions();
 
         QuestionSummary questionSummary = createQuestionSummary(cohQuestionRounds, 0, draft, "");
@@ -135,7 +172,7 @@ public class QuestionServiceTest {
         CohQuestionRounds cohQuestionRounds = someCohQuestionRoundsMultipleRoundsOfQuestions();
         QuestionSummary questionSummary = createQuestionSummary(cohQuestionRounds, 1, draft, "");
         when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
-        QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId, true);
         List<QuestionSummary> questions = questionRound.getQuestions();
 
         assertThat(questions, contains(questionSummary));
@@ -162,7 +199,7 @@ public class QuestionServiceTest {
         String secondQuestionBody = secondCohQuestionReference.getQuestionBodyText();
         String secondAnswerText = secondCohQuestionReference.getAnswers().get(0).getAnswerText();
         when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
-        QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId, true);
         List<QuestionSummary> questions = questionRound.getQuestions();
 
         assertThat(questions, contains(
@@ -178,7 +215,7 @@ public class QuestionServiceTest {
                 asList(new CohQuestionReference("questionId1", 1, "first question", "first question body", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), null)), 0, someCohState("question_drafted"))
         ));
         when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
-        QuestionRound questionRound = underTest.getQuestions(onlineHearingId);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId, true);
 
         assertThat(questionRound.getQuestions(), is(emptyList()));
     }

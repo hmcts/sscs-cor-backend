@@ -36,7 +36,7 @@ public abstract class AbstractQuestionPdfService extends StorePdfService<PdfQues
 
     @Override
     protected PdfQuestionsSummary getPdfContent(PdfData data, String onlineHearingId, PdfAppealDetails appealDetails) {
-        QuestionRound questions = questionService.getQuestions(onlineHearingId);
+        QuestionRound questions = questionService.getQuestions(onlineHearingId, false);
         return new PdfQuestionsSummary(appealDetails, questions.getQuestions());
     }
 }

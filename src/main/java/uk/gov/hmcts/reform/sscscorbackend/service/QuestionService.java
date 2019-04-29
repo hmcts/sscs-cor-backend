@@ -82,7 +82,7 @@ public class QuestionService {
                 .orElse(false);
     }
 
-    public QuestionRound getQuestions(String onlineHearingId) {
+    public QuestionRound getQuestions(String onlineHearingId, boolean notPending) {
         CohQuestionRounds questionRounds = cohService.getQuestionRounds(onlineHearingId);
         Map<String, List<Evidence>> evidencePerQuestion = evidenceUploadService.listQuestionEvidence(onlineHearingId);
 
@@ -93,7 +93,7 @@ public class QuestionService {
 
         CohQuestionRound currentQuestionRound = questionRounds.getCohQuestionRound().get(currentQuestionRoundNumber - 1);
         String currentQuestionRoundState = currentQuestionRound.getQuestionRoundState().getStateName();
-        if ("question_drafted".equals(currentQuestionRoundState) || "question_issue_pending".equals(currentQuestionRoundState)) {
+        if ("question_drafted".equals(currentQuestionRoundState) || (notPending && "question_issue_pending".equals(currentQuestionRoundState))) {
             return  QuestionRound.emptyQuestionRound();
         }
 
@@ -111,7 +111,7 @@ public class QuestionService {
     public Optional<QuestionRound> extendQuestionRoundDeadline(String onlineHearingId) {
         boolean haveExtendedRound = cohService.extendQuestionRoundDeadline(onlineHearingId);
         if (haveExtendedRound) {
-            return Optional.of(getQuestions(onlineHearingId));
+            return Optional.of(getQuestions(onlineHearingId, true));
         } else {
             return Optional.empty();
         }

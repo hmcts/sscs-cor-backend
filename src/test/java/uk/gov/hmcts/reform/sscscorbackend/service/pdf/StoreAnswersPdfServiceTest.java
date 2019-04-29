@@ -37,7 +37,7 @@ public class StoreAnswersPdfServiceTest {
     @Test
     public void getPdfQuestionSummary() {
         QuestionRound questionRound = DataFixtures.someQuestionRound();
-        when(questionService.getQuestions(onlineHearingId)).thenReturn(questionRound);
+        when(questionService.getQuestions(onlineHearingId, false)).thenReturn(questionRound);
         PdfAppealDetails appealDetails = mock(PdfAppealDetails.class);
         PdfQuestionsSummary pdfQuestionsSummary = storeQuestionsPdfService.getPdfContent(mock(PdfData.class), onlineHearingId, appealDetails);
 

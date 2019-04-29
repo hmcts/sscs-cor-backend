@@ -66,7 +66,7 @@ public class QuestionController {
     @RequestMapping(method = RequestMethod.GET, value = "{onlineHearingId}")
     public ResponseEntity<QuestionRound> getQuestionList(
             @ApiParam(value = "id of the hearing", example = "ID_1") @PathVariable String onlineHearingId) {
-        QuestionRound questions = questionService.getQuestions(onlineHearingId);
+        QuestionRound questions = questionService.getQuestions(onlineHearingId, true);
         return ResponseEntity.ok(questions);
     }
 

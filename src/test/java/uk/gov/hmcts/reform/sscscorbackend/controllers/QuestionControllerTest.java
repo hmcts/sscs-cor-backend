@@ -111,7 +111,7 @@ public class QuestionControllerTest {
 
     @Test
     public void getsAListOfQuestions() {
-        when(questionService.getQuestions(onlineHearingId)).thenReturn(questionRound);
+        when(questionService.getQuestions(onlineHearingId, true)).thenReturn(questionRound);
 
         ResponseEntity<QuestionRound> question = underTest.getQuestionList(onlineHearingId);
 
