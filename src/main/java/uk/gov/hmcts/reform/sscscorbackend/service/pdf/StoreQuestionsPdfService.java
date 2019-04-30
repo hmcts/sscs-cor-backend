@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscscorbackend.service.QuestionService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.util.QuestionUtils;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Service
@@ -20,8 +21,10 @@ public class StoreQuestionsPdfService extends AbstractQuestionPdfService {
             CcdPdfService ccdPdfService,
             IdamService idamService,
             QuestionService questionService,
-            EvidenceManagementService evidenceManagementService) {
-        super(pdfService, templatePath, ccdPdfService, idamService, questionService, evidenceManagementService);
+            EvidenceManagementService evidenceManagementService,
+            QuestionUtils questionUtils
+    ) {
+        super(pdfService, templatePath, ccdPdfService, idamService, questionService, evidenceManagementService, questionUtils);
     }
 
     @Override

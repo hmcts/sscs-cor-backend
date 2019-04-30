@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.QuestionService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.PdfData;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.PdfQuestionsSummary;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.util.QuestionUtils;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.OldPdfService;
 
 public class StoreQuestionsPdfServiceTest {
@@ -24,14 +25,16 @@ public class StoreQuestionsPdfServiceTest {
     private QuestionService questionService;
     private String onlineHearingId;
     private StoreQuestionsPdfService storeQuestionsPdfService;
+    private QuestionUtils questionUtils;
 
     @Before
     public void setUp() {
         questionService = mock(QuestionService.class);
         onlineHearingId = "someOnlineHearingId";
+        questionUtils = mock(QuestionUtils.class);
         storeQuestionsPdfService = new StoreQuestionsPdfService(
                 mock(OldPdfService.class), "sometemplate", mock(CcdPdfService.class), mock(IdamService.class),
-                questionService, mock(EvidenceManagementService.class));
+                questionService, mock(EvidenceManagementService.class), questionUtils);
     }
 
     @Test
@@ -39,6 +42,8 @@ public class StoreQuestionsPdfServiceTest {
         QuestionRound questionRound = DataFixtures.someQuestionRound();
         when(questionService.getQuestions(onlineHearingId, false)).thenReturn(questionRound);
         PdfAppealDetails appealDetails = mock(PdfAppealDetails.class);
+        when(questionUtils.cleanUpQuestionsHtml(questionRound.getQuestions())).thenReturn(questionRound.getQuestions());
+
         PdfQuestionsSummary pdfQuestionsSummary = storeQuestionsPdfService.getPdfContent(mock(PdfData.class), onlineHearingId, appealDetails);
 
         assertThat(pdfQuestionsSummary, is(new PdfQuestionsSummary(appealDetails, questionRound.getQuestions())));
