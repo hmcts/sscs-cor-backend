@@ -29,7 +29,7 @@ public class DecisionIssuedEventAction implements CohEventAction {
     @Override
     public CohEventActionContext handle(Long caseId, String onlineHearingId, CohEventActionContext cohEventActionContext) {
         String caseReference = cohEventActionContext.getDocument().getData().getCaseReference();
-        emailService.sendPdfToDwp(
+        emailService.sendFileToDwp(
                 cohEventActionContext,
                 "Preliminary view offered (" + caseReference + ")",
                 emailMessageBuilder.getDecisionIssuedMessage(cohEventActionContext.getDocument())

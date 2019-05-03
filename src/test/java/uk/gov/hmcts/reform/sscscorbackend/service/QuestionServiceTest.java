@@ -19,6 +19,7 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
+import uk.gov.hmcts.reform.sscscorbackend.service.evidence.EvidenceUploadService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.*;
 
@@ -83,7 +84,7 @@ public class QuestionServiceTest {
     @Test
     public void getsAListOfPendingQuestions() {
         List<CohQuestionReference> cohQuestionReferenceList = Arrays.asList(
-                new CohQuestionReference("someQuestionId1", 1, "first question", "first question body",  now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))
+                new CohQuestionReference("someQuestionId1", 1, "first question", "first question body", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))
         );
         CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(new CohQuestionRound(cohQuestionReferenceList, 0, someCohState("question_issue_pending"))));
         CohQuestionReference cohQuestionReference1 = cohQuestionRounds.getCohQuestionRound().get(0)
@@ -105,7 +106,7 @@ public class QuestionServiceTest {
     @Test
     public void doesNotGetsAListOfPendingQuestions() {
         List<CohQuestionReference> cohQuestionReferenceList = Arrays.asList(
-                new CohQuestionReference("someQuestionId1", 1, "first question", "first question body",  now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))
+                new CohQuestionReference("someQuestionId1", 1, "first question", "first question body", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), someCohAnswers("answer_drafted"))
         );
         CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(new CohQuestionRound(cohQuestionReferenceList, 0, someCohState("question_issue_pending"))));
 

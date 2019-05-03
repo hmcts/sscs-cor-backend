@@ -77,6 +77,11 @@ public class EmailMessageBuilder {
         );
     }
 
+    public String getEvidenceSubmittedMessage(SscsCaseDetails sscsCaseDetails) {
+        return buildMessageWithHeading(sscsCaseDetails, "The appellant has submitted evidence to the tribunal. The evidence is attached.",
+                "Additional evidence submitted");
+    }
+
     private String buildMessageWithHeading(SscsCaseDetails caseDetails, String message, String heading) {
         String templateWithHeading = TEMPLATE_WITH_HEADING.replace("{heading}", heading);
 

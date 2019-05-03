@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreOnlineHearingService;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.Pdf;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.UploadedEvidence;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
 
@@ -60,7 +60,7 @@ public class HearingRelistedActionTest {
                                 .build())
                         .build())
                 .build();
-        Pdf pdf = mock(Pdf.class);
+        UploadedEvidence pdf = mock(UploadedEvidence.class);
         CohEventActionContext cohEventActionContext = new CohEventActionContext(pdf, sscsCaseDetails);
         when(emailMessageBuilder.getRelistedMessage(sscsCaseDetails)).thenReturn("message body");
         String relistingReason = "relisting reason";

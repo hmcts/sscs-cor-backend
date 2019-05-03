@@ -8,6 +8,7 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
@@ -17,9 +18,11 @@ import org.junit.Assert;
 public class MailStub {
 
     private final SimpleSmtpServer smtpServer;
+    private final List<SmtpMessage> printedEmails;
 
     public MailStub(int port) throws IOException {
         smtpServer = SimpleSmtpServer.start(port);
+        printedEmails = new ArrayList<>();
     }
 
     public void stop() {
@@ -29,7 +32,10 @@ public class MailStub {
 
     public void printEmail() {
         if (System.getenv("SHOW_EMAILS") != null) {
-            smtpServer.getReceivedEmails().forEach(message -> {
+            List<SmtpMessage> receivedEmails = smtpServer.getReceivedEmails();
+
+            List<SmtpMessage> newMessages = receivedEmails.subList(printedEmails.size(), receivedEmails.size());
+            newMessages.forEach(message -> {
                 System.out.println("-------------- Received Email --------------");
                 System.out.println("To: " + message.getHeaderValue("To"));
                 System.out.println("Subject: " + message.getHeaderValue("Subject"));
@@ -37,6 +43,8 @@ public class MailStub {
                 System.out.println(message.getBody());
                 System.out.println("-------------- End Of Email --------------");
             });
+
+            printedEmails.addAll(newMessages);
         }
     }
 
@@ -89,10 +97,13 @@ public class MailStub {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        new MailStub(1025);
+        MailStub mailStub = new MailStub(1025);
+
+        System.out.println("Running stub mail server");
 
         while (true) {
-            Thread.sleep(50000L);
+            Thread.sleep(5000L);
+            mailStub.printEmail();
         }
     }
 }
