@@ -3,9 +3,7 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers;
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.unprocessableEntity;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -19,8 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 import uk.gov.hmcts.reform.sscscorbackend.domain.EvidenceDescription;
-import uk.gov.hmcts.reform.sscscorbackend.service.EvidenceUploadService;
 import uk.gov.hmcts.reform.sscscorbackend.service.coversheet.CoversheetService;
+import uk.gov.hmcts.reform.sscscorbackend.service.evidence.EvidenceUploadService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.IllegalFileTypeException;
 
 @Slf4j
@@ -55,6 +53,10 @@ public class EvidenceUploadController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization", value = "Auth Header", required = true, dataType = "string", paramType = "header"),
+            @ApiImplicitParam(name = "ServiceAuthorization", value = "Service auth header", required = true, dataType = "string", paramType = "header")
+    })
     public ResponseEntity<Evidence> uploadEvidence(
             @PathVariable("onlineHearingId") String onlineHearingId,
             @RequestParam("file") MultipartFile file
@@ -158,6 +160,10 @@ public class EvidenceUploadController {
         return hearingFound ? ResponseEntity.noContent().build() : notFound().build();
     }
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization", value = "Auth Header", required = true, dataType = "string", paramType = "header"),
+            @ApiImplicitParam(name = "ServiceAuthorization", value = "Service auth header", required = true, dataType = "string", paramType = "header")
+    })
     @ApiOperation(value = "Submit COR evidence",
             notes = "Submits the evidence that has already been uploaded in a draft state. This means it will be " +
                     "visible in CCD by a caseworker and JUI by the pannel members. You need to have an appeal in CCD " +

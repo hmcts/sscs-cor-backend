@@ -1,18 +1,18 @@
 package uk.gov.hmcts.reform.sscscorbackend.service.pdf;
 
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.Pdf;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.UploadedEvidence;
 
 public class CohEventActionContext {
-    private final Pdf pdf;
+    private final UploadedEvidence pdf;
     private final SscsCaseDetails document;
 
-    public CohEventActionContext(Pdf pdf, SscsCaseDetails document) {
+    public CohEventActionContext(UploadedEvidence pdf, SscsCaseDetails document) {
         this.pdf = pdf;
         this.document = document;
     }
 
-    public Pdf getPdf() {
+    public UploadedEvidence getPdf() {
         return pdf;
     }
 

@@ -7,7 +7,7 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.Pdf;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.UploadedEvidence;
 
 public class AppellantStatementEmailServiceTest {
 
@@ -29,13 +29,13 @@ public class AppellantStatementEmailServiceTest {
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder()
                 .caseReference(caseRef)
                 .build()).build();
-        CohEventActionContext cohEventActionContext = new CohEventActionContext(mock(Pdf.class), sscsCaseDetails);
+        CohEventActionContext cohEventActionContext = new CohEventActionContext(mock(UploadedEvidence.class), sscsCaseDetails);
         String message = "message body";
         when(emailMessageBuilder.getAppellantStatementMessage(sscsCaseDetails)).thenReturn(message);
 
         appellantStatementEmailService.sendEmail(cohEventActionContext);
 
-        verify(corEmailService).sendPdfToDwp(cohEventActionContext, "COR: Additional evidence submitted (" + caseRef + ")", message);
+        verify(corEmailService).sendFileToDwp(cohEventActionContext, "COR: Additional evidence submitted (" + caseRef + ")", message);
     }
 
 }

@@ -160,4 +160,21 @@ public class EmailMessageBuilderTest {
                 "PIP Benefit Appeals\n" +
                 "HMCTS\n"));
     }
+
+    @Test
+    public void buildEvidenceSubmitted() {
+        String message = new EmailMessageBuilder().getEvidenceSubmittedMessage(caseDetails);
+
+        assertThat(message, is(
+                "Additional evidence submitted\n" +
+                        "\n" +
+                        "Appeal reference number: caseReference\n" +
+                        "Appellant name: Jean Valjean\n" +
+                        "Appellant NINO: JV123456\n" +
+                        "\n" +
+                        "The appellant has submitted evidence to the tribunal. The evidence is attached.\n" +
+                        "\n" +
+                        "PIP Benefit Appeals\n" +
+                        "HMCTS\n"));
+    }
 }

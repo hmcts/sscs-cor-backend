@@ -27,7 +27,7 @@ public abstract class QuestionRoundEndedAction implements CohEventAction {
     public CohEventActionContext handle(Long caseId, String onlineHearingId, CohEventActionContext cohEventActionContext) {
         SscsCaseDetails sscsCaseDetails = cohEventActionContext.getDocument();
         String caseReference = sscsCaseDetails.getData().getCaseReference();
-        corEmailService.sendPdfToDwp(
+        corEmailService.sendFileToDwp(
                 cohEventActionContext,
                 getDwpEmailSubject(caseReference),
                 emailMessageBuilder.getAnswerMessage(sscsCaseDetails)

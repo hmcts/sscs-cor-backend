@@ -6,6 +6,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.draft;
+import static uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.UploadedEvidence.pdf;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,7 +19,6 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestion;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfQuestionRound;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfSummary;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.Pdf;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEvent;
@@ -143,7 +143,7 @@ public class DataFixtures {
 
     public static CohEventActionContext someStorePdfResult() {
         return new CohEventActionContext(
-                new Pdf(new byte[]{2, 4, 6, 0, 1}, "pdfName.pdf"),
+                pdf(new byte[]{2, 4, 6, 0, 1}, "pdfName.pdf"),
                 SscsCaseDetails.builder()
                         .data(SscsCaseData.builder()
                                 .caseReference("caseReference")

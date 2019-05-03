@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.service.pdf;
 
 import static java.time.LocalDate.now;
+import static uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.UploadedEvidence.pdf;
 import static uk.gov.hmcts.reform.sscscorbackend.service.pdf.util.PdfDateUtil.reformatDate;
 
 import java.net.URI;
@@ -16,8 +17,8 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppealDetails;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.Pdf;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.PdfData;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.UploadedEvidence;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Slf4j
@@ -63,14 +64,14 @@ public abstract class StorePdfService<E, D extends PdfData> {
         log.info("Adding pdf to ccd for [" + caseId + "]");
         SscsCaseData sscsCaseData = ccdPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens, "Other evidence");
 
-        return new CohEventActionContext(new Pdf(pdfBytes, pdfName), data.getCaseDetails().toBuilder().data(sscsCaseData).build());
+        return new CohEventActionContext(pdf(pdfBytes, pdfName), data.getCaseDetails().toBuilder().data(sscsCaseData).build());
     }
 
     private String getPdfName(String documentNamePrefix, String caseReference) {
         return documentNamePrefix + caseReference + ".pdf";
     }
 
-    private Pdf loadPdf(SscsCaseDetails caseDetails, String documentNamePrefix) {
+    private UploadedEvidence loadPdf(SscsCaseDetails caseDetails, String documentNamePrefix) {
         SscsDocument document = caseDetails.getData().getSscsDocument().stream()
                 .filter(sscsDocument -> sscsDocument.getValue().getDocumentFileName() != null)
                 .filter(documentNameMatches(documentNamePrefix))
@@ -78,7 +79,7 @@ public abstract class StorePdfService<E, D extends PdfData> {
                 .orElseThrow(() -> new IllegalStateException("Found PDF with name prefix [" + documentNamePrefix + "] but cannot load it"));
         String documentUrl = document.getValue().getDocumentLink().getDocumentUrl();
         try {
-            return new Pdf(evidenceManagementService.download(new URI(documentUrl), "sscs"), getPdfName(documentNamePrefix, caseDetails.getData().getCaseReference()));
+            return pdf(evidenceManagementService.download(new URI(documentUrl), "sscs"), getPdfName(documentNamePrefix, caseDetails.getData().getCaseReference()));
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Document uri invalid [" + documentUrl + "]");
         }
