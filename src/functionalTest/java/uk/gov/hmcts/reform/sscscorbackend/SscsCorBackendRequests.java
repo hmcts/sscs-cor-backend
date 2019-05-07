@@ -138,6 +138,13 @@ public class SscsCorBackendRequests {
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
     }
 
+    public void submitHearingEvidence(String hearingId, String description) throws IOException {
+        HttpResponse response = postRequest("/continuous-online-hearings/" + hearingId + "/evidence",
+                new StringEntity("{\"body\":\"" + description + "\"}", APPLICATION_JSON)
+        );
+        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+    }
+
     public JSONArray getDraftHearingEvidence(String hearingId) throws IOException {
         HttpResponse response = getRequest("/continuous-online-hearings/" + hearingId + "/evidence");
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
