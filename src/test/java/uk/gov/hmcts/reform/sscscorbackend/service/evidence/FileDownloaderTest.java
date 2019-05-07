@@ -27,7 +27,7 @@ public class FileDownloaderTest {
         documentDownloadClientApi = mock(DocumentDownloadClientApi.class);
         tokenGenerator = mock(AuthTokenGenerator.class);
 
-        fileDownloader = new FileDownloader(documentDownloadClientApi, tokenGenerator);
+        fileDownloader = new FileDownloader(documentDownloadClientApi, tokenGenerator, "http://somedomain/");
 
         token = "someToken";
         when(tokenGenerator.generate()).thenReturn(token);
