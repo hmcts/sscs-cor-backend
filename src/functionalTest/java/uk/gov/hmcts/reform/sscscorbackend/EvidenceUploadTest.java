@@ -4,10 +4,13 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 
 public class EvidenceUploadTest extends BaseFunctionTest {
     @Test
@@ -34,7 +37,7 @@ public class EvidenceUploadTest extends BaseFunctionTest {
     }
 
     @Test
-    public void uploadThenEvidenceThenSubmitQuestion() throws IOException, InterruptedException, JSONException {
+    public void uploadEvidenceThenSubmitQuestion() throws IOException, InterruptedException, JSONException {
         OnlineHearing hearingWithQuestion = createHearingWithQuestion(true);
 
         JSONObject questionResponse = sscsCorBackendRequests.getQuestion(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId());
@@ -75,6 +78,34 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         sscsCorBackendRequests.deleteHearingEvidence(hearingWithQuestion.getHearingId(), evidenceId);
         draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(hearingWithQuestion.getHearingId());
         assertThat(draftHearingEvidence.length(), is(0));
+    }
+
+    @Test
+    public void uploadThenSubmitEvidenceToHearing() throws IOException, JSONException {
+        OnlineHearing hearingWithQuestion = createHearing(true);
+
+        JSONArray draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(hearingWithQuestion.getHearingId());
+        assertThat(draftHearingEvidence.length(), is(0));
+
+        String fileName = "evidence.png";
+        sscsCorBackendRequests.uploadHearingEvidence(hearingWithQuestion.getHearingId(), fileName);
+
+        draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(hearingWithQuestion.getHearingId());
+        assertThat(draftHearingEvidence.length(), is(1));
+        assertThat(draftHearingEvidence.getJSONObject(0).getString("file_name"), is(fileName));
+
+        sscsCorBackendRequests.submitHearingEvidence(hearingWithQuestion.getHearingId(), "some description");
+
+        draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(hearingWithQuestion.getHearingId());
+        assertThat(draftHearingEvidence.length(), is(0));
+
+        SscsCaseDetails caseDetails = getCaseDetails(hearingWithQuestion.getCaseId());
+
+        List<SscsDocument> sscsDocument = caseDetails.getData().getSscsDocument();
+        assertThat(sscsDocument.size(), is(2));
+        String caseReference = caseDetails.getData().getCaseReference();
+        assertThat(sscsDocument.get(0).getValue().getDocumentFileName(), is("Evidence Description - " + caseReference + ".pdf"));
+        assertThat(sscsDocument.get(1).getValue().getDocumentFileName(), is(fileName));
     }
 
     @Test
