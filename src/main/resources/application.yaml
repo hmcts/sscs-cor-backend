@@ -105,7 +105,7 @@ appeal:
 
 enable_debug_error_message: ${ENABLE_DEBUG_ERROR_MESSAGE:true}
 enable_select_by_case_id: ${ENABLE_SELECT_BY_CASE_ID:false}
-enable_coh_event_thread_pool: ${ENABLE_COH_EVENT_THREAD_POOL:true}
+enable_coh_event_thread_pool: ${ENABLE_COH_EVENT_THREAD_POOL:false}
 
 feign:
   client:
