@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscscorbackend.service.pdf;
 
-import java.util.List;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
@@ -40,10 +39,11 @@ public abstract class AbstractQuestionPdfService extends StorePdfService<PdfQues
     @Override
     protected PdfQuestionsSummary getPdfContent(PdfData data, String onlineHearingId, PdfAppealDetails appealDetails) {
         QuestionRound questions = questionService.getQuestions(onlineHearingId, false);
-        List<QuestionSummary> printQuestions = questions.getQuestions();
-        for (QuestionSummary qs : printQuestions) {
+
+        for (QuestionSummary qs : questions.getQuestions())
             System.out.println("Question=" + qs.toString());
-        }
+
+
         return new PdfQuestionsSummary(appealDetails, questions.getQuestions());
     }
 }
