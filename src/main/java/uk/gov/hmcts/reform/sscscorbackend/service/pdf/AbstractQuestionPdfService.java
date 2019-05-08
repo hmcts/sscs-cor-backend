@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend.service.pdf;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
@@ -12,7 +13,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.PdfData;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.PdfQuestionsSummary;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
-
+@Slf4j
 public abstract class AbstractQuestionPdfService extends StorePdfService<PdfQuestionsSummary, PdfData> {
     private final QuestionService questionService;
 
@@ -41,7 +42,7 @@ public abstract class AbstractQuestionPdfService extends StorePdfService<PdfQues
         QuestionRound questions = questionService.getQuestions(onlineHearingId, false);
 
         for (QuestionSummary qs : questions.getQuestions()) {
-            System.out.println("Question=" + qs.toString());
+            log.info("Question=" + qs.toString());
         }
 
         return new PdfQuestionsSummary(appealDetails, questions.getQuestions());
