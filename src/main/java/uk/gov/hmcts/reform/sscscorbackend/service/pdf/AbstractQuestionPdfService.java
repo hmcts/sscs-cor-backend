@@ -40,9 +40,9 @@ public abstract class AbstractQuestionPdfService extends StorePdfService<PdfQues
     protected PdfQuestionsSummary getPdfContent(PdfData data, String onlineHearingId, PdfAppealDetails appealDetails) {
         QuestionRound questions = questionService.getQuestions(onlineHearingId, false);
 
-        for (QuestionSummary qs : questions.getQuestions())
+        for (QuestionSummary qs : questions.getQuestions()) {
             System.out.println("Question=" + qs.toString());
-
+        }
 
         return new PdfQuestionsSummary(appealDetails, questions.getQuestions());
     }
