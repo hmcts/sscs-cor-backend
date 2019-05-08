@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend.service.pdf;
 
+import java.util.List;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
@@ -12,7 +13,6 @@ import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.PdfData;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.PdfQuestionsSummary;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
-import java.util.List;
 
 public abstract class AbstractQuestionPdfService extends StorePdfService<PdfQuestionsSummary, PdfData> {
     private final QuestionService questionService;
