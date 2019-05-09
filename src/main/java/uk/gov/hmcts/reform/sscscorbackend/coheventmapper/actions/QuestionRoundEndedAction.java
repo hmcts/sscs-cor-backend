@@ -19,22 +19,20 @@ public abstract class QuestionRoundEndedAction implements CohEventAction {
     }
 
     @Override
-    public CohEventActionContext createAndStorePdf(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
-        return storePdfService.storePdf(caseId, onlineHearingId, new PdfData(caseDetails));
-    }
+    public CohEventActionContext handle(Long caseId, String onlineHearingId, SscsCaseDetails sscsCaseDetails) {
+        CohEventActionContext actionContext = storePdfService.storePdf(caseId, onlineHearingId, new PdfData(sscsCaseDetails));
 
-    @Override
-    public CohEventActionContext handle(Long caseId, String onlineHearingId, CohEventActionContext cohEventActionContext) {
-        SscsCaseDetails sscsCaseDetails = cohEventActionContext.getDocument();
         String caseReference = sscsCaseDetails.getData().getCaseReference();
         corEmailService.sendFileToDwp(
-                cohEventActionContext,
+                actionContext,
                 getDwpEmailSubject(caseReference),
                 emailMessageBuilder.getAnswerMessage(sscsCaseDetails)
         );
 
-        return cohEventActionContext;
+        return actionContext;
     }
 
-    protected abstract String getDwpEmailSubject(String caseReference);
+    protected String getDwpEmailSubject(String caseReference) {
+        return "Appellant has provided information (" + caseReference + ")";
+    }
 }

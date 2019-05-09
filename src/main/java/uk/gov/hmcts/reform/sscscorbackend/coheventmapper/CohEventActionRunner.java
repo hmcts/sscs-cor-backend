@@ -30,10 +30,8 @@ public class CohEventActionRunner {
         Long caseId = Long.valueOf(event.getCaseId());
 
         SscsCaseDetails sscsCaseDetails = loadCcdCaseDetails(caseId);
-        log.info("Storing pdf [" + caseId + "]");
-        CohEventActionContext storePdfResultStorePdf = cohEventAction.createAndStorePdf(caseId, onlineHearingId, sscsCaseDetails);
-        log.info("Handle coh event [" + caseId + "]");
-        CohEventActionContext cohEventActionContextHandle = cohEventAction.handle(caseId, onlineHearingId, storePdfResultStorePdf);
+        log.info("Storing and handle pdf [" + caseId + "]");
+        CohEventActionContext cohEventActionContextHandle = cohEventAction.handle(caseId, onlineHearingId, sscsCaseDetails);
         log.info("Notify appellant [" + caseId + "]");
 
         if (cohEventAction.notifyAppellant()) {

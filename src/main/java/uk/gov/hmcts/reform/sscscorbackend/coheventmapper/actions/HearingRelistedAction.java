@@ -38,19 +38,14 @@ public class HearingRelistedAction implements CohEventAction {
         this.cohService = cohService;
     }
 
-    @Override
-    public CohEventActionContext createAndStorePdf(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
-        return storeOnlineHearingService.storePdf(caseId, onlineHearingId, new PdfData(caseDetails));
-    }
-
-    @Override
-    public CohEventActionContext handle(Long caseId, String onlineHearingId, CohEventActionContext cohEventActionContext) {
-        SscsCaseData oralSscsCaseData = updateCcdCaseToOralHearing(caseId, onlineHearingId, cohEventActionContext);
-        String relistedMessage = emailMessageBuilder.getRelistedMessage(cohEventActionContext.getDocument());
+    public CohEventActionContext handle(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
+        CohEventActionContext actionContext = storeOnlineHearingService.storePdf(caseId, onlineHearingId, new PdfData(caseDetails));
+        SscsCaseData oralSscsCaseData = updateCcdCaseToOralHearing(caseId, onlineHearingId, actionContext);
+        String relistedMessage = emailMessageBuilder.getRelistedMessage(actionContext.getDocument());
         corEmailService.sendEmailToDwp("COR: Hearing required", relistedMessage);
 
-        SscsCaseDetails oralSscsCaseDetails = cohEventActionContext.getDocument().toBuilder().data(oralSscsCaseData).build();
-        return new CohEventActionContext(cohEventActionContext.getPdf(), oralSscsCaseDetails);
+        SscsCaseDetails oralSscsCaseDetails = actionContext.getDocument().toBuilder().data(oralSscsCaseData).build();
+        return new CohEventActionContext(actionContext.getPdf(), oralSscsCaseDetails);
     }
 
     private SscsCaseData updateCcdCaseToOralHearing(Long caseId, String onlineHearingId, CohEventActionContext cohEventActionContext) {

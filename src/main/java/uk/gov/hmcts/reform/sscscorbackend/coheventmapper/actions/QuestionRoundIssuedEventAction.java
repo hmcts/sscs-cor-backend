@@ -24,17 +24,12 @@ public class QuestionRoundIssuedEventAction implements CohEventAction {
         this.emailMessageBuilder = emailMessageBuilder;
     }
 
-    @Override
-    public CohEventActionContext createAndStorePdf(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
-        return storeQuestionsPdfService.storePdf(caseId, onlineHearingId, new PdfData(caseDetails));
-    }
+    public CohEventActionContext handle(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
+        CohEventActionContext actionContext = storeQuestionsPdfService.storePdf(caseId, onlineHearingId, new PdfData(caseDetails));
+        SscsCaseDetails sscsCaseDetails = actionContext.getDocument();
+        sendDwpEmail(actionContext, sscsCaseDetails);
 
-    @Override
-    public CohEventActionContext handle(Long caseId, String onlineHearingId, CohEventActionContext cohEventActionContext) {
-        SscsCaseDetails sscsCaseDetails = cohEventActionContext.getDocument();
-        sendDwpEmail(cohEventActionContext, sscsCaseDetails);
-
-        return cohEventActionContext;
+        return actionContext;
     }
 
     public StorePdfService getPdfService() {
