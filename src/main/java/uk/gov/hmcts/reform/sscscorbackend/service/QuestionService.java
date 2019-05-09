@@ -9,12 +9,15 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.*;
 
+@Slf4j
 @Service
 public class QuestionService {
     private final CohService cohService;
@@ -134,6 +137,14 @@ public class QuestionService {
 
     private QuestionSummary createQuestionSummary(CohQuestionReference cohQuestionReference, List<Evidence> evidence) {
         List<CohAnswer> answers = cohQuestionReference.getAnswers();
+
+        if (answers != null) {
+            for (CohAnswer answer : answers) {
+                if (answer != null) {
+                    log.info("Answer " + answer);
+                }
+            }
+        }
 
         AnswerState answerState = updateAnswerStateIfEvidencePresent(getAnswerState(answers), evidence);
 
