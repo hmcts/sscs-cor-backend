@@ -22,20 +22,16 @@ public class DecisionIssuedEventAction implements CohEventAction {
     }
 
     @Override
-    public CohEventActionContext createAndStorePdf(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
-        return storeOnlineHearingTribunalsViewService.storePdf(caseId, onlineHearingId, new PdfData(caseDetails));
-    }
-
-    @Override
-    public CohEventActionContext handle(Long caseId, String onlineHearingId, CohEventActionContext cohEventActionContext) {
-        String caseReference = cohEventActionContext.getDocument().getData().getCaseReference();
+    public CohEventActionContext handle(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
+        CohEventActionContext actionContext = storeOnlineHearingTribunalsViewService.storePdf(caseId, onlineHearingId, new PdfData(caseDetails));
+        String caseReference = actionContext.getDocument().getData().getCaseReference();
         emailService.sendFileToDwp(
-                cohEventActionContext,
+                actionContext,
                 "Preliminary view offered (" + caseReference + ")",
-                emailMessageBuilder.getDecisionIssuedMessage(cohEventActionContext.getDocument())
+                emailMessageBuilder.getDecisionIssuedMessage(actionContext.getDocument())
         );
 
-        return cohEventActionContext;
+        return actionContext;
     }
 
     @Override

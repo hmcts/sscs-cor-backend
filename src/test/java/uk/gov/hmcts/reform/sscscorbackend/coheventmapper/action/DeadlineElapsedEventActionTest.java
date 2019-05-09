@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreAnswersDeadlineElapsedPdfService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.PdfData;
 
 public class DeadlineElapsedEventActionTest {
     @Test
@@ -32,8 +33,10 @@ public class DeadlineElapsedEventActionTest {
         String pdfName = "pdf_name.pdf";
         CohEventActionContext cohEventActionContext = new CohEventActionContext(pdf(new byte[]{2, 5, 6, 0, 1}, pdfName), caseDetails);
         when(emailMessageBuilder.getAnswerMessage(caseDetails)).thenReturn("some message");
+        when(storeAnswersPdfService.storePdf(caseId, onlineHearingId, new PdfData(caseDetails)))
+                .thenReturn(cohEventActionContext);
 
-        CohEventActionContext result = deadlineElapsedEventAction.handle(caseId, onlineHearingId, cohEventActionContext);
+        CohEventActionContext result = deadlineElapsedEventAction.handle(caseId, onlineHearingId, caseDetails);
 
         verify(corEmailService).sendFileToDwp(cohEventActionContext, "Appellant has provided information (" + someCaseReference + ")", "some message");
         assertThat(result, is(cohEventActionContext));

@@ -79,7 +79,7 @@ public class CohEventsTest extends BaseIntegrationTest {
     public void answerSubmittedCohEvent() throws IOException {
         ccdStub.stubFindCaseByCaseId(caseId, caseReference, "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
         CohQuestionReference questionSummary = new CohQuestionReference(
-                "first-id", 1, "first question", "first question body", "2018-01-01", someCohAnswers("answer_drafted")
+                "first-id", 1, "first question", "first question body", "2018-01-01", someCohAnswers("answer_submitted")
         );
         cohStub.stubGetAllQuestionRounds(hearingId, questionSummary);
         cohStub.stubGetOnlineHearing(caseId, hearingId);

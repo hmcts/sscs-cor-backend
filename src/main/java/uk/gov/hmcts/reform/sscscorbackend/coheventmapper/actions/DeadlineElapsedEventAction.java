@@ -19,11 +19,6 @@ public class DeadlineElapsedEventAction extends QuestionRoundEndedAction {
     }
 
     @Override
-    protected String getDwpEmailSubject(String caseReference) {
-        return "Appellant has provided information (" + caseReference + ")";
-    }
-
-    @Override
     public String cohEvent() {
         return "question_deadline_elapsed";
     }

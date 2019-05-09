@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreQuestionsPdfService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.PdfData;
 
 public class QuestionRoundIssuedEventActionTest {
     private CorEmailService corEmailService;
@@ -20,10 +21,11 @@ public class QuestionRoundIssuedEventActionTest {
     private Long caseId;
     private String hearingId;
     private EmailMessageBuilder emailMessageBuilder;
+    private StoreQuestionsPdfService storeQuestionsPdfService;
 
     @Before
     public void setUp() {
-        StoreQuestionsPdfService storeQuestionsPdfService = mock(StoreQuestionsPdfService.class);
+        storeQuestionsPdfService = mock(StoreQuestionsPdfService.class);
         corEmailService = mock(CorEmailService.class);
         emailMessageBuilder = mock(EmailMessageBuilder.class);
         questionRoundIssuedEventAction = new QuestionRoundIssuedEventAction(
@@ -45,8 +47,10 @@ public class QuestionRoundIssuedEventActionTest {
         when(cohEventActionContext.getDocument()).thenReturn(sscsCaseDetails);
         String message = "message";
         when(emailMessageBuilder.getQuestionMessage(sscsCaseDetails)).thenReturn(message);
+        when(storeQuestionsPdfService.storePdf(caseId, hearingId, new PdfData(sscsCaseDetails)))
+                .thenReturn(cohEventActionContext);
 
-        CohEventActionContext result = questionRoundIssuedEventAction.handle(caseId, hearingId, cohEventActionContext);
+        CohEventActionContext result = questionRoundIssuedEventAction.handle(caseId, hearingId, sscsCaseDetails);
 
         verify(corEmailService).sendFileToDwp(cohEventActionContext, "Questions issued to the appellant (" + caseReference + ")", message);
         assertThat(result, is(cohEventActionContext));

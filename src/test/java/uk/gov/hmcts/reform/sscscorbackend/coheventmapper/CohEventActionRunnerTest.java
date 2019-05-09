@@ -23,7 +23,6 @@ public class CohEventActionRunnerTest {
     private CohEventAction cohEventAction;
     private String hearingId;
     private CohEvent cohEvent;
-    private CohEventActionContext cohEventActionContext;
     private Long caseIdLong;
     private CohEventActionRunner cohEventActionRunner;
     private CorCcdService corCcdService;
@@ -39,18 +38,14 @@ public class CohEventActionRunnerTest {
         String caseId = "123456";
         hearingId = "hearingId";
         cohEvent = someCohEvent(caseId, hearingId, "some-event");
-
-        cohEventActionContext = mock(CohEventActionContext.class);
         caseIdLong = valueOf(caseId);
-
         CohEventActionContext cohEventActionContextHandle = mock(CohEventActionContext.class);
         sscsCaseData = SscsCaseData.builder().build();
         sscsCaseDetails = SscsCaseDetails.builder()
                 .data(sscsCaseData)
                 .build();
         when(cohEventActionContextHandle.getDocument()).thenReturn(sscsCaseDetails);
-        when(cohEventAction.createAndStorePdf(caseIdLong, hearingId, sscsCaseDetails)).thenReturn(cohEventActionContext);
-        when(cohEventAction.handle(caseIdLong, hearingId, cohEventActionContext)).thenReturn(cohEventActionContextHandle);
+        when(cohEventAction.handle(caseIdLong, hearingId, sscsCaseDetails)).thenReturn(cohEventActionContextHandle);
         ccdEvent = EventType.COH_ANSWERS_SUBMITTED;
         when(cohEventAction.getCcdEventType()).thenReturn(ccdEvent);
 
@@ -69,8 +64,7 @@ public class CohEventActionRunnerTest {
 
         cohEventActionRunner.runActionSync(cohEvent, cohEventAction);
 
-        verify(cohEventAction).createAndStorePdf(caseIdLong, hearingId, sscsCaseDetails);
-        verify(cohEventAction).handle(caseIdLong, hearingId, cohEventActionContext);
+        verify(cohEventAction).handle(caseIdLong, hearingId, sscsCaseDetails);
         verify(notificationService).send(cohEvent);
         verify(corCcdService).updateCase(sscsCaseData,
                 caseIdLong,
@@ -86,8 +80,7 @@ public class CohEventActionRunnerTest {
 
         cohEventActionRunner.runActionSync(cohEvent, cohEventAction);
 
-        verify(cohEventAction).createAndStorePdf(caseIdLong, hearingId, sscsCaseDetails);
-        verify(cohEventAction).handle(caseIdLong, hearingId, cohEventActionContext);
+        verify(cohEventAction).handle(caseIdLong, hearingId, sscsCaseDetails);
         verifyZeroInteractions(notificationService);
         verify(corCcdService).updateCase(sscsCaseData,
                 caseIdLong,
@@ -103,8 +96,7 @@ public class CohEventActionRunnerTest {
 
         cohEventActionRunner.runActionAsync(cohEvent, cohEventAction);
 
-        verify(cohEventAction).createAndStorePdf(caseIdLong, hearingId, sscsCaseDetails);
-        verify(cohEventAction).handle(caseIdLong, hearingId, cohEventActionContext);
+        verify(cohEventAction).handle(caseIdLong, hearingId, sscsCaseDetails);
         verify(notificationService).send(cohEvent);
         verify(corCcdService).updateCase(sscsCaseData,
                 caseIdLong,
@@ -120,8 +112,7 @@ public class CohEventActionRunnerTest {
 
         cohEventActionRunner.runActionAsync(cohEvent, cohEventAction);
 
-        verify(cohEventAction).createAndStorePdf(caseIdLong, hearingId, sscsCaseDetails);
-        verify(cohEventAction).handle(caseIdLong, hearingId, cohEventActionContext);
+        verify(cohEventAction).handle(caseIdLong, hearingId, sscsCaseDetails);
         verifyZeroInteractions(notificationService);
         verify(corCcdService).updateCase(sscsCaseData,
                 caseIdLong,

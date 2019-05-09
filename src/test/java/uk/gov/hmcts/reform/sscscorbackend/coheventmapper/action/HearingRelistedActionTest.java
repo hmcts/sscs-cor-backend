@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreOnlineHearingService;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.PdfData;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.UploadedEvidence;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.CohService;
@@ -35,6 +36,7 @@ public class HearingRelistedActionTest {
     private CorEmailService corEmailService;
     private EmailMessageBuilder emailMessageBuilder;
     private CohService cohService;
+    private StoreOnlineHearingService storeOnlineHearingService;
 
     @Before
     public void setUp() {
@@ -48,7 +50,8 @@ public class HearingRelistedActionTest {
 
         emailMessageBuilder = mock(EmailMessageBuilder.class);
         cohService = mock(CohService.class);
-        underTest = new HearingRelistedAction(mock(StoreOnlineHearingService.class), corCcdService, idamService, corEmailService, emailMessageBuilder, cohService);
+        storeOnlineHearingService = mock(StoreOnlineHearingService.class);
+        underTest = new HearingRelistedAction(storeOnlineHearingService, corCcdService, idamService, corEmailService, emailMessageBuilder, cohService);
     }
 
     @Test
@@ -65,8 +68,10 @@ public class HearingRelistedActionTest {
         when(emailMessageBuilder.getRelistedMessage(sscsCaseDetails)).thenReturn("message body");
         String relistingReason = "relisting reason";
         when(cohService.getConversations(onlineHearingId)).thenReturn(DataFixtures.someCohConversations(relistingReason));
+        when(storeOnlineHearingService.storePdf(caseId, onlineHearingId, new PdfData(sscsCaseDetails)))
+                .thenReturn(cohEventActionContext);
 
-        CohEventActionContext result = underTest.handle(caseId, onlineHearingId, cohEventActionContext);
+        CohEventActionContext result = underTest.handle(caseId, onlineHearingId, sscsCaseDetails);
 
         ArgumentMatcher<SscsCaseData> hasOralHearing = data -> "oral".equals(data.getAppeal().getHearingType());
         ArgumentMatcher<SscsCaseData> hasRelistingReason = data -> relistingReason.equals(data.getRelistingReason());
