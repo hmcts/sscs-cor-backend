@@ -16,6 +16,7 @@ public class Question {
     private final int questionOrdinal;
     private final String questionHeaderText;
     private final String questionBodyText;
+    private final String answerId;
     private final String answer;
     private final AnswerState answerState;
     private final String answerDate;
@@ -26,6 +27,7 @@ public class Question {
                     int questionOrdinal,
                     String questionHeaderText,
                     String questionBodyText,
+                    String answerId,
                     String answer,
                     AnswerState answerState,
                     String answerDate,
@@ -35,6 +37,7 @@ public class Question {
         this.questionOrdinal = questionOrdinal;
         this.questionHeaderText = questionHeaderText;
         this.questionBodyText = questionBodyText;
+        this.answerId = answerId;
         this.answer = answer;
         this.answerState = answerState;
         this.answerDate = answerDate;
@@ -69,6 +72,10 @@ public class Question {
     @JsonProperty(value = "question_body_text")
     public String getQuestionBodyText() {
         return questionBodyText;
+    }
+
+    public String getAnswerId() {
+        return answerId;
     }
 
     @ApiModelProperty(example = "An answer to a question")
@@ -110,6 +117,7 @@ public class Question {
                 Objects.equals(questionHeaderText, question.questionHeaderText) &&
                 Objects.equals(questionBodyText, question.questionBodyText) &&
                 Objects.equals(evidence, question.evidence) &&
+                Objects.equals(answerId, question.answerId) &&
                 Objects.equals(answer, question.answer) &&
                 answerState == question.answerState &&
                 Objects.equals(answerDate, question.answerDate);
@@ -117,7 +125,7 @@ public class Question {
 
     @Override
     public int hashCode() {
-        return Objects.hash(onlineHearingId, questionId, questionOrdinal, questionHeaderText, questionBodyText, evidence, answer, answerState, answerDate);
+        return Objects.hash(onlineHearingId, questionId, questionOrdinal, questionHeaderText, questionBodyText, evidence, answerId, answer, answerState, answerDate);
     }
 
     @Override
@@ -129,6 +137,7 @@ public class Question {
                 ", questionHeaderText='" + questionHeaderText + '\'' +
                 ", questionBodyText='" + questionBodyText + '\'' +
                 ", evidence=" + evidence +
+                ", answerId='" + answerId + '\'' +
                 ", answer='" + answer + '\'' +
                 ", answerState=" + answerState +
                 ", answerDate='" + answerDate + '\'' +

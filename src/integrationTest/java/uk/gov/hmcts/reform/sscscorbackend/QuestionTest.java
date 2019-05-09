@@ -100,17 +100,25 @@ public class QuestionTest extends BaseIntegrationTest {
         String answerId = UUID.randomUUID().toString();
         String answer = "answer";
         long caseId = 123L;
+        cohStub.stubGetQuestionWithAnswer(
+                hearingId, questionId, "question header", "question body", answer, answerId, "answer_drafted", ZonedDateTime.now()
+        );
         cohStub.stubGetAnswer(hearingId, questionId, answer, answerId, "answer_drafted", ZonedDateTime.now());
+
         cohStub.stubUpdateAnswer(hearingId, questionId, answer, answerId, submitted);
         cohStub.stubGetOnlineHearing(caseId, hearingId);
-        ccdStub.stubFindCaseByCaseId(caseId, "1", "someEvidence", "01-01-2010", "http://evidenceUrl");
+        ccdStub.stubFindCaseByCaseId(caseId, "1", "someEvidence", "01-01-2010", "http://localhost:4603/documents/123");
         ccdStub.stubUpdateCaseWithEvent(caseId, "uploadCorDocument", "caseRef");
+        String evidenceFileContent = "Evidence pdf";
+        documentStoreStub.stubGetFile("/documents/123", evidenceFileContent);
 
         getRequest()
                 .when()
                 .post("/continuous-online-hearings/" + hearingId + "/questions/" + questionId)
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
+
+        mailStub.hasEmailWithSubjectAndAttachment("Evidence uploaded (caseRef)", evidenceFileContent.getBytes());
     }
 
     @Test

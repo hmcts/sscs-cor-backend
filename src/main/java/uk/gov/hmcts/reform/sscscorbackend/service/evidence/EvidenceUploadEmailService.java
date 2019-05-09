@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.sscscorbackend.service.evidence;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.List;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CorDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -27,9 +30,27 @@ public class EvidenceUploadEmailService {
 
         corEmailService.sendFileToDwp(evidenceDescription, subject, message);
 
+        sendFileToDwp(
+                newEvidence.stream().map(SscsDocument::getValue).collect(toList()),
+                message,
+                subject
+        );
+    }
+
+    public void sendToDwp(String questionSubject, List<CorDocument> newEvidence, SscsCaseDetails sscsCaseDetails) {
+        String message = emailMessageBuilder.getQuestionEvidenceSubmittedMessage(sscsCaseDetails, questionSubject);
+        String subject = "Evidence uploaded (" + sscsCaseDetails.getData().getCaseReference() + ")";
+
+        sendFileToDwp(
+                newEvidence.stream().map(evidence -> evidence.getValue().getDocument()).collect(toList()),
+                message,
+                subject
+        );
+    }
+
+    private void sendFileToDwp(List<SscsDocumentDetails> newEvidence, String message, String subject) {
         newEvidence.forEach(evidence -> {
-            SscsDocumentDetails evidenceValue = evidence.getValue();
-            String documentUrl = evidenceValue.getDocumentLink().getDocumentBinaryUrl();
+            String documentUrl = evidence.getDocumentLink().getDocumentBinaryUrl();
 
             corEmailService.sendFileToDwp(
                     fileDownloader.downloadFile(documentUrl),

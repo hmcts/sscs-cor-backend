@@ -33,6 +33,22 @@ public class CohStub extends BaseStub {
             "  \"question_round\": \"1\"\n" +
             "}";
 
+    private static final String getQuestionWithAnswerJson = "{\n" +
+            "  \"current_question_state\": {\n" +
+            "    \"state_datetime\": \"string\",\n" +
+            "    \"state_name\": \"string\"\n" +
+            "  },\n" +
+            "  \"deadline_expiry_date\": \"string\",\n" +
+            "  \"owner_reference\": \"string\",\n" +
+            "  \"question_body_text\": \"{question_body}\",\n" +
+            "  \"question_header_text\": \"{question_header}\",\n" +
+            "  \"question_id\": \"string\",\n" +
+            "  \"question_ordinal\": \"1\",\n" +
+            "  \"question_round\": \"1\"," +
+            "  \"answers\": {answers}\n" +
+            "}";
+
+
     private static final String getAnswersJson = "[\n" +
             "  {\n" +
             "    \"answer_id\": \"{answer_id}\",\n" +
@@ -145,6 +161,13 @@ public class CohStub extends BaseStub {
         );
     }
 
+    public void stubGetQuestionWithAnswer(String hearingId, String questionId, String questionHeader, String questionBody, String answer, String answerId, String answerState, ZonedDateTime answerDate) {
+        wireMock.stubFor(get(urlEqualTo("/continuous-online-hearings/" + hearingId + "/questions/" + questionId))
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .willReturn(okJson(buildGetQuestionWithAnswerBody(questionHeader, questionBody, answer, answerId, answerState, answerDate)))
+        );
+    }
+
     public void stubGetAnswer(String hearingId, String questionId, String answer) {
         stubGetAnswer(hearingId, questionId, answer, UUID.randomUUID().toString(), "draft", ZonedDateTime.now());
     }
@@ -159,6 +182,13 @@ public class CohStub extends BaseStub {
     private String buildGetQuestionBody(String questionHeader, String questionBody) {
         return getQuestionJson.replace("{question_header}", questionHeader)
                 .replace("{question_body}", questionBody);
+    }
+
+    private String buildGetQuestionWithAnswerBody(String questionHeader, String questionBody, String answer, String answerId, String answerState, ZonedDateTime answerDate) {
+        String answerJson = buildGetAnswerBody(answer, answerId, answerState, answerDate);
+        return getQuestionWithAnswerJson.replace("{question_header}", questionHeader)
+                .replace("{question_body}", questionBody)
+                .replace("{answers}", answerJson);
     }
 
     private String buildGetAnswerBody(String answer, String answerId, String answerState, ZonedDateTime answerDate) {

@@ -40,7 +40,8 @@ public class CcdStub extends BaseStub {
             "              \"documentFileName\": \"{evidenceFileName}\",\n" +
             "              \"documentDateAdded\": \"{evidenceCreatedDate}\",\n" +
             "              \"documentLink\": {\n" +
-            "                \"document_url\": \"{evidenceUrl}\"\n" +
+            "                \"document_url\": \"{evidenceUrl}\",\n" +
+            "                \"document_binary_url\": \"{evidenceUrl}\"\n" +
             "              }\n" +
             "            },\n" +
             "            \"questionId\": \"{evidenceQuestionId}\"\n" +
