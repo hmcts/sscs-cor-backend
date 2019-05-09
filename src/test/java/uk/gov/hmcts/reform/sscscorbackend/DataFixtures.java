@@ -38,7 +38,7 @@ public class DataFixtures {
     }
 
     public static Question someQuestion() {
-        return new Question("someHearingId", "someQuestionId", 1, "someQuestionHeader", "someBody", "someAnswer", draft, "2018-08-08T09:12:12Z", emptyList());
+        return new Question("someHearingId", "someQuestionId", 1, "someQuestionHeader", "someBody", "answerId", "someAnswer", draft, "2018-08-08T09:12:12Z", emptyList());
     }
 
     public static CohQuestion someCohQuestion() {

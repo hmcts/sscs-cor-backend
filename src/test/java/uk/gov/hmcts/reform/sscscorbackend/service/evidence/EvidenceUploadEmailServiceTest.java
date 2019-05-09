@@ -67,4 +67,41 @@ public class EvidenceUploadEmailServiceTest {
                 eq(message)
         );
     }
+
+    @Test
+    public void sendsQuestionEvidenceToDwp() {
+        String message = "some message";
+        String docUrl = "docUrl";
+        String fileName = "fileName";
+
+        CorDocument corDocument = CorDocument.builder()
+                .value(CorDocumentDetails.builder()
+                        .document(SscsDocumentDetails.builder()
+                                .documentFileName(fileName)
+                                .documentLink(DocumentLink.builder()
+                                        .documentBinaryUrl(docUrl)
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+
+        String questionSubject = "some question subject";
+
+        when(emailMessageBuilder.getQuestionEvidenceSubmittedMessage(sscsCaseDetails, questionSubject)).thenReturn(message);
+        UploadedEvidence expectedFile = mock(UploadedEvidence.class);
+        when(fileDownloader.downloadFile(docUrl)).thenReturn(expectedFile);
+
+        new EvidenceUploadEmailService(corEmailService, emailMessageBuilder, fileDownloader).sendToDwp(
+                questionSubject,
+                singletonList(corDocument),
+                sscsCaseDetails
+        );
+
+        verify(fileDownloader).downloadFile(docUrl);
+        verify(corEmailService, times(1)).sendFileToDwp(
+                eq(expectedFile),
+                eq("Evidence uploaded (" + caseReference + ")"),
+                eq(message)
+        );
+    }
 }

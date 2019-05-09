@@ -132,7 +132,7 @@ public class EvidenceUploadService {
                 .orElse(false);
     }
 
-    public boolean submitQuestionEvidence(String onlineHearingId, String questionId) {
+    public boolean submitQuestionEvidence(String questionSubject, String onlineHearingId, String questionId) {
         return onlineHearingService.getCcdCase(onlineHearingId)
                 .map(caseDetails -> {
                     Long ccdCaseId = caseDetails.getId();
@@ -154,6 +154,9 @@ public class EvidenceUploadService {
                         sscsCaseData.setCorDocument(newCorDocumentList);
                         sscsCaseData.setDraftCorDocument(draftCorDocumentsForQuestionId.get(false));
                         ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
+
+                        List<CorDocument> corDocuments = draftCorDocumentsForQuestionId.get(true);
+                        evidenceUploadEmailService.sendToDwp(questionSubject, corDocuments, caseDetails);
                     }
                     return true;
                 })

@@ -37,6 +37,7 @@ public class QuestionService {
                         question.getQuestionOrdinal(),
                         question.getQuestionHeaderText(),
                         question.getQuestionBodyText(),
+                        answers.get(0).getAnswerId(),
                         answers.get(0).getAnswerText(),
                         updateAnswerStateIfEvidencePresent(getAnswerState(answers), evidence),
                         answers.get(0).getCurrentAnswerState().getStateDateTime(),
@@ -48,6 +49,7 @@ public class QuestionService {
                         question.getQuestionOrdinal(),
                         question.getQuestionHeaderText(),
                         question.getQuestionBodyText(),
+                        null,
                         null,
                         updateAnswerStateIfEvidencePresent(AnswerState.unanswered, evidence),
                         null,
@@ -69,18 +71,15 @@ public class QuestionService {
     }
 
     public boolean submitAnswer(String onlineHearingId, String questionId) {
-        List<CohAnswer> answers = cohService.getAnswers(onlineHearingId, questionId);
+        Question question = getQuestion(onlineHearingId, questionId);
+        if (question != null && unanswered != question.getAnswerState()) {
+            CohUpdateAnswer updatedAnswer = new CohUpdateAnswer(AnswerState.submitted.getCohAnswerState(), question.getAnswer());
+            cohService.updateAnswer(onlineHearingId, questionId, question.getAnswerId(), updatedAnswer);
+            evidenceUploadService.submitQuestionEvidence(question.getQuestionHeaderText(), onlineHearingId, questionId);
 
-        return answers.stream().findFirst()
-                .map(answer -> {
-                    CohUpdateAnswer updatedAnswer = new CohUpdateAnswer(AnswerState.submitted.getCohAnswerState(), answer.getAnswerText());
-                    String answerId = answers.get(0).getAnswerId();
-                    cohService.updateAnswer(onlineHearingId, questionId, answerId, updatedAnswer);
-                    evidenceUploadService.submitQuestionEvidence(onlineHearingId, questionId);
-
-                    return true;
-                })
-                .orElse(false);
+            return true;
+        }
+        return false;
     }
 
     public QuestionRound getQuestions(String onlineHearingId, boolean notPending) {
@@ -95,7 +94,7 @@ public class QuestionService {
         CohQuestionRound currentQuestionRound = questionRounds.getCohQuestionRound().get(currentQuestionRoundNumber - 1);
         String currentQuestionRoundState = currentQuestionRound.getQuestionRoundState().getStateName();
         if ("question_drafted".equals(currentQuestionRoundState) || (notPending && "question_issue_pending".equals(currentQuestionRoundState))) {
-            return  QuestionRound.emptyQuestionRound();
+            return QuestionRound.emptyQuestionRound();
         }
 
         String deadlineExpiryDate = getQuestionRoundDeadlineExpiryDate(currentQuestionRound);
@@ -128,7 +127,7 @@ public class QuestionService {
             return questionRound.getQuestionReferences().get(0).getDeadlineExpiryDate();
         } else {
             throw new IllegalStateException(
-                "Cannot get questions required by date as question round has been published with no questions in it"
+                    "Cannot get questions required by date as question round has been published with no questions in it"
             );
         }
     }
@@ -150,9 +149,9 @@ public class QuestionService {
 
     private AnswerState getAnswerState(List<CohAnswer> answers) {
         return getFirstAnswer(answers)
-                    .map(cohAnswer -> cohAnswer.getCurrentAnswerState().getStateName())
-                    .map(AnswerState::of)
-                    .orElse(AnswerState.unanswered);
+                .map(cohAnswer -> cohAnswer.getCurrentAnswerState().getStateName())
+                .map(AnswerState::of)
+                .orElse(AnswerState.unanswered);
     }
 
     private String getAnswer(List<CohAnswer> answers) {

@@ -12,10 +12,7 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
@@ -235,6 +232,7 @@ public class QuestionServiceTest {
                 cohQuestion.getQuestionOrdinal(),
                 cohQuestion.getQuestionHeaderText(),
                 cohQuestion.getQuestionBodyText(),
+                cohAnswer.getAnswerId(),
                 cohAnswer.getAnswerText(),
                 AnswerState.of(cohAnswer.getCurrentAnswerState().getStateName()),
                 cohAnswer.getCurrentAnswerState().getStateDateTime(),
@@ -256,6 +254,7 @@ public class QuestionServiceTest {
                 cohQuestion.getQuestionHeaderText(),
                 cohQuestion.getQuestionBodyText(),
                 null,
+                null,
                 unanswered,
                 null,
                 emptyList()))
@@ -276,6 +275,7 @@ public class QuestionServiceTest {
                 cohQuestion.getQuestionOrdinal(),
                 cohQuestion.getQuestionHeaderText(),
                 cohQuestion.getQuestionBodyText(),
+                null,
                 null,
                 draft,
                 null,
@@ -318,6 +318,11 @@ public class QuestionServiceTest {
     public void submitAnswer() {
         String answerId = "some-id";
         String answer = "answer";
+
+        final CohAnswer answer_drafted = new CohAnswer(answerId, answer, someCohState("answer_drafted"), emptyList());
+        String questionHeader = "question header";
+        when(cohService.getQuestion(onlineHearingId, questionId))
+                .thenReturn(createCohQuestion(questionHeader, singletonList(answer_drafted)));
         when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(
                 singletonList(new CohAnswer(answerId, answer, someCohState("answer_drafted"), emptyList()))
         );
@@ -326,17 +331,20 @@ public class QuestionServiceTest {
 
         assertThat(hasBeenSubmitted, is(true));
         verify(cohService).updateAnswer(onlineHearingId, questionId, answerId, new CohUpdateAnswer(submitted.getCohAnswerState(), answer));
-        verify(evidenceUploadService).submitQuestionEvidence(onlineHearingId, questionId);
+        verify(evidenceUploadService).submitQuestionEvidence(questionHeader, onlineHearingId, questionId);
     }
 
     @Test
     public void cannotSubmitAnswerThatHasNotAlreadyBeenAnswered() {
+        when(cohService.getQuestion(onlineHearingId, questionId))
+                .thenReturn(createCohQuestion("question header", emptyList()));
         when(cohService.getAnswers(onlineHearingId, questionId)).thenReturn(emptyList());
 
         boolean hasBeenSubmitted = underTest.submitAnswer(onlineHearingId, questionId);
 
         assertThat(hasBeenSubmitted, is(false));
         verify(cohService, never()).updateAnswer(any(), any(), any(), any());
+        verify(evidenceUploadService, never()).submitQuestionEvidence(any(), any(), any());
     }
 
     @Test
@@ -368,6 +376,18 @@ public class QuestionServiceTest {
         CohQuestionRounds cohQuestionRounds = someCohQuestionRoundsWithSingleRoundOfQuestions();
 
         assertThat(cohQuestionRounds.getCohQuestionRound().get(0).getDeadlineExtensionCount(), is(0));
+    }
+
+    private CohQuestion createCohQuestion(String questionHeader, List<CohAnswer> answers) {
+        return new CohQuestion(onlineHearingId,
+                1,
+                questionId,
+                1,
+                questionHeader,
+                "question body",
+                emptyList(),
+                answers
+        );
     }
 
     private QuestionSummary createQuestionSummary(CohQuestionRounds cohQuestionRounds, int i, AnswerState answerState, String answer) {
