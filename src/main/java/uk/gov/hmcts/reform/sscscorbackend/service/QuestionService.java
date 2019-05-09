@@ -142,7 +142,7 @@ public class QuestionService {
             for (CohAnswer answer : answers) {
                 if (answer != null) {
                     log.info("Answer state" + answer.getCurrentAnswerState());
-                    log.info("Answer text" + answer.getAnswerText();
+                    log.info("Answer text" + answer.getAnswerText());
                 }
             }
         }
