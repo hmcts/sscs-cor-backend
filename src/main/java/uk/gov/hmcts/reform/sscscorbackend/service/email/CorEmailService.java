@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.sscs.domain.email.Email;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.service.EmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.UploadedEvidence;
 
 @Slf4j
 @Service
@@ -28,15 +29,24 @@ public class CorEmailService {
         this.dwpEmailAddress = dwpEmailAddress;
     }
 
-    public void sendPdfToDwp(CohEventActionContext cohEventActionContext, String subject, String message) {
-        byte[] content = cohEventActionContext.getPdf().getContent();
+    @Deprecated // use method below that takes a UploadedEvidence object
+    public void sendFileToDwp(CohEventActionContext cohEventActionContext, String subject, String message) {
+        sendFileToDwp(cohEventActionContext.getPdf(), subject, message);
+    }
+
+    public void sendFileToDwp(UploadedEvidence pdf, String subject, String message) {
         log.info("Sending email and PDf with subject [" + subject + "] to DWP");
         emailService.sendEmail(Email.builder()
                 .from(fromEmailAddress)
                 .to(dwpEmailAddress)
                 .subject(subject)
                 .message(message)
-                .attachments(asList(EmailAttachment.pdf(content, cohEventActionContext.getPdf().getName())))
+                .attachments(asList(EmailAttachment.builder()
+                        .contentType(pdf.getContentType())
+                        .data(pdf.getContent())
+                        .filename(pdf.getName())
+                        .build()
+                ))
                 .build());
     }
 

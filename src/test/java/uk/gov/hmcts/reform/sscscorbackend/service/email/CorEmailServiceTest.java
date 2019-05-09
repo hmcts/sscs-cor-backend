@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscscorbackend.service.email;
 import static java.util.Collections.singletonList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.UploadedEvidence.pdf;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +13,6 @@ import uk.gov.hmcts.reform.sscs.domain.email.Email;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.service.EmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.Pdf;
 
 public class CorEmailServiceTest {
 
@@ -40,7 +40,7 @@ public class CorEmailServiceTest {
                 .build();
         String message = "Some message";
         String subject = "subject";
-        corEmailService.sendPdfToDwp(new CohEventActionContext(new Pdf(pdfContent, pdfFileName), sscsCaseDetails), subject, message);
+        corEmailService.sendFileToDwp(new CohEventActionContext(pdf(pdfContent, pdfFileName), sscsCaseDetails), subject, message);
 
         verify(emailService).sendEmail(Email.builder()
                 .from(fromEmailAddress)

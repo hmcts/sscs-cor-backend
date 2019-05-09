@@ -31,6 +31,13 @@ public class DocumentStoreStub extends BaseStub {
                 .willReturn(okJson(uploadResponseTemplate)));
     }
 
+    public void stubGetFile(String documentUrl, String fileContent) {
+        wireMock.stubFor(get(documentUrl)
+                .willReturn(okForContentType("application/pdf", Arrays.toString(fileContent.getBytes()))
+                    .withHeader("originalfilename", "someEvidence.pdf")
+                ));
+    }
+
     public void verifyUploadFile(byte[] pdfBytes) {
         verifyAsync(postRequestedFor(urlEqualTo("/documents"))
             .withRequestBody(containing(Arrays.toString(pdfBytes)))

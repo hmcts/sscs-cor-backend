@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscscorbackend.service;
+package uk.gov.hmcts.reform.sscscorbackend.service.evidence;
 
 import static java.util.Collections.*;
 import static java.util.stream.Collectors.*;
@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 import uk.gov.hmcts.reform.sscscorbackend.domain.EvidenceDescription;
+import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.EvidenceDescriptionPdfData;
@@ -33,6 +34,7 @@ public class EvidenceUploadService {
     private final IdamService idamService;
     private final OnlineHearingService onlineHearingService;
     private final StoreEvidenceDescriptionService storeEvidenceDescriptionService;
+    private final EvidenceUploadEmailService evidenceUploadEmailService;
 
     private static final String UPDATED_SSCS = "Updated SSCS";
     private static final String UPLOAD_COR_DOCUMENT = "uploadCorDocument";
@@ -41,12 +43,13 @@ public class EvidenceUploadService {
     private static final QuestionDocumentExtractor questionDocumentExtractor = new QuestionDocumentExtractor();
 
     @Autowired
-    public EvidenceUploadService(DocumentManagementService documentManagementService, CorCcdService ccdService, IdamService idamService, OnlineHearingService onlineHearingService, StoreEvidenceDescriptionService storeEvidenceDescriptionService) {
+    public EvidenceUploadService(DocumentManagementService documentManagementService, CorCcdService ccdService, IdamService idamService, OnlineHearingService onlineHearingService, StoreEvidenceDescriptionService storeEvidenceDescriptionService, EvidenceUploadEmailService evidenceUploadEmailService) {
         this.documentManagementService = documentManagementService;
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.onlineHearingService = onlineHearingService;
         this.storeEvidenceDescriptionService = storeEvidenceDescriptionService;
+        this.evidenceUploadEmailService = evidenceUploadEmailService;
     }
 
     public Optional<Evidence> uploadDraftHearingEvidence(String onlineHearingId, MultipartFile file) {
@@ -121,6 +124,8 @@ public class EvidenceUploadService {
                     sscsCaseData.setDraftSscsDocument(Collections.emptyList());
 
                     ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
+
+                    evidenceUploadEmailService.sendToDwp(storePdfContext.getPdf(), draftSscsDocument, caseDetails);
 
                     return true;
                 })

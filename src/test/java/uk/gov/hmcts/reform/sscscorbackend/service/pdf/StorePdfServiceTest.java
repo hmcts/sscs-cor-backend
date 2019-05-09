@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -74,7 +75,7 @@ public class StorePdfServiceTest {
         CohEventActionContext cohEventActionContext = storePdfService.storePdf(caseId, someOnlineHearingId, new PdfData(caseDetails));
 
         verify(sscsPdfService).mergeDocIntoCcd(fileNamePrefix + CASE_REF + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), idamTokens, "Other evidence");
-        assertThat(cohEventActionContext.getPdf().getContent(), is(expectedPdfBytes));
+        assertThat(cohEventActionContext.getPdf().getContent(), is(new ByteArrayResource(expectedPdfBytes)));
         assertThat(cohEventActionContext.getPdf().getName(), is(fileNamePrefix + CASE_REF + ".pdf"));
         assertThat(cohEventActionContext.getDocument().getData().getCcdCaseId(), is(expectedCaseId));
     }
@@ -104,7 +105,7 @@ public class StorePdfServiceTest {
         CohEventActionContext cohEventActionContext = storePdfService.storePdf(caseId, someOnlineHearingId, new PdfData(sscsCaseDetails));
 
         verifyZeroInteractions(sscsPdfService);
-        assertThat(cohEventActionContext.getPdf().getContent(), is(expectedPdfBytes));
+        assertThat(cohEventActionContext.getPdf().getContent(), is(new ByteArrayResource(expectedPdfBytes)));
         assertThat(cohEventActionContext.getPdf().getName(), is(fileNamePrefix + CASE_REF + ".pdf"));
         assertThat(cohEventActionContext.getDocument(), is(sscsCaseDetails));
     }

@@ -46,6 +46,18 @@ public class CcdStub extends BaseStub {
             "            \"questionId\": \"{evidenceQuestionId}\"\n" +
             "          }\n" +
             "        }\n" +
+            "      ]," +
+            "      \"draftSscsDocument\": [\n" +
+            "        {\n" +
+            "          \"value\": {\n" +
+            "              \"documentFileName\": \"{evidenceFileName}\",\n" +
+            "              \"documentDateAdded\": \"{evidenceCreatedDate}\",\n" +
+            "              \"documentLink\": {\n" +
+            "                \"document_url\": \"{evidenceUrl}\",\n" +
+            "                \"document_binary_url\": \"{evidenceUrl}\"\n" +
+            "              }\n" +
+            "          }\n" +
+            "        }\n" +
             "      ]\n" +
             "  }\n" +
             "}";
@@ -81,7 +93,7 @@ public class CcdStub extends BaseStub {
                 .willReturn(okJson(new ObjectMapper().writeValueAsString(StartEventResponse.builder().build()))));
 
         wireMock.stubFor(post("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true")
-                .willReturn(okJson(createCaseDetails(caseId, caseReference, "firstName", "lastName", "evidenceQuestionId", "evidenceFileName", "evidenceCreatedDate", "evidenceUrl"))));
+                .willReturn(okJson(createCaseDetails(caseId, caseReference, "firstName", "lastName", "evidenceQuestionId", "evidenceFileName", "evidenceCreatedDate", "http://localhost:4603/documents/123"))));
     }
 
     public void stubUpdateCaseWithEvent(Long caseId, final String eventType, String caseReference) throws JsonProcessingException {
@@ -89,7 +101,7 @@ public class CcdStub extends BaseStub {
                 .willReturn(okJson(new ObjectMapper().writeValueAsString(StartEventResponse.builder().build()))));
 
         wireMock.stubFor(post("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true")
-                .willReturn(okJson(createCaseDetails(caseId, caseReference, "firstName", "lastName", "evidenceQuestionId", "evidenceFileName", "evidenceCreatedDate", "evidenceUrl"))));
+                .willReturn(okJson(createCaseDetails(caseId, caseReference, "firstName", "lastName", "evidenceQuestionId", "evidenceFileName", "evidenceCreatedDate", "http://localhost:4603/documents/123"))));
     }
 
     public void verifyUpdateCaseWithEvent(Long caseId, String eventType) {

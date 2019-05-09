@@ -42,7 +42,7 @@ public class QuestionRoundIssuedEventAction implements CohEventAction {
     }
 
     private void sendDwpEmail(CohEventActionContext cohEventActionContext, SscsCaseDetails sscsCaseDetails) {
-        corEmailService.sendPdfToDwp(
+        corEmailService.sendFileToDwp(
                 cohEventActionContext,
                 getDwpEmailSubject(sscsCaseDetails),
                 getDwpEmailMessage(sscsCaseDetails)
