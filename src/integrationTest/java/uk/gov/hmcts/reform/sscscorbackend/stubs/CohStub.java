@@ -42,7 +42,7 @@ public class CohStub extends BaseStub {
             "  \"owner_reference\": \"string\",\n" +
             "  \"question_body_text\": \"{question_body}\",\n" +
             "  \"question_header_text\": \"{question_header}\",\n" +
-            "  \"question_id\": \"string\",\n" +
+            "  \"question_id\": \"{question_id}\",\n" +
             "  \"question_ordinal\": \"1\",\n" +
             "  \"question_round\": \"1\"," +
             "  \"answers\": {answers}\n" +
@@ -164,7 +164,7 @@ public class CohStub extends BaseStub {
     public void stubGetQuestionWithAnswer(String hearingId, String questionId, String questionHeader, String questionBody, String answer, String answerId, String answerState, ZonedDateTime answerDate) {
         wireMock.stubFor(get(urlEqualTo("/continuous-online-hearings/" + hearingId + "/questions/" + questionId))
                 .withHeader("ServiceAuthorization", new RegexPattern(".*"))
-                .willReturn(okJson(buildGetQuestionWithAnswerBody(questionHeader, questionBody, answer, answerId, answerState, answerDate)))
+                .willReturn(okJson(buildGetQuestionWithAnswerBody(questionId, questionHeader, questionBody, answer, answerId, answerState, answerDate)))
         );
     }
 
@@ -184,9 +184,11 @@ public class CohStub extends BaseStub {
                 .replace("{question_body}", questionBody);
     }
 
-    private String buildGetQuestionWithAnswerBody(String questionHeader, String questionBody, String answer, String answerId, String answerState, ZonedDateTime answerDate) {
+    private String buildGetQuestionWithAnswerBody(String questionId, String questionHeader, String questionBody, String answer, String answerId, String answerState, ZonedDateTime answerDate) {
         String answerJson = buildGetAnswerBody(answer, answerId, answerState, answerDate);
-        return getQuestionWithAnswerJson.replace("{question_header}", questionHeader)
+        return getQuestionWithAnswerJson
+                .replace("{question_id}", questionId)
+                .replace("{question_header}", questionHeader)
                 .replace("{question_body}", questionBody)
                 .replace("{answers}", answerJson);
     }

@@ -75,7 +75,7 @@ public class QuestionService {
         if (question != null && unanswered != question.getAnswerState()) {
             CohUpdateAnswer updatedAnswer = new CohUpdateAnswer(AnswerState.submitted.getCohAnswerState(), question.getAnswer());
             cohService.updateAnswer(onlineHearingId, questionId, question.getAnswerId(), updatedAnswer);
-            evidenceUploadService.submitQuestionEvidence(question.getQuestionHeaderText(), onlineHearingId, questionId);
+            evidenceUploadService.submitQuestionEvidence(onlineHearingId, question);
 
             return true;
         }

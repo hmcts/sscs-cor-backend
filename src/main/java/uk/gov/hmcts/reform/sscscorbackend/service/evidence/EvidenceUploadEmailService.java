@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CorDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.UploadedEvidence;
@@ -37,8 +38,8 @@ public class EvidenceUploadEmailService {
         );
     }
 
-    public void sendToDwp(String questionSubject, List<CorDocument> newEvidence, SscsCaseDetails sscsCaseDetails) {
-        String message = emailMessageBuilder.getQuestionEvidenceSubmittedMessage(sscsCaseDetails, questionSubject);
+    public void sendToDwp(Question question, List<CorDocument> newEvidence, SscsCaseDetails sscsCaseDetails) {
+        String message = emailMessageBuilder.getQuestionEvidenceSubmittedMessage(sscsCaseDetails, question);
         String subject = "Evidence uploaded (" + sscsCaseDetails.getData().getCaseReference() + ")";
 
         sendFileToDwp(

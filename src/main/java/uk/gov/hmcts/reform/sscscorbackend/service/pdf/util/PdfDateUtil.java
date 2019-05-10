@@ -13,6 +13,13 @@ public final class PdfDateUtil {
 
     }
 
+    public static String reformatDateTimeToDate(String dateString) {
+        if (isNotBlank(dateString)) {
+            return reformatDate(dateString.substring(0, 10));
+        }
+        return dateString;
+    }
+
     public static String reformatDate(String dateString) {
         if (isNotBlank(dateString)) {
             return reformatDate(LocalDate.parse(dateString));

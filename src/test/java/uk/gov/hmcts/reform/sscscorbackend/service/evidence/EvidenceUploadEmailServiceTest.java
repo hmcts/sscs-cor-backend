@@ -7,6 +7,8 @@ import static uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.UploadedEviden
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
+import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.UploadedEvidence;
@@ -85,14 +87,15 @@ public class EvidenceUploadEmailServiceTest {
                         .build())
                 .build();
 
-        String questionSubject = "some question subject";
 
-        when(emailMessageBuilder.getQuestionEvidenceSubmittedMessage(sscsCaseDetails, questionSubject)).thenReturn(message);
+        Question question = DataFixtures.someQuestion();
+
+        when(emailMessageBuilder.getQuestionEvidenceSubmittedMessage(sscsCaseDetails, question)).thenReturn(message);
         UploadedEvidence expectedFile = mock(UploadedEvidence.class);
         when(fileDownloader.downloadFile(docUrl)).thenReturn(expectedFile);
 
         new EvidenceUploadEmailService(corEmailService, emailMessageBuilder, fileDownloader).sendToDwp(
-                questionSubject,
+                question,
                 singletonList(corDocument),
                 sscsCaseDetails
         );

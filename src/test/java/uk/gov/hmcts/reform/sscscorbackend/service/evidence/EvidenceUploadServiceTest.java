@@ -23,8 +23,10 @@ import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 import uk.gov.hmcts.reform.sscscorbackend.domain.EvidenceDescription;
+import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreEvidenceDescriptionService;
@@ -194,10 +196,11 @@ public class EvidenceUploadServiceTest {
         String questionHeader = "question header";
         List<CorDocument> draftCorDocument = sscsCaseDetails.getData().getDraftCorDocument();
 
-        boolean submittedEvidence = evidenceUploadService.submitQuestionEvidence(questionHeader, someOnlineHearingId, someQuestionId);
+        Question question = createQuestion(questionHeader);
+        boolean submittedEvidence = evidenceUploadService.submitQuestionEvidence(someOnlineHearingId, question);
 
         assertThat(submittedEvidence, is(true));
-        verify(evidenceUploadEmailService).sendToDwp(questionHeader, draftCorDocument, sscsCaseDetails);
+        verify(evidenceUploadEmailService).sendToDwp(question, draftCorDocument, sscsCaseDetails);
         verify(ccdService).updateCase(
                 and(hasCorDocument(0, someQuestionId, documentUrl, fileName), doesNotHaveDraftCorDocuments()),
                 eq(someCcdCaseId),
@@ -206,6 +209,10 @@ public class EvidenceUploadServiceTest {
                 eq("Updated SSCS"),
                 eq(idamTokens)
         );
+    }
+
+    private Question createQuestion(String questionHeader) {
+        return new Question(someOnlineHearingId, someQuestionId, 1, questionHeader, "questionBody", "answerId", "someAnswer", AnswerState.draft, "2018-10-10", emptyList());
     }
 
     @Test
@@ -220,10 +227,11 @@ public class EvidenceUploadServiceTest {
         String questionHeader = "question header";
         List<CorDocument> draftCorDocument = sscsCaseDetails.getData().getDraftCorDocument();
 
-        boolean submittedEvidence = evidenceUploadService.submitQuestionEvidence(questionHeader, someOnlineHearingId, someQuestionId);
+        Question question = createQuestion(questionHeader);
+        boolean submittedEvidence = evidenceUploadService.submitQuestionEvidence(someOnlineHearingId, question);
 
         assertThat(submittedEvidence, is(true));
-        verify(evidenceUploadEmailService).sendToDwp(questionHeader, draftCorDocument, sscsCaseDetails);
+        verify(evidenceUploadEmailService).sendToDwp(question, draftCorDocument, sscsCaseDetails);
         verify(ccdService).updateCase(
                 and(hasCorDocument(originalNumberOfSscsDocuments, someQuestionId, documentUrl, fileName), doesNotHaveDraftCorDocuments()),
                 eq(someCcdCaseId),
@@ -251,11 +259,12 @@ public class EvidenceUploadServiceTest {
 
         when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
         String questionHeader = "question header";
+        Question question = createQuestion(questionHeader);
 
-        boolean submittedEvidence = evidenceUploadService.submitQuestionEvidence(questionHeader, someOnlineHearingId, someQuestionId);
+        boolean submittedEvidence = evidenceUploadService.submitQuestionEvidence(someOnlineHearingId, question);
 
         assertThat(submittedEvidence, is(true));
-        verify(evidenceUploadEmailService).sendToDwp(questionHeader, asList(expectedCorDocument), sscsCaseDetails);
+        verify(evidenceUploadEmailService).sendToDwp(question, asList(expectedCorDocument), sscsCaseDetails);
         verify(ccdService).updateCase(
                 and(hasCorDocument(0, someQuestionId, expectedUrl, expectedFileName), hasDraftCorDocument(0, draftQuestionId, draftDocumentUrl, draftFileName)),
                 eq(someCcdCaseId),
@@ -274,8 +283,9 @@ public class EvidenceUploadServiceTest {
 
         when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
         String questionHeader = "question header";
+        Question question = createQuestion(questionHeader);
 
-        boolean submittedEvidence = evidenceUploadService.submitQuestionEvidence(questionHeader, someOnlineHearingId, someQuestionId);
+        boolean submittedEvidence = evidenceUploadService.submitQuestionEvidence(someOnlineHearingId, question);
 
         assertThat(submittedEvidence, is(true));
         verifyZeroInteractions(evidenceUploadEmailService);

@@ -3,9 +3,13 @@ package uk.gov.hmcts.reform.sscscorbackend.service.email;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
+import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.util.PdfDateUtil;
 
 public class EmailMessageBuilderTest {
 
@@ -164,15 +168,17 @@ public class EmailMessageBuilderTest {
     @Test
     public void buildEvidenceSubmitted() {
         String message = new EmailMessageBuilder().getEvidenceSubmittedMessage(caseDetails);
+        String submittedDate = PdfDateUtil.reformatDate(LocalDate.now());
 
         assertThat(message, is(
-                "Additional evidence submitted\n" +
+                "Additional evidence submitted by appellant\n" +
                         "\n" +
                         "Appeal reference number: caseReference\n" +
                         "Appellant name: Jean Valjean\n" +
                         "Appellant NINO: JV123456\n" +
                         "\n" +
-                        "The appellant has submitted evidence to the tribunal. The evidence is attached.\n" +
+                        "Additional evidence was received by the tribunal for the above appeal on " +
+                        submittedDate + ".\n" +
                         "\n" +
                         "PIP Benefit Appeals\n" +
                         "HMCTS\n"));
@@ -180,21 +186,21 @@ public class EmailMessageBuilderTest {
 
     @Test
     public void buildQuestionEvidenceSubmitted() {
-        String message = new EmailMessageBuilder().getQuestionEvidenceSubmittedMessage(caseDetails, "This is the question subject");
+        Question question = DataFixtures.someQuestion();
+        String questionHeaderText = question.getQuestionHeaderText();
+        String message = new EmailMessageBuilder().getQuestionEvidenceSubmittedMessage(caseDetails, question);
 
         assertThat(message, is(
-                "Additional evidence submitted\n" +
+                "Additional evidence submitted in relation to question\n" +
                         "\n" +
                         "Appeal reference number: caseReference\n" +
                         "Appellant name: Jean Valjean\n" +
                         "Appellant NINO: JV123456\n" +
                         "\n" +
-                        "The appellant has submitted evidence to the tribunal. The evidence relates to the question\n" +
-                        "\n" +
-                        "This is the question subject" +
-                        "\n" +
-                        "\nThe evidence is attached.\n" +
-                        "\n" +
+                        "Additional evidence was received by the tribunal for the above appeal on 08 August 2018. " +
+                        "It was submitted in relation to the question " +
+                        questionHeaderText +
+                        "\n\n" +
                         "PIP Benefit Appeals\n" +
                         "HMCTS\n"));
     }
