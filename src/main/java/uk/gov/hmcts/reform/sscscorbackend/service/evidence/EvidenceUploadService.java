@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 import uk.gov.hmcts.reform.sscscorbackend.domain.EvidenceDescription;
+import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreEvidenceDescriptionService;
@@ -132,11 +133,11 @@ public class EvidenceUploadService {
                 .orElse(false);
     }
 
-    public boolean submitQuestionEvidence(String questionSubject, String onlineHearingId, String questionId) {
+    public boolean submitQuestionEvidence(String onlineHearingId, Question question) {
         return onlineHearingService.getCcdCase(onlineHearingId)
                 .map(caseDetails -> {
                     Long ccdCaseId = caseDetails.getId();
-                    log.info("Submitting draft document for case [" + ccdCaseId + "] and question [" + questionId + "]");
+                    log.info("Submitting draft document for case [" + ccdCaseId + "] and question [" + question.getQuestionId() + "]");
 
                     SscsCaseData sscsCaseData = caseDetails.getData();
 
@@ -145,7 +146,7 @@ public class EvidenceUploadService {
 
                     if (draftCorDocument != null && !draftCorDocument.isEmpty()) {
                         Map<Boolean, List<CorDocument>> draftCorDocumentsForQuestionId = draftCorDocument.stream()
-                                .collect(partitioningBy(corDocument -> corDocument.getValue().getQuestionId().equals(questionId)));
+                                .collect(partitioningBy(corDocument -> corDocument.getValue().getQuestionId().equals(question.getQuestionId())));
 
                         List<CorDocument> newCorDocumentList = union(
                                 emptyIfNull(sscsCaseData.getCorDocument()),
@@ -156,7 +157,7 @@ public class EvidenceUploadService {
                         ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
 
                         List<CorDocument> corDocuments = draftCorDocumentsForQuestionId.get(true);
-                        evidenceUploadEmailService.sendToDwp(questionSubject, corDocuments, caseDetails);
+                        evidenceUploadEmailService.sendToDwp(question, corDocuments, caseDetails);
                     }
                     return true;
                 })

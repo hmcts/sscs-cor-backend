@@ -12,7 +12,10 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 import static uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState.*;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
@@ -331,7 +334,7 @@ public class QuestionServiceTest {
 
         assertThat(hasBeenSubmitted, is(true));
         verify(cohService).updateAnswer(onlineHearingId, questionId, answerId, new CohUpdateAnswer(submitted.getCohAnswerState(), answer));
-        verify(evidenceUploadService).submitQuestionEvidence(questionHeader, onlineHearingId, questionId);
+        verify(evidenceUploadService).submitQuestionEvidence(eq(onlineHearingId), argThat(argument -> questionId.equals(argument.getQuestionId())));
     }
 
     @Test
@@ -344,7 +347,7 @@ public class QuestionServiceTest {
 
         assertThat(hasBeenSubmitted, is(false));
         verify(cohService, never()).updateAnswer(any(), any(), any(), any());
-        verify(evidenceUploadService, never()).submitQuestionEvidence(any(), any(), any());
+        verify(evidenceUploadService, never()).submitQuestionEvidence(any(), any());
     }
 
     @Test

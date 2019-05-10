@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.sscscorbackend.service.email;
 
+import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.util.PdfDateUtil;
 
 @Service
 public class EmailMessageBuilder {
@@ -78,16 +81,19 @@ public class EmailMessageBuilder {
     }
 
     public String getEvidenceSubmittedMessage(SscsCaseDetails sscsCaseDetails) {
-        return buildMessageWithHeading(sscsCaseDetails, "The appellant has submitted evidence to the tribunal. The evidence is attached.",
-                "Additional evidence submitted");
+        String submittedDate = PdfDateUtil.reformatDate(LocalDate.now());
+        return buildMessageWithHeading(sscsCaseDetails, "Additional evidence was received by the tribunal for the above appeal on " +
+                        submittedDate + ".",
+                "Additional evidence submitted by appellant");
     }
 
-    public String getQuestionEvidenceSubmittedMessage(SscsCaseDetails sscsCaseDetails, String questionSubject) {
+    public String getQuestionEvidenceSubmittedMessage(SscsCaseDetails sscsCaseDetails, Question question) {
         return buildMessageWithHeading(sscsCaseDetails,
-                "The appellant has submitted evidence to the tribunal. The evidence relates to the question\n\n" +
-                        questionSubject +
-                        "\n\nThe evidence is attached.",
-                "Additional evidence submitted");
+                "Additional evidence was received by the tribunal for the above appeal on " +
+                        PdfDateUtil.reformatDateTimeToDate(question.getAnswerDate()) +
+                        ". It was submitted in relation to the question " +
+                        question.getQuestionHeaderText(),
+                "Additional evidence submitted in relation to question");
     }
 
     private String buildMessageWithHeading(SscsCaseDetails caseDetails, String message, String heading) {
