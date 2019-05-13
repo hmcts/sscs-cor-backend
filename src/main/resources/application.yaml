@@ -121,3 +121,6 @@ pdf-service:
   accessKey: ${PDF_SERVICE_ACCESS_KEY:setMe}
 
 juiBaseUrl: "${JUI_BASE_URL:https://jui-webapp-aat.service.core-compute-aat.internal}"
+
+swagger:
+  defaultTokens: ${SWAGGER_DEFAULT_TOKENS:false}
