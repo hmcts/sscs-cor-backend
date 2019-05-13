@@ -53,6 +53,10 @@ variable "dwp_email" {
   default = "dwp_email@example.com"
 }
 
+variable "caseworker_email_address" {
+  default = "caseworker@example.net"
+}
+
 variable "email_from_address" {
   default = "sscs@hmcts.net"
 }

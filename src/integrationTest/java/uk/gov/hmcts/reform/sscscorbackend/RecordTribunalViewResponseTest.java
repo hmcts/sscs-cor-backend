@@ -32,7 +32,7 @@ public class RecordTribunalViewResponseTest extends BaseIntegrationTest {
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
-        mailStub.hasEmailWithSubject("sscs@hmcts.net", "Tribunal view accepted (caseReference)");
+        mailStub.hasEmailWithSubject("caseworker@example.net", "Tribunal view accepted (caseReference)");
         mailStub.hasEmailWithSubject("dwp@example.com", "Tribunal view accepted (caseReference)");
     }
 
@@ -51,7 +51,7 @@ public class RecordTribunalViewResponseTest extends BaseIntegrationTest {
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
-        mailStub.hasEmailWithSubject("sscs@hmcts.net", "Tribunal view rejected (caseReference)");
+        mailStub.hasEmailWithSubject("caseworker@example.net", "Tribunal view rejected (caseReference)");
     }
 
     @Test

@@ -18,15 +18,18 @@ public class CorEmailService {
     private final EmailService emailService;
     private final String fromEmailAddress;
     private final String dwpEmailAddress;
+    private final String caseworkerEmailAddress;
 
     public CorEmailService(
             @Autowired EmailService emailService,
             @Value("${appeal.email.from}") String fromEmailAddress,
-            @Value("${appeal.email.dwpEmailAddress}") String dwpEmailAddress
+            @Value("${appeal.email.dwpEmailAddress}") String dwpEmailAddress,
+            @Value("${appeal.email.caseworkerAddress}") String caseworkerEmailAddress
     ) {
         this.emailService = emailService;
         this.fromEmailAddress = fromEmailAddress;
         this.dwpEmailAddress = dwpEmailAddress;
+        this.caseworkerEmailAddress = caseworkerEmailAddress;
     }
 
     @Deprecated // use method below that takes a UploadedEvidence object
@@ -64,7 +67,7 @@ public class CorEmailService {
         log.info("Sending email with subject [" + subject + "] to caseworker");
         emailService.sendEmail(Email.builder()
                 .from(fromEmailAddress)
-                .to(fromEmailAddress)
+                .to(caseworkerEmailAddress)
                 .subject(subject)
                 .message(message)
                 .build());

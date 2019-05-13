@@ -96,6 +96,7 @@ module "sscs-core-backend" {
     EMAIL_SERVER_PORT      = "${local.email_port}"
     DWP_EMAIL              = "${var.dwp_email}"
     EMAIL_FROM             = "${var.email_from_address}"
+    CASEWORKER_EMAIL       = "${var.caseworker_email_address}"
 
     PDF_SERVICE_ACCESS_KEY = "${data.azurerm_key_vault_secret.docmosis-api-key.value}"
 

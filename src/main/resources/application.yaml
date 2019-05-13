@@ -102,6 +102,7 @@ appeal:
     subject: ${EMAIL_SUBJECT:Not Used}
     message: ${EMAIL_MESSAGE:Not Used}
     dwpEmailAddress: ${DWP_EMAIL:dwp@example.com}
+    caseworkerAddress: ${CASEWORKER_EMAIL:caseworker@example.net}
 
 enable_debug_error_message: ${ENABLE_DEBUG_ERROR_MESSAGE:true}
 enable_select_by_case_id: ${ENABLE_SELECT_BY_CASE_ID:false}
