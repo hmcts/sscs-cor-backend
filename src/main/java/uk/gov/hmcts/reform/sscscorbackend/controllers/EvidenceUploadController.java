@@ -53,10 +53,6 @@ public class EvidenceUploadController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization", value = "Auth Header", required = true, dataType = "string", paramType = "header"),
-            @ApiImplicitParam(name = "ServiceAuthorization", value = "Service auth header", required = true, dataType = "string", paramType = "header")
-    })
     public ResponseEntity<Evidence> uploadEvidence(
             @PathVariable("onlineHearingId") String onlineHearingId,
             @RequestParam("file") MultipartFile file
@@ -160,10 +156,6 @@ public class EvidenceUploadController {
         return hearingFound ? ResponseEntity.noContent().build() : notFound().build();
     }
 
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization", value = "Auth Header", required = true, dataType = "string", paramType = "header"),
-            @ApiImplicitParam(name = "ServiceAuthorization", value = "Service auth header", required = true, dataType = "string", paramType = "header")
-    })
     @ApiOperation(value = "Submit COR evidence",
             notes = "Submits the evidence that has already been uploaded in a draft state. This means it will be " +
                     "visible in CCD by a caseworker and JUI by the pannel members. You need to have an appeal in CCD " +
