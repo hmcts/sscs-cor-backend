@@ -64,3 +64,7 @@ variable "createCcdEndpoint" {
 variable "jui_base_url" {
   type = "string"
 }
+
+variable "idam_url" {
+  type = "string"
+}
