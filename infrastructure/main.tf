@@ -41,18 +41,17 @@ data "azurerm_key_vault_secret" "docmosis-api-key" {
 locals {
   ase_name = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
 
-  local_env = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "aat" : "saat" : var.env}"
-  local_ase = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "core-compute-aat" : "core-compute-saat" : local.ase_name}"
+  local_idam_env = "${var.env == "prod" ? "" : ".${var.env}"}"
 
-  s2sCnpUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
-  cohUrl    = "http://coh-cor-${local.local_env}.service.${local.local_ase}.internal"
-  ccdApi    = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
-  idam_url  = "https://idam-api.${local.local_env}.platform.hmcts.net"
-  documentManagementUrl = "http://dm-store-${local.local_env}.service.${local.local_ase}.internal"
-  pdfService    = "http://cmc-pdf-service-${local.local_env}.service.${local.local_ase}.internal"
-  notificationsApiUrl = "http://sscs-tya-notif-${local.local_env}.service.${local.local_ase}.internal"
+  s2sCnpUrl = "http://rpe-service-auth-provider-${var.env}.service.${local.ase_name}.internal"
+  cohUrl    = "http://coh-cor-${var.env}.service.${local.ase_name}.internal"
+  ccdApi    = "http://ccd-data-store-api-${var.env}.service.${local.ase_name}.internal"
+  idam_url  = "https://idam-api${local.local_idam_env}.platform.hmcts.net"
+  documentManagementUrl = "http://dm-store-${var.env}.service.${local.ase_name}.internal"
+  pdfService    = "http://cmc-pdf-service-${var.env}.service.${local.ase_name}.internal"
+  notificationsApiUrl = "http://sscs-tya-notif-${var.env}.service.${local.ase_name}.internal"
 
-  azureVaultName = "sscs-${local.local_env}"
+  azureVaultName = "sscs-${var.env}"
 
   email_host      = "mta.reform.hmcts.net"
   email_port      = "25"
