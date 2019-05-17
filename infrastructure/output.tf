@@ -13,3 +13,8 @@ output "idam_s2s_auth" {
 output "coh_url" {
   value = "http://coh-cor-aat.service.core-compute-aat.internal"
 }
+
+output "idam_redirect_url" {
+  value = "${var.idam_redirect_url}"
+}
+
