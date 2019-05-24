@@ -66,12 +66,14 @@ public class QuestionServiceTest {
                 cohQuestionReference1.getQuestionHeaderText(),
                 cohQuestionReference1.getQuestionBodyText(),
                 draft,
+                null,
                 cohQuestionReference1.getAnswers().get(0).getAnswerText());
         QuestionSummary question2Summary = new QuestionSummary(cohQuestionReference2.getQuestionId(),
                 cohQuestionReference2.getQuestionOrdinal(),
                 cohQuestionReference2.getQuestionHeaderText(),
                 cohQuestionReference2.getQuestionBodyText(),
                 draft,
+                null,
                 cohQuestionReference2.getAnswers().get(0).getAnswerText());
         when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
         QuestionRound questionRound = underTest.getQuestions(onlineHearingId, true);
@@ -94,6 +96,7 @@ public class QuestionServiceTest {
                 cohQuestionReference1.getQuestionHeaderText(),
                 cohQuestionReference1.getQuestionBodyText(),
                 draft,
+                null,
                 cohQuestionReference1.getAnswers().get(0).getAnswerText());
 
         when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
@@ -204,10 +207,35 @@ public class QuestionServiceTest {
         List<QuestionSummary> questions = questionRound.getQuestions();
 
         assertThat(questions, contains(
-                new QuestionSummary(firstQuestionId, firstQuestionOrdinal, firstQuestionTitle, firstQuestionBody, draft, firstAnswerText),
-                new QuestionSummary(secondQuestionId, secondQuestionOrdinal, secondQuestionTitle, secondQuestionBody, draft, secondAnswerText)
+                new QuestionSummary(firstQuestionId, firstQuestionOrdinal, firstQuestionTitle, firstQuestionBody, draft, null, firstAnswerText),
+                new QuestionSummary(secondQuestionId, secondQuestionOrdinal, secondQuestionTitle, secondQuestionBody, draft, null, secondAnswerText)
                 )
         );
+    }
+
+    @Test
+    public void getsAnsweredDateFromAnsweredQuestion() {
+        String expectedAnsweredDate = "2018-08-08T09:12:12Z";
+        CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(new CohQuestionRound(
+                asList(new CohQuestionReference("questionId1", 1, "first question", "first question body", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), singletonList(new CohAnswer("", "", new CohState("answer_submitted", expectedAnsweredDate), singletonList(new CohState("answer_submitted", expectedAnsweredDate)))))), 0, someCohState("question_issued"))
+        ));
+        when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId, true);
+
+        assertThat(questionRound.getQuestions().size(), is(1));
+        assertThat(questionRound.getQuestions().get(0).getAnsweredDate(), is(expectedAnsweredDate));
+    }
+
+    @Test
+    public void getsNullAnsweredDateFromUnansweredQuestion() {
+        CohQuestionRounds cohQuestionRounds = new CohQuestionRounds(1, singletonList(new CohQuestionRound(
+                asList(new CohQuestionReference("questionId1", 1, "first question", "first question body", now().plusDays(7).format(ISO_LOCAL_DATE_TIME), singletonList(new CohAnswer("", "", new CohState("answer_drafted", "2018-08-08T09:12:12Z"), singletonList(new CohState("answer_drafted", "2018-08-08T09:12:12Z")))))), 0, someCohState("question_issued"))
+        ));
+        when(cohService.getQuestionRounds(onlineHearingId)).thenReturn(cohQuestionRounds);
+        QuestionRound questionRound = underTest.getQuestions(onlineHearingId, true);
+
+        assertThat(questionRound.getQuestions().size(), is(1));
+        assertThat(questionRound.getQuestions().get(0).getAnsweredDate(), is(nullValue()));
     }
 
     @Test
@@ -402,6 +430,6 @@ public class QuestionServiceTest {
         String questionBodyText = cohQuestionReference.getQuestionBodyText();
         List<CohAnswer> answers = cohQuestionReference.getAnswers();
         String answerText = (answers != null && answers.size() > 0) ? answers.get(0).getAnswerText() : "";
-        return new QuestionSummary(id, questionOrdinal, questionHeaderText, questionBodyText, answerState, answerText);
+        return new QuestionSummary(id, questionOrdinal, questionHeaderText, questionBodyText, answerState, null, answerText);
     }
 }

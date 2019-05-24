@@ -117,8 +117,6 @@ public class QuestionTest extends BaseIntegrationTest {
                 .post("/continuous-online-hearings/" + hearingId + "/questions/" + questionId)
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
-
-        mailStub.hasEmailWithSubjectAndAttachment("Evidence uploaded (caseRef)", evidenceFileContent.getBytes());
     }
 
     @Test
