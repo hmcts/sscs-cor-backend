@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionSummary;
 import uk.gov.hmcts.reform.sscscorbackend.service.QuestionService;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
+import uk.gov.hmcts.reform.sscscorbackend.service.evidence.EvidenceUploadEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreAnswersPdfService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.PdfData;
@@ -37,6 +38,7 @@ public class AnswerSubmittedEventActionTest {
     private SscsCaseDetails caseDetails;
     private String someCaseReference;
     private QuestionService questionService;
+    private EvidenceUploadEmailService evidenceUploadEmailService;
 
     @Before
     public void setUp() throws Exception {
@@ -44,8 +46,9 @@ public class AnswerSubmittedEventActionTest {
         storeAnswersPdfService = mock(StoreAnswersPdfService.class);
         emailMessageBuilder = mock(EmailMessageBuilder.class);
         questionService = mock(QuestionService.class);
+        evidenceUploadEmailService = mock(EvidenceUploadEmailService.class);
 
-        answerSubmittedEventAction = new AnswerSubmittedEventAction(corEmailService, storeAnswersPdfService, emailMessageBuilder, questionService);
+        answerSubmittedEventAction = new AnswerSubmittedEventAction(corEmailService, storeAnswersPdfService, emailMessageBuilder, evidenceUploadEmailService, questionService);
         caseId = 123L;
         onlineHearingId = "onlineHearingId";
 
@@ -93,8 +96,8 @@ public class AnswerSubmittedEventActionTest {
 
     private QuestionRound getQuestionRound(AnswerState answerState) {
         List<QuestionSummary> questionSummaries =
-                asList(new QuestionSummary("someQuestionId", 1, "someQuestionHeader", "someQuestionBody", submitted, "someAnswer"),
-                        new QuestionSummary("someQuestionId", 2, "someQuestionHeader", "someQuestionBody", answerState, "someAnswer"));
+                asList(new QuestionSummary("someQuestionId", 1, "someQuestionHeader", "someQuestionBody", submitted, "2018-08-08T09:12:12Z", "someAnswer"),
+                        new QuestionSummary("someQuestionId", 2, "someQuestionHeader", "someQuestionBody", answerState, null,"someAnswer"));
         return new QuestionRound(questionSummaries, now().plusDays(7).format(ISO_LOCAL_DATE_TIME), 0);
     }
 }

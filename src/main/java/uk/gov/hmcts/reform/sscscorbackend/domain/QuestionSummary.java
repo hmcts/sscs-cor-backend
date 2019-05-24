@@ -14,14 +14,16 @@ public class QuestionSummary {
     private final String questionHeaderText;
     private final String questionBodyText;
     private final AnswerState answerState;
+    private final String answeredDate;
     private final String answer;
 
-    public QuestionSummary(String id, int questionOrdinal, String questionHeaderText, String questionBodyText, AnswerState answerState, String answer) {
+    public QuestionSummary(String id, int questionOrdinal, String questionHeaderText, String questionBodyText, AnswerState answerState, String answeredDate, String answer) {
         this.id = id;
         this.questionHeaderText = questionHeaderText;
         this.questionBodyText = questionBodyText;
         this.answerState = answerState;
         this.questionOrdinal = questionOrdinal;
+        this.answeredDate = answeredDate;
         this.answer = answer;
     }
 
@@ -56,6 +58,12 @@ public class QuestionSummary {
     }
 
     @ApiModelProperty(required = false)
+    @JsonProperty(value = "answered_date")
+    public String getAnsweredDate() {
+        return answeredDate;
+    }
+
+    @ApiModelProperty(required = false)
     @JsonProperty(value = "answer")
     public String getAnswer() {
         return answer;
@@ -75,12 +83,13 @@ public class QuestionSummary {
                 Objects.equals(questionHeaderText, that.questionHeaderText) &&
                 Objects.equals(questionBodyText, that.questionBodyText) &&
                 answerState == that.answerState &&
+                Objects.equals(answeredDate, that.answeredDate) &&
                 Objects.equals(answer, that.answer);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, questionOrdinal, questionHeaderText, questionBodyText, answerState, answer);
+        return Objects.hash(id, questionOrdinal, questionHeaderText, questionBodyText, answerState, answeredDate, answer);
     }
 
     @Override
@@ -91,6 +100,7 @@ public class QuestionSummary {
                 ", questionHeaderText='" + questionHeaderText + '\'' +
                 ", questionBodyText='" + questionBodyText + '\'' +
                 ", answerState=" + answerState +
+                ", answeredDate='" + answeredDate + '\'' +
                 ", answer='" + answer + '\'' +
                 '}';
     }

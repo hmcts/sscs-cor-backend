@@ -34,7 +34,11 @@ public class DataFixtures {
     }
 
     public static List<QuestionSummary> someQuestionSummaries() {
-        return singletonList(new QuestionSummary("someQuestionId", 1, "someQuestionHeader", "someQuestionBody", draft, "someAnswer"));
+        return singletonList(someQuestionSummary());
+    }
+
+    public static QuestionSummary someQuestionSummary() {
+        return new QuestionSummary("someQuestionId", 1, "someQuestionHeader", "someQuestionBody", draft, "2018-08-08T09:12:12Z","someAnswer");
     }
 
     public static Question someQuestion() {
