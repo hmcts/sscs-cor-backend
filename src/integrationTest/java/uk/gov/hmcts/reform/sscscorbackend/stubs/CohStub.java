@@ -80,7 +80,7 @@ public class CohStub extends BaseStub {
             "              \"answer_id\": \"string\",\n" +
             "              \"answer_text\": \"string\",\n" +
             "              \"current_answer_state\": {\n" +
-            "                \"state_datetime\": \"string\",\n" +
+            "                \"state_datetime\": \"2019-05-28T15:19:40Z\",\n" +
             "                \"state_desc\": \"string\",\n" +
             "                \"state_name\": \"{answer_state}\"\n" +
             "              },\n" +
