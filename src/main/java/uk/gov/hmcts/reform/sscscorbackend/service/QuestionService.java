@@ -163,7 +163,8 @@ public class QuestionService {
 
     private String getAnswerDate(List<CohAnswer> answers) {
         return getFirstAnswer(answers)
-                .flatMap(CohAnswer::getAnsweredDate)
+                .filter(answer -> "answer_submitted".equals(answer.getCurrentAnswerState().getStateName()))
+                .map(answer -> answer.getCurrentAnswerState().getStateDateTime())
                 .orElse(null);
     }
 
