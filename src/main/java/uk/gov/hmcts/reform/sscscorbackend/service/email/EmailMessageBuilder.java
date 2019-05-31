@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
+import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionSummary;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.util.PdfDateUtil;
 
 @Service
@@ -87,10 +87,10 @@ public class EmailMessageBuilder {
                 "Additional evidence submitted by appellant");
     }
 
-    public String getQuestionEvidenceSubmittedMessage(SscsCaseDetails sscsCaseDetails, Question question) {
+    public String getQuestionEvidenceSubmittedMessage(SscsCaseDetails sscsCaseDetails, QuestionSummary question) {
         return buildMessageWithHeading(sscsCaseDetails,
                 "Additional evidence was received by the tribunal for the above appeal on " +
-                        PdfDateUtil.reformatDateTimeToDate(question.getAnswerDate()) +
+                        PdfDateUtil.reformatDateTimeToDate(question.getAnsweredDate()) +
                         ". It was submitted in relation to the question " +
                         question.getQuestionHeaderText(),
                 "Additional evidence submitted in relation to question");

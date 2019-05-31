@@ -168,7 +168,7 @@ public class OnlineHearingService {
                 .map(onlineHearing -> {
                     Name name = sscsCaseDeails.getData().getAppeal().getAppellant().getName();
                     String nameString = name.getFirstName() + " " + name.getLastName();
-                    
+
                     boolean hasFinalDecision = sscsCaseDeails.getData().isCorDecision();
 
                     return new OnlineHearing(

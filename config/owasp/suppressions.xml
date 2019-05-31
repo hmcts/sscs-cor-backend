@@ -76,4 +76,12 @@
     <notes>We don't use the CGI Servlet</notes>
     <cve>CVE-2019-0232</cve>
   </suppress>
+  <suppress>
+    <notes>Only an issue if using mysql-connector-java is on the classpath</notes>
+    <cve>CVE-2019-12086</cve>
+  </suppress>
+  <suppress>
+    <notes>Don't use SSI</notes>
+    <cve>CVE-2019-0221</cve>
+  </suppress>
 </suppressions>

@@ -10,7 +10,7 @@ public class EvidenceTest {
     public void getId() {
         Evidence evidence = new Evidence("http://example.com/documents/someId", "someFIleName", "someDate");
         String id = evidence.getId();
-        
+
         assertThat(id, is("someId"));
     }
 }

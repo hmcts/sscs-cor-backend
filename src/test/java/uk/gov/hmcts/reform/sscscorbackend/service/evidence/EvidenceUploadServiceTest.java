@@ -200,7 +200,6 @@ public class EvidenceUploadServiceTest {
         boolean submittedEvidence = evidenceUploadService.submitQuestionEvidence(someOnlineHearingId, question);
 
         assertThat(submittedEvidence, is(true));
-        verify(evidenceUploadEmailService).sendToDwp(question, draftCorDocument, sscsCaseDetails);
         verify(ccdService).updateCase(
                 and(hasCorDocument(0, someQuestionId, documentUrl, fileName), doesNotHaveDraftCorDocuments()),
                 eq(someCcdCaseId),
@@ -231,7 +230,6 @@ public class EvidenceUploadServiceTest {
         boolean submittedEvidence = evidenceUploadService.submitQuestionEvidence(someOnlineHearingId, question);
 
         assertThat(submittedEvidence, is(true));
-        verify(evidenceUploadEmailService).sendToDwp(question, draftCorDocument, sscsCaseDetails);
         verify(ccdService).updateCase(
                 and(hasCorDocument(originalNumberOfSscsDocuments, someQuestionId, documentUrl, fileName), doesNotHaveDraftCorDocuments()),
                 eq(someCcdCaseId),
@@ -264,7 +262,6 @@ public class EvidenceUploadServiceTest {
         boolean submittedEvidence = evidenceUploadService.submitQuestionEvidence(someOnlineHearingId, question);
 
         assertThat(submittedEvidence, is(true));
-        verify(evidenceUploadEmailService).sendToDwp(question, asList(expectedCorDocument), sscsCaseDetails);
         verify(ccdService).updateCase(
                 and(hasCorDocument(0, someQuestionId, expectedUrl, expectedFileName), hasDraftCorDocument(0, draftQuestionId, draftDocumentUrl, draftFileName)),
                 eq(someCcdCaseId),

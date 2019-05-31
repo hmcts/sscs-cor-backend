@@ -11,7 +11,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 public class CcdStub extends BaseStub {
 
@@ -89,6 +89,16 @@ public class CcdStub extends BaseStub {
         );
     }
 
+    public void stubFindCaseByCaseId(Long caseId, SscsCaseData.SscsCaseDataBuilder sscsCaseDetails) throws JsonProcessingException {
+        wireMock.stubFor(get(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId))
+                .withHeader("ServiceAuthorization", new RegexPattern(".*"))
+                .willReturn(okJson(new ObjectMapper().writeValueAsString(SscsCaseDetails.builder()
+                        .id(caseId)
+                        .data(sscsCaseDetails.build())
+                        .build())))
+        );
+    }
+
     public void stubUpdateCase(Long caseId, String caseReference) throws JsonProcessingException {
         wireMock.stubFor(get("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/event-triggers/uploadDocument/token")
                 .willReturn(okJson(new ObjectMapper().writeValueAsString(StartEventResponse.builder().build()))));
@@ -155,5 +165,26 @@ public class CcdStub extends BaseStub {
                 .replace("{evidenceCreatedDate}", evidenceCreatedDate)
                 .replace("{evidenceUrl}", evidenceUrl);
 
+    }
+
+    public static SscsCaseData.SscsCaseDataBuilder baseCaseData(String caseReference) {
+        return SscsCaseData.builder()
+                .caseReference(caseReference)
+                .onlinePanel(OnlinePanel.builder()
+                        .assignedTo("someJudge")
+                        .build())
+                .appeal(Appeal.builder()
+                        .hearingType("cor")
+                        .appellant(Appellant.builder()
+                                .name(Name.builder()
+                                        .firstName("firstName")
+                                        .lastName("lastName")
+                                        .build())
+                                .identity(Identity.builder()
+                                        .nino("nino")
+                                        .build())
+                                .build())
+                        .benefitType(BenefitType.builder().code("PIP").build())
+                        .build());
     }
 }

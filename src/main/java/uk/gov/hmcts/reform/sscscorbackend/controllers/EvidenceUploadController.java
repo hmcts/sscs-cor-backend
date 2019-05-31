@@ -3,7 +3,9 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers;
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.unprocessableEntity;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;

@@ -143,6 +143,7 @@ public class QuestionService {
                 cohQuestionReference.getQuestionHeaderText(),
                 cohQuestionReference.getQuestionBodyText(),
                 answerState,
+                getAnswerDate(answers),
                 getAnswer(answers)
         );
     }
@@ -158,6 +159,13 @@ public class QuestionService {
         return getFirstAnswer(answers)
                 .map(CohAnswer::getAnswerText)
                 .orElse("");
+    }
+
+    private String getAnswerDate(List<CohAnswer> answers) {
+        return getFirstAnswer(answers)
+                .filter(answer -> "answer_submitted".equals(answer.getCurrentAnswerState().getStateName()))
+                .map(answer -> answer.getCurrentAnswerState().getStateDateTime())
+                .orElse(null);
     }
 
     private Optional<CohAnswer> getFirstAnswer(List<CohAnswer> answers) {
