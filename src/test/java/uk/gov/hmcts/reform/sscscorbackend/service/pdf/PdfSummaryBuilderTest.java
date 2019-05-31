@@ -42,7 +42,7 @@ public class PdfSummaryBuilderTest {
         ));
 
         List<PdfQuestionRound> pdfQuestionRounds = new PdfSummaryBuilder().buildPdfSummary(cohConversations, somePdfAppealDetails()).getQuestionRounds();
-        
+
         assertThat(pdfQuestionRounds, is(asList(
                 new PdfQuestionRound(asList(
                         new PdfQuestion("questionHeader-1-1", "questionBody-1-1", "answerText-1-1", AnswerState.submitted, "5 June 2018", "5 July 2018"),

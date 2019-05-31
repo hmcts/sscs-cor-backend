@@ -10,7 +10,7 @@ public class AppellantStatementTest extends BaseIntegrationTest {
     private final Long caseId = 123L;
     private final String hearingId = "hearingId";
     private String caseReference = "caseReference";
-    
+
     @Test
     public void recordRejectedResponse() throws JsonProcessingException {
         cohStub.stubGetOnlineHearing(caseId, hearingId);

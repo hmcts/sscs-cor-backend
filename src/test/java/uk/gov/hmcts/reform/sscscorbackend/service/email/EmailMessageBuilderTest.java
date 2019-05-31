@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
-import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
+import uk.gov.hmcts.reform.sscscorbackend.domain.QuestionSummary;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.util.PdfDateUtil;
 
 public class EmailMessageBuilderTest {
@@ -186,7 +186,7 @@ public class EmailMessageBuilderTest {
 
     @Test
     public void buildQuestionEvidenceSubmitted() {
-        Question question = DataFixtures.someQuestion();
+        QuestionSummary question = DataFixtures.someQuestionSummary();
         String questionHeaderText = question.getQuestionHeaderText();
         String message = new EmailMessageBuilder().getQuestionEvidenceSubmittedMessage(caseDetails, question);
 

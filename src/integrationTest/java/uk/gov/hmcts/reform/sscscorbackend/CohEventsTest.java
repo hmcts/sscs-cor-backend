@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
+import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someCohAnswers;
+import static uk.gov.hmcts.reform.sscscorbackend.stubs.CcdStub.baseCaseData;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.RestAssured;
@@ -8,7 +10,7 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohQuestionReference;
 
 public class CohEventsTest extends BaseIntegrationTest {
@@ -77,9 +79,14 @@ public class CohEventsTest extends BaseIntegrationTest {
 
     @Test
     public void answerSubmittedCohEvent() throws IOException {
-        ccdStub.stubFindCaseByCaseId(caseId, caseReference, "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
+        String evidenceUrl = "http://localhost:4603/documents/123";
+        String questionId = "first-id";
+        SscsCaseData.SscsCaseDataBuilder sscsCaseData = createSscsCaseDataWithQuestionEvidence(evidenceUrl, questionId);
+        ccdStub.stubFindCaseByCaseId(caseId, sscsCaseData);
+
+
         CohQuestionReference questionSummary = new CohQuestionReference(
-                "first-id", 1, "first question", "first question body", "2018-01-01", someCohAnswers("answer_submitted")
+                questionId, 1, "first question", "first question body", "2018-01-01", someCohAnswers("answer_submitted")
         );
         cohStub.stubGetAllQuestionRounds(hearingId, questionSummary);
         cohStub.stubGetOnlineHearing(caseId, hearingId);
@@ -89,12 +96,17 @@ public class CohEventsTest extends BaseIntegrationTest {
         ccdStub.stubUpdateCase(caseId, caseReference);
         String cohEvent = createCohEvent("answers_submitted");
 
+        String evidenceFileContent = "evidence file content";
+        documentStoreStub.stubGetFile("/documents/123", evidenceFileContent);
+
         makeCohEventRequest(cohEvent);
 
         mailStub.hasEmailWithSubjectAndAttachment("Appellant has provided information (" + caseReference + ")", pdf);
         pdfServiceStub.verifyCreateAnswersPdf(caseReference);
         documentStoreStub.verifyUploadFile(pdf);
         ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "Issued Answers Round 1 - " + caseReference + ".pdf");
+
+        mailStub.hasEmailWithSubjectAndAttachment("Evidence uploaded (" + caseReference + ")", evidenceFileContent.getBytes());
     }
 
     @Test
@@ -120,10 +132,16 @@ public class CohEventsTest extends BaseIntegrationTest {
 
     @Test
     public void questionDealineElapsedCohEvent() throws IOException {
-        ccdStub.stubFindCaseByCaseId(caseId, caseReference, "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/document/1");
+        String evidenceUrl = "http://localhost:4603/documents/123";
+        String questionId = "first-id";
+        SscsCaseData.SscsCaseDataBuilder sscsCaseData = createSscsCaseDataWithQuestionEvidence(evidenceUrl, questionId);
+        ccdStub.stubFindCaseByCaseId(caseId, sscsCaseData);
         CohQuestionReference questionSummary = new CohQuestionReference(
-                "first-id", 1, "first question", "first question body", "2018-01-01", someCohAnswers("answer_drafted")
+                questionId, 1, "first question", "first question body", "2018-01-01", someCohAnswers("answer_submitted")
         );
+        String evidenceFileContent = "evidence file content";
+        documentStoreStub.stubGetFile("/documents/123", evidenceFileContent);
+
         cohStub.stubGetAllQuestionRounds(hearingId, questionSummary);
         cohStub.stubGetOnlineHearing(caseId, hearingId);
         ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_QUESTION_DEADLINE_ELAPSED.getCcdType(), caseReference);
@@ -136,6 +154,7 @@ public class CohEventsTest extends BaseIntegrationTest {
         makeCohEventRequest(cohEvent);
 
         mailStub.hasEmailWithSubjectAndAttachment("Appellant has provided information (" + caseReference + ")", pdf);
+        mailStub.hasEmailWithSubjectAndAttachment("Evidence uploaded (" + caseReference + ")", evidenceFileContent.getBytes());
         pdfServiceStub.verifyCreateAnswersPdf(caseReference);
         documentStoreStub.verifyUploadFile(pdf);
         ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "Issued Answers Deadline Elapsed Round 1 - " + caseReference + ".pdf");
@@ -165,6 +184,23 @@ public class CohEventsTest extends BaseIntegrationTest {
     @Test
     public void questionDealineRejectedCohEvent() throws IOException {
         testEvent(EventType.COH_DECISION_REJECTED, "decision_rejected", false);
+    }
+
+    private SscsCaseData.SscsCaseDataBuilder createSscsCaseDataWithQuestionEvidence(String evidenceUrl, String questionId) {
+        return baseCaseData(caseReference)
+                .corDocument(singletonList(CorDocument.builder()
+                        .value(CorDocumentDetails.builder()
+                                .questionId(questionId)
+                                .document(SscsDocumentDetails.builder()
+                                        .documentFileName("someEvidence")
+                                        .documentLink(DocumentLink.builder()
+                                                .documentUrl(evidenceUrl)
+                                                .documentBinaryUrl(evidenceUrl)
+                                                .build())
+                                        .documentDateAdded("evidenceCreatedDate")
+                                        .build())
+                                .build())
+                        .build()));
     }
 
     private void testEvent(EventType eventType, String cohEventType, boolean sendNotification) throws JsonProcessingException {

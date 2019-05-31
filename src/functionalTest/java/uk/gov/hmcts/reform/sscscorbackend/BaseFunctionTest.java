@@ -36,7 +36,8 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
         "core_case_data.api.url=http://ccd-data-store-api-aat.service.core-compute-aat.internal"
 })
 public abstract class BaseFunctionTest {
-    private final String baseUrl = System.getenv("TEST_URL");
+    private final String baseUrl = System.getenv("TEST_URL") != null ? System.getenv("TEST_URL") : "http://localhost:8090";
+
     private String cohBaseUrl = "http://coh-cor-aat.service.core-compute-aat.internal";
     private CloseableHttpClient client;
     private HttpClient cohClient;

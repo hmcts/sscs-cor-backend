@@ -155,9 +155,6 @@ public class EvidenceUploadService {
                         sscsCaseData.setCorDocument(newCorDocumentList);
                         sscsCaseData.setDraftCorDocument(draftCorDocumentsForQuestionId.get(false));
                         ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
-
-                        List<CorDocument> corDocuments = draftCorDocumentsForQuestionId.get(true);
-                        evidenceUploadEmailService.sendToDwp(question, corDocuments, caseDetails);
                     }
                     return true;
                 })
