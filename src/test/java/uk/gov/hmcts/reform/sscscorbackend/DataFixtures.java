@@ -117,17 +117,17 @@ public class DataFixtures {
     }
 
     public static OnlineHearing someOnlineHearing() {
-        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", null, new FinalDecision("final decision"), true);
+        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", 123456789L, null, new FinalDecision("final decision"), true);
     }
 
     public static OnlineHearing someOnlineHearingWithDecision() {
         Decision decision = new Decision("decision_issued", now().format(ISO_LOCAL_DATE_TIME), null, null, "startDate", "endDate", null, "decisionReason", null);
-        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", decision, new FinalDecision("final decision"), true);
+        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", 123456789L, decision, new FinalDecision("final decision"), true);
     }
 
     public static OnlineHearing someOnlineHearingWithDecisionAndAppellentReply() {
         Decision decision = new Decision("decision_issued", now().format(ISO_LOCAL_DATE_TIME), "decision_accepted", now().format(ISO_LOCAL_DATE_TIME), "startDate", "endDate", null, "decisionReason", null);
-        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", decision, new FinalDecision("final decision"), true);
+        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", 123456789L, decision, new FinalDecision("final decision"), true);
     }
 
     public static Evidence someEvidence() {

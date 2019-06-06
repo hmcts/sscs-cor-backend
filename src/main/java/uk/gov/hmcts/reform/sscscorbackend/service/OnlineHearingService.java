@@ -175,6 +175,7 @@ public class OnlineHearingService {
                             onlineHearing.getOnlineHearingId(),
                             nameString,
                             sscsCaseDeails.getData().getCaseReference(),
+                            sscsCaseDeails.getId(),
                             getDecision(onlineHearing.getOnlineHearingId(), sscsCaseDeails.getId()),
                             new FinalDecision(sscsCaseDeails.getData().getDecisionNotes()), hasFinalDecision);
                 });
