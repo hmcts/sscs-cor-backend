@@ -58,6 +58,7 @@ public class ActivitiesValidatorTest {
                 "hearingId",
                 "appellantName",
                 "caseRef",
+                123456789L,
                 new Decision(
                         "sate",
                         "startTime",

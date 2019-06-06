@@ -29,6 +29,7 @@ public class OnlineHearingDateReformatter {
                 onlineHearing.getOnlineHearingId(),
                 onlineHearing.getAppellantName(),
                 onlineHearing.getCaseReference(),
+                onlineHearing.getCaseId(),
                 newDecision,
                 onlineHearing.getFinalDecision(),
                 onlineHearing.isHasFinalDecision());
