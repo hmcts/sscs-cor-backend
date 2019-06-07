@@ -17,7 +17,7 @@ public class EmailMessageBuilderTest {
     private SscsCaseDetails caseDetails;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         emailMessageBuilder = new EmailMessageBuilder();
         caseDetails = SscsCaseDetails.builder()
                 .data(SscsCaseData.builder()
@@ -113,7 +113,7 @@ public class EmailMessageBuilderTest {
 
     @Test
     public void buildDecisionAccepted() {
-        String message = new EmailMessageBuilder().getDecisionAcceptedMessage(caseDetails);
+        String message = new EmailMessageBuilder().getDecisionAcceptedMessage(caseDetails, "someUrl");
 
         assertThat(message, is(
                 "Appeal reference number: caseReference\n" +
@@ -121,6 +121,8 @@ public class EmailMessageBuilderTest {
                         "Appellant NINO: JV123456\n" +
                         "\n" +
                         "The appellant has accepted the tribunal's view.\n" +
+                        "\n" +
+                        "someUrl\n" +
                         "\n" +
                         "PIP Benefit Appeals\n" +
                         "HMCTS\n"));
