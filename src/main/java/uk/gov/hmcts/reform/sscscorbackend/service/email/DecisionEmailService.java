@@ -21,13 +21,13 @@ public class DecisionEmailService {
     }
 
     public void sendEmail(SscsCaseDetails caseDetails, TribunalViewResponse tribunalViewResponse) {
+        String juiUrl = juiUrlGenerator.generateUrl(caseDetails);
         if (tribunalViewResponse.getReply().equals("decision_accepted")) {
-            String decisionIssuedMessage = emailMessageBuilder.getDecisionAcceptedMessage(caseDetails);
+            String decisionIssuedMessage = emailMessageBuilder.getDecisionAcceptedMessage(caseDetails, juiUrl);
             String subject = "Tribunal view accepted (" + caseDetails.getData().getCaseReference() + ")";
             corEmailService.sendEmailToCaseworker(subject, decisionIssuedMessage);
             corEmailService.sendEmailToDwp(subject, decisionIssuedMessage);
         } else {
-            String juiUrl = juiUrlGenerator.generateUrl(caseDetails);
             String decisionIssuedMessage = emailMessageBuilder.getDecisionRejectedMessage(caseDetails, tribunalViewResponse.getReason(), juiUrl);
             String subject = "Tribunal view rejected (" + caseDetails.getData().getCaseReference() + ")";
             corEmailService.sendEmailToCaseworker(subject, decisionIssuedMessage);
