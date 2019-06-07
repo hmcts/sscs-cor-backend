@@ -61,8 +61,9 @@ public class EmailMessageBuilder {
         return buildMessageWithHeading(caseDetails, message, "Preliminary view offered");
     }
 
-    public String getDecisionAcceptedMessage(SscsCaseDetails caseDetails) {
-        return buildMessage(caseDetails, "The appellant has accepted the tribunal's view.");
+    public String getDecisionAcceptedMessage(SscsCaseDetails caseDetails, String juiUrl) {
+        return buildMessage(caseDetails, "The appellant has accepted the tribunal's view.\n\n" +
+                juiUrl);
     }
 
     public String getDecisionRejectedMessage(SscsCaseDetails caseDetails, String reason, String juiUrl) {

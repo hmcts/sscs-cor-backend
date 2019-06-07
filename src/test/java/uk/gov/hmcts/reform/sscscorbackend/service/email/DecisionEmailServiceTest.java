@@ -32,8 +32,10 @@ public class DecisionEmailServiceTest {
 
     @Test
     public void sendsDwpAndCaseworkerEmailWhenDecisionAccepted() {
+        String juiUrl = "someUrl";
+        when(juiUrlGenerator.generateUrl(caseDetails)).thenReturn(juiUrl);
         SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().caseReference(caseReference).build()).build();
-        when(emailMessageBuilder.getDecisionAcceptedMessage(caseDetails)).thenReturn(messageBody);
+        when(emailMessageBuilder.getDecisionAcceptedMessage(caseDetails, juiUrl)).thenReturn(messageBody);
         TribunalViewResponse tribunalViewResponse = new TribunalViewResponse("decision_accepted", "reason");
 
         decisionEmailService.sendEmail(caseDetails, tribunalViewResponse);
