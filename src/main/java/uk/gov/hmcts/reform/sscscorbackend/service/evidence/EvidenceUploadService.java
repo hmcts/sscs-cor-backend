@@ -67,9 +67,12 @@ public class EvidenceUploadService {
                 .documentUrl(document.links.self.href)
                 .build();
 
-        return new SscsDocumentDetails(
-                "Other evidence", document.originalDocumentName, null, createdOn, documentLink, null
-        );
+        return SscsDocumentDetails.builder()
+                .documentType("Other evidence")
+                .documentFileName(document.originalDocumentName)
+                .documentDateAdded(createdOn)
+                .documentLink(documentLink)
+                .build();
     }
 
     private String getCreatedDate(Document document) {
