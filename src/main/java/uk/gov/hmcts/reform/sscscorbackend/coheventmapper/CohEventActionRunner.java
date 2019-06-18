@@ -32,9 +32,9 @@ public class CohEventActionRunner {
         SscsCaseDetails sscsCaseDetails = loadCcdCaseDetails(caseId);
         log.info("Storing and handle pdf [" + caseId + "]");
         CohEventActionContext cohEventActionContextHandle = cohEventAction.handle(caseId, onlineHearingId, sscsCaseDetails);
-        log.info("Notify appellant [" + caseId + "]");
 
         if (cohEventAction.notifyAppellant()) {
+            log.info("Notify appellant [" + caseId + "]");
             notificationService.send(event);
         }
 
