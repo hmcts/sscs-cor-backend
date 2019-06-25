@@ -8,10 +8,12 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 
+@Ignore
 public class EvidenceUploadTest extends BaseFunctionTest {
     @Test
     public void uploadThenDeleteEvidenceToQuestion() throws IOException, InterruptedException, JSONException {

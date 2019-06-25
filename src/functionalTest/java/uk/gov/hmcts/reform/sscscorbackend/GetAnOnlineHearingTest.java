@@ -7,8 +7,10 @@ import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class GetAnOnlineHearingTest extends BaseFunctionTest {
 
     @Test

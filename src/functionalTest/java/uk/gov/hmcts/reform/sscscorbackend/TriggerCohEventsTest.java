@@ -5,10 +5,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.nullValue;
 
 import java.io.IOException;
+import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 
+@Ignore
 public class TriggerCohEventsTest extends BaseFunctionTest {
     @Test
     public void relistingHearingUpdatesCcd() throws IOException, InterruptedException {

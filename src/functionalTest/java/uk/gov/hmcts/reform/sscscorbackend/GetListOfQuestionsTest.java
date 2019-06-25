@@ -6,10 +6,12 @@ import static org.junit.Assert.assertThat;
 import java.io.IOException;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 
+@Ignore
 @RunWith(SpringRunner.class)
 public class GetListOfQuestionsTest extends BaseFunctionTest {
     @Test
