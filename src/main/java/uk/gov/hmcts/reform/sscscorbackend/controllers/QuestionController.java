@@ -28,7 +28,9 @@ public class QuestionController {
     private final QuestionService questionService;
     private final OnlineHearingService onlineHearingService;
 
-    public QuestionController(@Autowired QuestionService questionService, @Autowired OnlineHearingService onlineHearingService) {
+    @Autowired
+    public QuestionController(QuestionService questionService,
+                              OnlineHearingService onlineHearingService) {
         this.questionService = questionService;
         this.onlineHearingService = onlineHearingService;
     }

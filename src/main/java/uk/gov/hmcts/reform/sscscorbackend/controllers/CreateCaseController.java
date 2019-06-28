@@ -14,10 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
@@ -70,6 +67,7 @@ public class CreateCaseController {
         HashMap<String, String> body = new HashMap<>();
         body.put("id", caseDetails.getId().toString());
         body.put("case_reference", caseDetails.getData().getCaseReference());
+        body.put("appellant_tya", caseDetails.getData().getSubscriptions().getAppellantSubscription().getTya());
         return ResponseEntity.created(new URI("case/someId")).body(body);
     }
 
@@ -89,6 +87,24 @@ public class CreateCaseController {
                     .build();
 
             sscsCaseData = sscsCaseData.toBuilder()
+                    .appeal(Appeal.builder()
+                            .benefitType(BenefitType.builder()
+                                    .code("PIP")
+                                    .build())
+                            .hearingType("cor")
+                            .appellant(Appellant.builder()
+                                    .name(Name.builder()
+                                            .firstName("firstName")
+                                            .lastName("lastName")
+                                            .build())
+                                    .identity(Identity.builder()
+                                            .nino("nino")
+                                            .build())
+                                    .address(Address.builder()
+                                            .postcode("CM11 1AB")
+                                            .build())
+                                    .build())
+                            .build())
                     .onlinePanel(OnlinePanel.builder()
                             .assignedTo("someJudge")
                             .disabilityQualifiedMember("disabilityQualifiedMember")
@@ -104,6 +120,7 @@ public class CreateCaseController {
                                                     .mobile(mobile)
                                                     .subscribeEmail("yes")
                                                     .subscribeSms((mobile != null) ? "yes" : "no")
+                                                    .tya(UUID.randomUUID().toString())
                                                     .build()
                                     ).build()
                     ).build();
