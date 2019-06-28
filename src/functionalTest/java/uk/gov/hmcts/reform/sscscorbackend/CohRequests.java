@@ -108,14 +108,14 @@ public class CohRequests {
 
     public int getDeadlineExtensionCount(String hearingId) throws IOException {
         String url = cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/questionrounds";
-        int deadlineExtensionCount = makeGetRequest(cohClient, url, null).getJSONArray("question_rounds")
+        int deadlineExtensionCount = makeGetRequest(cohClient, url).getJSONArray("question_rounds")
                 .getJSONObject(0).getInt("deadline_extension_count");
         return deadlineExtensionCount;
     }
 
     public JSONObject getDecisionReplies(String hearingId) throws IOException {
         String url = cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/decisionreplies";
-        return makeGetRequest(cohClient, url, null);
+        return makeGetRequest(cohClient, url);
     }
 
     public String addDecisionReply(String hearingId, String reply, String reason) throws IOException {
@@ -140,8 +140,7 @@ public class CohRequests {
             try {
                 String roundState = makeGetRequest(
                         cohClient,
-                        cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/questionrounds/1",
-                        "question_round_state.state_name"
+                        cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/questionrounds/1"
                 ).getJSONObject("question_round_state").getString("state_name");
                 boolean questionIssued = roundState.equals("question_issued");
                 System.out.println("Question round issued [" + questionIssued + "]");
@@ -157,8 +156,7 @@ public class CohRequests {
             try {
                 String decisionState = makeGetRequest(
                         cohClient,
-                        cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/decisions",
-                        "decision_state.state_name"
+                        cohBaseUrl + "/continuous-online-hearings/" + hearingId + "/decisions"
                 ).getJSONObject("decision_state").getString("state_name");
                 boolean decisionIssued = decisionState.equals("decision_issued");
                 System.out.println("Decision issued [" + decisionIssued + "]");
@@ -197,7 +195,7 @@ public class CohRequests {
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(expectedStatus.value()));
     }
 
-    private JSONObject makeGetRequest(HttpClient client, String uri, String responseValue) throws IOException {
+    private JSONObject makeGetRequest(HttpClient client, String uri) throws IOException {
         HttpResponse httpResponse = client.execute(get(uri)
                 .setHeader(HttpHeaders.AUTHORIZATION, idamTokens.getIdamOauth2Token())
                 .setHeader("ServiceAuthorization", idamTokens.getServiceAuthorization())

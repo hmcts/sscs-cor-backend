@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.util.PostcodeUtil;
 
@@ -23,35 +24,47 @@ public class CitizenLoginService {
     private final SscsCcdConvertService sscsCcdConvertService;
     private final IdamService idamService;
     private final PostcodeUtil postcodeUtil;
+    private final OnlineHearingService onlineHearingService;
 
-    public CitizenLoginService(CorCcdService corCcdService, SscsCcdConvertService sscsCcdConvertService, IdamService idamService, PostcodeUtil postcodeUtil) {
+    public CitizenLoginService(CorCcdService corCcdService, SscsCcdConvertService sscsCcdConvertService, IdamService idamService, PostcodeUtil postcodeUtil, OnlineHearingService onlineHearingService) {
         this.corCcdService = corCcdService;
         this.sscsCcdConvertService = sscsCcdConvertService;
         this.idamService = idamService;
         this.postcodeUtil = postcodeUtil;
+        this.onlineHearingService = onlineHearingService;
     }
 
-    public List<SscsCaseDetails> findCasesForCitizen(IdamTokens idamTokens, String tya) {
+    public List<OnlineHearing> findCasesForCitizen(IdamTokens idamTokens, String tya) {
         List<CaseDetails> caseDetails = corCcdService.searchForCitizen(idamTokens);
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .collect(toList());
         if (!isBlank(tya)) {
-            return sscsCaseDetails.stream()
-                    .filter(casesWithSubscriptionMatchingTya(tya))
-                    .collect(toList());
+            return convert(
+                    sscsCaseDetails.stream()
+                            .filter(casesWithSubscriptionMatchingTya(tya))
+                            .collect(toList())
+            );
         }
 
-        return sscsCaseDetails;
+        return convert(sscsCaseDetails);
     }
 
-    public Optional<SscsCaseDetails> associateCaseToCitizen(IdamTokens citizenIdamTokens, String tya, String email, String postcode) {
+    private List<OnlineHearing> convert(List<SscsCaseDetails> sscsCaseDetails) {
+        return sscsCaseDetails.stream()
+                .map(onlineHearingService::loadOnlineHearingFromCoh)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(toList());
+    }
+
+    public Optional<OnlineHearing> associateCaseToCitizen(IdamTokens citizenIdamTokens, String tya, String email, String postcode) {
         SscsCaseDetails caseByAppealNumber = corCcdService.findCaseByAppealNumber(tya, idamService.getIdamTokens());
 
         if (caseByAppealNumber != null && postcodeUtil.hasAppellantPostcode(caseByAppealNumber, postcode) && caseHasSubscriptionWithTyaAndEmail(caseByAppealNumber, tya, email)) {
-            corCcdService.addUserToCase(citizenIdamTokens.getUserId(), Long.valueOf(caseByAppealNumber.getData().getCcdCaseId()));
+            corCcdService.addUserToCase(citizenIdamTokens.getUserId(), caseByAppealNumber.getId());
 
-            return Optional.of(caseByAppealNumber);
+            return onlineHearingService.loadOnlineHearingFromCoh(caseByAppealNumber);
         } else {
             return Optional.empty();
         }
