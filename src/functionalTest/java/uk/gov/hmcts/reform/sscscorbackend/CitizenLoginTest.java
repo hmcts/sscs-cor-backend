@@ -20,7 +20,7 @@ public class CitizenLoginTest extends BaseFunctionTest {
         JSONArray onlineHearingForTya = sscsCorBackendRequests.getOnlineHearingForCitizen(appellantTya, userEmail);
         assertThat(onlineHearingForTya.length(), is(0));
 
-        JSONObject jsonObject = sscsCorBackendRequests.assignCaseToUser(appellantTya, userEmail, "CM11 1AB");
+        JSONObject jsonObject = sscsCorBackendRequests.assignCaseToUser(appellantTya, userEmail, "TN32 6PL");
         Long expectedCaseId = Long.valueOf(hearingAndCcdCase.getOnlineHearing().getCaseId());
         assertThat(jsonObject.getLong("case_id"), is(expectedCaseId));
 
