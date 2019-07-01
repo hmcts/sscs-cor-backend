@@ -6,6 +6,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -26,12 +27,14 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 public class SscsCorBackendRequests {
     private final IdamTokens idamTokens;
+    private final CorIdamService corIdamService;
     private String baseUrl;
     private CloseableHttpClient client;
 
 
-    public SscsCorBackendRequests(IdamService idamService, String baseUrl, CloseableHttpClient client) {
+    public SscsCorBackendRequests(IdamService idamService, CorIdamService corIdamService, String baseUrl, CloseableHttpClient client) {
         this.idamTokens = idamService.getIdamTokens();
+        this.corIdamService = corIdamService;
         this.baseUrl = baseUrl;
         this.client = client;
     }
@@ -81,7 +84,29 @@ public class SscsCorBackendRequests {
         return new JSONObject(responseBody);
     }
 
-    public String createCase(String emailAddress) throws IOException {
+    public JSONArray getOnlineHearingForCitizen(String tya, String email) throws IOException {
+        String uri = (StringUtils.isNotBlank(tya)) ? "/citizen/" + tya : "/citizen";
+        HttpResponse getOnlineHearingResponse = getRequest(uri, email);
+
+        assertThat(getOnlineHearingResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+
+        String responseBody = EntityUtils.toString(getOnlineHearingResponse.getEntity());
+
+        return new JSONArray(responseBody);
+    }
+
+    public JSONObject assignCaseToUser(String tya, String email, String postcode) throws IOException {
+        StringEntity entity = new StringEntity("{\"email\":\"" + email + "\", \"postcode\":\"" + postcode + "\"}", APPLICATION_JSON);
+
+        HttpResponse response = postRequest("/citizen/" + tya, entity, email);
+        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+
+        String responseBody = EntityUtils.toString(response.getEntity());
+
+        return new JSONObject(responseBody);
+    }
+
+    public CreatedCcdCase createCase(String emailAddress) throws IOException {
         HttpResponse createCaseResponse = client.execute(post(baseUrl + "/case?email=" + emailAddress)
                 .setHeader("Content-Length", "0")
                 .build());
@@ -91,7 +116,10 @@ public class SscsCorBackendRequests {
         String responseBody = EntityUtils.toString(createCaseResponse.getEntity());
         JSONObject jsonObject = new JSONObject(responseBody);
         System.out.println("Case id " + jsonObject.getString("id"));
-        return jsonObject.getString("id");
+        return new CreatedCcdCase(
+                jsonObject.getString("id"),
+                jsonObject.getString("appellant_tya")
+        );
     }
 
     public JSONObject extendQuestionRoundDeadline(String hearingId) throws IOException {
@@ -207,8 +235,20 @@ public class SscsCorBackendRequests {
                 .setHeader("ServiceAuthorization", idamTokens.getServiceAuthorization());
     }
 
+    private RequestBuilder addHeaders(RequestBuilder requestBuilder, String email) {
+        String userToken = corIdamService.getUserToken(email, "Apassword123");
+        return requestBuilder
+                .setHeader(HttpHeaders.AUTHORIZATION, userToken)
+                .setHeader("ServiceAuthorization", idamTokens.getServiceAuthorization());
+    }
+
     private CloseableHttpResponse getRequest(String url) throws IOException {
         return client.execute(addHeaders(get(baseUrl + url))
+                .build());
+    }
+
+    private CloseableHttpResponse getRequest(String url, String email) throws IOException {
+        return client.execute(addHeaders(get(baseUrl + url), email)
                 .build());
     }
 
@@ -226,6 +266,12 @@ public class SscsCorBackendRequests {
 
     private CloseableHttpResponse postRequest(String url, HttpEntity body) throws IOException {
         return client.execute(addHeaders(post(baseUrl + url))
+                .setEntity(body)
+                .build());
+    }
+
+    private CloseableHttpResponse postRequest(String url, HttpEntity body, String email) throws IOException {
+        return client.execute(addHeaders(post(baseUrl + url), email)
                 .setEntity(body)
                 .build());
     }

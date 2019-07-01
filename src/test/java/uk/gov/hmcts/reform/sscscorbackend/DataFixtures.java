@@ -117,7 +117,11 @@ public class DataFixtures {
     }
 
     public static OnlineHearing someOnlineHearing() {
-        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", 123456789L, null, new FinalDecision("final decision"), true);
+        return someOnlineHearing(123456789L);
+    }
+
+    public static OnlineHearing someOnlineHearing(long caseId) {
+        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", caseId, null, new FinalDecision("final decision"), true);
     }
 
     public static OnlineHearing someOnlineHearingWithDecision() {
