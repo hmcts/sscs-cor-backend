@@ -18,6 +18,7 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -27,7 +28,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class)
+@SpringBootTest(classes = {Application.class, CorIdamService.class})
 @TestPropertySource(properties = {
         "idam.s2s-auth.url=http://rpe-service-auth-provider-aat.service.core-compute-aat.internal",
         "idam.url=http://idam-api.aat.platform.hmcts.net",
@@ -53,14 +54,21 @@ public abstract class BaseFunctionTest {
     @Autowired
     private IdamService idamService;
     @Autowired
+    protected CorIdamService corIdamService;
+    @Autowired
     protected CorCcdService corCcdService;
+
+    @Value("${idam.url}")
+    private String idamApiUrl;
+    protected IdamTestApiRequests idamTestApiRequests;
 
     @Before
     public void setUp() throws Exception {
         cohClient = buildClient("USE_COH_PROXY");
         client = buildClient("USE_BACKEND_PROXY");
-        sscsCorBackendRequests = new SscsCorBackendRequests(idamService, baseUrl, client);
+        sscsCorBackendRequests = new SscsCorBackendRequests(idamService, corIdamService, baseUrl, client);
         cohRequests = new CohRequests(idamService, cohBaseUrl, cohClient);
+        idamTestApiRequests = new IdamTestApiRequests(cohClient, idamApiUrl);
     }
 
     protected String createRandomEmail() {
@@ -71,17 +79,45 @@ public abstract class BaseFunctionTest {
     }
 
     protected OnlineHearing createHearing(boolean ccdCaseRequired) throws IOException {
+        return createHearingAndCcdCase(ccdCaseRequired).getOnlineHearing();
+    }
+
+    protected CreatedCaseHearingData createHearingAndCcdCase(boolean ccdCaseRequired) throws IOException {
+        String emailAddress = createRandomEmail();
+        return createHearingAndCcdCase(ccdCaseRequired, emailAddress);
+    }
+
+    protected CreatedCaseHearingData createHearingAndCcdCase(boolean ccdCaseRequired, String emailAddress) throws IOException {
         String hearingId;
-        String emailAddress = null;
-        String caseId = null;
+        CreatedCcdCase createdCcdCase = null;
         if (ccdCaseRequired) {
-            emailAddress = createRandomEmail();
-            caseId = sscsCorBackendRequests.createCase(emailAddress);
-            hearingId = cohRequests.createHearing(caseId);
+            createdCcdCase = sscsCorBackendRequests.createCase(emailAddress);
+            hearingId = cohRequests.createHearing(createdCcdCase.getCaseId());
         } else {
             hearingId = cohRequests.createHearing();
         }
-        return new OnlineHearing(emailAddress, hearingId, null, caseId);
+        return new CreatedCaseHearingData(
+                new OnlineHearing(emailAddress, hearingId, null, createdCcdCase.getCaseId()),
+                createdCcdCase
+        );
+    }
+
+    public static class CreatedCaseHearingData {
+        private final OnlineHearing onlineHearing;
+        private final CreatedCcdCase createdCcdCase;
+
+        public CreatedCaseHearingData(OnlineHearing onlineHearing, CreatedCcdCase createdCcdCase) {
+            this.onlineHearing = onlineHearing;
+            this.createdCcdCase = createdCcdCase;
+        }
+
+        public OnlineHearing getOnlineHearing() {
+            return onlineHearing;
+        }
+
+        public CreatedCcdCase getCreatedCcdCase() {
+            return createdCcdCase;
+        }
     }
 
     protected OnlineHearing createHearingWithQuestion(boolean ccdCaseRequired) throws IOException, InterruptedException {
