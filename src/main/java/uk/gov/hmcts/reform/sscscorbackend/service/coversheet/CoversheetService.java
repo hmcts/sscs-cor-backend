@@ -31,6 +31,7 @@ public class CoversheetService {
                     Address address = sscsCaseData.getAppeal().getAppellant().getAddress();
                     PdfCoverSheet pdfCoverSheet = new PdfCoverSheet(
                             "" + sscsCase.getId(),
+                            sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle(),
                             address.getLine1(),
                             address.getLine2(),
                             address.getTown(),
