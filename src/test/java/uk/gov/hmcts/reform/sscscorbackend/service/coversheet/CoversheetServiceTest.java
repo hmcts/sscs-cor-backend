@@ -33,7 +33,7 @@ public class CoversheetServiceTest {
                 .thenReturn(Optional.of(createSscsCaseDetails()));
 
         byte[] pdf = {2, 4, 6, 0, 1};
-        PdfCoverSheet pdfSummary = new PdfCoverSheet("12345", "line1", "line2", "town", "county", "postcode");
+        PdfCoverSheet pdfSummary = new PdfCoverSheet("12345", "firstname lastname", "line1", "line2", "town", "county", "postcode");
         when(pdfService.createPdf(pdfSummary, template)).thenReturn(pdf);
 
         Optional<byte[]> pdfOptional =
@@ -59,6 +59,10 @@ public class CoversheetServiceTest {
                 .data(SscsCaseData.builder()
                         .appeal(Appeal.builder()
                                 .appellant(Appellant.builder()
+                                        .name(Name.builder()
+                                                .firstName("firstname")
+                                                .lastName("lastname")
+                                                .build())
                                         .address(Address.builder()
                                                 .line1("line1")
                                                 .line2("line2")
