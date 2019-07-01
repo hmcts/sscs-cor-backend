@@ -14,10 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
@@ -70,6 +67,7 @@ public class CreateCaseController {
         HashMap<String, String> body = new HashMap<>();
         body.put("id", caseDetails.getId().toString());
         body.put("case_reference", caseDetails.getData().getCaseReference());
+        body.put("appellant_tya", caseDetails.getData().getSubscriptions().getAppellantSubscription().getTya());
         return ResponseEntity.created(new URI("case/someId")).body(body);
     }
 
@@ -104,6 +102,7 @@ public class CreateCaseController {
                                                     .mobile(mobile)
                                                     .subscribeEmail("yes")
                                                     .subscribeSms((mobile != null) ? "yes" : "no")
+                                                    .tya(UUID.randomUUID().toString())
                                                     .build()
                                     ).build()
                     ).build();

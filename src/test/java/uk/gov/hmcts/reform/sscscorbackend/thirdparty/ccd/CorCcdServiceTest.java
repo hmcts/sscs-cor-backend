@@ -8,6 +8,7 @@ import static org.mockito.Mockito.*;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CreateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.ccd.service.ReadCcdCaseService;
@@ -54,7 +55,8 @@ public class CorCcdServiceTest {
                 mock(ReadCcdCaseService.class),
                 ccdClient,
                 idamService,
-                ccdRequestDetails
+                ccdRequestDetails,
+                mock(CoreCaseDataApi.class)
         );
         caseId = 123L;
     }
