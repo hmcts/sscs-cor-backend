@@ -9,15 +9,24 @@ import java.util.Objects;
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OnlineHearing {
-    private String onlineHearingId;
-    private String appellantName;
-    private String caseReference;
-    private Long caseId;
-    private Decision decision;
-    private FinalDecision finalDecision;
-    private boolean hasFinalDecision;
+    private final String onlineHearingId;
+    private final String appellantName;
+    private final String caseReference;
+    private final Long caseId;
+    private final Decision decision;
+    private final FinalDecision finalDecision;
+    private final boolean hasFinalDecision;
+    private final HearingArrangements hearingArrangements;
 
     public OnlineHearing(String onlineHearingId, String appellantName, String caseReference, Long caseId, Decision decision, FinalDecision finalDecision, boolean hasFinalDecision) {
+        this(onlineHearingId, appellantName, caseReference, caseId, decision, finalDecision, hasFinalDecision, null);
+    }
+
+    public OnlineHearing(String appellantName, String caseReference, Long caseId, HearingArrangements hearingArrangements) {
+        this(null, appellantName, caseReference, caseId, null, null, false, hearingArrangements);
+    }
+
+    private OnlineHearing(String onlineHearingId, String appellantName, String caseReference, Long caseId, Decision decision, FinalDecision finalDecision, boolean hasFinalDecision, HearingArrangements hearingArrangements) {
         this.onlineHearingId = onlineHearingId;
         this.appellantName = appellantName;
         this.caseReference = caseReference;
@@ -25,6 +34,7 @@ public class OnlineHearing {
         this.decision = decision;
         this.finalDecision = finalDecision;
         this.hasFinalDecision = hasFinalDecision;
+        this.hearingArrangements = hearingArrangements;
     }
 
     @ApiModelProperty(example = "ID_1", required = true)
@@ -66,6 +76,11 @@ public class OnlineHearing {
         return hasFinalDecision;
     }
 
+    @JsonProperty(value = "hearing_arrangements")
+    public HearingArrangements getHearingArrangements() {
+        return hearingArrangements;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -81,12 +96,13 @@ public class OnlineHearing {
                 Objects.equals(caseReference, that.caseReference) &&
                 Objects.equals(caseId, that.caseId) &&
                 Objects.equals(decision, that.decision) &&
-                Objects.equals(finalDecision, that.finalDecision);
+                Objects.equals(finalDecision, that.finalDecision) &&
+                Objects.equals(hearingArrangements, that.hearingArrangements);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(onlineHearingId, appellantName, caseReference, caseId, decision, finalDecision, hasFinalDecision);
+        return Objects.hash(onlineHearingId, appellantName, caseReference, caseId, decision, finalDecision, hasFinalDecision, hearingArrangements);
     }
 
     @Override
@@ -99,6 +115,7 @@ public class OnlineHearing {
                 ", decision=" + decision +
                 ", finalDecision=" + finalDecision +
                 ", hasFinalDecision=" + hasFinalDecision +
+                ", hearingArrangements=" + hearingArrangements +
                 '}';
     }
 }
