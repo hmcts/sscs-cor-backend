@@ -15,10 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
-import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
-import uk.gov.hmcts.reform.sscscorbackend.domain.FinalDecision;
-import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
-import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
+import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.DecisionEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.api.CcdHistoryEvent;
@@ -293,22 +290,35 @@ public class OnlineHearingServiceTest {
     public void loadHearingWithoutCorCase() {
         SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "online");
 
+        HearingOptions hearingOptions = HearingOptions.builder()
+                .languageInterpreter("yes")
+                .languages("french")
+                .arrangements(asList("signLanguageInterpreter", "hearingLoop", "disabledAccess"))
+                .signLanguageType("BSL")
+                .other("other arrangements")
+                .build();
+        sscsCaseDetails.getData().getAppeal().setHearingOptions(hearingOptions);
+
         when(cohService.getOnlineHearing(someCaseId)).thenReturn(new CohOnlineHearings(emptyList()));
 
         Optional<OnlineHearing> onlineHearing = underTest.loadHearing(sscsCaseDetails);
 
         assertThat(onlineHearing.isPresent(), is(true));
         assertThat(onlineHearing.get(), is(new OnlineHearing(
-                null,
                 "firstname lastname",
                 "caseref",
                 1234321L,
-                null,
-                null,
-                false
+                new HearingArrangements(
+                        true,
+                        "french",
+                        true,
+                        "BSL",
+                        true,
+                        true,
+                        "other arrangements"
+                )
         )));
     }
-
 
     @Test
     public void addDecisionReplyAndSendEmailIfDecisionAccepted() {
