@@ -8,7 +8,6 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
+import uk.gov.hmcts.reform.sscscorbackend.domain.FinalDecision;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.DecisionEmailService;
@@ -223,7 +223,7 @@ public class OnlineHearingServiceTest {
         when(ccdService.findCaseBy(singletonMap("case.subscriptions.appellantSubscription.email", someEmailAddress), idamTokens))
                 .thenReturn(singletonList(createCaseDetails(someCaseId, "caseref", "firstname", "lastname")));
 
-        CohOnlineHearings emptyCohOnlineHearings = new CohOnlineHearings(Collections.emptyList());
+        CohOnlineHearings emptyCohOnlineHearings = new CohOnlineHearings(emptyList());
         when(cohService.getOnlineHearing(someCaseId)).thenReturn(emptyCohOnlineHearings);
 
         Optional<OnlineHearing> onlineHearing = underTest.getOnlineHearing(someEmailAddress);
@@ -248,7 +248,7 @@ public class OnlineHearingServiceTest {
     }
 
     @Test
-    public void loadOnlineHearingIncludsFinalDecision() {
+    public void loadOnlineHearingIncludesFinalDecision() {
         SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "online");
         sscsCaseDetails.getData().setIsCorDecision("YES");
 
@@ -260,6 +260,55 @@ public class OnlineHearingServiceTest {
         assertThat(onlineHearing.get().getFinalDecision().getReason(), is(sscsCaseDetails.getData().getDecisionNotes()));
         assertThat(onlineHearing.get().isHasFinalDecision(), is(true));
     }
+
+    @Test
+    public void loadHearingWithCorCase() {
+        SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "online");
+        sscsCaseDetails.getData().setIsCorDecision("YES");
+
+        when(cohService.getOnlineHearing(someCaseId)).thenReturn(DataFixtures.someCohOnlineHearings());
+        when(ccdService.getHistoryEvents(someCaseId)).thenReturn(singletonList(new CcdHistoryEvent(EventType.FINAL_DECISION.getCcdType())));
+        CohDecision cohDecision = someCohDecision();
+        when(cohService.getDecision("someOnlineHearingId")).thenReturn(Optional.of(cohDecision));
+        CohDecisionReplies cohDecisionReplies = someCohDecisionReplies();
+        when(cohService.getDecisionReplies("someOnlineHearingId")).thenReturn(Optional.of(cohDecisionReplies));
+        Decision decision = someDecision();
+        when(decisionExtractor.extract(someCaseId, cohDecision, cohDecisionReplies.getDecisionReplies().get(0))).thenReturn(decision);
+
+        Optional<OnlineHearing> onlineHearing = underTest.loadHearing(sscsCaseDetails);
+
+        assertThat(onlineHearing.isPresent(), is(true));
+        assertThat(onlineHearing.get(), is(new OnlineHearing(
+                "someOnlineHearingId",
+                "firstname lastname",
+                "caseref",
+                1234321L,
+                decision,
+                new FinalDecision("decision notes"),
+                true
+        )));
+    }
+
+    @Test
+    public void loadHearingWithoutCorCase() {
+        SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "online");
+
+        when(cohService.getOnlineHearing(someCaseId)).thenReturn(new CohOnlineHearings(emptyList()));
+
+        Optional<OnlineHearing> onlineHearing = underTest.loadHearing(sscsCaseDetails);
+
+        assertThat(onlineHearing.isPresent(), is(true));
+        assertThat(onlineHearing.get(), is(new OnlineHearing(
+                null,
+                "firstname lastname",
+                "caseref",
+                1234321L,
+                null,
+                null,
+                false
+        )));
+    }
+
 
     @Test
     public void addDecisionReplyAndSendEmailIfDecisionAccepted() {
