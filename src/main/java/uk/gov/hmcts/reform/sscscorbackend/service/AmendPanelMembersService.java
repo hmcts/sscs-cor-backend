@@ -37,7 +37,7 @@ public class AmendPanelMembersService {
             membersToAddPermissionTo.remove(oldCaseDetails.getAssignedToMedicalMember());
 
             for (String member : membersToRemovePermissionsFrom) {
-                if (member != null) {
+                if (member != null && member.length() != 0) {
                     log.info("Remove member with id starting [" + member.substring(0, 3) + "] from case [" + caseId + "]");
                     ccdService.removeUserFromCase(member, caseId);
                 }
