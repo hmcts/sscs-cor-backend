@@ -112,4 +112,22 @@ public class AmendPanelMembersServiceTest {
         String fixedListValue = null;
         assertEquals(null, amendPanelMembersService.stripOutUserName(fixedListValue));
     }
+
+    @Test
+    public void willAddOneMedicalPanelMember() {
+        newCaseData = new CaseData("onlineHearingId", "judge", "", medicalMember);
+        amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData), null));
+
+        verify(corCcdService).addUserToCase(medicalMember, Long.valueOf(caseId));
+        verifyNoMoreInteractions(corCcdService);
+    }
+
+    @Test
+    public void willAddOneDisabilityPanelMember() {
+        newCaseData = new CaseData("onlineHearingId", "judge", disabilityMember, "");
+        amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData), null));
+        
+        verify(corCcdService).addUserToCase(disabilityMember, Long.valueOf(caseId));
+        verifyNoMoreInteractions(corCcdService);
+    }
 }

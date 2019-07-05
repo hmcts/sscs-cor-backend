@@ -44,7 +44,7 @@ public class AmendPanelMembersService {
             }
         }
         for (String member : membersToAddPermissionTo) {
-            if (member != null) {
+            if (member != null && member.length() != 0) {
                 log.info("Add member with id starting [" + member.substring(0, 3) + "] to case [" + caseId + "]");
                 ccdService.addUserToCase(member, caseId);
             }
