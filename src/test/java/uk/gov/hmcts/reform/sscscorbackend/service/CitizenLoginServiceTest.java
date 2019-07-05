@@ -69,9 +69,9 @@ public class CitizenLoginServiceTest {
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing1 = someOnlineHearing(111L);
-        when(onlineHearingService.loadOnlineHearingFromCoh(sscsCaseDetails1)).thenReturn(Optional.of(onlineHearing1));
+        when(onlineHearingService.loadHearing(sscsCaseDetails1)).thenReturn(Optional.of(onlineHearing1));
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadOnlineHearingFromCoh(sscsCaseDetails2)).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
@@ -85,7 +85,7 @@ public class CitizenLoginServiceTest {
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetailsWithDifferentTya);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
         OnlineHearing onlineHearing = someOnlineHearing(111L);
-        when(onlineHearingService.loadOnlineHearingFromCoh(sscsCaseDetailsWithTya)).thenReturn(Optional.of(onlineHearing));
+        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya)).thenReturn(Optional.of(onlineHearing));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, tya);
 
@@ -100,7 +100,7 @@ public class CitizenLoginServiceTest {
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
 
         OnlineHearing onlineHearing = someOnlineHearing(111L);
-        when(onlineHearingService.loadOnlineHearingFromCoh(sscsCaseDetailsWithTya)).thenReturn(Optional.of(onlineHearing));
+        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya)).thenReturn(Optional.of(onlineHearing));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, tya);
 
@@ -114,7 +114,7 @@ public class CitizenLoginServiceTest {
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetailsWithDifferentTya);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
         OnlineHearing onlineHearing = someOnlineHearing(111L);
-        when(onlineHearingService.loadOnlineHearingFromCoh(sscsCaseDetailsWithTya)).thenReturn(Optional.of(onlineHearing));
+        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya)).thenReturn(Optional.of(onlineHearing));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, tya);
 
@@ -127,7 +127,7 @@ public class CitizenLoginServiceTest {
         when(corCcdService.findCaseByAppealNumber(tya, serviceIdamTokens))
                 .thenReturn(expectedCase);
         OnlineHearing expectedOnlineHearing = someOnlineHearing(123L);
-        when(onlineHearingService.loadOnlineHearingFromCoh(expectedCase)).thenReturn(Optional.of(expectedOnlineHearing));
+        when(onlineHearingService.loadHearing(expectedCase)).thenReturn(Optional.of(expectedOnlineHearing));
         Optional<OnlineHearing> sscsCaseDetails = underTest.associateCaseToCitizen(
                 citizenIdamTokens, tya, SUBSCRIPTION_EMAIL_ADDRESS, APPEAL_POSTCODE
         );
@@ -144,7 +144,7 @@ public class CitizenLoginServiceTest {
         when(corCcdService.findCaseByAppealNumber(tya, serviceIdamTokens))
                 .thenReturn(expectedCase);
         OnlineHearing expectedOnlineHearing = someOnlineHearing(123L);
-        when(onlineHearingService.loadOnlineHearingFromCoh(expectedCase)).thenReturn(Optional.of(expectedOnlineHearing));
+        when(onlineHearingService.loadHearing(expectedCase)).thenReturn(Optional.of(expectedOnlineHearing));
         Optional<OnlineHearing> sscsCaseDetails = underTest.associateCaseToCitizen(
                 citizenIdamTokens, tya, SUBSCRIPTION_EMAIL_ADDRESS, APPEAL_POSTCODE
         );
@@ -161,7 +161,7 @@ public class CitizenLoginServiceTest {
         when(corCcdService.findCaseByAppealNumber(tya, serviceIdamTokens))
                 .thenReturn(expectedCase);
         OnlineHearing expectedOnlineHearing = someOnlineHearing(123L);
-        when(onlineHearingService.loadOnlineHearingFromCoh(expectedCase)).thenReturn(Optional.of(expectedOnlineHearing));
+        when(onlineHearingService.loadHearing(expectedCase)).thenReturn(Optional.of(expectedOnlineHearing));
         Optional<OnlineHearing> sscsCaseDetails = underTest.associateCaseToCitizen(
                 citizenIdamTokens, tya, SUBSCRIPTION_EMAIL_ADDRESS, APPEAL_POSTCODE
         );

@@ -180,4 +180,18 @@ public class OnlineHearingService {
                             new FinalDecision(sscsCaseDeails.getData().getDecisionNotes()), hasFinalDecision);
                 });
     }
+
+    public Optional<OnlineHearing> loadHearing(SscsCaseDetails sscsCaseDeails) {
+        Name name = sscsCaseDeails.getData().getAppeal().getAppellant().getName();
+        String nameString = name.getFirstName() + " " + name.getLastName();
+        return Optional.of(loadOnlineHearingFromCoh(sscsCaseDeails)
+                .orElse(new OnlineHearing(
+                null,
+                nameString,
+                sscsCaseDeails.getData().getCaseReference(),
+                sscsCaseDeails.getId(),
+                null,
+                null,
+                false)));
+    }
 }
