@@ -112,4 +112,55 @@ public class AmendPanelMembersServiceTest {
         String fixedListValue = null;
         assertEquals(null, amendPanelMembersService.stripOutUserName(fixedListValue));
     }
+
+    @Test
+    public void willAddOneMedicalPanelMember() {
+        newCaseData = new CaseData("onlineHearingId", "judge", "", medicalMember);
+        amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData), null));
+
+        verify(corCcdService).addUserToCase(medicalMember, Long.valueOf(caseId));
+        verifyNoMoreInteractions(corCcdService);
+    }
+
+    @Test
+    public void willAddOneDisabilityPanelMember() {
+        newCaseData = new CaseData("onlineHearingId", "judge", disabilityMember, "");
+        amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData), null));
+
+        verify(corCcdService).addUserToCase(disabilityMember, Long.valueOf(caseId));
+        verifyNoMoreInteractions(corCcdService);
+    }
+
+    @Test
+    public void willChangeFromJustOneDisabilityMemberToOneMedicalMember() {
+        CaseData oldCaseData = new CaseData("onlineHearingId", "judge", oldDisabilityMember, "");
+        newCaseData = new CaseData("onlineHearingId", "judge", "", medicalMember);
+        amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData), new CaseDetails(caseId, oldCaseData)));
+
+        verify(corCcdService).addUserToCase(medicalMember, Long.valueOf(caseId));
+        verify(corCcdService).removeUserFromCase(oldDisabilityMember, Long.valueOf(caseId));
+        verifyNoMoreInteractions(corCcdService);
+    }
+
+    @Test
+    public void willChangeFromJustOneMedicalMemberToOneDisabilityMember() {
+        CaseData oldCaseData = new CaseData("onlineHearingId", "judge", "", oldMedicalMember);
+        newCaseData = new CaseData("onlineHearingId", "judge", disabilityMember, "");
+        amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData), new CaseDetails(caseId, oldCaseData)));
+
+        verify(corCcdService).addUserToCase(disabilityMember, Long.valueOf(caseId));
+        verify(corCcdService).removeUserFromCase(oldMedicalMember, Long.valueOf(caseId));
+        verifyNoMoreInteractions(corCcdService);
+    }
+
+    @Test
+    public void willRemovePanelMembers() {
+        CaseData oldCaseData = new CaseData("onlineHearingId", "judge", oldDisabilityMember, oldMedicalMember);
+        newCaseData = new CaseData("onlineHearingId", "judge", "", "");
+        amendPanelMembersService.amendPanelMembersPermissions(new CcdEvent(new CaseDetails(caseId, newCaseData), new CaseDetails(caseId, oldCaseData)));
+
+        verify(corCcdService).removeUserFromCase(oldDisabilityMember, Long.valueOf(caseId));
+        verify(corCcdService).removeUserFromCase(oldMedicalMember, Long.valueOf(caseId));
+        verifyNoMoreInteractions(corCcdService);
+    }
 }

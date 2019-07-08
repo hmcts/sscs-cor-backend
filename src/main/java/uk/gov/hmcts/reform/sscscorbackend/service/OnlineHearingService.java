@@ -9,14 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscscorbackend.domain.Decision;
-import uk.gov.hmcts.reform.sscscorbackend.domain.FinalDecision;
-import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
-import uk.gov.hmcts.reform.sscscorbackend.domain.TribunalViewResponse;
+import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.DecisionEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CaseDetails;
@@ -179,5 +178,27 @@ public class OnlineHearingService {
                             getDecision(onlineHearing.getOnlineHearingId(), sscsCaseDeails.getId()),
                             new FinalDecision(sscsCaseDeails.getData().getDecisionNotes()), hasFinalDecision);
                 });
+    }
+
+    public Optional<OnlineHearing> loadHearing(SscsCaseDetails sscsCaseDeails) {
+        SscsCaseData data = sscsCaseDeails.getData();
+        HearingOptions hearingOptions = data.getAppeal().getHearingOptions();
+        Name name = data.getAppeal().getAppellant().getName();
+        String nameString = name.getFirstName() + " " + name.getLastName();
+
+        return Optional.of(loadOnlineHearingFromCoh(sscsCaseDeails)
+                .orElseGet(() -> new OnlineHearing(
+                        nameString,
+                        sscsCaseDeails.getData().getCaseReference(),
+                        sscsCaseDeails.getId(),
+                        new HearingArrangements(
+                                "yes".equalsIgnoreCase(hearingOptions.getLanguageInterpreter()),
+                                hearingOptions.getLanguages(),
+                                hearingOptions.getArrangements().contains("signLanguageInterpreter"),
+                                hearingOptions.getSignLanguageType(),
+                                hearingOptions.getArrangements().contains("hearingLoop"),
+                                hearingOptions.getArrangements().contains("disabledAccess"),
+                                hearingOptions.getOther()
+                        ))));
     }
 }
