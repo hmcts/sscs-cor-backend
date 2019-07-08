@@ -192,4 +192,12 @@ public class DataFixtures {
                 )
         );
     }
+
+    public static CohDecision someCohDecision() {
+        return new CohDecision("onlineHearingId", "descisionAward", "decisionHeader", "decisionReason", "decisionText", new CohState("stateName", "startDateTime"));
+    }
+
+    public static CohDecisionReplies someCohDecisionReplies() {
+        return new CohDecisionReplies(singletonList(new CohDecisionReply("reply", "replyReason")));
+    }
 }
