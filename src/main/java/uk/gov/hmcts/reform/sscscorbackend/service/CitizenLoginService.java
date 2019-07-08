@@ -52,7 +52,7 @@ public class CitizenLoginService {
 
     private List<OnlineHearing> convert(List<SscsCaseDetails> sscsCaseDetails) {
         return sscsCaseDetails.stream()
-                .map(onlineHearingService::loadOnlineHearingFromCoh)
+                .map(onlineHearingService::loadHearing)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(toList());
@@ -64,7 +64,7 @@ public class CitizenLoginService {
         if (caseByAppealNumber != null && postcodeUtil.hasAppellantPostcode(caseByAppealNumber, postcode) && caseHasSubscriptionWithTyaAndEmail(caseByAppealNumber, tya, email)) {
             corCcdService.addUserToCase(citizenIdamTokens.getUserId(), caseByAppealNumber.getId());
 
-            return onlineHearingService.loadOnlineHearingFromCoh(caseByAppealNumber);
+            return onlineHearingService.loadHearing(caseByAppealNumber);
         } else {
             return Optional.empty();
         }
@@ -75,7 +75,7 @@ public class CitizenLoginService {
             Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
 
             return of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription())
-                    .anyMatch(subscription -> subscription != null && subscription.getTya().equals(tya));
+                    .anyMatch(subscription -> subscription != null && tya.equals(subscription.getTya()));
         };
     }
 
