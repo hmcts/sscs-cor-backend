@@ -321,6 +321,35 @@ public class OnlineHearingServiceTest {
     }
 
     @Test
+    public void loadHearingWithoutCorCaseOrHearingArrangements() {
+        SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "online");
+
+        HearingOptions hearingOptions = HearingOptions.builder()
+                .build();
+        sscsCaseDetails.getData().getAppeal().setHearingOptions(hearingOptions);
+
+        when(cohService.getOnlineHearing(someCaseId)).thenReturn(new CohOnlineHearings(emptyList()));
+
+        Optional<OnlineHearing> onlineHearing = underTest.loadHearing(sscsCaseDetails);
+
+        assertThat(onlineHearing.isPresent(), is(true));
+        assertThat(onlineHearing.get(), is(new OnlineHearing(
+                "firstname lastname",
+                "caseref",
+                1234321L,
+                new HearingArrangements(
+                        false,
+                        null,
+                        false,
+                        null,
+                        false,
+                        false,
+                        null
+                )
+        )));
+    }
+
+    @Test
     public void addDecisionReplyAndSendEmailIfDecisionAccepted() {
         String someOnlineHearingId = "someOnlineHearingId";
         String reply = "decision_accepted";
