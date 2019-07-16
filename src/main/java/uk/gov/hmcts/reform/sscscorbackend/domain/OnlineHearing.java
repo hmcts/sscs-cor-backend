@@ -49,7 +49,7 @@ public class OnlineHearing {
         return appellantName;
     }
 
-    @ApiModelProperty(example = "SC112/233", required = true)
+    @ApiModelProperty(example = "SC112/233")
     @JsonProperty(value = "case_reference")
     public String getCaseReference() {
         return caseReference;
