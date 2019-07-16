@@ -6,8 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Objects;
 
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OnlineHearing {
@@ -19,17 +17,17 @@ public class OnlineHearing {
     private final FinalDecision finalDecision;
     private final boolean hasFinalDecision;
     private final HearingArrangements hearingArrangements;
-    private final Appellant appellant;
+    private final AppellantDetails appellantDetails;
 
-    public OnlineHearing(String onlineHearingId, String appellantName, String caseReference, Long caseId, Decision decision, FinalDecision finalDecision, boolean hasFinalDecision, Appellant appellant) {
-        this(onlineHearingId, appellantName, caseReference, caseId, decision, finalDecision, hasFinalDecision, null, appellant);
+    public OnlineHearing(String onlineHearingId, String appellantName, String caseReference, Long caseId, Decision decision, FinalDecision finalDecision, boolean hasFinalDecision, AppellantDetails appellantDetails) {
+        this(onlineHearingId, appellantName, caseReference, caseId, decision, finalDecision, hasFinalDecision, null, appellantDetails);
     }
 
-    public OnlineHearing(String appellantName, String caseReference, Long caseId, HearingArrangements hearingArrangements, Appellant appellant) {
-        this(null, appellantName, caseReference, caseId, null, null, false, hearingArrangements, appellant);
+    public OnlineHearing(String appellantName, String caseReference, Long caseId, HearingArrangements hearingArrangements, AppellantDetails appellantDetails) {
+        this(null, appellantName, caseReference, caseId, null, null, false, hearingArrangements, appellantDetails);
     }
 
-    private OnlineHearing(String onlineHearingId, String appellantName, String caseReference, Long caseId, Decision decision, FinalDecision finalDecision, boolean hasFinalDecision, HearingArrangements hearingArrangements, Appellant appellant) {
+    private OnlineHearing(String onlineHearingId, String appellantName, String caseReference, Long caseId, Decision decision, FinalDecision finalDecision, boolean hasFinalDecision, HearingArrangements hearingArrangements, AppellantDetails appellantDetails) {
         this.onlineHearingId = onlineHearingId;
         this.appellantName = appellantName;
         this.caseReference = caseReference;
@@ -38,7 +36,7 @@ public class OnlineHearing {
         this.finalDecision = finalDecision;
         this.hasFinalDecision = hasFinalDecision;
         this.hearingArrangements = hearingArrangements;
-        this.appellant = appellant;
+        this.appellantDetails = appellantDetails;
     }
 
     @ApiModelProperty(example = "ID_1", required = true)
@@ -85,9 +83,9 @@ public class OnlineHearing {
         return hearingArrangements;
     }
 
-    @JsonProperty(value = "appellant")
-    public Appellant getAppellant() {
-        return appellant;
+    @JsonProperty(value = "appellant_details")
+    public AppellantDetails getAppellantDetails() {
+        return appellantDetails;
     }
 
 
@@ -108,12 +106,12 @@ public class OnlineHearing {
                 Objects.equals(decision, that.decision) &&
                 Objects.equals(finalDecision, that.finalDecision) &&
                 Objects.equals(hearingArrangements, that.hearingArrangements) &&
-                Objects.equals(appellant, that.appellant);
+                Objects.equals(appellantDetails, that.appellantDetails);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(onlineHearingId, appellantName, caseReference, caseId, decision, finalDecision, hasFinalDecision, hearingArrangements, appellant);
+        return Objects.hash(onlineHearingId, appellantName, caseReference, caseId, decision, finalDecision, hasFinalDecision, hearingArrangements, appellantDetails);
     }
 
     @Override
@@ -127,7 +125,7 @@ public class OnlineHearing {
                 ", finalDecision=" + finalDecision +
                 ", hasFinalDecision=" + hasFinalDecision +
                 ", hearingArrangements=" + hearingArrangements +
-                ", appellant=" + appellant +
+                ", appellantDetails=" + appellantDetails +
                 '}';
     }
 }

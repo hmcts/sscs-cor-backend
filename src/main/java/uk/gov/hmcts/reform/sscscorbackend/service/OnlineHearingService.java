@@ -164,6 +164,7 @@ public class OnlineHearingService {
                 .findFirst()
                 .map(onlineHearing -> {
                     Appellant appellant = sscsCaseDeails.getData().getAppeal().getAppellant();
+                    AppellantDetails appellantDetails = convertAppellantDetails(appellant);
                     Name name = appellant.getName();
                     String nameString = name.getFirstName() + " " + name.getLastName();
 
@@ -175,14 +176,15 @@ public class OnlineHearingService {
                             sscsCaseDeails.getData().getCaseReference(),
                             sscsCaseDeails.getId(),
                             getDecision(onlineHearing.getOnlineHearingId(), sscsCaseDeails.getId()),
-                            new FinalDecision(sscsCaseDeails.getData().getDecisionNotes()), hasFinalDecision, appellant);
+                            new FinalDecision(sscsCaseDeails.getData().getDecisionNotes()), hasFinalDecision, appellantDetails);
                 });
     }
 
     public Optional<OnlineHearing> loadHearing(SscsCaseDetails sscsCaseDeails) {
         SscsCaseData data = sscsCaseDeails.getData();
         HearingOptions hearingOptions = data.getAppeal().getHearingOptions();
-        Appellant appellant = data.getAppeal().getAppellant();
+        Appellant appellant = sscsCaseDeails.getData().getAppeal().getAppellant();
+        AppellantDetails appellantDetails = convertAppellantDetails(appellant);
         Name name = appellant.getName();
         String nameString = name.getFirstName() + " " + name.getLastName();
 
@@ -203,7 +205,15 @@ public class OnlineHearingService {
                                     arrangements.contains("disabledAccess"),
                                     hearingOptions.getOther()
                             ),
-                            appellant);
+                            appellantDetails);
                 }));
+    }
+
+    private AppellantDetails convertAppellantDetails(Appellant appellant) {
+        Address address = appellant.getAddress();
+        Contact contact = appellant.getContact();
+        AddressDetails addressDetails = new AddressDetails(address.getLine1(), address.getLine2(), address.getTown(), address.getCounty(), address.getPostcode());
+        AppellantDetails appellantDetails = new AppellantDetails(addressDetails, contact.getEmail(), contact.getPhone(), contact.getMobile());
+        return appellantDetails;
     }
 }

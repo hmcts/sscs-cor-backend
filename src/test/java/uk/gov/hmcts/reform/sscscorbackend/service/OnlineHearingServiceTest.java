@@ -283,7 +283,7 @@ public class OnlineHearingServiceTest {
                 decision,
                 new FinalDecision("decision notes"),
                 true,
-                sscsCaseDetails.getData().getAppeal().getAppellant()
+                new AppellantDetails(new AddressDetails("line1","line2",null, "county","postcode"), "email", "012", "120")
         )));
     }
 
@@ -318,7 +318,7 @@ public class OnlineHearingServiceTest {
                         true,
                         "other arrangements"
                 ),
-                sscsCaseDetails.getData().getAppeal().getAppellant()
+                new AppellantDetails(new AddressDetails("line1","line2",null, "county","postcode"), "email", "012", "120")
         )));
     }
 
@@ -348,7 +348,7 @@ public class OnlineHearingServiceTest {
                         false,
                         null
                 ),
-                sscsCaseDetails.getData().getAppeal().getAppellant()
+                new AppellantDetails(new AddressDetails("line1","line2",null, "county","postcode"), "email", "012", "120")
         )));
     }
 
@@ -395,7 +395,19 @@ public class OnlineHearingServiceTest {
                                                 .firstName(firstName)
                                                 .lastName(lastName)
                                                 .build()
-                                        ).build()
+                                        )
+                                        .address(Address.builder()
+                                                .line1("line1")
+                                                .line2("line2")
+                                                .county("county")
+                                                .postcode("postcode")
+                                                .build())
+                                        .contact(Contact.builder()
+                                                .email("email")
+                                                .phone("012")
+                                                .mobile("120")
+                                                .build())
+                                        .build()
                                 ).build()
                         )
                         .decisionNotes("decision notes")
