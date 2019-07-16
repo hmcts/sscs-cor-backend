@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend.service;
 
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.ImmutableMap;
@@ -187,18 +188,22 @@ public class OnlineHearingService {
         String nameString = name.getFirstName() + " " + name.getLastName();
 
         return Optional.of(loadOnlineHearingFromCoh(sscsCaseDeails)
-                .orElseGet(() -> new OnlineHearing(
-                        nameString,
-                        sscsCaseDeails.getData().getCaseReference(),
-                        sscsCaseDeails.getId(),
-                        new HearingArrangements(
-                                "yes".equalsIgnoreCase(hearingOptions.getLanguageInterpreter()),
-                                hearingOptions.getLanguages(),
-                                hearingOptions.getArrangements().contains("signLanguageInterpreter"),
-                                hearingOptions.getSignLanguageType(),
-                                hearingOptions.getArrangements().contains("hearingLoop"),
-                                hearingOptions.getArrangements().contains("disabledAccess"),
-                                hearingOptions.getOther()
-                        ))));
+                .orElseGet(() -> {
+                    List<String> arrangements = (hearingOptions.getArrangements() != null)
+                            ? hearingOptions.getArrangements() : emptyList();
+                    return new OnlineHearing(
+                            nameString,
+                            sscsCaseDeails.getData().getCaseReference(),
+                            sscsCaseDeails.getId(),
+                            new HearingArrangements(
+                                    "yes".equalsIgnoreCase(hearingOptions.getLanguageInterpreter()),
+                                    hearingOptions.getLanguages(),
+                                    arrangements.contains("signLanguageInterpreter"),
+                                    hearingOptions.getSignLanguageType(),
+                                    arrangements.contains("hearingLoop"),
+                                    arrangements.contains("disabledAccess"),
+                                    hearingOptions.getOther()
+                            ));
+                }));
     }
 }
