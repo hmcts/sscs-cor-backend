@@ -72,7 +72,7 @@ public class ActivitiesValidatorTest {
                 ),
                 new FinalDecision("reason"),
                 true,
-                new AppellantDetails(null, null, null, null)
+                new AppellantDetails(new AddressDetails("line1","line2","town", "county","postcode"), "email", "012", "120")
 
         );
     }

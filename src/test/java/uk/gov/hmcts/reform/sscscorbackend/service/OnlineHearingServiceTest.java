@@ -283,7 +283,7 @@ public class OnlineHearingServiceTest {
                 decision,
                 new FinalDecision("decision notes"),
                 true,
-                new AppellantDetails(new AddressDetails("line1","line2",null, "county","postcode"), "email", "012", "120")
+                new AppellantDetails(new AddressDetails("line1","line2","town", "county","postcode"), "email", "012", "120")
         )));
     }
 
@@ -318,7 +318,7 @@ public class OnlineHearingServiceTest {
                         true,
                         "other arrangements"
                 ),
-                new AppellantDetails(new AddressDetails("line1","line2",null, "county","postcode"), "email", "012", "120")
+                new AppellantDetails(new AddressDetails("line1","line2","town", "county","postcode"), "email", "012", "120")
         )));
     }
 
@@ -348,7 +348,7 @@ public class OnlineHearingServiceTest {
                         false,
                         null
                 ),
-                new AppellantDetails(new AddressDetails("line1","line2",null, "county","postcode"), "email", "012", "120")
+                new AppellantDetails(new AddressDetails("line1","line2","town", "county","postcode"), "email", "012", "120")
         )));
     }
 
@@ -399,6 +399,7 @@ public class OnlineHearingServiceTest {
                                         .address(Address.builder()
                                                 .line1("line1")
                                                 .line2("line2")
+                                                .town("town")
                                                 .county("county")
                                                 .postcode("postcode")
                                                 .build())
