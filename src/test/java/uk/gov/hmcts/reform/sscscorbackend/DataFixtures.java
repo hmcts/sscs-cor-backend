@@ -11,6 +11,8 @@ import static uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.UploadedEviden
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
@@ -121,17 +123,20 @@ public class DataFixtures {
     }
 
     public static OnlineHearing someOnlineHearing(long caseId) {
-        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", caseId, null, new FinalDecision("final decision"), true);
+        Appellant appellant = Appellant.builder().build();
+        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", caseId, null, new FinalDecision("final decision"), true, appellant);
     }
 
     public static OnlineHearing someOnlineHearingWithDecision() {
+        Appellant appellant = Appellant.builder().build();
         Decision decision = new Decision("decision_issued", now().format(ISO_LOCAL_DATE_TIME), null, null, "startDate", "endDate", null, "decisionReason", null);
-        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", 123456789L, decision, new FinalDecision("final decision"), true);
+        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", 123456789L, decision, new FinalDecision("final decision"), true, appellant);
     }
 
     public static OnlineHearing someOnlineHearingWithDecisionAndAppellentReply() {
+        Appellant appellant = Appellant.builder().build();
         Decision decision = new Decision("decision_issued", now().format(ISO_LOCAL_DATE_TIME), "decision_accepted", now().format(ISO_LOCAL_DATE_TIME), "startDate", "endDate", null, "decisionReason", null);
-        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", 123456789L, decision, new FinalDecision("final decision"), true);
+        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", 123456789L, decision, new FinalDecision("final decision"), true, appellant);
     }
 
     public static Evidence someEvidence() {

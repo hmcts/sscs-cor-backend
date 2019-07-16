@@ -282,7 +282,8 @@ public class OnlineHearingServiceTest {
                 1234321L,
                 decision,
                 new FinalDecision("decision notes"),
-                true
+                true,
+                sscsCaseDetails.getData().getAppeal().getAppellant()
         )));
     }
 
@@ -316,7 +317,8 @@ public class OnlineHearingServiceTest {
                         true,
                         true,
                         "other arrangements"
-                )
+                ),
+                sscsCaseDetails.getData().getAppeal().getAppellant()
         )));
     }
 
@@ -345,7 +347,8 @@ public class OnlineHearingServiceTest {
                         false,
                         false,
                         null
-                )
+                ),
+                sscsCaseDetails.getData().getAppeal().getAppellant()
         )));
     }
 

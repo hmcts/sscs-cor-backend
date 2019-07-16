@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.util.I18nBuilder;
 
@@ -71,7 +72,9 @@ public class ActivitiesValidatorTest {
                         new Activities(singletonList(dailyLiving), singletonList(mobility))
                 ),
                 new FinalDecision("reason"),
-                true
+                true,
+                Appellant.builder().build()
+
         );
     }
 
