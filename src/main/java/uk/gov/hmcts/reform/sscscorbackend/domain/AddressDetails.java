@@ -8,11 +8,11 @@ import java.util.Objects;
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AddressDetails {
-    private String line1;
-    private String line2;
-    private String town;
-    private String county;
-    private String postcode;
+    private final String line1;
+    private final String line2;
+    private final String town;
+    private final String county;
+    private final String postcode;
 
     public AddressDetails(String line1, String line2, String town, String county, String postcode) {
         this.line1 = line1;
