@@ -210,10 +210,19 @@ public class OnlineHearingService {
     }
 
     private AppellantDetails convertAppellantDetails(Appellant appellant) {
-        Address address = appellant.getAddress();
-        Contact contact = appellant.getContact();
-        AddressDetails addressDetails = new AddressDetails(address.getLine1(), address.getLine2(), address.getTown(), address.getCounty(), address.getPostcode());
-        AppellantDetails appellantDetails = new AppellantDetails(addressDetails, contact.getEmail(), contact.getPhone(), contact.getMobile());
+        Optional<Address> address = Optional.ofNullable(appellant.getAddress());
+        Optional<Contact> contact = Optional.ofNullable(appellant.getContact());
+
+        AddressDetails addressDetails = new AddressDetails();
+
+        if (address.isPresent()) {
+            Address addressObj = address.get();
+            addressDetails = new AddressDetails(addressObj.getLine1(), addressObj.getLine2(), addressObj.getTown(), addressObj.getCounty(), addressObj.getPostcode());
+        }
+
+        AppellantDetails appellantDetails = new AppellantDetails(addressDetails, contact.orElseGet(null).getEmail(),
+                contact.orElse(null).getPhone(), contact.orElseGet(null).getMobile());
+
         return appellantDetails;
     }
 }
