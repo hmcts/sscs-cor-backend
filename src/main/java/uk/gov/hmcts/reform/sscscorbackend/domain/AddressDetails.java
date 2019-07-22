@@ -14,9 +14,6 @@ public class AddressDetails {
     private String county;
     private String postcode;
 
-    public AddressDetails() {
-    }
-
     public AddressDetails(String line1, String line2, String town, String county, String postcode) {
         this.line1 = line1;
         this.line2 = line2;
