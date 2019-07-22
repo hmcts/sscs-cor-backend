@@ -212,6 +212,9 @@ public class OnlineHearingService {
     private AppellantDetails convertAppellantDetails(Appellant appellant) {
         Optional<Address> address = Optional.ofNullable(appellant.getAddress());
         Optional<Contact> contact = Optional.ofNullable(appellant.getContact());
+        String email = null;
+        String phone = null;
+        String mobile = null;
 
         AddressDetails addressDetails = new AddressDetails();
 
@@ -220,8 +223,14 @@ public class OnlineHearingService {
             addressDetails = new AddressDetails(addressObj.getLine1(), addressObj.getLine2(), addressObj.getTown(), addressObj.getCounty(), addressObj.getPostcode());
         }
 
-        AppellantDetails appellantDetails = new AppellantDetails(addressDetails, contact.orElseGet(null).getEmail(),
-                contact.orElse(null).getPhone(), contact.orElseGet(null).getMobile());
+        if (contact.isPresent()) {
+            Contact contactObj = contact.get();
+            email = contactObj.getEmail();
+            phone = contactObj.getPhone();
+            mobile = contactObj.getMobile();
+        }
+
+        AppellantDetails appellantDetails = new AppellantDetails(addressDetails, email, phone, mobile);
 
         return appellantDetails;
     }
