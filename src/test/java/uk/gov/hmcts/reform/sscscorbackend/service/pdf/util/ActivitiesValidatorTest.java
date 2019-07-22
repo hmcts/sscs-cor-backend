@@ -71,7 +71,9 @@ public class ActivitiesValidatorTest {
                         new Activities(singletonList(dailyLiving), singletonList(mobility))
                 ),
                 new FinalDecision("reason"),
-                true
+                true,
+                new AppellantDetails(new AddressDetails("line1","line2","town", "county","postcode"), "email", "012", "120")
+
         );
     }
 
