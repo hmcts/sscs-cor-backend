@@ -25,6 +25,7 @@ public class CoversheetServiceTest {
     private CcdService ccdService;
     private IdamService idamService;
     private IdamTokens idamTokens;
+    private String hmctsImg;
 
     @Before
     public void setUp() {
@@ -36,6 +37,7 @@ public class CoversheetServiceTest {
         idamService = mock(IdamService.class);
         idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
+        hmctsImg = "hmcts.img";
     }
 
     @Test
@@ -44,11 +46,11 @@ public class CoversheetServiceTest {
                 .thenReturn(Optional.of(createSscsCaseDetails()));
 
         byte[] pdf = {2, 4, 6, 0, 1};
-        PdfCoverSheet pdfSummary = new PdfCoverSheet("12345", "firstname lastname", "line1", "line2", "town", "county", "postcode");
+        PdfCoverSheet pdfSummary = new PdfCoverSheet("12345", "firstname lastname", "line1", "line2", "town", "county", "postcode", hmctsImg);
         when(pdfService.createPdf(pdfSummary, template)).thenReturn(pdf);
 
         Optional<byte[]> pdfOptional =
-                new CoversheetService(onlineHearingService, pdfService, template, ccdService, idamService).createCoverSheet(onlineHearingId);
+                new CoversheetService(onlineHearingService, pdfService, template, hmctsImg, ccdService, idamService).createCoverSheet(onlineHearingId);
 
         assertThat(pdfOptional.isPresent(), is(true));
         assertThat(pdfOptional.get(), is(pdf));
@@ -59,7 +61,7 @@ public class CoversheetServiceTest {
         when(onlineHearingService.getCcdCase(onlineHearingId)).thenReturn(Optional.empty());
 
         Optional<byte[]> pdfOptional =
-                new CoversheetService(onlineHearingService, pdfService, template, ccdService, idamService).createCoverSheet(onlineHearingId);
+                new CoversheetService(onlineHearingService, pdfService, template, hmctsImg, ccdService, idamService).createCoverSheet(onlineHearingId);
 
         assertThat(pdfOptional.isPresent(), is(false));
     }
@@ -69,11 +71,11 @@ public class CoversheetServiceTest {
         when(ccdService.getByCaseId(caseId, idamTokens)).thenReturn(createSscsCaseDetails());
 
         byte[] pdf = {2, 4, 6, 0, 1};
-        PdfCoverSheet pdfSummary = new PdfCoverSheet("12345", "firstname lastname", "line1", "line2", "town", "county", "postcode");
+        PdfCoverSheet pdfSummary = new PdfCoverSheet("12345", "firstname lastname", "line1", "line2", "town", "county", "postcode", hmctsImg);
         when(pdfService.createPdf(pdfSummary, template)).thenReturn(pdf);
 
         Optional<byte[]> pdfOptional =
-                new CoversheetService(onlineHearingService, pdfService, template, ccdService, idamService).createCoverSheet(caseId + "");
+                new CoversheetService(onlineHearingService, pdfService, template, hmctsImg, ccdService, idamService).createCoverSheet(caseId + "");
 
         assertThat(pdfOptional.isPresent(), is(true));
         assertThat(pdfOptional.get(), is(pdf));
@@ -84,7 +86,7 @@ public class CoversheetServiceTest {
         when(ccdService.getByCaseId(caseId, idamTokens)).thenReturn(null);
 
         Optional<byte[]> pdfOptional =
-                new CoversheetService(onlineHearingService, pdfService, template, ccdService, idamService).createCoverSheet(onlineHearingId);
+                new CoversheetService(onlineHearingService, pdfService, template, hmctsImg, ccdService, idamService).createCoverSheet(onlineHearingId);
 
         assertThat(pdfOptional.isPresent(), is(false));
     }
