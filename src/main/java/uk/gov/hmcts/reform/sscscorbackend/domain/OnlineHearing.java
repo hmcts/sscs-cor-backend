@@ -17,16 +17,17 @@ public class OnlineHearing {
     private final FinalDecision finalDecision;
     private final boolean hasFinalDecision;
     private final HearingArrangements hearingArrangements;
+    private final AppellantDetails appellantDetails;
 
-    public OnlineHearing(String onlineHearingId, String appellantName, String caseReference, Long caseId, Decision decision, FinalDecision finalDecision, boolean hasFinalDecision) {
-        this(onlineHearingId, appellantName, caseReference, caseId, decision, finalDecision, hasFinalDecision, null);
+    public OnlineHearing(String onlineHearingId, String appellantName, String caseReference, Long caseId, Decision decision, FinalDecision finalDecision, boolean hasFinalDecision, AppellantDetails appellantDetails) {
+        this(onlineHearingId, appellantName, caseReference, caseId, decision, finalDecision, hasFinalDecision, null, appellantDetails);
     }
 
-    public OnlineHearing(String appellantName, String caseReference, Long caseId, HearingArrangements hearingArrangements) {
-        this(null, appellantName, caseReference, caseId, null, null, false, hearingArrangements);
+    public OnlineHearing(String appellantName, String caseReference, Long caseId, HearingArrangements hearingArrangements, AppellantDetails appellantDetails) {
+        this(null, appellantName, caseReference, caseId, null, null, false, hearingArrangements, appellantDetails);
     }
 
-    private OnlineHearing(String onlineHearingId, String appellantName, String caseReference, Long caseId, Decision decision, FinalDecision finalDecision, boolean hasFinalDecision, HearingArrangements hearingArrangements) {
+    private OnlineHearing(String onlineHearingId, String appellantName, String caseReference, Long caseId, Decision decision, FinalDecision finalDecision, boolean hasFinalDecision, HearingArrangements hearingArrangements, AppellantDetails appellantDetails) {
         this.onlineHearingId = onlineHearingId;
         this.appellantName = appellantName;
         this.caseReference = caseReference;
@@ -35,6 +36,7 @@ public class OnlineHearing {
         this.finalDecision = finalDecision;
         this.hasFinalDecision = hasFinalDecision;
         this.hearingArrangements = hearingArrangements;
+        this.appellantDetails = appellantDetails;
     }
 
     @ApiModelProperty(example = "ID_1", required = true)
@@ -81,6 +83,12 @@ public class OnlineHearing {
         return hearingArrangements;
     }
 
+    @JsonProperty(value = "appellant_details")
+    public AppellantDetails getAppellantDetails() {
+        return appellantDetails;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -97,12 +105,13 @@ public class OnlineHearing {
                 Objects.equals(caseId, that.caseId) &&
                 Objects.equals(decision, that.decision) &&
                 Objects.equals(finalDecision, that.finalDecision) &&
-                Objects.equals(hearingArrangements, that.hearingArrangements);
+                Objects.equals(hearingArrangements, that.hearingArrangements) &&
+                Objects.equals(appellantDetails, that.appellantDetails);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(onlineHearingId, appellantName, caseReference, caseId, decision, finalDecision, hasFinalDecision, hearingArrangements);
+        return Objects.hash(onlineHearingId, appellantName, caseReference, caseId, decision, finalDecision, hasFinalDecision, hearingArrangements, appellantDetails);
     }
 
     @Override
@@ -116,6 +125,7 @@ public class OnlineHearing {
                 ", finalDecision=" + finalDecision +
                 ", hasFinalDecision=" + hasFinalDecision +
                 ", hearingArrangements=" + hearingArrangements +
+                ", appellantDetails=" + appellantDetails +
                 '}';
     }
 }
