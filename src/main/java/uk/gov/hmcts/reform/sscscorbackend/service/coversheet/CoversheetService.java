@@ -18,16 +18,20 @@ public class CoversheetService {
     private final OnlineHearingService onlineHearingService;
     private final PdfService pdfService;
     private final String template;
+    private final String hmctsImg;
     private final CcdService ccdService;
     private final IdamService idamService;
 
     public CoversheetService(
             OnlineHearingService onlineHearingService,
             @Qualifier("docmosisPdfService") PdfService pdfService,
-            @Value("${evidenceCoverSheet.docmosis.template}") String template, CcdService ccdService, IdamService idamService) {
+            @Value("${evidenceCoverSheet.docmosis.template}") String template,
+            @Value("${evidenceCoverSheet.docmosis.hmctsImgVal}") String hmctsImg,
+            CcdService ccdService, IdamService idamService) {
         this.onlineHearingService = onlineHearingService;
         this.pdfService = pdfService;
         this.template = template;
+        this.hmctsImg = hmctsImg;
         this.ccdService = ccdService;
         this.idamService = idamService;
     }
@@ -48,7 +52,8 @@ public class CoversheetService {
                             address.getLine2(),
                             address.getTown(),
                             address.getCounty(),
-                            address.getPostcode()
+                            address.getPostcode(),
+                            hmctsImg
                     );
 
                     return pdfService.createPdf(pdfCoverSheet, template);
