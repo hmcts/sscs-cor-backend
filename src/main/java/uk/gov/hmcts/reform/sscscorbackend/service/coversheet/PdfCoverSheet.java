@@ -7,7 +7,7 @@ public class PdfCoverSheet {
     @JsonProperty("case_id")
     private final String caseId;
     @JsonProperty("name")
-    private final String name;
+    private String name;
     @JsonProperty("address_line1")
     private final String addressLine1;
     @JsonProperty("address_line2")
@@ -18,6 +18,8 @@ public class PdfCoverSheet {
     private final String addressCounty;
     @JsonProperty("address_postcode")
     private final String addressPostcode;
+    @JsonProperty("hmcts")
+    private final String hmcts;
 
     public PdfCoverSheet(String caseId,
                          String name,
@@ -25,7 +27,8 @@ public class PdfCoverSheet {
                          String addressLine2,
                          String addressTown,
                          String addressCounty,
-                         String addressPostcode) {
+                         String addressPostcode,
+                         String hmcts) {
         this.caseId = caseId;
         this.name = name;
         this.addressLine1 = addressLine1;
@@ -33,6 +36,7 @@ public class PdfCoverSheet {
         this.addressTown = addressTown;
         this.addressCounty = addressCounty;
         this.addressPostcode = addressPostcode;
+        this.hmcts = hmcts;
     }
 
     @Override
@@ -50,11 +54,12 @@ public class PdfCoverSheet {
                 Objects.equals(addressLine2, that.addressLine2) &&
                 Objects.equals(addressTown, that.addressTown) &&
                 Objects.equals(addressCounty, that.addressCounty) &&
-                Objects.equals(addressPostcode, that.addressPostcode);
+                Objects.equals(addressPostcode, that.addressPostcode) &&
+                Objects.equals(hmcts, that.hmcts);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(caseId, name, addressLine1, addressLine2, addressTown, addressCounty, addressPostcode);
+        return Objects.hash(caseId, name, addressLine1, addressLine2, addressTown, addressCounty, addressPostcode, hmcts);
     }
 }

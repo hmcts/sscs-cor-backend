@@ -4,6 +4,7 @@ import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.unprocessableEntity;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.List;
@@ -183,20 +184,20 @@ public class EvidenceUploadController {
 
     @ApiOperation(value = "Get evidence cover sheet",
             notes = "Generates a PDF file that can be printed out and added as a cover sheet to evidence that is to be " +
-                    "posted in."
+                    "posted in. Can use either the CCD case id which is a number or online hearing id which is a GUUID."
     )
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "A PDF cover sheet"),
             @ApiResponse(code = 404, message = "No online hearing found with online hearing id")
     })
     @GetMapping(
-            value = "{onlineHearingId}/evidence/coversheet",
+            value = "{identifier}/evidence/coversheet",
             produces = MediaType.APPLICATION_PDF_VALUE
     )
     public ResponseEntity<ByteArrayResource> getCoverSheet(
-            @PathVariable("onlineHearingId") String onlineHearingId
+            @ApiParam(value = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier
     ) {
-        Optional<byte[]> coverSheet = coversheetService.createCoverSheet(onlineHearingId);
+        Optional<byte[]> coverSheet = coversheetService.createCoverSheet(identifier);
         return coverSheet.map(pdfBytes ->
                 ResponseEntity.ok()
                         .header("Content-Disposition", "inline; filename=evidence_cover_sheet.pdf")
