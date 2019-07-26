@@ -29,6 +29,17 @@ public class CcdStub extends BaseStub {
             "            \"firstName\": \"{firstName}\",\n" +
             "            \"lastName\": \"{lastName}\"\n" +
             "          },\n" +
+            "           \"address\": {\n" +
+            "            \"line1\": \"123 Hairy Lane\",\n" +
+            "            \"line2\": \"Off Hairy Park\",\n" +
+            "            \"town\": \"Town\",\n" +
+            "            \"county\": \"County\",\n" +
+            "            \"postcode\": \"TS3 3ST\"\n" +
+            "          },\n" +
+            "          \"contact\": {\n" +
+            "            \"email\": \"harry.potter@wizards.com\",\n" +
+            "            \"mobile\": \"07411999999\"\n" +
+            "          }," +
             "          \"identity\": { \"nino\": \"nino\" }\n" +
             "        },\n" +
             "        \"benefitType\": { \"code\": \"PIP\" }\n" +
@@ -182,6 +193,18 @@ public class CcdStub extends BaseStub {
                                         .build())
                                 .identity(Identity.builder()
                                         .nino("nino")
+                                        .build())
+                                .address(Address.builder()
+                                        .line1("line1")
+                                        .line2("line2")
+                                        .town("town")
+                                        .county("county")
+                                        .postcode("postcode")
+                                        .build())
+                                .contact(Contact.builder()
+                                        .email("email")
+                                        .phone("012")
+                                        .mobile("120")
                                         .build())
                                 .build())
                         .benefitType(BenefitType.builder().code("PIP").build())

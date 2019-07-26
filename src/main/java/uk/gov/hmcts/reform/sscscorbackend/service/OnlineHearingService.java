@@ -10,10 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
@@ -166,7 +163,9 @@ public class OnlineHearingService {
         return cohOnlineHearings.getOnlineHearings().stream()
                 .findFirst()
                 .map(onlineHearing -> {
-                    Name name = sscsCaseDeails.getData().getAppeal().getAppellant().getName();
+                    Appellant appellant = sscsCaseDeails.getData().getAppeal().getAppellant();
+                    AppellantDetails appellantDetails = convertAppellantDetails(appellant);
+                    Name name = appellant.getName();
                     String nameString = name.getFirstName() + " " + name.getLastName();
 
                     boolean hasFinalDecision = sscsCaseDeails.getData().isCorDecision();
@@ -177,14 +176,16 @@ public class OnlineHearingService {
                             sscsCaseDeails.getData().getCaseReference(),
                             sscsCaseDeails.getId(),
                             getDecision(onlineHearing.getOnlineHearingId(), sscsCaseDeails.getId()),
-                            new FinalDecision(sscsCaseDeails.getData().getDecisionNotes()), hasFinalDecision);
+                            new FinalDecision(sscsCaseDeails.getData().getDecisionNotes()), hasFinalDecision, appellantDetails);
                 });
     }
 
     public Optional<OnlineHearing> loadHearing(SscsCaseDetails sscsCaseDeails) {
         SscsCaseData data = sscsCaseDeails.getData();
         HearingOptions hearingOptions = data.getAppeal().getHearingOptions();
-        Name name = data.getAppeal().getAppellant().getName();
+        Appellant appellant = sscsCaseDeails.getData().getAppeal().getAppellant();
+        AppellantDetails appellantDetails = convertAppellantDetails(appellant);
+        Name name = appellant.getName();
         String nameString = name.getFirstName() + " " + name.getLastName();
 
         return Optional.of(loadOnlineHearingFromCoh(sscsCaseDeails)
@@ -203,7 +204,29 @@ public class OnlineHearingService {
                                     arrangements.contains("hearingLoop"),
                                     arrangements.contains("disabledAccess"),
                                     hearingOptions.getOther()
-                            ));
+                            ),
+                            appellantDetails);
                 }));
+    }
+
+    private AppellantDetails convertAppellantDetails(Appellant appellant) {
+        Address address = appellant.getAddress();
+        Optional<Contact> contact = Optional.ofNullable(appellant.getContact());
+        String email = null;
+        String phone = null;
+        String mobile = null;
+
+        AddressDetails addressDetails = new AddressDetails(address.getLine1(), address.getLine2(), address.getTown(), address.getCounty(), address.getPostcode());
+
+        if (contact.isPresent()) {
+            Contact contactObj = contact.get();
+            email = contactObj.getEmail();
+            phone = contactObj.getPhone();
+            mobile = contactObj.getMobile();
+        }
+
+        AppellantDetails appellantDetails = new AppellantDetails(addressDetails, email, phone, mobile);
+
+        return appellantDetails;
     }
 }
