@@ -60,7 +60,7 @@ public class HearingArrangements {
         return disabledAccessRequired;
     }
 
-    @ApiModelProperty(example = "true", required = true)
+    @ApiModelProperty(example = "some other arrangements", required = true)
     @JsonProperty(value = "other_arrangements")
     public String getOtherArrangements() {
         return otherArrangements;
