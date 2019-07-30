@@ -33,6 +33,7 @@ public class OnlineHearingDateReformatter {
                 newDecision,
                 onlineHearing.getFinalDecision(),
                 onlineHearing.isHasFinalDecision(),
-                onlineHearing.getAppellantDetails());
+                onlineHearing.getAppellantDetails(),
+                onlineHearing.getAppealDetails());
     }
 }
