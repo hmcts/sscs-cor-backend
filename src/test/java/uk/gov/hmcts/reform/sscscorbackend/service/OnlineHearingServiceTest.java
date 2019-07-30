@@ -7,6 +7,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
 import org.junit.Before;
@@ -283,7 +285,8 @@ public class OnlineHearingServiceTest {
                 decision,
                 new FinalDecision("decision notes"),
                 true,
-                new AppellantDetails(new AddressDetails("line1","line2","town", "county","postcode"), "email", "012", "120")
+                new AppellantDetails(new AddressDetails("line1","line2","town", "county","postcode"), "email", "012", "120"),
+                new AppealDetails(sscsCaseDetails.getCreatedDate().format(DateTimeFormatter.ISO_LOCAL_DATE), "12-12-2019", "PIP")
         )));
     }
 
@@ -318,7 +321,8 @@ public class OnlineHearingServiceTest {
                         true,
                         "other arrangements"
                 ),
-                new AppellantDetails(new AddressDetails("line1","line2","town", "county","postcode"), "email", "012", "120")
+                new AppellantDetails(new AddressDetails("line1","line2","town", "county","postcode"), "email", "012", "120"),
+                new AppealDetails(sscsCaseDetails.getCreatedDate().format(DateTimeFormatter.ISO_LOCAL_DATE), "12-12-2019", "PIP")
         )));
     }
 
@@ -348,7 +352,8 @@ public class OnlineHearingServiceTest {
                         false,
                         null
                 ),
-                new AppellantDetails(new AddressDetails("line1","line2","town", "county","postcode"), "email", "012", "120")
+                new AppellantDetails(new AddressDetails("line1","line2","town", "county","postcode"), "email", "012", "120"),
+                new AppealDetails(sscsCaseDetails.getCreatedDate().format(DateTimeFormatter.ISO_LOCAL_DATE), "12-12-2019", "PIP")
         )));
     }
 
@@ -385,6 +390,7 @@ public class OnlineHearingServiceTest {
     private SscsCaseDetails createCaseDetails(Long caseId, String expectedCaseReference, String firstName, String lastName, String hearingType) {
         return SscsCaseDetails.builder()
                 .id(caseId)
+                .createdDate(LocalDateTime.now())
                 .data(SscsCaseData.builder()
                         .caseReference(expectedCaseReference)
                         .onlinePanel(OnlinePanel.builder().assignedTo("someJudge").build())
@@ -409,7 +415,14 @@ public class OnlineHearingServiceTest {
                                                 .mobile("120")
                                                 .build())
                                         .build()
-                                ).build()
+                                )
+                                .mrnDetails(MrnDetails.builder()
+                                        .mrnDate("12-12-2019")
+                                        .build())
+                                .benefitType(BenefitType.builder()
+                                        .code("PIP")
+                                        .build())
+                                .build()
                         )
                         .decisionNotes("decision notes")
                         .events(new ArrayList<>())
