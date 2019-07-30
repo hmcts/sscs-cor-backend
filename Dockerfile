@@ -1,4 +1,4 @@
-FROM hmcts/cnp-java-base:openjdk-8u181-jre-alpine3.8-1.0
+FROM hmcts/cnp-java-base:openjdk-8u191-jre-alpine3.9-2.0.1
 
 ENV APP sscs-cor-backend.jar
 ENV APPLICATION_TOTAL_MEMORY 1024M
@@ -11,3 +11,4 @@ WORKDIR /opt/app
 HEALTHCHECK --interval=100s --timeout=100s --retries=10 CMD http_proxy="" wget -q http://localhost:8090/health || exit 1
 
 EXPOSE 8090
+
