@@ -23,6 +23,10 @@ public class CcdStub extends BaseStub {
             "        \"assignedTo\": \"someJudge\"\n" +
             "      },\n" +
             "      \"appeal\": {\n" +
+            "         \"mrnDetails\": {\n" +
+            "             \"dwpIssuingOffice\": \"1\",\n" +
+            "             \"mrnDate\": \"2018-02-01\"\n" +
+            "         }," +
             "        \"hearingType\": \"cor\",\n" +
             "        \"appellant\": {\n" +
             "          \"name\": {\n" +
