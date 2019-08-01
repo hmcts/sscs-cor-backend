@@ -11,7 +11,6 @@ import static uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.UploadedEviden
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
@@ -124,21 +123,25 @@ public class DataFixtures {
     public static OnlineHearing someOnlineHearing(long caseId) {
         AddressDetails addressDetails = new AddressDetails("line1", "line2", "town", "country", "postcode");
         AppellantDetails appellantDetails = new AppellantDetails(addressDetails, "email", "phone", "mobile");
-        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", caseId, null, new FinalDecision("final decision"), true, appellantDetails);
+        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", caseId, null, new FinalDecision("final decision"), true, appellantDetails, someAppealDetails());
+    }
+
+    public static AppealDetails someAppealDetails() {
+        return new AppealDetails("12-12-2019", "11-11-2019", "PIP");
     }
 
     public static OnlineHearing someOnlineHearingWithDecision() {
         AddressDetails addressDetails = new AddressDetails("line1", "line2", "town", "country", "postcode");
         AppellantDetails appellantDetails = new AppellantDetails(addressDetails, "email", "phone", "mobile");
         Decision decision = new Decision("decision_issued", now().format(ISO_LOCAL_DATE_TIME), null, null, "startDate", "endDate", null, "decisionReason", null);
-        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", 123456789L, decision, new FinalDecision("final decision"), true, appellantDetails);
+        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", 123456789L, decision, new FinalDecision("final decision"), true, appellantDetails, someAppealDetails());
     }
 
     public static OnlineHearing someOnlineHearingWithDecisionAndAppellentReply() {
         AddressDetails addressDetails = new AddressDetails("line1", "line2", "town", "country", "postcode");
         AppellantDetails appellantDetails = new AppellantDetails(addressDetails, "email", "phone", "mobile");
         Decision decision = new Decision("decision_issued", now().format(ISO_LOCAL_DATE_TIME), "decision_accepted", now().format(ISO_LOCAL_DATE_TIME), "startDate", "endDate", null, "decisionReason", null);
-        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", 123456789L, decision, new FinalDecision("final decision"), true, appellantDetails);
+        return new OnlineHearing("someOnlineHearingId", "someAppellantName", "someCaseReference", 123456789L, decision, new FinalDecision("final decision"), true, appellantDetails, someAppealDetails());
     }
 
     public static Evidence someEvidence() {

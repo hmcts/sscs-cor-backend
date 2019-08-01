@@ -4,6 +4,7 @@ import static java.util.Collections.singletonList;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscscorbackend.domain.*;
 import uk.gov.hmcts.reform.sscscorbackend.util.I18nBuilder;
@@ -72,7 +73,8 @@ public class ActivitiesValidatorTest {
                 ),
                 new FinalDecision("reason"),
                 true,
-                new AppellantDetails(new AddressDetails("line1","line2","town", "county","postcode"), "email", "012", "120")
+                new AppellantDetails(new AddressDetails("line1","line2","town", "county","postcode"), "email", "012", "120"),
+                new AppealDetails(LocalDateTime.now().toString(), "12-12-2019", "PIP")
 
         );
     }

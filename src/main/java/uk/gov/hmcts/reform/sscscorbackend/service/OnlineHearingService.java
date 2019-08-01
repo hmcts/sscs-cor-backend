@@ -4,6 +4,7 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.ImmutableMap;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -165,6 +166,7 @@ public class OnlineHearingService {
                 .map(onlineHearing -> {
                     Appellant appellant = sscsCaseDeails.getData().getAppeal().getAppellant();
                     AppellantDetails appellantDetails = convertAppellantDetails(appellant);
+                    AppealDetails appealDetails = convertAppealDetails(sscsCaseDeails);
                     Name name = appellant.getName();
                     String nameString = name.getFirstName() + " " + name.getLastName();
 
@@ -176,7 +178,11 @@ public class OnlineHearingService {
                             sscsCaseDeails.getData().getCaseReference(),
                             sscsCaseDeails.getId(),
                             getDecision(onlineHearing.getOnlineHearingId(), sscsCaseDeails.getId()),
-                            new FinalDecision(sscsCaseDeails.getData().getDecisionNotes()), hasFinalDecision, appellantDetails);
+                            new FinalDecision(sscsCaseDeails.getData().getDecisionNotes()),
+                            hasFinalDecision,
+                            appellantDetails,
+                            appealDetails
+                    );
                 });
     }
 
@@ -185,6 +191,7 @@ public class OnlineHearingService {
         HearingOptions hearingOptions = data.getAppeal().getHearingOptions();
         Appellant appellant = sscsCaseDeails.getData().getAppeal().getAppellant();
         AppellantDetails appellantDetails = convertAppellantDetails(appellant);
+        AppealDetails appealDetails = convertAppealDetails(sscsCaseDeails);
         Name name = appellant.getName();
         String nameString = name.getFirstName() + " " + name.getLastName();
 
@@ -205,8 +212,19 @@ public class OnlineHearingService {
                                     arrangements.contains("disabledAccess"),
                                     hearingOptions.getOther()
                             ),
-                            appellantDetails);
+                            appellantDetails,
+                            appealDetails
+                    );
                 }));
+    }
+
+    private AppealDetails convertAppealDetails(SscsCaseDetails sscsCaseDeails) {
+        String createdDate = (sscsCaseDeails.getCreatedDate() != null) ? sscsCaseDeails.getCreatedDate().format(DateTimeFormatter.ISO_DATE) : "";
+
+        return new AppealDetails(createdDate,
+                sscsCaseDeails.getData().getAppeal().getMrnDetails().getMrnDate(),
+                sscsCaseDeails.getData().getAppeal().getBenefitType().getCode()
+        );
     }
 
     private AppellantDetails convertAppellantDetails(Appellant appellant) {

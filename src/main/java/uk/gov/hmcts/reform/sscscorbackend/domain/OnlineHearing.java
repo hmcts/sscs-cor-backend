@@ -18,16 +18,17 @@ public class OnlineHearing {
     private final boolean hasFinalDecision;
     private final HearingArrangements hearingArrangements;
     private final AppellantDetails appellantDetails;
+    private final AppealDetails appealDetails;
 
-    public OnlineHearing(String onlineHearingId, String appellantName, String caseReference, Long caseId, Decision decision, FinalDecision finalDecision, boolean hasFinalDecision, AppellantDetails appellantDetails) {
-        this(onlineHearingId, appellantName, caseReference, caseId, decision, finalDecision, hasFinalDecision, null, appellantDetails);
+    public OnlineHearing(String onlineHearingId, String appellantName, String caseReference, Long caseId, Decision decision, FinalDecision finalDecision, boolean hasFinalDecision, AppellantDetails appellantDetails, AppealDetails appealDetails) {
+        this(onlineHearingId, appellantName, caseReference, caseId, decision, finalDecision, hasFinalDecision, null, appellantDetails, appealDetails);
     }
 
-    public OnlineHearing(String appellantName, String caseReference, Long caseId, HearingArrangements hearingArrangements, AppellantDetails appellantDetails) {
-        this(null, appellantName, caseReference, caseId, null, null, false, hearingArrangements, appellantDetails);
+    public OnlineHearing(String appellantName, String caseReference, Long caseId, HearingArrangements hearingArrangements, AppellantDetails appellantDetails, AppealDetails appealDetails) {
+        this(null, appellantName, caseReference, caseId, null, null, false, hearingArrangements, appellantDetails, appealDetails);
     }
 
-    private OnlineHearing(String onlineHearingId, String appellantName, String caseReference, Long caseId, Decision decision, FinalDecision finalDecision, boolean hasFinalDecision, HearingArrangements hearingArrangements, AppellantDetails appellantDetails) {
+    private OnlineHearing(String onlineHearingId, String appellantName, String caseReference, Long caseId, Decision decision, FinalDecision finalDecision, boolean hasFinalDecision, HearingArrangements hearingArrangements, AppellantDetails appellantDetails, AppealDetails appealDetails) {
         this.onlineHearingId = onlineHearingId;
         this.appellantName = appellantName;
         this.caseReference = caseReference;
@@ -37,6 +38,7 @@ public class OnlineHearing {
         this.hasFinalDecision = hasFinalDecision;
         this.hearingArrangements = hearingArrangements;
         this.appellantDetails = appellantDetails;
+        this.appealDetails = appealDetails;
     }
 
     @ApiModelProperty(example = "ID_1", required = true)
@@ -88,6 +90,10 @@ public class OnlineHearing {
         return appellantDetails;
     }
 
+    @JsonProperty(value = "appeal_details")
+    public AppealDetails getAppealDetails() {
+        return appealDetails;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -106,12 +112,13 @@ public class OnlineHearing {
                 Objects.equals(decision, that.decision) &&
                 Objects.equals(finalDecision, that.finalDecision) &&
                 Objects.equals(hearingArrangements, that.hearingArrangements) &&
-                Objects.equals(appellantDetails, that.appellantDetails);
+                Objects.equals(appellantDetails, that.appellantDetails) &&
+                Objects.equals(appealDetails, that.appealDetails);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(onlineHearingId, appellantName, caseReference, caseId, decision, finalDecision, hasFinalDecision, hearingArrangements, appellantDetails);
+        return Objects.hash(onlineHearingId, appellantName, caseReference, caseId, decision, finalDecision, hasFinalDecision, hearingArrangements, appellantDetails, appealDetails);
     }
 
     @Override
@@ -126,6 +133,7 @@ public class OnlineHearing {
                 ", hasFinalDecision=" + hasFinalDecision +
                 ", hearingArrangements=" + hearingArrangements +
                 ", appellantDetails=" + appellantDetails +
+                ", appealDetails=" + appealDetails +
                 '}';
     }
 }
