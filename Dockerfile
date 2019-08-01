@@ -1,4 +1,4 @@
-FROM hmcts/cnp-java-base:openjdk-8u191-jre-alpine3.9-2.0.1
+FROM hmctspublic/cnp-java-base:openjdk-8u191-jre-alpine3.9-2.0.1
 
 ENV APP sscs-cor-backend.jar
 ENV APPLICATION_TOTAL_MEMORY 1024M
