@@ -20,7 +20,7 @@ notifications:
 auth:
   idam:
     client:
-      baseUrl: ${IDAM_URL:http://localhost:4501}
+      baseUrl: ${IDAM_URL:http://localhost:5000}
   provider:
     service:
       client:
