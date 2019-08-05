@@ -39,6 +39,8 @@ public class CohEventsTest extends BaseIntegrationTest {
         ccdStub.stubUpdateCase(caseId, caseReference);
         ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_DECISION_ISSUED.getCcdType(), caseReference);
         ccdStub.stubGetHistoryEvents(caseId, EventType.SYA_APPEAL_CREATED);
+        ccdStub.stubRemovePanelMember(caseId, "someMedicalMember");
+        ccdStub.stubRemovePanelMember(caseId, "someDisabilityMember");
         String cohEvent = createCohEvent("decision_issued");
         notificationsStub.stubSendNotification(cohEvent);
 
@@ -49,6 +51,8 @@ public class CohEventsTest extends BaseIntegrationTest {
         ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "Tribunals view - " + caseReference + ".pdf");
         mailStub.hasEmailWithSubjectAndAttachment("Preliminary view offered (" + caseReference + ")", pdf);
         notificationsStub.verifySendNotification(cohEvent);
+        ccdStub.verifyRemovePanelMember(caseId, "someMedicalMember");
+        ccdStub.verifyRemovePanelMember(caseId, "someDisabilityMember");
     }
 
     @Test
@@ -120,6 +124,8 @@ public class CohEventsTest extends BaseIntegrationTest {
         notificationsStub.stubSendNotification(cohEvent);
         ccdStub.stubUpdateCaseWithEvent(caseId, "updateHearingType", caseReference);
         ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_ONLINE_HEARING_RELISTED.getCcdType(), caseReference);
+        ccdStub.stubRemovePanelMember(caseId, "someMedicalMember");
+        ccdStub.stubRemovePanelMember(caseId, "someDisabilityMember");
 
         makeCohEventRequest(cohEvent);
 
@@ -128,6 +134,8 @@ public class CohEventsTest extends BaseIntegrationTest {
         documentStoreStub.verifyUploadFile(pdf);
         ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "COR Transcript - " + caseReference + ".pdf");
         ccdStub.verifyUpdateCaseToOralHearing(caseId, caseReference);
+        ccdStub.verifyRemovePanelMember(caseId, "someMedicalMember");
+        ccdStub.verifyRemovePanelMember(caseId, "someDisabilityMember");
     }
 
     @Test

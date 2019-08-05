@@ -22,6 +22,9 @@ public class CcdStub extends BaseStub {
             "      \"onlinePanel\": {\n" +
             "        \"assignedTo\": \"someJudge\"\n" +
             "      },\n" +
+            "      \"assignedToJudge\": \"someJudge\"," +
+            "      \"assignedToDisabilityMember\": \"someDisabilityMember\"," +
+            "      \"assignedToMedicalMember\": \"someMedicalMember\"," +
             "      \"appeal\": {\n" +
             "         \"mrnDetails\": {\n" +
             "             \"dwpIssuingOffice\": \"1\",\n" +
@@ -142,12 +145,21 @@ public class CcdStub extends BaseStub {
         );
     }
 
-    public void verifyUpdateCaseToOralHearing(Long caseId, String caseReference) throws JsonProcessingException {
+    public void verifyUpdateCaseToOralHearing(Long caseId, String caseReference) {
         verifyAsync(postRequestedFor(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true"))
                 .withRequestBody(matchingJsonPath("$.event.summary", equalTo("SSCS - appeal updated event")))
                 .withRequestBody(matchingJsonPath("$.data.caseReference", equalTo(caseReference)))
                 .withRequestBody(matchingJsonPath("$.data.appeal.hearingType", equalTo("oral")))
         );
+    }
+
+    public void stubRemovePanelMember(Long caseId, String memberToRemove) {
+        wireMock.stubFor(delete("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/users/" + memberToRemove)
+            .willReturn(ok()));
+    }
+
+    public void verifyRemovePanelMember(Long caseId, String memberToRemove) {
+        verifyAsync(deleteRequestedFor(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/users/" + memberToRemove)));
     }
 
     public void stubAddUserToCase(long caseId, String userToAdd) throws JsonProcessingException {
@@ -185,9 +197,6 @@ public class CcdStub extends BaseStub {
     public static SscsCaseData.SscsCaseDataBuilder baseCaseData(String caseReference) {
         return SscsCaseData.builder()
                 .caseReference(caseReference)
-                .onlinePanel(OnlinePanel.builder()
-                        .assignedTo("someJudge")
-                        .build())
                 .appeal(Appeal.builder()
                         .hearingType("cor")
                         .appellant(Appellant.builder()

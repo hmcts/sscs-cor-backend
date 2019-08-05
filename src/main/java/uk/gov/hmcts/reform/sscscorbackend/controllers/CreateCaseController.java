@@ -87,11 +87,6 @@ public class CreateCaseController {
                     .build();
 
             sscsCaseData = sscsCaseData.toBuilder()
-                    .onlinePanel(OnlinePanel.builder()
-                            .assignedTo("someJudge")
-                            .disabilityQualifiedMember("disabilityQualifiedMember")
-                            .medicalMember("medicalMember")
-                            .build())
                     .events(Collections.singletonList(events))
                     .caseReference("SC285/17/" + new Random().nextInt(90000) + 10000)
                     .subscriptions(

@@ -14,15 +14,18 @@ public class DecisionIssuedEventAction implements CohEventAction {
     private final StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService;
     private final CorEmailService emailService;
     private final EmailMessageBuilder emailMessageBuilder;
+    private final RemovePanelMembersFeature removePanelMembersFeature;
 
-    public DecisionIssuedEventAction(StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService, CorEmailService emailService, EmailMessageBuilder emailMessageBuilder) {
+    public DecisionIssuedEventAction(StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService, CorEmailService emailService, EmailMessageBuilder emailMessageBuilder, RemovePanelMembersFeature removePanelMembersFeature) {
         this.storeOnlineHearingTribunalsViewService = storeOnlineHearingTribunalsViewService;
         this.emailService = emailService;
         this.emailMessageBuilder = emailMessageBuilder;
+        this.removePanelMembersFeature = removePanelMembersFeature;
     }
 
     @Override
     public CohEventActionContext handle(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
+        removePanelMembersFeature.removePanelMembers(caseDetails);
         CohEventActionContext actionContext = storeOnlineHearingTribunalsViewService.storePdf(caseId, onlineHearingId, new PdfData(caseDetails));
         String caseReference = actionContext.getDocument().getData().getCaseReference();
         emailService.sendFileToDwp(

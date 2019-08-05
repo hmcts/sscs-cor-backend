@@ -10,6 +10,7 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.coheventmapper.actions.DecisionIssuedEventAction;
+import uk.gov.hmcts.reform.sscscorbackend.coheventmapper.actions.RemovePanelMembersFeature;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
@@ -22,6 +23,7 @@ public class DecisionIssuedEventActionTest {
     private EmailMessageBuilder emailMessageBuilder;
     private DecisionIssuedEventAction decisionIssuedEventAction;
     private StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService;
+    private RemovePanelMembersFeature removePanelMembersFeature;
 
     @Before
     public void setUp() {
@@ -29,11 +31,12 @@ public class DecisionIssuedEventActionTest {
         corEmailService = mock(CorEmailService.class);
         emailMessageBuilder = mock(EmailMessageBuilder.class);
 
+        removePanelMembersFeature = mock(RemovePanelMembersFeature.class);
         decisionIssuedEventAction = new DecisionIssuedEventAction(
                 storeOnlineHearingTribunalsViewService,
                 corEmailService,
-                emailMessageBuilder
-        );
+                emailMessageBuilder,
+                removePanelMembersFeature);
     }
 
     @Test
@@ -57,6 +60,8 @@ public class DecisionIssuedEventActionTest {
 
         String subject = "Preliminary view offered (" + cohEventActionContext.getDocument().getData().getCaseReference() + ")";
         verify(corEmailService).sendFileToDwp(cohEventActionContext, subject, message);
+        verify(removePanelMembersFeature).removePanelMembers(caseDetails);
+
         assertThat(result, is(cohEventActionContext));
     }
 }
