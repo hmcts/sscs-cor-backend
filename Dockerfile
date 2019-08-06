@@ -11,3 +11,5 @@ WORKDIR /opt/app
 HEALTHCHECK --interval=100s --timeout=100s --retries=10 CMD http_proxy="" wget -q http://localhost:8090/health || exit 1
 
 EXPOSE 8090
+
+CMD ["sscs-cor-backend.jar"]
