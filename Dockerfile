@@ -1,5 +1,5 @@
 ARG APP_INSIGHTS_AGENT_VERSION=2.3.1
-FROM hmctspublic.azurecr.io/base/java:openjdk-11-distroless-1.0
+FROM openjdk:8-alpine
 
 ENV APP sscs-cor-backend.jar
 ENV APPLICATION_TOTAL_MEMORY 1024M
