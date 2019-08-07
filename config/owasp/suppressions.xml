@@ -84,4 +84,9 @@
     <notes>Don't use SSI</notes>
     <cve>CVE-2019-0221</cve>
   </suppress>
+  <suppress>
+    <notes>Don't use ehcache</notes>
+    <cve>CVE-2019-14379</cve>
+  </suppress>
+
 </suppressions>
