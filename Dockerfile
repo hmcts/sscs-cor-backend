@@ -4,7 +4,7 @@ FROM hmctspublic.azurecr.io/base/java:openjdk-8-distroless-1.0
 
 ENV APP sscs-cor-backend.jar
 ENV APPLICATION_TOTAL_MEMORY 2048M
-ENV APPLICATION_SIZE_ON_DISK_IN_MB 100
+ENV APPLICATION_SIZE_ON_DISK_IN_MB 128
 
 COPY lib/applicationinsights-agent-2.3.1.jar lib/AI-Agent.xml /opt/app/
 COPY build/libs/$APP /opt/app/
