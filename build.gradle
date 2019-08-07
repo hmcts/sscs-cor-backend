@@ -173,8 +173,8 @@ dependencies {
   // compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix-dashboard', version: versions.springHystrix
   
   //Remove when our dependencies pull in this version or later
-  compile 'com.fasterxml.jackson.core:jackson-databind:2.9.9.1'
-  integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.9.9.1'
+  compile 'com.fasterxml.jackson.core:jackson-databind:2.9.9.3'
+  integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.9.9.3'
   integrationTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.0'
   functionalTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.4.2'
   //Down grade feign as 10.2.0 appears to change query param encoding and s2s redirect urls end up being different 
