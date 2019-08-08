@@ -90,7 +90,7 @@ public class EvidenceUploadServiceTest {
     public void uploadsEvidenceAndAddsItToDraftSscsDocumentsInCcd() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
         final int originalNumberOfSscsDocuments = sscsCaseDetails.getData().getDraftSscsDocument().size();
-        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftHearingEvidence(someOnlineHearingId, file);
 
@@ -110,7 +110,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void submitsEvidenceAddsDraftSscsDocumentsToSscsDocumentsInCcdWhenThereAreNoSscsDocuments() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
-        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
         UploadedEvidence evidenceDescriptionPdf = mock(UploadedEvidence.class);
         when(storeEvidenceDescriptionService.storePdf(
                 someCcdCaseId,
@@ -154,7 +154,7 @@ public class EvidenceUploadServiceTest {
         sscsCaseDetails.getData().setSscsDocument(list);
 
         final int originalNumberOfSscsDocuments = sscsCaseDetails.getData().getSscsDocument().size();
-        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
         UploadedEvidence evidenceDescriptionPdf = mock(UploadedEvidence.class);
         when(storeEvidenceDescriptionService.storePdf(
                 someCcdCaseId,
@@ -307,7 +307,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void uploadsEvidenceWhenThereAreNotAlreadySscsDocumentsInCcd() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
-        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftHearingEvidence(someOnlineHearingId, file);
 
@@ -338,7 +338,7 @@ public class EvidenceUploadServiceTest {
     public void uploadsEvidenceToQuestionAndAddsItToDraftCorDocumentsInCcd() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
         final int originalNumberOfCorDocuments = sscsCaseDetails.getData().getDraftCorDocument().size();
-        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftQuestionEvidence(someOnlineHearingId, someQuestionId, file);
 
@@ -358,7 +358,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void uploadsEvidenceToQuestionWhenThereAreNotAlreadyCorDocumentsInCcd() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
-        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         Optional<Evidence> evidenceOptional = evidenceUploadService.uploadDraftQuestionEvidence(someOnlineHearingId, someQuestionId, file);
 
@@ -388,8 +388,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void listEvidenceWhenQuestionUnanswered() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
-        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
-
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         List<Evidence> evidenceList = evidenceUploadService.listQuestionEvidence(someOnlineHearingId, someQuestionId);
 
@@ -403,7 +402,7 @@ public class EvidenceUploadServiceTest {
         sscsCaseDetails.getData().setCorDocument(sscsCaseDetails.getData().getDraftCorDocument());
         sscsCaseDetails.getData().setDraftCorDocument(null);
 
-        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
 
         List<Evidence> evidenceList = evidenceUploadService.listQuestionEvidence(someOnlineHearingId, someQuestionId);
@@ -445,7 +444,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void deleteEvidenceFromCcd() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
-        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(someOnlineHearingId, someEvidenceId);
 
@@ -463,7 +462,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void deleteEvidenceIfCaseHadNoEvidence() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
-        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(someOnlineHearingId, someEvidenceId);
 
@@ -484,7 +483,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void deleteEvidenceForQuestionFromCcd() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
-        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         boolean hearingFound = evidenceUploadService.deleteQuestionEvidence(someOnlineHearingId, someEvidenceId);
 
@@ -502,7 +501,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void deleteEvidenceForQuestionIfCaseHadNoCohEvidence() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
-        when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         boolean hearingFound = evidenceUploadService.deleteQuestionEvidence(someOnlineHearingId, someEvidenceId);
 
