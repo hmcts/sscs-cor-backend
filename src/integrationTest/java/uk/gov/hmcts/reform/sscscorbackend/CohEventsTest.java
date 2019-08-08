@@ -39,8 +39,6 @@ public class CohEventsTest extends BaseIntegrationTest {
         ccdStub.stubUpdateCase(caseId, caseReference);
         ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_DECISION_ISSUED.getCcdType(), caseReference);
         ccdStub.stubGetHistoryEvents(caseId, EventType.SYA_APPEAL_CREATED);
-        ccdStub.stubRemovePanelMember(caseId, "someMedicalMember");
-        ccdStub.stubRemovePanelMember(caseId, "someDisabilityMember");
         String cohEvent = createCohEvent("decision_issued");
         notificationsStub.stubSendNotification(cohEvent);
 
@@ -51,8 +49,6 @@ public class CohEventsTest extends BaseIntegrationTest {
         ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "Tribunals view - " + caseReference + ".pdf");
         mailStub.hasEmailWithSubjectAndAttachment("Preliminary view offered (" + caseReference + ")", pdf);
         notificationsStub.verifySendNotification(cohEvent);
-        ccdStub.verifyRemovePanelMember(caseId, "someMedicalMember");
-        ccdStub.verifyRemovePanelMember(caseId, "someDisabilityMember");
     }
 
     @Test

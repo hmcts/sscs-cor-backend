@@ -60,7 +60,6 @@ public class DecisionIssuedEventActionTest {
 
         String subject = "Preliminary view offered (" + cohEventActionContext.getDocument().getData().getCaseReference() + ")";
         verify(corEmailService).sendFileToDwp(cohEventActionContext, subject, message);
-        verify(removePanelMembersFeature).removePanelMembers(caseDetails);
 
         assertThat(result, is(cohEventActionContext));
     }
