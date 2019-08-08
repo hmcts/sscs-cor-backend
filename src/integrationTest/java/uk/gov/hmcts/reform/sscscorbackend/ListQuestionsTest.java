@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohQuestionReferenc
 public class ListQuestionsTest extends BaseIntegrationTest {
     @Test
     public void getQuestion() {
-        String hearingId = "1";
+        String hearingId = "xxx1";
         String deadlineExpiryDate = now().plusDays(7).format(ISO_LOCAL_DATE_TIME);
         CohQuestionReference firstQuestionSummary = new CohQuestionReference(
                 "first-id", 1, "first question", "first question body", deadlineExpiryDate, someCohAnswers("answer_drafted")

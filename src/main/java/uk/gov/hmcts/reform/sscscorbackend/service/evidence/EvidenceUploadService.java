@@ -53,12 +53,12 @@ public class EvidenceUploadService {
         this.evidenceUploadEmailService = evidenceUploadEmailService;
     }
 
-    public Optional<Evidence> uploadDraftHearingEvidence(String onlineHearingId, MultipartFile file) {
-        return uploadEvidence(onlineHearingId, file, draftHearingDocumentExtractor, document -> new SscsDocument(createNewDocumentDetails(document)));
+    public Optional<Evidence> uploadDraftHearingEvidence(String identifier, MultipartFile file) {
+        return uploadEvidence(identifier, file, draftHearingDocumentExtractor, document -> new SscsDocument(createNewDocumentDetails(document)));
     }
 
-    public Optional<Evidence> uploadDraftQuestionEvidence(String onlineHearingId, String questionId, MultipartFile file) {
-        return uploadEvidence(onlineHearingId, file, questionDocumentExtractor, document -> new CorDocument(new CorDocumentDetails(createNewDocumentDetails(document), questionId)));
+    public Optional<Evidence> uploadDraftQuestionEvidence(String identifier, String questionId, MultipartFile file) {
+        return uploadEvidence(identifier, file, questionDocumentExtractor, document -> new CorDocument(new CorDocumentDetails(createNewDocumentDetails(document), questionId)));
     }
 
     private SscsDocumentDetails createNewDocumentDetails(Document document) {
@@ -82,8 +82,8 @@ public class EvidenceUploadService {
                 .format(DateTimeFormatter.ISO_DATE);
     }
 
-    private <E> Optional<Evidence> uploadEvidence(String onlineHearingId, MultipartFile file, DocumentExtract<E> documentExtract, Function<Document, E> createNewDocument) {
-        return onlineHearingService.getCcdCase(onlineHearingId)
+    private <E> Optional<Evidence> uploadEvidence(String identifier, MultipartFile file, DocumentExtract<E> documentExtract, Function<Document, E> createNewDocument) {
+        return onlineHearingService.getCcdCaseByIdentifier(identifier)
                 .map(caseDetails -> {
                     Document document = uploadDocument(file);
 
@@ -107,8 +107,8 @@ public class EvidenceUploadService {
                 .get(0);
     }
 
-    public boolean submitHearingEvidence(String onlineHearingId, EvidenceDescription description) {
-        return onlineHearingService.getCcdCase(onlineHearingId)
+    public boolean submitHearingEvidence(String identifier, EvidenceDescription description) {
+        return onlineHearingService.getCcdCaseByIdentifier(identifier)
                 .map(caseDetails -> {
                     Long ccdCaseId = caseDetails.getId();
                     log.info("Submitting draft document for case [" + ccdCaseId + "]");
@@ -116,7 +116,7 @@ public class EvidenceUploadService {
                     SscsCaseData sscsCaseData = caseDetails.getData();
 
                     EvidenceDescriptionPdfData data = new EvidenceDescriptionPdfData(caseDetails, description, getFileNames(sscsCaseData));
-                    CohEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(ccdCaseId, onlineHearingId, data);
+                    CohEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(ccdCaseId, identifier, data);
 
                     List<SscsDocument> draftSscsDocument = storePdfContext.getDocument().getData().getDraftSscsDocument();
                     List<SscsDocument> newSscsDocumentsList = union(
@@ -170,8 +170,8 @@ public class EvidenceUploadService {
                 .collect(toList());
     }
 
-    public List<Evidence> listDraftHearingEvidence(String onlineHearingId) {
-        return loadEvidence(onlineHearingId)
+    public List<Evidence> listDraftHearingEvidence(String identifier) {
+        return loadEvidence(identifier)
                 .map(LoadedEvidence::getDraftHearingEvidence)
                 .orElse(emptyList());
     }
@@ -196,8 +196,8 @@ public class EvidenceUploadService {
         return combinedEvidence;
     }
 
-    private Optional<LoadedEvidence> loadEvidence(String onlineHearingId) {
-        return onlineHearingService.getCcdCase(onlineHearingId)
+    private Optional<LoadedEvidence> loadEvidence(String identifier) {
+        return onlineHearingService.getCcdCaseByIdentifier(identifier)
                 .map(LoadedEvidence::new);
     }
 
@@ -205,12 +205,12 @@ public class EvidenceUploadService {
         return deleteEvidence(onlineHearingId, evidenceId, questionDocumentExtractor);
     }
 
-    public boolean deleteDraftHearingEvidence(String onlineHearingId, String evidenceId) {
-        return deleteEvidence(onlineHearingId, evidenceId, draftHearingDocumentExtractor);
+    public boolean deleteDraftHearingEvidence(String identifier, String evidenceId) {
+        return deleteEvidence(identifier, evidenceId, draftHearingDocumentExtractor);
     }
 
-    private <E> boolean deleteEvidence(String onlineHearingId, String evidenceId, DocumentExtract<E> documentExtract) {
-        return onlineHearingService.getCcdCase(onlineHearingId)
+    private <E> boolean deleteEvidence(String identifier, String evidenceId, DocumentExtract<E> documentExtract) {
+        return onlineHearingService.getCcdCaseByIdentifier(identifier)
                 .map(caseDetails -> {
                     List<E> documents = documentExtract.getDocuments().apply(caseDetails.getData());
 
