@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.apinotifications.CcdEve
 @Slf4j
 @Service
 public class AmendPanelMembersService {
+    public static final String UNASSIGNED_PANEL_MEMBER = "unassigned";
     private final CorCcdService ccdService;
 
     public AmendPanelMembersService(CorCcdService ccdService) {
@@ -24,29 +25,33 @@ public class AmendPanelMembersService {
         CaseDetails newCaseDetails = ccdEvent.getCaseDetails();
         CaseData newCase = newCaseDetails.getCaseData();
         List<String> membersToAddPermissionTo = new ArrayList<>(asList(
-                stripOutUserName(newCase.getAssignedToDisabilityMember()),
-                stripOutUserName(newCase.getAssignedToMedicalMember())));
+                newCase.getAssignedToDisabilityMember(),
+                newCase.getAssignedToMedicalMember()));
         long caseId = Long.parseLong(newCaseDetails.getCaseId());
         if (ccdEvent.getCaseDetailsBefore() != null && ccdEvent.getCaseDetailsBefore().getCaseData() != null) {
             CaseData oldCaseDetails = ccdEvent.getCaseDetailsBefore().getCaseData();
             List<String> membersToRemovePermissionsFrom = new ArrayList<>(asList(
-                    stripOutUserName(oldCaseDetails.getAssignedToDisabilityMember()),
-                    stripOutUserName(oldCaseDetails.getAssignedToMedicalMember())));
+                    oldCaseDetails.getAssignedToDisabilityMember(),
+                    oldCaseDetails.getAssignedToMedicalMember()));
             membersToRemovePermissionsFrom.removeAll(membersToAddPermissionTo);
             membersToAddPermissionTo.remove(oldCaseDetails.getAssignedToDisabilityMember());
             membersToAddPermissionTo.remove(oldCaseDetails.getAssignedToMedicalMember());
 
-            for (String member : membersToRemovePermissionsFrom) {
-                if (member != null && member.length() != 0) {
-                    log.info("Remove member with id starting [" + member.substring(0, 3) + "] from case [" + caseId + "]");
-                    ccdService.removeUserFromCase(member, caseId);
-                }
-            }
+            removePermissionsFrom(caseId, membersToRemovePermissionsFrom);
         }
         for (String member : membersToAddPermissionTo) {
-            if (member != null && member.length() != 0) {
+            if (member != null && member.length() != 0 && !member.equals(UNASSIGNED_PANEL_MEMBER)) {
                 log.info("Add member with id starting [" + member.substring(0, 3) + "] to case [" + caseId + "]");
-                ccdService.addUserToCase(member, caseId);
+                ccdService.addUserToCase(stripOutUserName(member), caseId);
+            }
+        }
+    }
+
+    public void removePermissionsFrom(long caseId, List<String> membersToRemovePermissionsFrom) {
+        for (String member : membersToRemovePermissionsFrom) {
+            if (member != null && member.length() != 0 && !member.equals(UNASSIGNED_PANEL_MEMBER)) {
+                log.info("Remove member with id starting [" + member.substring(0, 3) + "] from case [" + caseId + "]");
+                ccdService.removeUserFromCase(stripOutUserName(member), caseId);
             }
         }
     }
