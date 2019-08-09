@@ -39,11 +39,10 @@ public class EvidenceUploadController {
         this.coversheetService = coversheetService;
     }
 
-    @ApiOperation(value = "Upload COR evidence",
-            notes = "Uploads evidence for a COR appeal which will be held in a draft state against the case that is not " +
+    @ApiOperation(value = "Upload evidence",
+            notes = "Uploads evidence for an appeal which will be held in a draft state against the case that is not " +
                     "visible by a caseworker in CCD. You will need to submit the evidence for it to be visbale in CCD " +
-                    "by a caseworker. You need to have an appeal in CCD and an online hearing in COH that references " +
-                    "the appeal in CCD."
+                    "by a caseworker. You need to have an appeal in CCD."
     )
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Evidence has been added to the appeal"),
@@ -51,16 +50,16 @@ public class EvidenceUploadController {
             @ApiResponse(code = 422, message = "The file cannot be added to the document store")
     })
     @RequestMapping(
-            value = "{onlineHearingId}/evidence",
+            value = "{identifier}/evidence",
             method = RequestMethod.PUT,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     public ResponseEntity<Evidence> uploadEvidence(
-            @PathVariable("onlineHearingId") String onlineHearingId,
+            @ApiParam(value = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx") @PathVariable("identifier") String identifier,
             @RequestParam("file") MultipartFile file
     ) {
-        return uploadEvidence(() -> evidenceUploadService.uploadDraftHearingEvidence(onlineHearingId, file));
+        return uploadEvidence(() -> evidenceUploadService.uploadDraftHearingEvidence(identifier, file));
     }
 
     @ApiOperation(value = "Upload COR evidence to a question",
@@ -104,14 +103,14 @@ public class EvidenceUploadController {
             @ApiResponse(code = 200, message = "List of draft evidence")
     })
     @RequestMapping(
-            value = "{onlineHearingId}/evidence",
+            value = "{identifier}/evidence",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     public ResponseEntity<List<Evidence>> listDraftEvidence(
-            @PathVariable("onlineHearingId") String onlineHearingId
+            @PathVariable("identifier") String identifier
     ) {
-        return ResponseEntity.ok(evidenceUploadService.listDraftHearingEvidence(onlineHearingId));
+        return ResponseEntity.ok(evidenceUploadService.listDraftHearingEvidence(identifier));
     }
 
     @ApiOperation(value = "Delete COR evidence",
@@ -124,15 +123,15 @@ public class EvidenceUploadController {
     })
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @RequestMapping(
-            value = "{onlineHearingId}/evidence/{evidenceId}",
+            value = "{identifier}/evidence/{evidenceId}",
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     public ResponseEntity deleteEvidence(
-            @PathVariable("onlineHearingId") String onlineHearingId,
+            @ApiParam(value = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx")@PathVariable("identifier") String identifier,
             @PathVariable("evidenceId") String evidenceId
     ) {
-        boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(onlineHearingId, evidenceId);
+        boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(identifier, evidenceId);
         return hearingFound ? ResponseEntity.noContent().build() : notFound().build();
     }
 
@@ -170,15 +169,15 @@ public class EvidenceUploadController {
             @ApiResponse(code = 404, message = "No online hearing found with online hearing id")
     })
     @RequestMapping(
-            value = "{onlineHearingId}/evidence",
+            value = "{identifier}/evidence",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     public ResponseEntity submitEvidence(
-            @PathVariable("onlineHearingId") String onlineHearingId,
+            @PathVariable("identifier") String identifier,
             @RequestBody EvidenceDescription description
     ) {
-        boolean evidenceSubmitted = evidenceUploadService.submitHearingEvidence(onlineHearingId, description);
+        boolean evidenceSubmitted = evidenceUploadService.submitHearingEvidence(identifier, description);
         return evidenceSubmitted ? ResponseEntity.noContent().build() : notFound().build();
     }
 

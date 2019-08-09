@@ -207,6 +207,31 @@ public class OnlineHearingServiceTest {
         underTest.getCcdCase(onlineHearingId);
     }
 
+    @Test
+    public void getsACcdCaseByIdentifierFromHearingId() {
+        String onlineHearingId = "someOnlineHearingId";
+        CohOnlineHearing cohOnlineHearing = someCohOnlineHearing();
+        when(cohService.getOnlineHearing(onlineHearingId)).thenReturn(cohOnlineHearing);
+        SscsCaseDetails caseDetails = createCaseDetails(someCaseId, "someCaseReference", "firstName", "lastName");
+        when(ccdService.getByCaseId(cohOnlineHearing.getCcdCaseId(), idamTokens)).thenReturn(caseDetails);
+
+        Optional<SscsCaseDetails> sscsCaseDetails = underTest.getCcdCaseByIdentifier(onlineHearingId);
+
+        assertThat(sscsCaseDetails.isPresent(), is(true));
+        assertThat(sscsCaseDetails.get(), is(caseDetails));
+    }
+
+    @Test
+    public void getsACcdCaseByIdentifierFromCcdId() {
+        SscsCaseDetails caseDetails = createCaseDetails(someCaseId, "someCaseReference", "firstName", "lastName");
+        when(ccdService.getByCaseId(someCaseId, idamTokens)).thenReturn(caseDetails);
+
+        Optional<SscsCaseDetails> sscsCaseDetails = underTest.getCcdCaseByIdentifier(someCaseId.toString());
+
+        assertThat(sscsCaseDetails.isPresent(), is(true));
+        assertThat(sscsCaseDetails.get(), is(caseDetails));
+    }
+
     @Test(expected = IllegalStateException.class)
     public void exceptionWhenGettingAHearingIfThereIsMoreThanOneCaseWithAnOnlinePanel() {
         SscsCaseDetails caseDetails1 = createCaseDetails(someCaseId, "someCaseReference", "firstName", "lastName");

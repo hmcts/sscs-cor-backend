@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -110,6 +111,12 @@ public class OnlineHearingService {
     public Optional<Long> getCcdCaseId(String onlineHearingId) {
         CohOnlineHearing onlineHearing = cohClient.getOnlineHearing(onlineHearingId);
         return (onlineHearing != null) ? Optional.of(onlineHearing.getCcdCaseId()) : Optional.empty();
+    }
+
+    public Optional<SscsCaseDetails> getCcdCaseByIdentifier(String identifier) {
+        return !NumberUtils.isDigits(identifier)
+                ? getCcdCase(identifier) :
+                Optional.ofNullable(ccdService.getByCaseId(Long.parseLong(identifier), idamService.getIdamTokens()));
     }
 
     public Optional<SscsCaseDetails> getCcdCase(String onlineHearingId) {
