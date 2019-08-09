@@ -185,9 +185,6 @@ public class CcdStub extends BaseStub {
     public static SscsCaseData.SscsCaseDataBuilder baseCaseData(String caseReference) {
         return SscsCaseData.builder()
                 .caseReference(caseReference)
-                .onlinePanel(OnlinePanel.builder()
-                        .assignedTo("someJudge")
-                        .build())
                 .appeal(Appeal.builder()
                         .hearingType("cor")
                         .appellant(Appellant.builder()
