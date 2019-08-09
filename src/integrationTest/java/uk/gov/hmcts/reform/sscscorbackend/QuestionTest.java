@@ -25,7 +25,7 @@ public class QuestionTest extends BaseIntegrationTest {
 
     @Test
     public void getQuestion() {
-        String hearingId = "1";
+        String hearingId = "xxx1";
         String questionId = "1";
         cohStub.stubGetQuestion(hearingId, questionId, QUESTION_HEADER, QUESTION_BODY);
         ZonedDateTime answerDate = ZonedDateTime.now();
@@ -95,7 +95,7 @@ public class QuestionTest extends BaseIntegrationTest {
 
     @Test
     public void submitAnAnswerToAQuestion() throws JsonProcessingException {
-        String hearingId = "1";
+        String hearingId = "xxx1";
         String questionId = "1";;
         String answerId = UUID.randomUUID().toString();
         String answer = "answer";
@@ -121,7 +121,7 @@ public class QuestionTest extends BaseIntegrationTest {
 
     @Test
     public void extendQuestionRoundDeadline() {
-        String hearingId = "1";
+        String hearingId = "xxx1";
         cohStub.stubExtendQuestionRoundDeadline(hearingId);
         String deadlineExpiryDate = now().plusDays(7).format(ISO_LOCAL_DATE_TIME);
         CohQuestionReference questionSummary = new CohQuestionReference(
