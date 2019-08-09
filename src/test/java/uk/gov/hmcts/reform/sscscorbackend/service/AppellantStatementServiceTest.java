@@ -47,7 +47,7 @@ public class AppellantStatementServiceTest {
     @Test
     public void findsOnlineHearing() {
         long id = 1234L;
-        when(onlineHearingService.getCcdCase(someOnlineHearing)).thenReturn(Optional.of(SscsCaseDetails.builder().id(id).build()));
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearing)).thenReturn(Optional.of(SscsCaseDetails.builder().id(id).build()));
         when(storeAppellantStatementService.storePdf(eq(id), eq(someOnlineHearing), any(AppellantStatementPdfData.class)))
                 .thenReturn(mock(CohEventActionContext.class));
         Optional handled = appellantStatementService.handleAppellantStatement(someOnlineHearing, someStatement());
@@ -58,7 +58,7 @@ public class AppellantStatementServiceTest {
     @Test
     public void generatesAndSavesPdf() {
         long id = 1234L;
-        when(onlineHearingService.getCcdCase(someOnlineHearing)).thenReturn(Optional.of(SscsCaseDetails.builder().id(id).build()));
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearing)).thenReturn(Optional.of(SscsCaseDetails.builder().id(id).build()));
         CohEventActionContext cohEventActionContext = mock(CohEventActionContext.class);
         when(storeAppellantStatementService.storePdf(eq(id), eq(someOnlineHearing), any(AppellantStatementPdfData.class)))
                 .thenReturn(cohEventActionContext);

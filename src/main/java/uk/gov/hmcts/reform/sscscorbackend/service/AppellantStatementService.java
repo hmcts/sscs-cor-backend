@@ -25,11 +25,11 @@ public class AppellantStatementService {
         this.appellantStatementEmailService = appellantStatementEmailService;
     }
 
-    public Optional<CohEventActionContext> handleAppellantStatement(String onlineHearingId, Statement statement) {
-        return onlineHearingService.getCcdCase(onlineHearingId).map(caseDetails -> {
+    public Optional<CohEventActionContext> handleAppellantStatement(String identifier, Statement statement) {
+        return onlineHearingService.getCcdCaseByIdentifier(identifier).map(caseDetails -> {
             CohEventActionContext cohEventActionContext = storeAppellantStatementService.storePdf(
                     caseDetails.getId(),
-                    onlineHearingId,
+                    identifier,
                     new AppellantStatementPdfData(caseDetails, statement)
             );
             appellantStatementEmailService.sendEmail(cohEventActionContext);

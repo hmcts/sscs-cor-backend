@@ -23,23 +23,23 @@ public class StatementController {
     }
 
     @ApiOperation(value = "Upload COR personal statement",
-            notes = "Uploads a personal statement for a COR appeal. You need to have an appeal in CCD and an online hearing in COH " +
-                    "that references the appeal in CCD. The statement is saved as a piece of evidence for the case in CCD as a PDF."
+            notes = "Uploads a personal statement for a COR appeal. You need to have an appeal in CCD. " +
+                    "The statement is saved as a piece of evidence for the case in CCD as a PDF."
     )
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Statement has been added to the appeal"),
             @ApiResponse(code = 404, message = "No online hearing found with online hearing id")
     })
     @PostMapping(
-            value = "/{onlineHearingId}/statement",
+            value = "/{identifier}/statement",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     public ResponseEntity uploadStatement(
-            @PathVariable("onlineHearingId") String onlineHearingId,
+            @PathVariable("identifier") String identifier,
             @RequestBody Statement statement) {
 
         return appellantStatementService
-                .handleAppellantStatement(onlineHearingId, statement)
+                .handleAppellantStatement(identifier, statement)
                 .map(handled -> ResponseEntity.noContent().build())
                 .orElse(ResponseEntity.notFound().build());
     }
