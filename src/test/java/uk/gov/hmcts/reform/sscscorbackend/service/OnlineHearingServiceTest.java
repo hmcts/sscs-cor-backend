@@ -287,7 +287,7 @@ public class OnlineHearingServiceTest {
 
     @Test
     public void loadHearingWithCorCase() {
-        SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "online");
+        SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "cor");
         sscsCaseDetails.getData().setIsCorDecision("YES");
 
         when(cohService.getOnlineHearing(someCaseId)).thenReturn(DataFixtures.someCohOnlineHearings());
@@ -317,7 +317,7 @@ public class OnlineHearingServiceTest {
 
     @Test
     public void loadHearingWithoutCorCase() {
-        SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "online");
+        SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "paper");
 
         HearingOptions hearingOptions = HearingOptions.builder()
                 .languageInterpreter("yes")
@@ -327,8 +327,6 @@ public class OnlineHearingServiceTest {
                 .other("other arrangements")
                 .build();
         sscsCaseDetails.getData().getAppeal().setHearingOptions(hearingOptions);
-
-        when(cohService.getOnlineHearing(someCaseId)).thenReturn(new CohOnlineHearings(emptyList()));
 
         Optional<OnlineHearing> onlineHearing = underTest.loadHearing(sscsCaseDetails);
 
