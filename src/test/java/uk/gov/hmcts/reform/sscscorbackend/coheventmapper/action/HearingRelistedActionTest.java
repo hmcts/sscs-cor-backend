@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.DataFixtures;
 import uk.gov.hmcts.reform.sscscorbackend.coheventmapper.actions.HearingRelistedAction;
+import uk.gov.hmcts.reform.sscscorbackend.coheventmapper.actions.RemovePanelMembersFeature;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.CorEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.email.EmailMessageBuilder;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
@@ -37,6 +38,7 @@ public class HearingRelistedActionTest {
     private EmailMessageBuilder emailMessageBuilder;
     private CohService cohService;
     private StoreOnlineHearingService storeOnlineHearingService;
+    private RemovePanelMembersFeature removePanelMembersFeature;
 
     @Before
     public void setUp() {
@@ -51,7 +53,8 @@ public class HearingRelistedActionTest {
         emailMessageBuilder = mock(EmailMessageBuilder.class);
         cohService = mock(CohService.class);
         storeOnlineHearingService = mock(StoreOnlineHearingService.class);
-        underTest = new HearingRelistedAction(storeOnlineHearingService, corCcdService, idamService, corEmailService, emailMessageBuilder, cohService);
+        removePanelMembersFeature = mock(RemovePanelMembersFeature.class);
+        underTest = new HearingRelistedAction(storeOnlineHearingService, corCcdService, idamService, corEmailService, emailMessageBuilder, cohService, removePanelMembersFeature);
     }
 
     @Test
@@ -73,6 +76,9 @@ public class HearingRelistedActionTest {
 
         CohEventActionContext result = underTest.handle(caseId, onlineHearingId, sscsCaseDetails);
 
+        assertThat(result.getPdf(), is(pdf));
+        assertThat(result.getDocument().getData().getAppeal().getHearingType(), is("oral"));
+
         ArgumentMatcher<SscsCaseData> hasOralHearing = data -> "oral".equals(data.getAppeal().getHearingType());
         ArgumentMatcher<SscsCaseData> hasRelistingReason = data -> relistingReason.equals(data.getRelistingReason());
         verify(corCcdService).updateCase(
@@ -83,7 +89,7 @@ public class HearingRelistedActionTest {
                 eq("Update SSCS hearing type"),
                 eq(idamTokens));
         verify(corEmailService).sendEmailToDwp("COR: Hearing required", "message body");
-        assertThat(result.getPdf(), is(pdf));
-        assertThat(result.getDocument().getData().getAppeal().getHearingType(), is("oral"));
+        verify(removePanelMembersFeature).removePanelMembers(sscsCaseDetails);
+
     }
 }

@@ -120,6 +120,8 @@ public class CohEventsTest extends BaseIntegrationTest {
         notificationsStub.stubSendNotification(cohEvent);
         ccdStub.stubUpdateCaseWithEvent(caseId, "updateHearingType", caseReference);
         ccdStub.stubUpdateCaseWithEvent(caseId, EventType.COH_ONLINE_HEARING_RELISTED.getCcdType(), caseReference);
+        ccdStub.stubRemovePanelMember(caseId, "someMedicalMember");
+        ccdStub.stubRemovePanelMember(caseId, "someDisabilityMember");
 
         makeCohEventRequest(cohEvent);
 
@@ -128,6 +130,8 @@ public class CohEventsTest extends BaseIntegrationTest {
         documentStoreStub.verifyUploadFile(pdf);
         ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "COR Transcript - " + caseReference + ".pdf");
         ccdStub.verifyUpdateCaseToOralHearing(caseId, caseReference);
+        ccdStub.verifyRemovePanelMember(caseId, "someMedicalMember");
+        ccdStub.verifyRemovePanelMember(caseId, "someDisabilityMember");
     }
 
     @Test

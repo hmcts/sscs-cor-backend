@@ -24,21 +24,24 @@ public class HearingRelistedAction implements CohEventAction {
     private final CorEmailService corEmailService;
     private final EmailMessageBuilder emailMessageBuilder;
     private final CohService cohService;
+    private final RemovePanelMembersFeature removePanelMembersFeature;
 
     @Autowired
     public HearingRelistedAction(StoreOnlineHearingService storeOnlineHearingService,
                                  CorCcdService corCcdService, IdamService idamService,
                                  CorEmailService corEmailService,
-                                 EmailMessageBuilder emailMessageBuilder, CohService cohService) {
+                                 EmailMessageBuilder emailMessageBuilder, CohService cohService, RemovePanelMembersFeature removePanelMembersFeature) {
         this.storeOnlineHearingService = storeOnlineHearingService;
         this.corCcdService = corCcdService;
         this.idamService = idamService;
         this.corEmailService = corEmailService;
         this.emailMessageBuilder = emailMessageBuilder;
         this.cohService = cohService;
+        this.removePanelMembersFeature = removePanelMembersFeature;
     }
 
     public CohEventActionContext handle(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
+        removePanelMembersFeature.removePanelMembers(caseDetails);
         CohEventActionContext actionContext = storeOnlineHearingService.storePdf(caseId, onlineHearingId, new PdfData(caseDetails));
         SscsCaseData oralSscsCaseData = updateCcdCaseToOralHearing(caseId, onlineHearingId, actionContext);
         String relistedMessage = emailMessageBuilder.getRelistedMessage(actionContext.getDocument());

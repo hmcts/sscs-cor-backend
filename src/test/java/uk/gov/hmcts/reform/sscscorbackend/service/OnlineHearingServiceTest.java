@@ -416,7 +416,6 @@ public class OnlineHearingServiceTest {
                 .createdDate(LocalDateTime.now())
                 .data(SscsCaseData.builder()
                         .caseReference(expectedCaseReference)
-                        .onlinePanel(OnlinePanel.builder().assignedTo("someJudge").build())
                         .appeal(Appeal.builder()
                                 .hearingType(hearingType)
                                 .appellant(Appellant.builder()

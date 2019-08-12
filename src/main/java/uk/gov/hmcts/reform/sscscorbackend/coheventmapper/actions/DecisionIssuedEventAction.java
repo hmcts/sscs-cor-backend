@@ -15,7 +15,7 @@ public class DecisionIssuedEventAction implements CohEventAction {
     private final CorEmailService emailService;
     private final EmailMessageBuilder emailMessageBuilder;
 
-    public DecisionIssuedEventAction(StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService, CorEmailService emailService, EmailMessageBuilder emailMessageBuilder) {
+    public DecisionIssuedEventAction(StoreOnlineHearingTribunalsViewService storeOnlineHearingTribunalsViewService, CorEmailService emailService, EmailMessageBuilder emailMessageBuilder, RemovePanelMembersFeature removePanelMembersFeature) {
         this.storeOnlineHearingTribunalsViewService = storeOnlineHearingTribunalsViewService;
         this.emailService = emailService;
         this.emailMessageBuilder = emailMessageBuilder;
