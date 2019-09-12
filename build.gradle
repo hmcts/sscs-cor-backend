@@ -132,6 +132,12 @@ repositories {
   maven { url 'https://jitpack.io' }
 }
 
+dependencyManagement {
+  dependencies {
+    dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
+  }
+}
+
 // it is important to specify logback classic and core packages explicitly as libraries like spring boot
 // enforces it's own (older) version which is not recommended.
 def versions = [
