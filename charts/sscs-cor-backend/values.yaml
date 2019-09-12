@@ -1,0 +1,14 @@
+java:
+  image: 'https://hmctspublic.azurecr.io/sscs/cor-backend:latest'
+  applicationPort: 8080
+  keyVaults:
+    sscs:
+      resourceGroup: sscs
+      secrets:
+        - idam-sscs-systemupdate-user
+        - idam-sscs-systemupdate-password
+        - idam-sscs-oauth2-client-secret
+        - idam-s2s-api
+        - sscs-s2s-secret
+        - docmosis-api-key
+
