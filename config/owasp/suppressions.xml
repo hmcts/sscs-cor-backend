@@ -84,4 +84,8 @@
     <notes>Don't use SSI</notes>
     <cve>CVE-2019-0221</cve>
   </suppress>
+  <suppress>
+    <notes>Don't use handlebars</notes>
+    <cve>CVE-2019-11358</cve>
+  </suppress>
 </suppressions>
