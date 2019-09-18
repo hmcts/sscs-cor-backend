@@ -5,19 +5,11 @@ java:
     sscs:
       resourceGroup: sscs
       secrets:
-        - idam-api
-        - sscs-email-mac-secret-text
-        - idam-oauth-user
-        - ccd-api
-        - ccd-jid
-        - ccd-tid
-        - idam-redirect
+        - idam-sscs-oauth2-client-secret
         - idam-sscs-systemupdate-user
         - idam-sscs-systemupdate-password
-        - idam-sscs-oauth2-client-secret
-        - idam-s2s-api
+        - docmosis-api-key
         - sscs-s2s-secret
-        - s2s-micro
   environment:
     SERVER_PORT: 8080
     REFORM_TEAM: sscs
