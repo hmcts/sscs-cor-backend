@@ -92,6 +92,12 @@ jacocoTestReport {
   }
 }
 
+dependencyManagement {
+  dependencies {
+    dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
+  }
+}
+
 dependencyUpdates.resolutionStrategy = {
   componentSelection { rules ->
     rules.all { ComponentSelection selection ->
