@@ -91,5 +91,6 @@
   <suppress>
     <notes>Get a class missing from spring when trying to update to 2.10.0.pr3</notes>
     <cve>CVE-2019-16335</cve>
+    <cve>CVE-2019-14540</cve>
   </suppress>
 </suppressions>
