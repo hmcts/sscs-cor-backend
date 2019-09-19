@@ -1,6 +1,5 @@
 java:
-  image: ${IMAGE_NAME}
-  ingressHost: ${SERVICE_FQDN}
+  image: 'https://hmctspublic.azurecr.io/sscs/cor-backend:latest'
   applicationPort: 8080
   environment:
     SERVER_PORT: 8080
@@ -12,6 +11,8 @@ java:
     IDAM_SSCS_SYSTEMUPDATE_USER: ${IDAM_SSCS_SYSTEMUPDATE_USER}
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
     IDAM_OAUTH2_CLIENT_SECRET: ${IDAM_OAUTH2_CLIENT_SECRET}
+    ROOT_LOGGING_LEVEL: INFO
+    LOG_OUTPUT: single
     IDAM_URL: http://idam-api.aat.platform.hmcts.net
     IDAM_SSCS_URL: https://evidence-sharing-preprod.sscs.reform.hmcts.net
     IDAM_OAUTH2_REDIRECT_URL: https://evidence-sharing-preprod.sscs.reform.hmcts.net
@@ -21,8 +22,4 @@ java:
     EMAIL_SERVER_HOST: mta.reform.hmcts.net
     EMAIL_SERVER_PORT: 25
     DWP_EMAIL: var.dwp_email
-    APPINSIGHTS_INSTRUMENTATIONKEY: ${APPINSIGHTS_INSTRUMENTATIONKEY}
-    ROOT_LOGGING_LEVEL: INFO
-    LOG_OUTPUT: single
-    PDF_SERVICE_ACCESS_KEY: ${PDF_SERVICE_ACCESS_KEY}
     JUI_BASE_URL: https://jui-webapp-aat.service.core-compute-aat.internal
