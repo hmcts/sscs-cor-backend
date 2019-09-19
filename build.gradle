@@ -142,6 +142,13 @@ def versions = [
   restAssured: '3.3.0'
 ]
 
+dependencyManagement {
+  dependencies {
+    dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
+
+  }
+}
+
 dependencies {
 
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
@@ -174,7 +181,7 @@ dependencies {
   // compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix-dashboard', version: versions.springHystrix
 
   //Remove when our dependencies pull in this version or later
-  compile 'com.fasterxml.jackson.core:jackson-databind:2.9.9.3'
+  compile 'com.fasterxml.jackson.core:jackson-databind:2.10.0.pr3'
   integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.9.9.3'
   integrationTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
   functionalTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'

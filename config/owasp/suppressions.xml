@@ -84,4 +84,8 @@
     <notes>Don't use SSI</notes>
     <cve>CVE-2019-0221</cve>
   </suppress>
+  <suppress>
+    <notes>We are using 2.1.10</notes>
+    <cve>CVE-2019-14540</cve>
+  </suppress>
 </suppressions>
