@@ -105,6 +105,12 @@ dependencyUpdates.resolutionStrategy = {
   }
 }
 
+dependencyManagement {
+  dependencies {
+    dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
+  }
+}
+
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
   // Specifies if the build should be failed if a CVSS score above a specified level is identified.
