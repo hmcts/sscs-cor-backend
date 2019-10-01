@@ -64,7 +64,7 @@ public class CitizenController {
             @ApiParam(value = "tya number for an user and appeal", example = "A123-B123-c123-Dgdg") @PathVariable("tya") String tya) {
         List<OnlineHearing> casesForCitizen = citizenLoginService.findCasesForCitizen(getUserTokens(authorisation), tya);
 
-        if (casesForCitizen.size() > 0 ) {
+        if (casesForCitizen.size() > 0) {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 String value = mapper.writeValueAsString(casesForCitizen.get(0));
