@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -61,6 +63,16 @@ public class CitizenController {
             @ApiParam(value = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW") @RequestHeader(AUTHORIZATION) String authorisation,
             @ApiParam(value = "tya number for an user and appeal", example = "A123-B123-c123-Dgdg") @PathVariable("tya") String tya) {
         List<OnlineHearing> casesForCitizen = citizenLoginService.findCasesForCitizen(getUserTokens(authorisation), tya);
+
+        if (casesForCitizen.size() > 0 ) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                String value = mapper.writeValueAsString(casesForCitizen.get(0));
+                log.info("TYA Hearing "  + value);
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
 
         return ResponseEntity.ok(casesForCitizen);
     }
