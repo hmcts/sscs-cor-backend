@@ -147,6 +147,20 @@ repositories {
 dependencyManagement {
   dependencies {
     dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
+
+    // CVE-2019-16869
+    dependencySet(group: 'io.netty', version: '4.1.37.Final') {
+      entry 'netty-handler'
+      entry 'netty-transport-native-epoll'
+      entry 'netty-transport-native-kqueue'
+      entry 'netty-codec-http'
+      entry 'netty-codec'
+      entry 'netty-transport-native-unix-common'
+      entry 'netty-transport'
+      entry 'netty-buffer'
+      entry 'netty-resolver'
+      entry 'netty-common'
+    }
   }
 }
 
@@ -192,8 +206,8 @@ dependencies {
   // compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix-dashboard', version: versions.springHystrix
 
   //Remove when our dependencies pull in this version or later
-  compile 'com.fasterxml.jackson.core:jackson-databind:2.9.9.3'
-  integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.9.9.3'
+  compile 'com.fasterxml.jackson.core:jackson-databind:2.9.10'
+  integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.9.10'
   integrationTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
   functionalTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.1'
   //Down grade feign as 10.2.0 appears to change query param encoding and s2s redirect urls end up being different
