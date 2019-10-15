@@ -3,6 +3,15 @@ java:
   applicationPort: 8080
   aadIdentityName: sscs
   ingressHost: sscs-cor-backend-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  keyVaults:
+    sscs:
+      resourceGroup: sscs
+      secrets:
+        - idam-sscs-oauth2-client-secret
+        - idam-sscs-systemupdate-user
+        - idam-sscs-systemupdate-password
+        - docmosis-api-key
+        - sscs-s2s-secret
   environment:
     SERVER_PORT: 8080
     REFORM_TEAM: sscs
