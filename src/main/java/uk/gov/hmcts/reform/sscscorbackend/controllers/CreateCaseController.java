@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscscorbackend.exception.SscsCorBackendException;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 
@@ -29,14 +30,14 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 public class CreateCaseController {
 
     private final CorCcdService ccdService;
-    private final IdamServiceTesting idamServiceTesting;
+    private final IdamService idamService;
 
     public CreateCaseController(
             @Autowired CorCcdService ccdService,
-            @Autowired IdamServiceTesting idamServiceTesting
+            @Autowired IdamService idamService
     ) {
         this.ccdService = ccdService;
-        this.idamServiceTesting = idamServiceTesting;
+        this.idamService = idamService;
     }
 
     @ApiOperation(value = "Create a case",
@@ -60,7 +61,7 @@ public class CreateCaseController {
                 createSscsCase(email, mobile),
                 EventType.SYA_APPEAL_CREATED.getCcdType(),
                 "SSCS - appeal created event", "Created SSCS",
-                idamServiceTesting.getIdamTokens()
+                idamService.getIdamTokens()
         );
 
         HashMap<String, String> body = new HashMap<>();
