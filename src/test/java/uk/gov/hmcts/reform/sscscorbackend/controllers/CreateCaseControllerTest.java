@@ -17,21 +17,20 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 
 public class CreateCaseControllerTest {
 
     private CorCcdService ccdService;
-    private IdamService idamService;
+    private IdamServiceTesting idamServiceTesting;
 
     @Before
     public void setUp() {
         ccdService = mock(CorCcdService.class);
 
-        idamService = mock(IdamService.class);
-        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        idamServiceTesting = mock(IdamServiceTesting.class);
+        when(idamServiceTesting.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }
 
     @Test
@@ -49,7 +48,7 @@ public class CreateCaseControllerTest {
                 .build()
         ).build();
         when(ccdService.createCase(any(SscsCaseData.class), eq("appealCreated"), eq("SSCS - appeal created event"), eq("Created SSCS"), any(IdamTokens.class))).thenReturn(sscsCaseDetails);
-        CreateCaseController createCaseController = new CreateCaseController(ccdService, idamService);
+        CreateCaseController createCaseController = new CreateCaseController(ccdService, idamServiceTesting);
 
         ResponseEntity<Map<String, String>> createCaseResponse = createCaseController.createCase("someEmail", "someMobile");
 
