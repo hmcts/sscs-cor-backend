@@ -5,7 +5,7 @@ plugins {
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.8.RELEASE'
   id 'org.springframework.boot' version '2.1.7.RELEASE'
-  id 'org.owasp.dependencycheck' version '5.2.1'
+  id 'org.owasp.dependencycheck' version '5.2.2'
   id 'com.github.ben-manes.versions' version '0.22.0'
   id 'org.sonarqube' version '2.7.1'
 }
@@ -70,7 +70,7 @@ task smoke(type: Test) {
 
 checkstyle {
   maxWarnings = 0
-  toolVersion = '8.18'
+  toolVersion = '8.23'
   // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
   configDir = new File(rootDir, 'config/checkstyle')
 }
@@ -95,6 +95,14 @@ jacocoTestReport {
 dependencyManagement {
   dependencies {
     dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
+
+    // solves CVE-2019-12086
+    // solves CVE-2019-14439
+    // remove once spring manager incorporates this changes
+    dependencySet(group: 'com.fasterxml.jackson.core', version: '2.9.10') {
+      entry 'jackson-core'
+      entry 'jackson-databind'
+    }
   }
 }
 
@@ -195,7 +203,7 @@ dependencies {
   compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.4.RELEASE'
   compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
 
-  compile group: 'uk.gov.hmcts.reform', name:'sscs-common', version: '3.0.45'
+  compile group: 'uk.gov.hmcts.reform', name:'sscs-common', version: '3.0.80'
 
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.1.2'
   compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '6.0.0'
@@ -204,7 +212,7 @@ dependencies {
 
   compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: '2.4.1'
   compile group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.4.1'
-  
+
   // Removed for now as we have an issue with some of its dependencies
   // compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix-dashboard', version: versions.springHystrix
 
