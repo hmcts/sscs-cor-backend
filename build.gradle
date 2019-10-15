@@ -202,6 +202,9 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging-spring', version: '5.0.1'
   compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4'
 
+  compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: '2.4.1'
+  compile group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.4.1'
+  
   // Removed for now as we have an issue with some of its dependencies
   // compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix-dashboard', version: versions.springHystrix
 
