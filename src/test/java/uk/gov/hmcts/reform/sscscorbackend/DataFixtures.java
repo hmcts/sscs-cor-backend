@@ -27,7 +27,9 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEve
 
 
 public class DataFixtures {
-    private DataFixtures() {}
+    private DataFixtures() {
+
+    }
 
     public static QuestionRound someQuestionRound() {
         return new QuestionRound(someQuestionSummaries(), now().plusDays(7).format(ISO_LOCAL_DATE_TIME), 0);

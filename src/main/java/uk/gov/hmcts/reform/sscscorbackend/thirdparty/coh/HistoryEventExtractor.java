@@ -6,7 +6,9 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.api.CohState;
 
 public final class HistoryEventExtractor {
 
-    private HistoryEventExtractor() {}
+    private HistoryEventExtractor() {
+
+    }
 
     public static Optional<String> getStateDate(List<CohState> history, String state) {
         if (history != null) {
