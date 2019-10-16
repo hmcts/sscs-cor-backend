@@ -1,5 +1,5 @@
 java:
-  image: 'https://hmctspublic.azurecr.io/sscs/cor-backend:latest'
+  image: 'hmctspublic.azurecr.io/sscs/cor-backend:latest'
   applicationPort: 8080
   aadIdentityName: sscs
   ingressHost: sscs-cor-backend-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
