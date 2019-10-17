@@ -45,4 +45,5 @@ withPipeline(type, product, component) {
     enableSlackNotifications('#sscs-tech')
     installCharts()
     enableAksStagingDeployment()
+    disableLegacyDeploymentOnAAT()
 }
