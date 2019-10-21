@@ -206,9 +206,6 @@ public class SscsCorBackendRequests {
     }
 
     private void cohEvent(String hearingId, String caseId, String event) throws IOException {
-        log.info("Sending to url " + baseUrl + "/notify/onlinehearing");
-        log.info("JSON: " + "{\"case_id\":\"" + caseId + "\", \"event_type\":\"" + event +
-                "\", \"online_hearing_id\":\"" + hearingId + "\"}");
         HttpResponse resolveHearingResponse = client.execute(post(baseUrl + "/notify/onlinehearing")
                 .setEntity(new StringEntity(
                         "{\"case_id\":\"" + caseId + "\", \"event_type\":\"" + event +
