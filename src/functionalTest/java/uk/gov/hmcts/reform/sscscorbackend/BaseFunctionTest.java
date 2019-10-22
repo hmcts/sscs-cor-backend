@@ -37,7 +37,7 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
         "core_case_data.api.url=http://ccd-data-store-api-aat.service.core-compute-aat.internal"
 })
 public abstract class BaseFunctionTest {
-    private final String baseUrl = System.getenv("TEST_URL") != null ? System.getenv("TEST_URL") : "http://sscs-cor-backend-aat.service.core-compute-aat.internal";
+    private final String baseUrl = System.getenv("TEST_URL") != null ? System.getenv("TEST_URL") : "http://localhost:8090";
 
     private String cohBaseUrl = "http://coh-cor-aat.service.core-compute-aat.internal";
     private CloseableHttpClient client;
@@ -149,7 +149,7 @@ public abstract class BaseFunctionTest {
 
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create()
                 .setSSLSocketFactory(sslsf);
-        if (true) {
+        if (System.getenv(proxySystemProperty) != null) {
             httpClientBuilder = httpClientBuilder.setProxy(new HttpHost("proxyout.reform.hmcts.net", 8080));
         }
         return httpClientBuilder.build();
