@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 
 public class TriggerCohEventsTest extends BaseFunctionTest {
-    @Ignore
+    
     @Test
     public void relistingHearingUpdatesCcd() throws IOException, InterruptedException {
         OnlineHearing onlineHearing = createHearingWithQuestion(true);
