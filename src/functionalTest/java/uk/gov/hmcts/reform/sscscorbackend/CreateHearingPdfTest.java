@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
 import java.io.IOException;
+
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class CreateHearingPdfTest extends BaseFunctionTest {
 
+    @Ignore
     @Test
     public void testCreate() throws IOException, InterruptedException {
         OnlineHearing onlineHearing = createHearingWithQuestion(true);
@@ -15,6 +18,7 @@ public class CreateHearingPdfTest extends BaseFunctionTest {
         relistHearing(onlineHearing.getHearingId(), onlineHearing.getCaseId());
     }
 
+    @Ignore
     @Test
     public void recordRejectedResponse() throws IOException, InterruptedException {
         OnlineHearing onlineHearing = createHearingWithQuestion(true);
