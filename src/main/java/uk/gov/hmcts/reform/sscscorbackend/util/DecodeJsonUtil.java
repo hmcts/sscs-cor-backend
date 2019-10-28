@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscscorbackend.util;
 
 public class DecodeJsonUtil {
-    private DecodeJsonUtil() {}
+    private DecodeJsonUtil() {
+
+    }
 
     public static String decodeStringWithWhitespace(String value) {
         if (value != null) {

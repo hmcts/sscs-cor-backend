@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
 import java.io.IOException;
+
 import org.junit.Test;
 
 public class CreateHearingPdfTest extends BaseFunctionTest {
@@ -14,7 +15,7 @@ public class CreateHearingPdfTest extends BaseFunctionTest {
         //now trigger our endpoint
         relistHearing(onlineHearing.getHearingId(), onlineHearing.getCaseId());
     }
-
+    
     @Test
     public void recordRejectedResponse() throws IOException, InterruptedException {
         OnlineHearing onlineHearing = createHearingWithQuestion(true);

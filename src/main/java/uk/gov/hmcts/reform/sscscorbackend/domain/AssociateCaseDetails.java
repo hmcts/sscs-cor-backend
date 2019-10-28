@@ -14,7 +14,9 @@ public class AssociateCaseDetails {
     private String postcode;
 
     //Needed for Jackson
-    private AssociateCaseDetails() {}
+    private AssociateCaseDetails() {
+
+    }
 
     public AssociateCaseDetails(String email, String postcode) {
         this.email = email;

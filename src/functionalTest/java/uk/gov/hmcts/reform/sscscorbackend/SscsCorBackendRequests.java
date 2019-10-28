@@ -6,6 +6,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -25,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
+@Slf4j
 public class SscsCorBackendRequests {
     private final IdamTokens idamTokens;
     private final CorIdamService corIdamService;
