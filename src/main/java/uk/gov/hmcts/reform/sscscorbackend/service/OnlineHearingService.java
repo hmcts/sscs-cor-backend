@@ -202,27 +202,28 @@ public class OnlineHearingService {
         Name name = appellant.getName();
         String nameString = name.getFirstName() + " " + name.getLastName();
 
-        return Optional.of(loadOnlineHearingFromCoh(sscsCaseDeails)
-                .orElseGet(() -> {
-                    List<String> arrangements = (hearingOptions.getArrangements() != null)
-                            ? hearingOptions.getArrangements() : emptyList();
-                    return new OnlineHearing(
-                            nameString,
-                            sscsCaseDeails.getData().getCaseReference(),
-                            sscsCaseDeails.getId(),
-                            new HearingArrangements(
-                                    "yes".equalsIgnoreCase(hearingOptions.getLanguageInterpreter()),
-                                    hearingOptions.getLanguages(),
-                                    arrangements.contains("signLanguageInterpreter"),
-                                    hearingOptions.getSignLanguageType(),
-                                    arrangements.contains("hearingLoop"),
-                                    arrangements.contains("disabledAccess"),
-                                    hearingOptions.getOther()
-                            ),
-                            appellantDetails,
-                            appealDetails
-                    );
-                }));
+        if ("cor".equals(sscsCaseDeails.getData().getAppeal().getHearingType())) {
+            return loadOnlineHearingFromCoh(sscsCaseDeails);
+        } else {
+            List<String> arrangements = (hearingOptions.getArrangements() != null)
+                    ? hearingOptions.getArrangements() : emptyList();
+            return Optional.of(new OnlineHearing(
+                    nameString,
+                    sscsCaseDeails.getData().getCaseReference(),
+                    sscsCaseDeails.getId(),
+                    new HearingArrangements(
+                            "yes".equalsIgnoreCase(hearingOptions.getLanguageInterpreter()),
+                            hearingOptions.getLanguages(),
+                            arrangements.contains("signLanguageInterpreter"),
+                            hearingOptions.getSignLanguageType(),
+                            arrangements.contains("hearingLoop"),
+                            arrangements.contains("disabledAccess"),
+                            hearingOptions.getOther()
+                    ),
+                    appellantDetails,
+                    appealDetails
+            ));
+        }
     }
 
     private AppealDetails convertAppealDetails(SscsCaseDetails sscsCaseDeails) {
