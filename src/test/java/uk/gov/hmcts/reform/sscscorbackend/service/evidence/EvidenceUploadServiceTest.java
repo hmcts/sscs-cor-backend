@@ -9,6 +9,7 @@ import static org.mockito.AdditionalMatchers.and;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ATTACH_SCANNED_DOCS;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -97,6 +98,7 @@ public class EvidenceUploadServiceTest {
         assertThat(evidenceOptional.isPresent(), is(true));
         Evidence evidence = evidenceOptional.get();
         assertThat(evidence, is(new Evidence(documentUrl, fileName, convertCreatedOnDate(evidenceCreatedOn))));
+
         verify(ccdService).updateCase(
                 hasDraftSscsDocument(originalNumberOfSscsDocuments, documentUrl, fileName),
                 eq(someCcdCaseId),
@@ -519,6 +521,39 @@ public class EvidenceUploadServiceTest {
         assertThat(hearingFound, is(false));
     }
 
+    @Test
+    public void givenANonCorCaseWithScannedDocumentsAndDraftDocument_thenMoveDraftToScannedDocumentsAndUpdateCaseInCcd() {
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
+        ScannedDocument descriptionDocument = ScannedDocument.builder()
+                    .value(ScannedDocumentDetails.builder()
+                        .fileName("anotherFileName")
+                        .url(DocumentLink.builder()
+                            .documentUrl("http://anotherUrl")
+                            .build())
+                        .scannedDate(convertCreatedOnDate(evidenceCreatedOn))
+                    .build())
+                .build();
+        List<ScannedDocument> list = singletonList(descriptionDocument);
+        sscsCaseDetails.getData().setScannedDocuments(list);
+        sscsCaseDetails.getData().setAppeal(Appeal.builder().hearingType("sya").build());
+
+        final int originalNumberOfScannedDocuments = sscsCaseDetails.getData().getScannedDocuments().size();
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+
+        boolean submittedEvidence = evidenceUploadService.submitHearingEvidence(someOnlineHearingId, someDescription);
+
+        assertThat(submittedEvidence, is(true));
+
+        verify(ccdService).updateCase(
+                and(hasSscsScannedDocument(originalNumberOfScannedDocuments, documentUrl, fileName), doesNotHaveDraftSscsDocumentsAndEvidenceHandledNo()),
+                eq(someCcdCaseId),
+                eq(ATTACH_SCANNED_DOCS.getCcdType()),
+                eq("SSCS - upload evidence from MYA"),
+                eq("Uploaded a further evidence document"),
+                eq(idamTokens)
+        );
+    }
+
     private UploadResponse createUploadResponse() {
         Document document = new Document();
         document.createdOn = evidenceCreatedOn;
@@ -552,6 +587,15 @@ public class EvidenceUploadServiceTest {
         });
     }
 
+    private SscsCaseData hasSscsScannedDocument(int originalNumberOfDocuments, String documentUrl, String fileName) {
+        return argThat(argument -> {
+            List<ScannedDocument> scannedDocuments = argument.getScannedDocuments();
+            return scannedDocuments.size() == originalNumberOfDocuments + 1 &&
+                    scannedDocuments.get(originalNumberOfDocuments).getValue().getUrl().getDocumentUrl().equals(documentUrl) &&
+                    scannedDocuments.get(originalNumberOfDocuments).getValue().getFileName().equals(fileName);
+        });
+    }
+
     private SscsCaseData hasDraftSscsDocument(int originalNumberOfDocuments, String documentUrl, String fileName) {
         return argThat(argument -> {
             List<SscsDocument> sscsDocument = argument.getDraftSscsDocument();
@@ -582,6 +626,13 @@ public class EvidenceUploadServiceTest {
         return argThat(argument -> {
             List<SscsDocument> sscsDocument = argument.getDraftSscsDocument();
             return sscsDocument.isEmpty();
+        });
+    }
+
+    private SscsCaseData doesNotHaveDraftSscsDocumentsAndEvidenceHandledNo() {
+        return argThat(argument -> {
+            List<SscsDocument> sscsDocument = argument.getDraftSscsDocument();
+            return sscsDocument.isEmpty() && argument.getEvidenceHandled().equals("No");
         });
     }
 
