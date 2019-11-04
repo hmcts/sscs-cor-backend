@@ -55,10 +55,11 @@ public class CreateCaseController {
             @ApiParam(value = "email address of the appellant must be unique in CCD", example = "foo@bar.com", required = true)
             @RequestParam("email")String email,
             @ApiParam(value = "mobile number of appellant. Optional if not set will not subscribe for sms.")
-            @RequestParam(value = "mobile", required = false) String mobile
+            @RequestParam(value = "mobile", required = false) String mobile,
+            @RequestParam(value = "hearingType", defaultValue = "cor") String hearingType
     ) throws URISyntaxException {
         SscsCaseDetails caseDetails = ccdService.createCase(
-                createSscsCase(email, mobile),
+                createSscsCase(email, mobile, hearingType),
                 EventType.SYA_APPEAL_CREATED.getCcdType(),
                 "SSCS - appeal created event", "Created SSCS",
                 idamService.getIdamTokens()
@@ -71,7 +72,7 @@ public class CreateCaseController {
         return ResponseEntity.created(new URI("case/someId")).body(body);
     }
 
-    private SscsCaseData createSscsCase(String email, String mobile) {
+    private SscsCaseData createSscsCase(String email, String mobile, String hearingType) {
         InputStream caseStream = getClass().getClassLoader().getResourceAsStream("json/ccd_case.json");
         String caseAsString = new BufferedReader(new InputStreamReader(caseStream)).lines().collect(joining("\n"));
         SscsCaseData sscsCaseData;
@@ -100,7 +101,9 @@ public class CreateCaseController {
                                                     .tya(UUID.randomUUID().toString())
                                                     .build()
                                     ).build()
-                    ).build();
+                    )
+                    .build();
+            sscsCaseData.getAppeal().setHearingType(hearingType);
         } catch (IOException e) {
             throw new SscsCorBackendException(e);
         }

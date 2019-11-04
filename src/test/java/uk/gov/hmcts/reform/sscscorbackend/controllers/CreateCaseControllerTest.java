@@ -51,7 +51,7 @@ public class CreateCaseControllerTest {
         when(ccdService.createCase(any(SscsCaseData.class), eq("appealCreated"), eq("SSCS - appeal created event"), eq("Created SSCS"), any(IdamTokens.class))).thenReturn(sscsCaseDetails);
         CreateCaseController createCaseController = new CreateCaseController(ccdService, idamService);
 
-        ResponseEntity<Map<String, String>> createCaseResponse = createCaseController.createCase("someEmail", "someMobile");
+        ResponseEntity<Map<String, String>> createCaseResponse = createCaseController.createCase("someEmail", "someMobile", "oral");
 
         assertThat(createCaseResponse.getStatusCode(), is(HttpStatus.CREATED));
         assertThat(createCaseResponse.getBody().get("id"), is(caseId.toString()));
