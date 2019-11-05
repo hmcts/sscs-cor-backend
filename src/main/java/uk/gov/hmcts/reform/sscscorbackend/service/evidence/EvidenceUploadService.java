@@ -6,6 +6,7 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ATTACH_SCANNED_DOCS;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -142,7 +143,7 @@ public class EvidenceUploadService {
                                         .type("other")
                                         .url(draftSscsDocument.getValue().getDocumentLink())
                                         .fileName(draftSscsDocument.getValue().getDocumentFileName())
-                                        .scannedDate(draftSscsDocument.getValue().getDocumentDateAdded())
+                                        .scannedDate(LocalDateTime.parse(draftSscsDocument.getValue().getDocumentDateAdded()).toString())
                                         .build()).build();
 
                             scannedDocs.add(scannedDocument);
