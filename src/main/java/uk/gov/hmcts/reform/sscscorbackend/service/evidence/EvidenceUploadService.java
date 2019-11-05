@@ -6,6 +6,7 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ATTACH_SCANNED_DOCS;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -137,13 +138,18 @@ public class EvidenceUploadService {
                         return true;
                     } else {
                         List<ScannedDocument> scannedDocs = new ArrayList<>();
+                        DateTimeFormatter DateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                        
                         for (SscsDocument draftSscsDocument : caseDetails.getData().getDraftSscsDocument()) {
+                            LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(), DateFormatter);
+                            LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
+
                             ScannedDocument scannedDocument = ScannedDocument.builder().value(
                                     ScannedDocumentDetails.builder()
                                         .type("other")
                                         .url(draftSscsDocument.getValue().getDocumentLink())
                                         .fileName(draftSscsDocument.getValue().getDocumentFileName())
-                                        .scannedDate(LocalDateTime.parse(draftSscsDocument.getValue().getDocumentDateAdded()).toString())
+                                            .scannedDate(ldt.toString())
                                         .build()).build();
 
                             scannedDocs.add(scannedDocument);
