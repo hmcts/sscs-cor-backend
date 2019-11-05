@@ -138,10 +138,9 @@ public class EvidenceUploadService {
                         return true;
                     } else {
                         List<ScannedDocument> scannedDocs = new ArrayList<>();
-                        DateTimeFormatter DateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                        
+                        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                         for (SscsDocument draftSscsDocument : caseDetails.getData().getDraftSscsDocument()) {
-                            LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(), DateFormatter);
+                            LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(), dateFormatter);
                             LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
 
                             ScannedDocument scannedDocument = ScannedDocument.builder().value(
