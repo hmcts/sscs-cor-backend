@@ -38,4 +38,5 @@ java:
     NOTIFICATIONS_API_URL: http://sscs-tya-notif-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     PDF_SERVICE_CONVERT_URL: https://docmosis-development.platform.hmcts.net/rs/convert
     PDF_SERVICE_HEALTH_URL: https://docmosis-development.platform.hmcts.net/rs/status
+    PDF_SERVICE_BASE_URL: https://docmosis-development.platform.hmcts.net/rs/render
     PDF_SERVICE_ACCESS_KEY: ${PDF_SERVICE_ACCESS_KEY}
