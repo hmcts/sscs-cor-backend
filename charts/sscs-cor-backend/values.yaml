@@ -36,3 +36,6 @@ java:
     DOCUMENT_MANAGEMENT_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     PDF_API_URL: http://cmc-pdf-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     NOTIFICATIONS_API_URL: http://sscs-tya-notif-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    PDF_SERVICE_CONVERT_URL: https://docmosis-development.platform.hmcts.net/rs/convert
+    PDF_SERVICE_HEALTH_URL: https://docmosis-development.platform.hmcts.net/rs/status
+    PDF_SERVICE_ACCESS_KEY: ${PDF_SERVICE_ACCESS_KEY}

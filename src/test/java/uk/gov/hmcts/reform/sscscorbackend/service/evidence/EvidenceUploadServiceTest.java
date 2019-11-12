@@ -24,6 +24,8 @@ import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.AnswerState;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 import uk.gov.hmcts.reform.sscscorbackend.domain.EvidenceDescription;
@@ -53,6 +55,8 @@ public class EvidenceUploadServiceTest {
     private StoreEvidenceDescriptionService storeEvidenceDescriptionService;
     private EvidenceDescription someDescription;
     private EvidenceUploadEmailService evidenceUploadEmailService;
+    private FileToPdfConversionService fileToPdfConversionService;
+    private EvidenceManagementService evidenceManagementService;
 
     @Before
     public void setUp() {
@@ -70,21 +74,28 @@ public class EvidenceUploadServiceTest {
         idamTokens = mock(IdamTokens.class);
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        DocumentManagementService documentManagementService = mock(DocumentManagementService.class);
         storeEvidenceDescriptionService = mock(StoreEvidenceDescriptionService.class);
         evidenceUploadEmailService = mock(EvidenceUploadEmailService.class);
+        fileToPdfConversionService = mock(FileToPdfConversionService.class);
+        evidenceManagementService = mock(EvidenceManagementService.class);
+        DocumentManagementService documentManagementService = mock(DocumentManagementService.class);
+
         evidenceUploadService = new EvidenceUploadService(
                 documentManagementService,
                 ccdService,
                 idamService,
                 onlineHearingService,
-                storeEvidenceDescriptionService, evidenceUploadEmailService);
+                storeEvidenceDescriptionService,
+                evidenceUploadEmailService,
+                fileToPdfConversionService,
+                evidenceManagementService);
         fileName = "someFileName.txt";
         documentUrl = "http://example.com/document/" + someEvidenceId;
         file = mock(MultipartFile.class);
 
         UploadResponse uploadResponse = createUploadResponse();
-        when(documentManagementService.upload(singletonList(file))).thenReturn(uploadResponse);
+        when(evidenceManagementService.upload(singletonList(file), "sscs")).thenReturn(uploadResponse);
+        when(fileToPdfConversionService.convert(singletonList(file))).thenReturn(singletonList(file));
     }
 
     @Test
@@ -102,8 +113,8 @@ public class EvidenceUploadServiceTest {
         verify(ccdService).updateCase(
                 hasDraftSscsDocument(originalNumberOfSscsDocuments, documentUrl, fileName),
                 eq(someCcdCaseId),
-                eq("uploadCorDocument"),
-                eq("SSCS - cor evidence uploaded"),
+                eq("uploadDraftDocument"),
+                eq("SSCS - upload document from MYA"),
                 eq("Updated SSCS"),
                 eq(idamTokens)
         );
@@ -319,8 +330,8 @@ public class EvidenceUploadServiceTest {
         verify(ccdService).updateCase(
                 hasDraftSscsDocument(0, documentUrl, fileName),
                 eq(someCcdCaseId),
-                eq("uploadCorDocument"),
-                eq("SSCS - cor evidence uploaded"),
+                eq("uploadDraftDocument"),
+                eq("SSCS - upload document from MYA"),
                 eq("Updated SSCS"),
                 eq(idamTokens)
         );

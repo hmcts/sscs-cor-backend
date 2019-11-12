@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+import okhttp3.OkHttpClient;
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -104,10 +106,20 @@ public class Application {
 
     @Bean
     public DocmosisPdfGenerationService docmosisPdfGenerationService(
-            @Value("${pdf-service.uri}") String pdfServiceEndpoint,
-            @Value("${pdf-service.accessKey}") String pdfServiceAccessKey,
+            @Value("${docmosis.uri}") String docmosisServiceEndpoint,
+            @Value("${docmosis.accessKey}") String docmosisServiceAccessKey,
             RestTemplate restTemplate
     ) {
-        return new DocmosisPdfGenerationService(pdfServiceEndpoint, pdfServiceAccessKey, restTemplate);
+        return new DocmosisPdfGenerationService(docmosisServiceEndpoint, docmosisServiceAccessKey, restTemplate);
+    }
+
+    @Bean
+    public OkHttpClient okHttpClient() {
+        int timeout = 10;
+        return new OkHttpClient.Builder()
+                .connectTimeout(timeout, TimeUnit.MINUTES)
+                .readTimeout(timeout, TimeUnit.MINUTES)
+                .retryOnConnectionFailure(true)
+                .build();
     }
 }
