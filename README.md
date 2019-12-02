@@ -81,6 +81,13 @@ docker image rm <image-userId>
 
 There is no need to remove postgres and java or similar core images.
 
+## Debugging in Intellij configurations
+
+VM options: -Dhttp.proxyHost=proxyout.reform.hmcts.net -Dhttp.proxyPort=8080  -Dhttps.proxyHost=proxyout.reform.hmcts.net -Dhttps.proxyPort=8080
+
+Environment Variables: CREATE_CCD_ENDPOINT=true;COH_URL=http://coh-cor-aat.service.core-compute-aat.internal;IDAM_SSCS_SYSTEMUPDATE_USER=sscs-system-update@hmcts.net;IDAM_SSCS_SYSTEMUPDATE_PASSWORD=Bb********;IDAM_OAUTH2_CLIENT_ID=sscs;IDAM_OAUTH2_CLIENT_SECRET=3$*******;IDAM_S2S_AUTH=http://rpe-service-auth-provider-aat.service.core-compute-aat.internal;IDAM_S2S_AUTH_TOTP_SECRET=44*********;S2S_URL=http://rpe-service-auth-provider-aat.service.core-compute-aat.internal;CORE_CASE_DATA_URL=http://ccd-data-store-api-aat.service.core-compute-aat.internal;IDAM_API_URL=http://idam-api.aat.platform.hmcts.net;IDAM_URL=http://idam-api.aat.platform.hmcts.net;IDAM_OAUTH2_REDIRECT_URL=https://evidence-sharing-preprod.sscs.reform.hmcts.net;PDF_API_URL=http://cmc-pdf-service-aat.service.core-compute-aat.internal;PDF_SERVICE_ACCESS_KEY=ZD********************;EMAIL_SERVER_HOST=mta.reform.hmcts.net;EMAIL_SERVER_PORT=25 
+
+
 ## Functional tests
 
 Can be run in your ide or with
