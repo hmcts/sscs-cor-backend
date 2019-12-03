@@ -68,3 +68,7 @@ variable "createCcdEndpoint" {
 variable "jui_base_url" {
   type = "string"
 }
+
+variable "appinsights_instrumentation_key" {
+  type = "string"
+}
