@@ -80,6 +80,7 @@ module "sscs-core-backend" {
     IDAM_OAUTH2_REDIRECT_URL        = "${var.idam_redirect_url}"
     IDAM_URL                        = "${local.idam_url}"
     IDAM_SSCS_URL                   = "${var.idam_sscs_url}"
+    APPINSIGHTS_INSTRUMENTATIONKEY = "${data.azurerm_key_vault_secret.AppInsightsInstrumentationKey.value}"
 
     COH_URL = "${local.cohUrl}"
     CORE_CASE_DATA_URL = "${local.ccdApi}"
