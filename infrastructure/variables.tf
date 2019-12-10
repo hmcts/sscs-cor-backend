@@ -68,3 +68,15 @@ variable "createCcdEndpoint" {
 variable "jui_base_url" {
   type = "string"
 }
+
+variable "pdf_service_health_url" {
+  type = "string"
+}
+
+variable "pdf_service_convert_url" {
+  type = "string"
+}
+
+variable "pdf_service_base_url" {
+  type = "string"
+}

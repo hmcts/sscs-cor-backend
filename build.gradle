@@ -96,6 +96,11 @@ dependencyManagement {
   dependencies {
     dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
 
+    // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103
+    dependencySet(group: 'org.jetbrains.kotlin', version: '1.3.60') {
+      entry 'kotlin-stdlib'
+    }
+
     // solves CVE-2019-12086
     // solves CVE-2019-14439
     // remove once spring manager incorporates this changes
@@ -204,9 +209,9 @@ dependencies {
   compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.4.RELEASE'
   compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
 
-  compile group: 'uk.gov.hmcts.reform', name:'sscs-common', version: '3.0.88'
+  compile group: 'uk.gov.hmcts.reform', name:'sscs-common', version: '3.1.3'
 
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.1.2'
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.2.1'
   compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '6.0.0'
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging-spring', version: '5.0.1'
   compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4'

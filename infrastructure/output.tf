@@ -18,3 +18,14 @@ output "idam_redirect_url" {
   value = "${var.idam_redirect_url}"
 }
 
+output "pdf_service_health_url" {
+  value = "${var.pdf_service_health_url}rs/render"
+}
+
+output "pdf_service_convert_url" {
+  value = "${var.pdf_service_convert_url}rs/convert"
+}
+
+output "pdf_service_base_url" {
+  value = "${var.pdf_service_base_url}rs/render"
+}

@@ -31,6 +31,7 @@ public class DocumentManagementService {
     public UploadResponse upload(List<MultipartFile> files) {
         String serviceAuthorization = authTokenGenerator.generate();
 
+
         try {
             return documentUploadClientApi.upload(OAUTH2_TOKEN, serviceAuthorization, USER_ID, files);
         } catch (HttpClientErrorException exc) {

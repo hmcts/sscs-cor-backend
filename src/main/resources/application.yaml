@@ -118,11 +118,13 @@ feign:
 logging.level:
   org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod: DEBUG
 
-pdf-service:
-  uri: ${PDF_SERVICE_BASE_URL:https://docmosis-development.platform.hmcts.net/rs/render}
-  accessKey: ${PDF_SERVICE_ACCESS_KEY:setMe}
-
 juiBaseUrl: "${JUI_BASE_URL:https://jui-webapp-aat.service.core-compute-aat.internal}"
 
 swagger:
   defaultTokens: ${SWAGGER_DEFAULT_TOKENS:false}
+
+docmosis:
+  accessKey: ${PDF_SERVICE_ACCESS_KEY:something}
+  convert.endpoint: ${PDF_SERVICE_CONVERT_URL:https://docmosis-development.platform.hmcts.net/rs/convert}
+  health.endpoint: ${PDF_SERVICE_HEALTH_URL:https://docmosis-development.platform.hmcts.net/rs/status}
+  uri: ${PDF_SERVICE_BASE_URL:https://docmosis-development.platform.hmcts.net/rs/render}

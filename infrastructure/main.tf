@@ -38,8 +38,14 @@ data "azurerm_key_vault_secret" "docmosis-api-key" {
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
+
 data "azurerm_key_vault_secret" "appinsights_instrumentation_key" {
   name      = "AppInsightsInstrumentationKey"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
+}
+
+data "azurerm_key_vault_secret" "pdf_service_base_url" {
+  name      = "docmosis-endpoint"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
@@ -104,6 +110,9 @@ module "sscs-core-backend" {
     CASEWORKER_EMAIL       = "${var.caseworker_email_address}"
 
     PDF_SERVICE_ACCESS_KEY = "${data.azurerm_key_vault_secret.docmosis-api-key.value}"
+    PDF_SERVICE_CONVERT_URL = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/convert"
+    PDF_SERVICE_HEALTH_URL = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/status"
+    PDF_SERVICE_BASE_URL   = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/render"
 
     JUI_BASE_URL  = "${var.jui_base_url}"
   }
