@@ -80,3 +80,7 @@ variable "pdf_service_convert_url" {
 variable "pdf_service_base_url" {
   type = "string"
 }
+
+variable "enable_ase" {
+  default = false
+}
