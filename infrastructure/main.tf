@@ -80,6 +80,7 @@ module "sscs-core-backend" {
   common_tags         = "${var.common_tags}"
   asp_rg              = "${var.product}-${var.component}-${var.env}"
   asp_name            = "${var.product}-${var.component}-${var.env}"
+  enable_ase          = "${var.enable_ase}"
 
   app_settings = {
     IDAM_S2S_AUTH                   = "${local.s2sCnpUrl}"
