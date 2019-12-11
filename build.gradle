@@ -232,6 +232,7 @@ dependencies {
 
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
   testCompile group: 'junit', name: 'junit', version: versions.junit
+  testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath

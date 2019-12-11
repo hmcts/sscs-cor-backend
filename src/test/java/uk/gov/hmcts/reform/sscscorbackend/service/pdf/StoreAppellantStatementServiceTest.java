@@ -5,17 +5,21 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.OldPdfService;
 
+@RunWith(JUnitParamsRunner.class)
 public class StoreAppellantStatementServiceTest {
 
     private StoreAppellantStatementService storeAppellantStatementService;
@@ -23,46 +27,65 @@ public class StoreAppellantStatementServiceTest {
     @Before
     public void setUp() {
         storeAppellantStatementService = new StoreAppellantStatementService(
-                mock(OldPdfService.class),
-                "templatePath",
-                mock(CcdPdfService.class),
-                mock(IdamService.class),
-                mock(EvidenceManagementService.class)
+            mock(OldPdfService.class),
+            "templatePath",
+            mock(CcdPdfService.class),
+            mock(IdamService.class),
+            mock(EvidenceManagementService.class)
         );
     }
 
     @Test
-    public void getDocumentPrefixWhenNoOtherDocuments() {
-        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build();
-        String documentPrefix = storeAppellantStatementService.documentNamePrefix(sscsCaseDetails, "onlineHearing");
+    @Parameters(method = "generateDifferentCaseDataScenarios")
+    public void getDocumentPrefixWhenNoOtherDocuments(SscsCaseData sscsCaseData, String expectedFileName) {
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        String documentPrefix = storeAppellantStatementService.documentNamePrefix(sscsCaseDetails,
+            "onlineHearingId");
 
-        assertThat(documentPrefix, is("Appellant statement 1 - "));
+        assertThat(documentPrefix, is(expectedFileName));
     }
 
-    @Test
-    public void getDocumentPrefixWhenOtherDocuments() {
-        SscsCaseDetails sscsCaseDetails = caseWithDocument("Some other document.txt");
-        String documentPrefix = storeAppellantStatementService.documentNamePrefix(sscsCaseDetails, "onlineHearing");
-
-        assertThat(documentPrefix, is("Appellant statement 1 - "));
+    private Object[] generateDifferentCaseDataScenarios() {
+        SscsCaseData sscsCaseDataWithNoDocs = SscsCaseData.builder().build();
+        SscsCaseData sscsCaseDataWithSomeOtherDoc = caseWithDocument("Some other document.txt");
+        SscsCaseData sscsCaseDataWithSomeOtherStatement = caseWithDocument(
+            "Appellant statement 1 - SC0011111.pdf");
+        SscsCaseData sscsCaseDataWithDocWithNullValue = SscsCaseData.builder()
+            .scannedDocuments(singletonList(ScannedDocument.builder()
+                .value(null)
+                .build()))
+            .build();
+        SscsCaseData sscsCaseDataWithDocWithEmptyFilename = SscsCaseData.builder()
+            .scannedDocuments(singletonList(ScannedDocument.builder()
+                .value(ScannedDocumentDetails.builder()
+                    .fileName("")
+                    .build())
+                .build()))
+            .build();
+        SscsCaseData sscsCaseDataWithDocWithNullFilename = SscsCaseData.builder()
+            .scannedDocuments(singletonList(ScannedDocument.builder()
+                .value(ScannedDocumentDetails.builder()
+                    .fileName(null)
+                    .build())
+                .build()))
+            .build();
+        return new Object[]{
+            new Object[]{sscsCaseDataWithNoDocs, "Appellant statement 1 - "},
+            new Object[]{sscsCaseDataWithSomeOtherDoc, "Appellant statement 1 - "},
+            new Object[]{sscsCaseDataWithSomeOtherStatement, "Appellant statement 2 - "},
+            new Object[]{sscsCaseDataWithDocWithNullValue, "Appellant statement 1 - "},
+            new Object[]{sscsCaseDataWithDocWithEmptyFilename, "Appellant statement 1 - "},
+            new Object[]{sscsCaseDataWithDocWithNullFilename, "Appellant statement 1 - "}
+        };
     }
 
-    @Test
-    public void getDocumentPrefixWhenOtherStatements() {
-        SscsCaseDetails sscsCaseDetails = caseWithDocument("Appellant statement 1 - SC0011111.pdf");
-        String documentPrefix = storeAppellantStatementService.documentNamePrefix(sscsCaseDetails, "onlineHearing");
-
-        assertThat(documentPrefix, is("Appellant statement 2 - "));
-    }
-
-    private SscsCaseDetails caseWithDocument(String documentFileName) {
-        return SscsCaseDetails.builder().data(SscsCaseData.builder()
-                .sscsDocument(singletonList(
-                        SscsDocument.builder().value(
-                                SscsDocumentDetails.builder()
-                                        .documentFileName(documentFileName)
-                                        .build())
-                                .build()))
-                .build()).build();
+    private SscsCaseData caseWithDocument(String documentFileName) {
+        return SscsCaseData.builder()
+            .scannedDocuments(singletonList(ScannedDocument.builder()
+                .value(ScannedDocumentDetails.builder()
+                    .fileName(documentFileName)
+                    .build())
+                .build()))
+            .build();
     }
 }
