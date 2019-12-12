@@ -118,17 +118,18 @@ public class StoreAppellantStatementServiceTest {
 
     @Test
     public void givenCaseDataWithSomeOtherStatement_shouldCallTheStorePdfWithTheCorrectPdfName() {
-        SscsCaseDetails caseDetails = buildSscsCaseDetailsTestData();
-        Statement statement = new Statement("some statement");
-        AppellantStatementPdfData data = new AppellantStatementPdfData(caseDetails, statement);
 
         when(pdfService.createPdf(any(), eq("templatePath"))).thenReturn(new byte[0]);
 
         when(ccdPdfService.mergeDocIntoCcd(eq(APPELLANT_STATEMENT_2_SC_0022222_PDF), any(),
             eq(1L), any(SscsCaseData.class), any(IdamTokens.class), eq(OTHER_EVIDENCE)))
-            .thenReturn(caseDetails.getData());
+            .thenReturn(SscsCaseData.builder().build());
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+
+        SscsCaseDetails caseDetails = buildSscsCaseDetailsTestData();
+        Statement statement = new Statement("some statement");
+        AppellantStatementPdfData data = new AppellantStatementPdfData(caseDetails, statement);
 
         storeAppellantStatementService.storePdf(1L, "onlineHearingId", data);
 
