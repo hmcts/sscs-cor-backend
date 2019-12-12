@@ -139,6 +139,9 @@ public class StoreAppellantStatementServiceTest {
         assertThat(acForPdfName.getValue(), is(APPELLANT_STATEMENT_2_SC_0022222_PDF));
     }
 
+    //todo: Do we need a scenario for when there is a appellant statement with the same name already in the
+    // SscsDocument tab.
+
     private SscsCaseDetails buildSscsCaseDetailsTestData() {
         SscsCaseData caseData = caseWithDocument(APPELLANT_STATEMENT_1_SC_0011111_PDF);
         caseData.setAppeal(Appeal.builder()
