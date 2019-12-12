@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.spy;
 
+import java.net.URI;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -163,16 +164,33 @@ public class StoreAppellantStatementServiceTest {
         ArgumentCaptor<String> acForPdfName = ArgumentCaptor.forClass(String.class);
         verify(ccdPdfService, times(1)).mergeDocIntoCcd(acForPdfName.capture(), any(),
             eq(1L), any(SscsCaseData.class), any(IdamTokens.class), eq(OTHER_EVIDENCE));
-
         assertThat(acForPdfName.getValue(), is(APPELLANT_STATEMENT_2_SC_0022222_PDF));
         verifyZeroInteractions(evidenceManagementService);
     }
 
+    @Test
+    public void givenCaseDataWithPdfStatementAlreadyCreated_shouldCallTheLoadPdf() throws Exception {
+        doReturn(APPELLANT_STATEMENT_1_SC_0011111_PDF).when(storeAppellantStatementService,
+            "documentNamePrefix", any(SscsCaseDetails.class), anyString());
 
-
-    private void mockPdfHasNotAlreadyBeenCreatedElsePath() throws Exception {
         doReturn(false).when(storeAppellantStatementService,
             "pdfHasNotAlreadyBeenCreated", any(SscsCaseDetails.class), anyString());
+
+        when(evidenceManagementService.download(eq(new URI("http://dm-store/scannedDoc")), anyString()))
+            .thenReturn(new byte[0]);
+
+
+        SscsCaseDetails caseDetails = buildSscsCaseDetailsTestData();
+        Statement statement = new Statement("some statement");
+        AppellantStatementPdfData data = new AppellantStatementPdfData(caseDetails, statement);
+
+        storeAppellantStatementService.storePdf(1L, "onlineHearingId", data);
+
+        verify(evidenceManagementService, times(1))
+            .download(eq(new URI("http://dm-store/scannedDoc")), anyString());
+        verifyZeroInteractions(ccdPdfService);
+        verifyZeroInteractions(idamService);
+        verifyZeroInteractions(pdfService);
     }
 
     private SscsCaseDetails buildSscsCaseDetailsTestData() {
