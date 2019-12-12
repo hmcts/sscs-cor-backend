@@ -4,12 +4,16 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
+import static org.powermock.api.mockito.PowerMockito.spy;
 
+import java.net.URI;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -27,12 +31,15 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
@@ -43,8 +50,8 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockRunnerDelegate(JUnitParamsRunner.class)
-@PrepareForTest(value = {StorePdfService.class})
-@PowerMockIgnore({ "javax.net.ssl.*", "javax.security.*" })
+@PrepareForTest(value = {StoreAppellantStatementService.class})
+@PowerMockIgnore({"javax.net.ssl.*", "javax.security.*"})
 public class StoreAppellantStatementServiceTest {
 
     private static final String APPELLANT_STATEMENT_1 = "Appellant statement 1 - ";
@@ -61,13 +68,15 @@ public class StoreAppellantStatementServiceTest {
     private CcdPdfService ccdPdfService;
     @Mock
     private IdamService idamService;
+    @Mock
+    private EvidenceManagementService evidenceManagementService;
 
     private StoreAppellantStatementService storeAppellantStatementService;
 
     @Before
     public void setUp() {
-        storeAppellantStatementService = new StoreAppellantStatementService(pdfService, "templatePath",
-            ccdPdfService, idamService, mock(EvidenceManagementService.class));
+        storeAppellantStatementService = spy(new StoreAppellantStatementService(pdfService,
+            "templatePath", ccdPdfService, idamService, evidenceManagementService));
     }
 
     @Test
@@ -82,8 +91,10 @@ public class StoreAppellantStatementServiceTest {
 
     private Object[] generateDifferentCaseDataScenarios() {
         SscsCaseData sscsCaseDataWithNoDocs = SscsCaseData.builder().build();
-        SscsCaseData sscsCaseDataWithSomeOtherDoc = caseWithDocument("Some other document.txt");
-        SscsCaseData sscsCaseDataWithSomeOtherStatement = caseWithDocument(APPELLANT_STATEMENT_1_SC_0011111_PDF);
+        SscsCaseData sscsCaseDataWithSomeOtherDoc = caseWithScannedDocumentAndSscsDocument(
+            "Some other document.txt", APPELLANT_STATEMENT_2_SC_0022222_PDF);
+        SscsCaseData sscsCaseDataWithSomeOtherStatement = caseWithScannedDocumentAndSscsDocument(
+            APPELLANT_STATEMENT_1_SC_0011111_PDF, APPELLANT_STATEMENT_2_SC_0022222_PDF);
         SscsCaseData sscsCaseDataWithDocWithNullValue = SscsCaseData.builder()
             .scannedDocuments(singletonList(ScannedDocument.builder()
                 .value(null)
@@ -113,11 +124,22 @@ public class StoreAppellantStatementServiceTest {
         };
     }
 
-    private SscsCaseData caseWithDocument(String documentFileName) {
+    private SscsCaseData caseWithScannedDocumentAndSscsDocument(String scannedDocFilename, String sscsDocFilename) {
         return SscsCaseData.builder()
             .scannedDocuments(singletonList(ScannedDocument.builder()
                 .value(ScannedDocumentDetails.builder()
-                    .fileName(documentFileName)
+                    .fileName(scannedDocFilename)
+                    .url(DocumentLink.builder()
+                        .documentUrl("http://dm-store/scannedDoc")
+                        .build())
+                    .build())
+                .build()))
+            .sscsDocument(singletonList(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                    .documentFileName(sscsDocFilename)
+                    .documentLink(DocumentLink.builder()
+                        .documentUrl("http://dm-store/sscsDoc")
+                        .build())
                     .build())
                 .build()))
             .build();
@@ -125,7 +147,6 @@ public class StoreAppellantStatementServiceTest {
 
     @Test
     public void givenCaseDataWithSomeOtherStatement_shouldCallTheStorePdfWithTheCorrectPdfName() {
-
         when(pdfService.createPdf(any(), eq("templatePath"))).thenReturn(new byte[0]);
 
         when(ccdPdfService.mergeDocIntoCcd(eq(APPELLANT_STATEMENT_2_SC_0022222_PDF), any(),
@@ -145,10 +166,19 @@ public class StoreAppellantStatementServiceTest {
             eq(1L), any(SscsCaseData.class), any(IdamTokens.class), eq(OTHER_EVIDENCE));
 
         assertThat(acForPdfName.getValue(), is(APPELLANT_STATEMENT_2_SC_0022222_PDF));
+        verifyZeroInteractions(evidenceManagementService);
+    }
+
+
+
+    private void mockPdfHasNotAlreadyBeenCreatedElsePath() throws Exception {
+        doReturn(false).when(storeAppellantStatementService,
+            "pdfHasNotAlreadyBeenCreated", any(SscsCaseDetails.class), anyString());
     }
 
     private SscsCaseDetails buildSscsCaseDetailsTestData() {
-        SscsCaseData caseData = caseWithDocument(APPELLANT_STATEMENT_1_SC_0011111_PDF);
+        SscsCaseData caseData = caseWithScannedDocumentAndSscsDocument(APPELLANT_STATEMENT_1_SC_0011111_PDF,
+            APPELLANT_STATEMENT_2_SC_0022222_PDF);
         caseData.setAppeal(Appeal.builder()
             .appellant(Appellant.builder()
                 .name(Name.builder()

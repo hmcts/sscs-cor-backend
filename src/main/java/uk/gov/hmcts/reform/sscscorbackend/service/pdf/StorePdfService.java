@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.encoder.org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -55,7 +56,8 @@ public abstract class StorePdfService<E, D extends PdfData> {
         }
     }
 
-    private CohEventActionContext storePdf(Long caseId, String onlineHearingId, IdamTokens idamTokens, D data, String documentNamePrefix) {
+    private CohEventActionContext storePdf(Long caseId, String onlineHearingId, IdamTokens idamTokens, D data,
+                                           String documentNamePrefix) {
         SscsCaseDetails caseDetails = data.getCaseDetails();
         PdfAppealDetails pdfAppealDetails = getPdfAppealDetails(caseId, caseDetails);
         log.info("Storing pdf for [" + caseId + "]");
@@ -67,7 +69,8 @@ public abstract class StorePdfService<E, D extends PdfData> {
         SscsCaseData sscsCaseData = ccdPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens,
             "Other evidence");
 
-        return new CohEventActionContext(pdf(pdfBytes, pdfName), data.getCaseDetails().toBuilder().data(sscsCaseData).build());
+        return new CohEventActionContext(pdf(pdfBytes, pdfName), data.getCaseDetails().toBuilder()
+            .data(sscsCaseData).build());
     }
 
     private String getPdfName(String documentNamePrefix, String caseReference) {
@@ -75,38 +78,64 @@ public abstract class StorePdfService<E, D extends PdfData> {
     }
 
     private UploadedEvidence loadPdf(SscsCaseDetails caseDetails, String documentNamePrefix) {
-        if (this.getClass().getSimpleName().equals("StoreAppellantStatementService")) {
-            //todo: add similar logic for the ScannedDocument
+        String documentUrl;
+        if (this.getClass().getSimpleName().contains(StoreAppellantStatementService.class.getSimpleName())) {
+            ScannedDocument document = getScannedDocument(caseDetails, documentNamePrefix);
+            documentUrl = document.getValue().getUrl().getDocumentUrl();
+        } else {
+            SscsDocument document = getSscsDocument(caseDetails, documentNamePrefix);
+            documentUrl = document.getValue().getDocumentLink().getDocumentUrl();
         }
-        SscsDocument document = caseDetails.getData().getSscsDocument().stream()
-                .filter(sscsDocument -> sscsDocument.getValue().getDocumentFileName() != null)
-                .filter(documentNameMatches(documentNamePrefix))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Found PDF with name prefix [" + documentNamePrefix + "] but cannot load it"));
-        String documentUrl = document.getValue().getDocumentLink().getDocumentUrl();
         try {
-            return pdf(evidenceManagementService.download(new URI(documentUrl), "sscs"), getPdfName(documentNamePrefix, caseDetails.getData().getCaseReference()));
+            return pdf(evidenceManagementService.download(new URI(documentUrl), "sscs"),
+                getPdfName(documentNamePrefix, caseDetails.getData().getCaseReference()));
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Document uri invalid [" + documentUrl + "]");
         }
     }
 
-    protected boolean pdfHasNotAlreadyBeenCreated(SscsCaseDetails caseDetails, String documentNamePrefix) {
-        if (StoreAppellantStatementService.class.equals(this.getClass())) {
-            return checkScannedDocsIfAppellantStatement(caseDetails, documentNamePrefix);
-        }
-        List<SscsDocument> sscsDocuments = caseDetails.getData().getSscsDocument();
-        return sscsDocuments == null || sscsDocuments.stream()
-                .filter(sscsDocument -> sscsDocument.getValue().getDocumentFileName() != null)
-                .noneMatch(documentNameMatches(documentNamePrefix));
+    private SscsDocument getSscsDocument(SscsCaseDetails caseDetails, String documentNamePrefix) {
+        return caseDetails.getData().getSscsDocument().stream()
+            .filter(sscsDocument -> sscsDocument.getValue().getDocumentFileName() != null)
+            .filter(documentNameMatches(documentNamePrefix))
+            .findFirst()
+            .orElseThrow(() -> getIllegalStateException(documentNamePrefix));
     }
 
-    private boolean checkScannedDocsIfAppellantStatement(SscsCaseDetails caseDetails, String documentNamePrefix) {
-        List<ScannedDocument> scannedDocuments = caseDetails.getData().getScannedDocuments();
+    private ScannedDocument getScannedDocument(SscsCaseDetails caseDetails, String documentNamePrefix) {
+        return caseDetails.getData().getScannedDocuments().stream()
+            .filter(scannedDocument -> scannedDocument.getValue() != null)
+            .filter(scannedDocument -> StringUtils.isNotBlank(scannedDocument.getValue().getFileName()))
+            .filter(scannedDocument -> scannedDocument.getValue().getFileName().startsWith(documentNamePrefix))
+            .findFirst()
+            .orElseThrow(() -> getIllegalStateException(documentNamePrefix));
+    }
+
+    @NotNull
+    private IllegalStateException getIllegalStateException(String documentNamePrefix) {
+        return new IllegalStateException("Found PDF with name prefix [" + documentNamePrefix + "] "
+            + "but cannot load it");
+    }
+
+    protected boolean pdfHasNotAlreadyBeenCreated(SscsCaseDetails caseDetails, String documentNamePrefix) {
+        if (this.getClass().getSimpleName().contains(StoreAppellantStatementService.class.getSimpleName())) {
+            List<ScannedDocument> scannedDocuments = caseDetails.getData().getScannedDocuments();
+            return scannedDocumentNoPresent(documentNamePrefix, scannedDocuments);
+        }
+        return sscsDocumentNotPresent(documentNamePrefix, caseDetails.getData().getSscsDocument());
+    }
+
+    private boolean scannedDocumentNoPresent(String documentNamePrefix, List<ScannedDocument> scannedDocuments) {
         return scannedDocuments == null || scannedDocuments.stream()
             .filter(scannedDocument -> scannedDocument.getValue() != null)
             .filter(scannedDocument -> StringUtils.isNotBlank(scannedDocument.getValue().getFileName()))
             .noneMatch(scannedDocument -> scannedDocument.getValue().getFileName().startsWith(documentNamePrefix));
+    }
+
+    private boolean sscsDocumentNotPresent(String documentNamePrefix, List<SscsDocument> sscsDocuments) {
+        return sscsDocuments == null || sscsDocuments.stream()
+            .filter(sscsDocument -> sscsDocument.getValue().getDocumentFileName() != null)
+            .noneMatch(documentNameMatches(documentNamePrefix));
     }
 
     private Predicate<SscsDocument> documentNameMatches(String documentNamePrefix) {
@@ -123,7 +152,8 @@ public abstract class StorePdfService<E, D extends PdfData> {
         String caseReference = caseDetails.getData().getCaseReference();
         String dateCreated = reformatDate(now());
 
-        return new PdfAppealDetails(appellantTitle, appellantFirstName, appellantLastName, nino, caseReference, dateCreated);
+        return new PdfAppealDetails(appellantTitle, appellantFirstName, appellantLastName, nino, caseReference,
+            dateCreated);
     }
 
     protected abstract String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId);
