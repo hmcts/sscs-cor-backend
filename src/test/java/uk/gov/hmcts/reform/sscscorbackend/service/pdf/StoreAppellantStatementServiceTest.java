@@ -92,9 +92,9 @@ public class StoreAppellantStatementServiceTest {
     private Object[] generateDifferentCaseDataScenarios() {
         SscsCaseData sscsCaseDataWithNoDocs = SscsCaseData.builder().build();
         SscsCaseData sscsCaseDataWithSomeOtherDoc = caseWithScannedDocumentAndSscsDocument(
-            "Some other document.txt", APPELLANT_STATEMENT_2_SC_0022222_PDF);
+            "Some other document.txt");
         SscsCaseData sscsCaseDataWithSomeOtherStatement = caseWithScannedDocumentAndSscsDocument(
-            APPELLANT_STATEMENT_1_SC_0011111_PDF, APPELLANT_STATEMENT_2_SC_0022222_PDF);
+            APPELLANT_STATEMENT_1_SC_0011111_PDF);
         SscsCaseData sscsCaseDataWithDocWithNullValue = SscsCaseData.builder()
             .scannedDocuments(singletonList(ScannedDocument.builder()
                 .value(null)
@@ -124,7 +124,7 @@ public class StoreAppellantStatementServiceTest {
         };
     }
 
-    private SscsCaseData caseWithScannedDocumentAndSscsDocument(String scannedDocFilename, String sscsDocFilename) {
+    private SscsCaseData caseWithScannedDocumentAndSscsDocument(String scannedDocFilename) {
         return SscsCaseData.builder()
             .scannedDocuments(singletonList(ScannedDocument.builder()
                 .value(ScannedDocumentDetails.builder()
@@ -136,7 +136,7 @@ public class StoreAppellantStatementServiceTest {
                 .build()))
             .sscsDocument(singletonList(SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
-                    .documentFileName(sscsDocFilename)
+                    .documentFileName(StoreAppellantStatementServiceTest.APPELLANT_STATEMENT_2_SC_0022222_PDF)
                     .documentLink(DocumentLink.builder()
                         .documentUrl("http://dm-store/sscsDoc")
                         .build())
@@ -194,8 +194,8 @@ public class StoreAppellantStatementServiceTest {
     }
 
     private SscsCaseDetails buildSscsCaseDetailsTestData() {
-        SscsCaseData caseData = caseWithScannedDocumentAndSscsDocument(APPELLANT_STATEMENT_1_SC_0011111_PDF,
-            APPELLANT_STATEMENT_2_SC_0022222_PDF);
+        SscsCaseData caseData = caseWithScannedDocumentAndSscsDocument(APPELLANT_STATEMENT_1_SC_0011111_PDF
+        );
         caseData.setAppeal(Appeal.builder()
             .appellant(Appellant.builder()
                 .name(Name.builder()

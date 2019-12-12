@@ -184,7 +184,8 @@ def versions = [
   springBoot: springBoot.class.package.implementationVersion,
   springfoxSwagger: '2.9.2',
   junit: '4.12',
-  restAssured: '3.3.0'
+  restAssured: '3.3.0',
+  powerMock: '1.7.3'
 ]
 
 dependencies {
@@ -233,8 +234,9 @@ dependencies {
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
   testCompile group: 'junit', name: 'junit', version: versions.junit
   testCompile 'pl.pragmatists:JUnitParams:1.1.1'
-  testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.4'
-  testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.4'
+  testCompile group: 'org.powermock', name:'powermock-api-mockito2', version:versions.powerMock
+  testCompile group: 'org.powermock', name: 'powermock-api-mockito-common', version:versions.powerMock
+  testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: versions.powerMock
 
 
 
