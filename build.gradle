@@ -283,6 +283,8 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscscorbackend/service/EvidenceUploadService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscscorbackend/service/OnlineHearingService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscscorbackend/service/pdf/data/EvidenceDescriptionPdfData.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscscorbackend/service/pdf/StoreAppellantStatementService.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscscorbackend/service/pdf/StorePdfService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscscorbackend/domain/pdf/PdfEvidenceDescription.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscscorbackend/service/coversheet/PdfCoverSheet.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscscorbackend/controllers/CreateCaseController.java," +
