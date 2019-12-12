@@ -44,10 +44,12 @@ public abstract class StorePdfService<E, D extends PdfData> {
     public CohEventActionContext storePdf(Long caseId, String onlineHearingId, D data) {
         SscsCaseDetails caseDetails = data.getCaseDetails();
         String documentNamePrefix = documentNamePrefix(caseDetails, onlineHearingId);
+        //todo: can we remove this if condition? We just generated a filename that does not exist
         if (pdfHasNotAlreadyBeenCreated(caseDetails, documentNamePrefix)) {
             log.info("Creating pdf for [" + caseId + "]");
             return storePdf(caseId, onlineHearingId, idamService.getIdamTokens(), data, documentNamePrefix);
         } else {
+            //todo: can we remove this else statement? We do nothing with this return object
             log.info("Loading pdf for [" + caseId + "]");
             return new CohEventActionContext(loadPdf(caseDetails, documentNamePrefix), caseDetails);
         }
@@ -62,7 +64,8 @@ public abstract class StorePdfService<E, D extends PdfData> {
         SscsCaseData caseData = caseDetails.getData();
         String pdfName = getPdfName(documentNamePrefix, caseData.getCaseReference());
         log.info("Adding pdf to ccd for [" + caseId + "]");
-        SscsCaseData sscsCaseData = ccdPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens, "Other evidence");
+        SscsCaseData sscsCaseData = ccdPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens,
+            "Other evidence");
 
         return new CohEventActionContext(pdf(pdfBytes, pdfName), data.getCaseDetails().toBuilder().data(sscsCaseData).build());
     }
