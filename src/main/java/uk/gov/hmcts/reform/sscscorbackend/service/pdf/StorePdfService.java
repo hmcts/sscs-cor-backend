@@ -9,6 +9,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
+import net.logstash.logback.encoder.org.apache.commons.lang.StringUtils;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -44,12 +46,10 @@ public abstract class StorePdfService<E, D extends PdfData> {
     public CohEventActionContext storePdf(Long caseId, String onlineHearingId, D data) {
         SscsCaseDetails caseDetails = data.getCaseDetails();
         String documentNamePrefix = documentNamePrefix(caseDetails, onlineHearingId);
-        //todo: can we remove this if condition? We just generated a filename that does not exist
         if (pdfHasNotAlreadyBeenCreated(caseDetails, documentNamePrefix)) {
             log.info("Creating pdf for [" + caseId + "]");
             return storePdf(caseId, onlineHearingId, idamService.getIdamTokens(), data, documentNamePrefix);
         } else {
-            //todo: can we remove this else statement? We do nothing with this return object
             log.info("Loading pdf for [" + caseId + "]");
             return new CohEventActionContext(loadPdf(caseDetails, documentNamePrefix), caseDetails);
         }
@@ -75,6 +75,9 @@ public abstract class StorePdfService<E, D extends PdfData> {
     }
 
     private UploadedEvidence loadPdf(SscsCaseDetails caseDetails, String documentNamePrefix) {
+        if (this.getClass().getSimpleName().equals("StoreAppellantStatementService")) {
+            //todo: add similar logic for the ScannedDocument
+        }
         SscsDocument document = caseDetails.getData().getSscsDocument().stream()
                 .filter(sscsDocument -> sscsDocument.getValue().getDocumentFileName() != null)
                 .filter(documentNameMatches(documentNamePrefix))
@@ -89,10 +92,21 @@ public abstract class StorePdfService<E, D extends PdfData> {
     }
 
     protected boolean pdfHasNotAlreadyBeenCreated(SscsCaseDetails caseDetails, String documentNamePrefix) {
+        if (StoreAppellantStatementService.class.equals(this.getClass())) {
+            return checkScannedDocsIfAppellantStatement(caseDetails, documentNamePrefix);
+        }
         List<SscsDocument> sscsDocuments = caseDetails.getData().getSscsDocument();
         return sscsDocuments == null || sscsDocuments.stream()
                 .filter(sscsDocument -> sscsDocument.getValue().getDocumentFileName() != null)
                 .noneMatch(documentNameMatches(documentNamePrefix));
+    }
+
+    private boolean checkScannedDocsIfAppellantStatement(SscsCaseDetails caseDetails, String documentNamePrefix) {
+        List<ScannedDocument> scannedDocuments = caseDetails.getData().getScannedDocuments();
+        return scannedDocuments == null || scannedDocuments.stream()
+            .filter(scannedDocument -> scannedDocument.getValue() != null)
+            .filter(scannedDocument -> StringUtils.isNotBlank(scannedDocument.getValue().getFileName()))
+            .noneMatch(scannedDocument -> scannedDocument.getValue().getFileName().startsWith(documentNamePrefix));
     }
 
     private Predicate<SscsDocument> documentNameMatches(String documentNamePrefix) {

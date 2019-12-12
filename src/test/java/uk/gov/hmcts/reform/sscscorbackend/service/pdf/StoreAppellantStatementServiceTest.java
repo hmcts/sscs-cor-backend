@@ -21,6 +21,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
@@ -37,7 +41,10 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.Statement;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.AppellantStatementPdfData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
-@RunWith(JUnitParamsRunner.class)
+@RunWith(PowerMockRunner.class)
+@PowerMockRunnerDelegate(JUnitParamsRunner.class)
+@PrepareForTest(value = {StorePdfService.class})
+@PowerMockIgnore({ "javax.net.ssl.*", "javax.security.*" })
 public class StoreAppellantStatementServiceTest {
 
     private static final String APPELLANT_STATEMENT_1 = "Appellant statement 1 - ";
@@ -139,9 +146,6 @@ public class StoreAppellantStatementServiceTest {
 
         assertThat(acForPdfName.getValue(), is(APPELLANT_STATEMENT_2_SC_0022222_PDF));
     }
-
-    //todo: Do we need a scenario for when there is a appellant statement with the same name already in the
-    // SscsDocument tab.
 
     private SscsCaseDetails buildSscsCaseDetailsTestData() {
         SscsCaseData caseData = caseWithDocument(APPELLANT_STATEMENT_1_SC_0011111_PDF);

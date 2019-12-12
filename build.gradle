@@ -233,6 +233,10 @@ dependencies {
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
   testCompile group: 'junit', name: 'junit', version: versions.junit
   testCompile 'pl.pragmatists:JUnitParams:1.1.1'
+  testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.4'
+  testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.4'
+
+
 
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath
