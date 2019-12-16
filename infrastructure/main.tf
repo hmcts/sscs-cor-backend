@@ -38,6 +38,12 @@ data "azurerm_key_vault_secret" "docmosis-api-key" {
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
+
+data "azurerm_key_vault_secret" "appinsights_instrumentation_key" {
+  name      = "AppInsightsInstrumentationKey"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
+}
+
 data "azurerm_key_vault_secret" "pdf_service_base_url" {
   name      = "docmosis-endpoint"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
@@ -85,7 +91,8 @@ module "sscs-core-backend" {
     IDAM_OAUTH2_REDIRECT_URL        = "${var.idam_redirect_url}"
     IDAM_URL                        = "${local.idam_url}"
     IDAM_SSCS_URL                   = "${var.idam_sscs_url}"
-
+    APPINSIGHTS_INSTRUMENTATIONKEY = "${data.azurerm_key_vault_secret.appinsights_instrumentation_key.value}"
+    
     COH_URL = "${local.cohUrl}"
     CORE_CASE_DATA_URL = "${local.ccdApi}"
 
