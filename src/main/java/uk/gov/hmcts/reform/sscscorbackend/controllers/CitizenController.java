@@ -60,6 +60,11 @@ public class CitizenController {
     public ResponseEntity<List<OnlineHearing>> getOnlineHearingsForTyaNumber(
             @ApiParam(value = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW") @RequestHeader(AUTHORIZATION) String authorisation,
             @ApiParam(value = "tya number for an user and appeal", example = "A123-B123-c123-Dgdg") @PathVariable("tya") String tya) {
+
+        if (!idamService.verifyTokenSignature(authorisation)) {
+            log.error("Invalid Token {}", authorisation);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
         List<OnlineHearing> casesForCitizen = citizenLoginService.findCasesForCitizen(getUserTokens(authorisation), tya);
 
         return ResponseEntity.ok(casesForCitizen);
@@ -88,6 +93,11 @@ public class CitizenController {
             @ApiParam(value = "tya number for an user and appeal", example = "A123-B123-c123-Dgdg") @PathVariable("tya") String tya,
             @ApiParam(value = "email address of the appellant", example = "foo@bar.com") @RequestBody() AssociateCaseDetails associateCaseDetails
     ) {
+        if (!idamService.verifyTokenSignature(authorisation)) {
+            log.error("Invalid Token {}", authorisation);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
         Optional<OnlineHearing> onlineHearing = citizenLoginService.associateCaseToCitizen(
                 getUserTokens(authorisation),
                 tya,
