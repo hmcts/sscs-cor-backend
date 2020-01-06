@@ -28,7 +28,9 @@ java:
     ENABLE_SELECT_BY_CASE_ID: true
     EMAIL_SERVER_HOST: mta.reform.hmcts.net
     EMAIL_SERVER_PORT: 25
-    DWP_EMAIL: var.dwp_email
+    CASEWORKER_EMAIL: joelle.richards@hmcts.net
+    DWP_EMAIL: joelle.richards@hmcts.net
+    EMAIL_FROM: joelle.richards@hmcts.net
     JUI_BASE_URL: https://jui-webapp-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     CORE_CASE_DATA_URL: http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     COH_URL: http://coh-cor-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
