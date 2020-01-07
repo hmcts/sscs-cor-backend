@@ -88,7 +88,7 @@ public abstract class StorePdfService<E, D extends PdfData> {
         }
         try {
             return pdf(evidenceManagementService.download(new URI(documentUrl), "sscs"),
-                getPdfName(documentNamePrefix, caseDetails.getData().getCaseReference()));
+                getPdfName(documentNamePrefix, caseDetails.getData().getCcdCaseId()));
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Document uri invalid [" + documentUrl + "]");
         }

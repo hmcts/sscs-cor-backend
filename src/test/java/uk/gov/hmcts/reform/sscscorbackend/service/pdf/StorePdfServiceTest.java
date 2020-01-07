@@ -25,7 +25,7 @@ public class StorePdfServiceTest {
     private static final String FIRST_NAME = "firstName";
     private static final String LAST_NAME = "lastName";
     private static final String NINO = "nino";
-    private static final String CASE_REF = "caseRef";
+    private static final String CASE_ID = "caseId";
 
     private PdfService pdfService;
     private CcdPdfService sscsPdfService;
@@ -69,14 +69,14 @@ public class StorePdfServiceTest {
         byte[] expectedPdfBytes = {2, 4, 6, 0, 1};
         when(pdfService.createPdf(pdfContent, "sometemplate")).thenReturn(expectedPdfBytes);
         String expectedCaseId = "expectedCcdCaseId";
-        when(sscsPdfService.mergeDocIntoCcd(fileNamePrefix + CASE_REF + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), idamTokens, "Other evidence"))
+        when(sscsPdfService.mergeDocIntoCcd(fileNamePrefix + CASE_ID + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), idamTokens, "Other evidence"))
                 .thenReturn(SscsCaseData.builder().ccdCaseId(expectedCaseId).build());
 
         CohEventActionContext cohEventActionContext = storePdfService.storePdf(caseId, someOnlineHearingId, new PdfData(caseDetails));
 
-        verify(sscsPdfService).mergeDocIntoCcd(fileNamePrefix + CASE_REF + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), idamTokens, "Other evidence");
+        verify(sscsPdfService).mergeDocIntoCcd(fileNamePrefix + CASE_ID + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), idamTokens, "Other evidence");
         assertThat(cohEventActionContext.getPdf().getContent(), is(new ByteArrayResource(expectedPdfBytes)));
-        assertThat(cohEventActionContext.getPdf().getName(), is(fileNamePrefix + CASE_REF + ".pdf"));
+        assertThat(cohEventActionContext.getPdf().getName(), is(fileNamePrefix + CASE_ID + ".pdf"));
         assertThat(cohEventActionContext.getDocument().getData().getCcdCaseId(), is(expectedCaseId));
     }
 
@@ -84,11 +84,11 @@ public class StorePdfServiceTest {
     public void doNotStorePdfIfCaseAlreadyHasATribunalsView() throws URISyntaxException {
         String documentUrl = "http://example.com/someDocument";
         SscsCaseData sscsCaseData = SscsCaseData.builder()
-                .caseReference(CASE_REF)
+                .ccdCaseId(CASE_ID)
                 .generatedNino("someNino")
                 .sscsDocument(singletonList(SscsDocument.builder()
                         .value(SscsDocumentDetails.builder()
-                                .documentFileName(fileNamePrefix + CASE_REF + ".pdf")
+                                .documentFileName(fileNamePrefix + CASE_ID + ".pdf")
                                 .documentLink(DocumentLink.builder().documentUrl(documentUrl).build())
                                 .build())
                         .build()))
@@ -106,13 +106,14 @@ public class StorePdfServiceTest {
 
         verifyZeroInteractions(sscsPdfService);
         assertThat(cohEventActionContext.getPdf().getContent(), is(new ByteArrayResource(expectedPdfBytes)));
-        assertThat(cohEventActionContext.getPdf().getName(), is(fileNamePrefix + CASE_REF + ".pdf"));
+        assertThat(cohEventActionContext.getPdf().getName(), is(fileNamePrefix + CASE_ID + ".pdf"));
         assertThat(cohEventActionContext.getDocument(), is(sscsCaseDetails));
     }
 
     private SscsCaseDetails createCaseDetails() {
         return SscsCaseDetails.builder()
                 .data(SscsCaseData.builder()
+                        .ccdCaseId(CASE_ID)
                         .appeal(Appeal.builder()
                                 .appellant(Appellant.builder()
                                         .name(Name.builder()
@@ -125,7 +126,6 @@ public class StorePdfServiceTest {
                                                 .build())
                                         .build())
                                 .build())
-                        .caseReference(CASE_REF)
                         .build())
                 .build();
     }
