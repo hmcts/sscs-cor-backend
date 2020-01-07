@@ -12,6 +12,7 @@ java:
         - idam-sscs-systemupdate-password
         - docmosis-api-key
         - sscs-s2s-secret
+        - AppInsightsInstrumentationKey
   environment:
     SERVER_PORT: 8080
     REFORM_TEAM: sscs
