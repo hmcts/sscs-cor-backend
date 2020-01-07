@@ -46,6 +46,9 @@ withPipeline(type, product, component) {
     enableDockerBuild()
     enableSlackNotifications('#sscs-tech')
     installCharts()
-    enableAksStagingDeployment()
-    disableLegacyDeploymentOnAAT()
+    
+    if ("demo"  != "${env.BRANCH_NAME}") {
+        enableAksStagingDeployment()
+        disableLegacyDeployment()
+    }
 }
