@@ -2,7 +2,3 @@ java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   aadIdentityName:
-  environment:
-    CASEWORKER_EMAIL: adwoa.kwarteng@hmcts.net
-    DWP_EMAIL: adwoa.kwarteng@hmcts.net
-    EMAIL_FROM: adwoa.kwarteng@hmcts.net
