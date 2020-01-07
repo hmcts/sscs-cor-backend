@@ -219,6 +219,8 @@ dependencies {
   compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: '2.4.1'
   compile group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.4.1'
 
+  compile group: 'org.jetbrains', name: 'annotations', version: '15.0'
+
   // Removed for now as we have an issue with some of its dependencies
   // compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix-dashboard', version: versions.springHystrix
 
