@@ -142,14 +142,13 @@ public class EvidenceUploadService {
                     SscsCaseData sscsCaseData = caseDetails.getData();
                     Long ccdCaseId = caseDetails.getId();
 
+                    CohEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(
+                        ccdCaseId, identifier, new EvidenceDescriptionPdfData(caseDetails, description,
+                            getFileNames(sscsCaseData)));
+
                     if (sscsCaseData.getAppeal() == null || sscsCaseData.getAppeal().getHearingType() == null
                         || sscsCaseData.getAppeal().getHearingType().equals("cor")) {
                         log.info("Submitting draft document for case [" + ccdCaseId + "]");
-
-                        EvidenceDescriptionPdfData data = new EvidenceDescriptionPdfData(caseDetails, description,
-                            getFileNames(sscsCaseData));
-                        CohEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(
-                            ccdCaseId, identifier, data);
 
                         List<SscsDocument> draftSscsDocument = storePdfContext.getDocument().getData()
                             .getDraftSscsDocument();
@@ -159,25 +158,30 @@ public class EvidenceUploadService {
                         );
 
                         sscsCaseData.setSscsDocument(newSscsDocumentsList);
-                        sscsCaseData.setDraftSscsDocument(Collections.emptyList());
+                        sscsCaseData.setDraftSscsDocument(emptyList());
 
                         ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT.getCcdType(),
                             "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
 
                         evidenceUploadEmailService.sendToDwp(storePdfContext.getPdf(), draftSscsDocument, caseDetails);
 
-                    return true;
-                } else {
-                    CohEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(
-                        ccdCaseId, identifier, new EvidenceDescriptionPdfData(
-                            caseDetails, description, getFileNames(sscsCaseData)));
+                    } else {
+                        SscsCaseData caseData = storePdfContext.getDocument().getData();
+                        int lastDocIndex = caseData.getSscsDocument().size() - 1;
+                        SscsDocument newEvidenceDescAsSscsDoc = caseData.getSscsDocument().get(lastDocIndex);
 
-                    List<ScannedDocument> scannedDocs = new ArrayList<>();
-                    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                    for (SscsDocument draftSscsDocument : caseDetails.getData().getDraftSscsDocument()) {
-                        LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(),
-                            dateFormatter);
-                        LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
+                        //remove it from sscsDocs
+                        caseData.getSscsDocument().remove(lastDocIndex);
+
+                        //added to drafts
+                        caseData.getDraftSscsDocument().add(newEvidenceDescAsSscsDoc);
+
+                        List<ScannedDocument> scannedDocs = new ArrayList<>();
+                        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                        for (SscsDocument draftSscsDocument : caseData.getDraftSscsDocument()) {
+                            LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(),
+                                dateFormatter);
+                            LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
 
                         ScannedDocument scannedDocument = ScannedDocument.builder().value(
                             ScannedDocumentDetails.builder()
@@ -202,9 +206,9 @@ public class EvidenceUploadService {
 
                     ccdService.updateCase(sscsCaseData, ccdCaseId, ATTACH_SCANNED_DOCS.getCcdType(), "SSCS - upload evidence from MYA", "Uploaded a further evidence document", idamService.getIdamTokens());
 
+                    }
                     return true;
-                }
-            })
+                })
             .orElse(false);
     }
 
