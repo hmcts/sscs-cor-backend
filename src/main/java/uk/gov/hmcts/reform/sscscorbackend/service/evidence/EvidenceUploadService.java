@@ -138,31 +138,33 @@ public class EvidenceUploadService {
 
     public boolean submitHearingEvidence(String identifier, EvidenceDescription description) {
         return onlineHearingService.getCcdCaseByIdentifier(identifier)
-            .map(caseDetails -> {
-                SscsCaseData sscsCaseData = caseDetails.getData();
-                Long ccdCaseId = caseDetails.getId();
+                .map(caseDetails -> {
+                    SscsCaseData sscsCaseData = caseDetails.getData();
+                    Long ccdCaseId = caseDetails.getId();
 
-                if (sscsCaseData.getAppeal() == null || sscsCaseData.getAppeal().getHearingType() == null
-                    || sscsCaseData.getAppeal().getHearingType().equals("cor")) {
-                    log.info("Submitting draft document for case [" + ccdCaseId + "]");
+                    if (sscsCaseData.getAppeal() == null || sscsCaseData.getAppeal().getHearingType() == null
+                        || sscsCaseData.getAppeal().getHearingType().equals("cor")) {
+                        log.info("Submitting draft document for case [" + ccdCaseId + "]");
 
-                    CohEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(
-                        ccdCaseId, identifier, new EvidenceDescriptionPdfData(
-                            caseDetails, description, getFileNames(sscsCaseData)));
+                        EvidenceDescriptionPdfData data = new EvidenceDescriptionPdfData(caseDetails, description,
+                            getFileNames(sscsCaseData));
+                        CohEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(
+                            ccdCaseId, identifier, data);
 
-                    List<SscsDocument> draftSscsDocument = storePdfContext.getDocument().getData().getDraftSscsDocument();
-                    List<SscsDocument> newSscsDocumentsList = union(
-                        emptyIfNull(storePdfContext.getDocument().getData().getSscsDocument()),
-                        emptyIfNull(draftSscsDocument)
-                    );
+                        List<SscsDocument> draftSscsDocument = storePdfContext.getDocument().getData()
+                            .getDraftSscsDocument();
+                        List<SscsDocument> newSscsDocumentsList = union(
+                                emptyIfNull(storePdfContext.getDocument().getData().getSscsDocument()),
+                                emptyIfNull(draftSscsDocument)
+                        );
 
-                    sscsCaseData.setSscsDocument(newSscsDocumentsList);
-                    sscsCaseData.setDraftSscsDocument(Collections.emptyList());
+                        sscsCaseData.setSscsDocument(newSscsDocumentsList);
+                        sscsCaseData.setDraftSscsDocument(Collections.emptyList());
 
-                    ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT.getCcdType(),
-                        "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
+                        ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT.getCcdType(),
+                            "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
 
-                    evidenceUploadEmailService.sendToDwp(storePdfContext.getPdf(), draftSscsDocument, caseDetails);
+                        evidenceUploadEmailService.sendToDwp(storePdfContext.getPdf(), draftSscsDocument, caseDetails);
 
                     return true;
                 } else {
