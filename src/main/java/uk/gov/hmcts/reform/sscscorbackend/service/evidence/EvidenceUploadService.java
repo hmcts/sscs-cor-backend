@@ -1,16 +1,28 @@
 package uk.gov.hmcts.reform.sscscorbackend.service.evidence;
 
-import static java.util.Collections.*;
-import static java.util.stream.Collectors.*;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.partitioningBy;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ATTACH_SCANNED_DOCS;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_COR_DOCUMENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DRAFT_DOCUMENT;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +30,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CorDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CorDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
@@ -117,65 +138,72 @@ public class EvidenceUploadService {
 
     public boolean submitHearingEvidence(String identifier, EvidenceDescription description) {
         return onlineHearingService.getCcdCaseByIdentifier(identifier)
-                .map(caseDetails -> {
-                    SscsCaseData sscsCaseData = caseDetails.getData();
-                    Long ccdCaseId = caseDetails.getId();
+            .map(caseDetails -> {
+                SscsCaseData sscsCaseData = caseDetails.getData();
+                Long ccdCaseId = caseDetails.getId();
 
-                    if (sscsCaseData.getAppeal() == null || sscsCaseData.getAppeal().getHearingType() == null || sscsCaseData.getAppeal().getHearingType().equals("cor")) {
-                        log.info("Submitting draft document for case [" + ccdCaseId + "]");
+                if (sscsCaseData.getAppeal() == null || sscsCaseData.getAppeal().getHearingType() == null
+                    || sscsCaseData.getAppeal().getHearingType().equals("cor")) {
+                    log.info("Submitting draft document for case [" + ccdCaseId + "]");
 
-                        EvidenceDescriptionPdfData data = new EvidenceDescriptionPdfData(caseDetails, description, getFileNames(sscsCaseData));
-                        CohEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(ccdCaseId, identifier, data);
+                    CohEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(
+                        ccdCaseId, identifier, new EvidenceDescriptionPdfData(
+                            caseDetails, description, getFileNames(sscsCaseData)));
 
-                        List<SscsDocument> draftSscsDocument = storePdfContext.getDocument().getData().getDraftSscsDocument();
-                        List<SscsDocument> newSscsDocumentsList = union(
-                                emptyIfNull(storePdfContext.getDocument().getData().getSscsDocument()),
-                                emptyIfNull(draftSscsDocument)
-                        );
+                    List<SscsDocument> draftSscsDocument = storePdfContext.getDocument().getData().getDraftSscsDocument();
+                    List<SscsDocument> newSscsDocumentsList = union(
+                        emptyIfNull(storePdfContext.getDocument().getData().getSscsDocument()),
+                        emptyIfNull(draftSscsDocument)
+                    );
 
-                        sscsCaseData.setSscsDocument(newSscsDocumentsList);
-                        sscsCaseData.setDraftSscsDocument(Collections.emptyList());
+                    sscsCaseData.setSscsDocument(newSscsDocumentsList);
+                    sscsCaseData.setDraftSscsDocument(Collections.emptyList());
 
-                        ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT.getCcdType(), "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
+                    ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT.getCcdType(),
+                        "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
 
-                        evidenceUploadEmailService.sendToDwp(storePdfContext.getPdf(), draftSscsDocument, caseDetails);
+                    evidenceUploadEmailService.sendToDwp(storePdfContext.getPdf(), draftSscsDocument, caseDetails);
 
-                        return true;
-                    } else {
-                        List<ScannedDocument> scannedDocs = new ArrayList<>();
-                        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                        for (SscsDocument draftSscsDocument : caseDetails.getData().getDraftSscsDocument()) {
-                            LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(),
-                                dateFormatter);
-                            LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
+                    return true;
+                } else {
+                    CohEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(
+                        ccdCaseId, identifier, new EvidenceDescriptionPdfData(
+                            caseDetails, description, getFileNames(sscsCaseData)));
 
-                            ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                                    ScannedDocumentDetails.builder()
-                                        .type("other")
-                                        .url(draftSscsDocument.getValue().getDocumentLink())
-                                        .fileName(draftSscsDocument.getValue().getDocumentFileName())
-                                            .scannedDate(ldt.toString())
-                                        .build()).build();
+                    List<ScannedDocument> scannedDocs = new ArrayList<>();
+                    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                    for (SscsDocument draftSscsDocument : caseDetails.getData().getDraftSscsDocument()) {
+                        LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(),
+                            dateFormatter);
+                        LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
 
-                            scannedDocs.add(scannedDocument);
-                        }
+                        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                            ScannedDocumentDetails.builder()
+                                .type("other")
+                                .url(draftSscsDocument.getValue().getDocumentLink())
+                                .fileName(draftSscsDocument.getValue().getDocumentFileName())
+                                .scannedDate(ldt.toString())
+                                .build()).build();
 
-                        List<ScannedDocument> newScannedDocumentsList = union(
-                                emptyIfNull(caseDetails.getData().getScannedDocuments()),
-                                emptyIfNull(scannedDocs)
-                        );
-
-                        sscsCaseData.setScannedDocuments(newScannedDocumentsList);
-                        sscsCaseData.setDraftSscsDocument(Collections.emptyList());
-
-                        sscsCaseData.setEvidenceHandled("No");
-
-                        ccdService.updateCase(sscsCaseData, ccdCaseId, ATTACH_SCANNED_DOCS.getCcdType(), "SSCS - upload evidence from MYA", "Uploaded a further evidence document", idamService.getIdamTokens());
-
-                        return true;
+                        scannedDocs.add(scannedDocument);
                     }
-                })
-                .orElse(false);
+
+                    List<ScannedDocument> newScannedDocumentsList = union(
+                        emptyIfNull(caseDetails.getData().getScannedDocuments()),
+                        emptyIfNull(scannedDocs)
+                    );
+
+                    sscsCaseData.setScannedDocuments(newScannedDocumentsList);
+                    sscsCaseData.setDraftSscsDocument(Collections.emptyList());
+
+                    sscsCaseData.setEvidenceHandled("No");
+
+                    ccdService.updateCase(sscsCaseData, ccdCaseId, ATTACH_SCANNED_DOCS.getCcdType(), "SSCS - upload evidence from MYA", "Uploaded a further evidence document", idamService.getIdamTokens());
+
+                    return true;
+                }
+            })
+            .orElse(false);
     }
 
     public boolean submitQuestionEvidence(String onlineHearingId, Question question) {
