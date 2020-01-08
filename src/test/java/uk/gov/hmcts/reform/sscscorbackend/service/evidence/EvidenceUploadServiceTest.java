@@ -97,14 +97,14 @@ public class EvidenceUploadServiceTest {
         DocumentManagementService documentManagementService = mock(DocumentManagementService.class);
 
         evidenceUploadService = new EvidenceUploadService(
-            documentManagementService,
-            ccdService,
-            idamService,
-            onlineHearingService,
-            storeEvidenceDescriptionService,
-            evidenceUploadEmailService,
-            fileToPdfConversionService,
-            evidenceManagementService);
+                documentManagementService,
+                ccdService,
+                idamService,
+                onlineHearingService,
+                storeEvidenceDescriptionService,
+                evidenceUploadEmailService,
+                fileToPdfConversionService,
+                evidenceManagementService);
         fileName = "someFileName.txt";
         documentUrl = "http://example.com/document/" + someEvidenceId;
         file = mock(MultipartFile.class);
@@ -127,12 +127,12 @@ public class EvidenceUploadServiceTest {
         assertThat(evidence, is(new Evidence(documentUrl, fileName, convertCreatedOnDate(evidenceCreatedOn))));
 
         verify(ccdService).updateCase(
-            hasDraftSscsDocument(originalNumberOfSscsDocuments, documentUrl, fileName),
-            eq(someCcdCaseId),
-            eq("uploadDraftDocument"),
-            eq("SSCS - upload document from MYA"),
-            eq("Updated SSCS"),
-            eq(idamTokens)
+                hasDraftSscsDocument(originalNumberOfSscsDocuments, documentUrl, fileName),
+                eq(someCcdCaseId),
+                eq("uploadDraftDocument"),
+                eq("SSCS - upload document from MYA"),
+                eq("Updated SSCS"),
+                eq(idamTokens)
         );
     }
 
@@ -142,9 +142,9 @@ public class EvidenceUploadServiceTest {
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
         UploadedEvidence evidenceDescriptionPdf = mock(UploadedEvidence.class);
         when(storeEvidenceDescriptionService.storePdf(
-            someCcdCaseId,
-            someOnlineHearingId,
-            new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
+                someCcdCaseId,
+                someOnlineHearingId,
+                new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
         )).thenReturn(new CohEventActionContext(evidenceDescriptionPdf, sscsCaseDetails));
         List<SscsDocument> draftSscsDocument = sscsCaseDetails.getData().getDraftSscsDocument();
 
@@ -153,17 +153,17 @@ public class EvidenceUploadServiceTest {
         assertThat(submittedEvidence, is(true));
         verify(evidenceUploadEmailService).sendToDwp(evidenceDescriptionPdf, draftSscsDocument, sscsCaseDetails);
         verify(ccdService).updateCase(
-            and(hasSscsDocument(0, documentUrl, fileName), doesNotHaveDraftSscsDocuments()),
-            eq(someCcdCaseId),
-            eq("uploadCorDocument"),
-            eq("SSCS - cor evidence uploaded"),
-            eq("Updated SSCS"),
-            eq(idamTokens)
+                and(hasSscsDocument(0, documentUrl, fileName), doesNotHaveDraftSscsDocuments()),
+                eq(someCcdCaseId),
+                eq("uploadCorDocument"),
+                eq("SSCS - cor evidence uploaded"),
+                eq("Updated SSCS"),
+                eq(idamTokens)
         );
         verify(storeEvidenceDescriptionService).storePdf(
-            someCcdCaseId,
-            someOnlineHearingId,
-            new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
+                someCcdCaseId,
+                someOnlineHearingId,
+                new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
         );
     }
 
@@ -171,14 +171,14 @@ public class EvidenceUploadServiceTest {
     public void submitsEvidenceAddsDraftSscsDocumentsToSscsDocumentsInCcdWhenThereAreOtherSscsDocuments() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithOneDraftSscsDocAndDraftCorSscsDoc(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
         SscsDocument descriptionDocument = SscsDocument.builder()
-            .value(SscsDocumentDetails.builder()
-                .documentFileName("anotherFileName")
-                .documentLink(DocumentLink.builder()
-                    .documentUrl("http://anotherUrl")
-                    .build())
-                .documentDateAdded(convertCreatedOnDate(evidenceCreatedOn))
-                .build())
-            .build();
+                .value(SscsDocumentDetails.builder()
+                        .documentFileName("anotherFileName")
+                        .documentLink(DocumentLink.builder()
+                                .documentUrl("http://anotherUrl")
+                                .build())
+                        .documentDateAdded(convertCreatedOnDate(evidenceCreatedOn))
+                        .build())
+                .build();
         List<SscsDocument> list = singletonList(descriptionDocument);
         sscsCaseDetails.getData().setSscsDocument(list);
 
@@ -186,9 +186,9 @@ public class EvidenceUploadServiceTest {
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
         UploadedEvidence evidenceDescriptionPdf = mock(UploadedEvidence.class);
         when(storeEvidenceDescriptionService.storePdf(
-            someCcdCaseId,
-            someOnlineHearingId,
-            new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
+                someCcdCaseId,
+                someOnlineHearingId,
+                new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
         )).thenReturn(new CohEventActionContext(evidenceDescriptionPdf, sscsCaseDetails));
         List<SscsDocument> draftSscsDocument = sscsCaseDetails.getData().getDraftSscsDocument();
 
@@ -197,18 +197,18 @@ public class EvidenceUploadServiceTest {
         assertThat(submittedEvidence, is(true));
         verify(evidenceUploadEmailService).sendToDwp(evidenceDescriptionPdf, draftSscsDocument, sscsCaseDetails);
         verify(ccdService).updateCase(
-            and(hasSscsDocument(originalNumberOfSscsDocuments, documentUrl, fileName), doesNotHaveDraftSscsDocuments()),
-            eq(someCcdCaseId),
-            eq("uploadCorDocument"),
-            eq("SSCS - cor evidence uploaded"),
-            eq("Updated SSCS"),
-            eq(idamTokens)
+                and(hasSscsDocument(originalNumberOfSscsDocuments, documentUrl, fileName), doesNotHaveDraftSscsDocuments()),
+                eq(someCcdCaseId),
+                eq("uploadCorDocument"),
+                eq("SSCS - cor evidence uploaded"),
+                eq("Updated SSCS"),
+                eq(idamTokens)
         );
 
         verify(storeEvidenceDescriptionService).storePdf(
-            someCcdCaseId,
-            someOnlineHearingId,
-            new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
+                someCcdCaseId,
+                someOnlineHearingId,
+                new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
         );
     }
 
@@ -217,9 +217,9 @@ public class EvidenceUploadServiceTest {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithOneDraftSscsDocAndDraftCorSscsDoc(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
         when(onlineHearingService.getCcdCase(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
         when(storeEvidenceDescriptionService.storePdf(
-            someCcdCaseId,
-            someOnlineHearingId,
-            new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
+                someCcdCaseId,
+                someOnlineHearingId,
+                new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
         )).thenReturn(new CohEventActionContext(mock(UploadedEvidence.class), sscsCaseDetails));
 
         String questionHeader = "question header";
@@ -230,12 +230,12 @@ public class EvidenceUploadServiceTest {
 
         assertThat(submittedEvidence, is(true));
         verify(ccdService).updateCase(
-            and(hasCorDocument(0, someQuestionId, documentUrl, fileName), doesNotHaveDraftCorDocuments()),
-            eq(someCcdCaseId),
-            eq("uploadCorDocument"),
-            eq("SSCS - cor evidence uploaded"),
-            eq("Updated SSCS"),
-            eq(idamTokens)
+                and(hasCorDocument(0, someQuestionId, documentUrl, fileName), doesNotHaveDraftCorDocuments()),
+                eq(someCcdCaseId),
+                eq("uploadCorDocument"),
+                eq("SSCS - cor evidence uploaded"),
+                eq("Updated SSCS"),
+                eq(idamTokens)
         );
     }
 
@@ -260,12 +260,12 @@ public class EvidenceUploadServiceTest {
 
         assertThat(submittedEvidence, is(true));
         verify(ccdService).updateCase(
-            and(hasCorDocument(originalNumberOfSscsDocuments, someQuestionId, documentUrl, fileName), doesNotHaveDraftCorDocuments()),
-            eq(someCcdCaseId),
-            eq("uploadCorDocument"),
-            eq("SSCS - cor evidence uploaded"),
-            eq("Updated SSCS"),
-            eq(idamTokens)
+                and(hasCorDocument(originalNumberOfSscsDocuments, someQuestionId, documentUrl, fileName), doesNotHaveDraftCorDocuments()),
+                eq(someCcdCaseId),
+                eq("uploadCorDocument"),
+                eq("SSCS - cor evidence uploaded"),
+                eq("Updated SSCS"),
+                eq(idamTokens)
         );
     }
 
@@ -279,8 +279,8 @@ public class EvidenceUploadServiceTest {
         String draftQuestionId = "1";
         CorDocument expectedCorDocument = createCorDocument(expectedFileName, expectedUrl, someQuestionId);
         List<CorDocument> draftCorDocuments = asList(
-            createCorDocument(draftFileName, draftDocumentUrl, draftQuestionId),
-            expectedCorDocument
+                createCorDocument(draftFileName, draftDocumentUrl, draftQuestionId),
+                expectedCorDocument
         );
         sscsCaseDetails.getData().setDraftCorDocument(draftCorDocuments);
 
@@ -292,12 +292,12 @@ public class EvidenceUploadServiceTest {
 
         assertThat(submittedEvidence, is(true));
         verify(ccdService).updateCase(
-            and(hasCorDocument(0, someQuestionId, expectedUrl, expectedFileName), hasDraftCorDocument(0, draftQuestionId, draftDocumentUrl, draftFileName)),
-            eq(someCcdCaseId),
-            eq("uploadCorDocument"),
-            eq("SSCS - cor evidence uploaded"),
-            eq("Updated SSCS"),
-            eq(idamTokens)
+                and(hasCorDocument(0, someQuestionId, expectedUrl, expectedFileName), hasDraftCorDocument(0, draftQuestionId, draftDocumentUrl, draftFileName)),
+                eq(someCcdCaseId),
+                eq("uploadCorDocument"),
+                eq("SSCS - cor evidence uploaded"),
+                eq("Updated SSCS"),
+                eq(idamTokens)
         );
     }
 
@@ -479,12 +479,12 @@ public class EvidenceUploadServiceTest {
 
         assertThat(hearingFound, is(true));
         verify(ccdService).updateCase(
-            doesNotHaveDraftSscsDocuments(),
-            eq(someCcdCaseId),
-            eq("uploadCorDocument"),
-            eq("SSCS - cor evidence deleted"),
-            eq("Updated SSCS"),
-            eq(idamTokens)
+                doesNotHaveDraftSscsDocuments(),
+                eq(someCcdCaseId),
+                eq("uploadCorDocument"),
+                eq("SSCS - cor evidence deleted"),
+                eq("Updated SSCS"),
+                eq(idamTokens)
         );
     }
 
@@ -518,12 +518,12 @@ public class EvidenceUploadServiceTest {
 
         assertThat(hearingFound, is(true));
         verify(ccdService).updateCase(
-            doesNotHaveDraftCorDocuments(),
-            eq(someCcdCaseId),
-            eq("uploadCorDocument"),
-            eq("SSCS - cor evidence deleted"),
-            eq("Updated SSCS"),
-            eq(idamTokens)
+                doesNotHaveDraftCorDocuments(),
+                eq(someCcdCaseId),
+                eq("uploadCorDocument"),
+                eq("SSCS - cor evidence deleted"),
+                eq("Updated SSCS"),
+                eq(idamTokens)
         );
     }
 
@@ -603,9 +603,9 @@ public class EvidenceUploadServiceTest {
         return argThat(argument -> {
             List<CorDocument> corDocument = argument.getDraftCorDocument();
             return corDocument.size() == originalNumberOfCorDocuments + 1 &&
-                corDocument.get(originalNumberOfCorDocuments).getValue().getQuestionId().equals(someQuestionId) &&
-                corDocument.get(originalNumberOfCorDocuments).getValue().getDocument().getDocumentLink().getDocumentUrl().equals(documentUrl) &&
-                corDocument.get(originalNumberOfCorDocuments).getValue().getDocument().getDocumentFileName().equals(fileName);
+                    corDocument.get(originalNumberOfCorDocuments).getValue().getQuestionId().equals(someQuestionId) &&
+                    corDocument.get(originalNumberOfCorDocuments).getValue().getDocument().getDocumentLink().getDocumentUrl().equals(documentUrl) &&
+                    corDocument.get(originalNumberOfCorDocuments).getValue().getDocument().getDocumentFileName().equals(fileName);
         });
     }
 
@@ -613,8 +613,8 @@ public class EvidenceUploadServiceTest {
         return argThat(argument -> {
             List<SscsDocument> sscsDocument = argument.getSscsDocument();
             return sscsDocument.size() == originalNumberOfDocuments + 1 &&
-                sscsDocument.get(originalNumberOfDocuments).getValue().getDocumentLink().getDocumentUrl().equals(documentUrl) &&
-                sscsDocument.get(originalNumberOfDocuments).getValue().getDocumentFileName().equals(fileName);
+                    sscsDocument.get(originalNumberOfDocuments).getValue().getDocumentLink().getDocumentUrl().equals(documentUrl) &&
+                    sscsDocument.get(originalNumberOfDocuments).getValue().getDocumentFileName().equals(fileName);
         });
     }
 
@@ -634,8 +634,8 @@ public class EvidenceUploadServiceTest {
         return argThat(argument -> {
             List<SscsDocument> sscsDocument = argument.getDraftSscsDocument();
             return sscsDocument.size() == originalNumberOfDocuments + 1 &&
-                sscsDocument.get(originalNumberOfDocuments).getValue().getDocumentLink().getDocumentUrl().equals(documentUrl) &&
-                sscsDocument.get(originalNumberOfDocuments).getValue().getDocumentFileName().equals(fileName);
+                    sscsDocument.get(originalNumberOfDocuments).getValue().getDocumentLink().getDocumentUrl().equals(documentUrl) &&
+                    sscsDocument.get(originalNumberOfDocuments).getValue().getDocumentFileName().equals(fileName);
         });
     }
 
@@ -643,9 +643,9 @@ public class EvidenceUploadServiceTest {
         return argThat(argument -> {
             List<CorDocument> sscsDocument = argument.getCorDocument();
             return sscsDocument.size() == originalNumberOfDocuments + 1 &&
-                sscsDocument.get(originalNumberOfDocuments).getValue().getQuestionId().equals(questionId) &&
-                sscsDocument.get(originalNumberOfDocuments).getValue().getDocument().getDocumentLink().getDocumentUrl().equals(documentUrl) &&
-                sscsDocument.get(originalNumberOfDocuments).getValue().getDocument().getDocumentFileName().equals(fileName);
+                    sscsDocument.get(originalNumberOfDocuments).getValue().getQuestionId().equals(questionId) &&
+                    sscsDocument.get(originalNumberOfDocuments).getValue().getDocument().getDocumentLink().getDocumentUrl().equals(documentUrl) &&
+                    sscsDocument.get(originalNumberOfDocuments).getValue().getDocument().getDocumentFileName().equals(fileName);
         });
     }
 
@@ -675,31 +675,31 @@ public class EvidenceUploadServiceTest {
                                                                                        String documentUrl,
                                                                                        Date evidenceCreatedOn) {
         return SscsCaseDetails.builder()
-            .id(someCcdCaseId)
-            .data(SscsCaseData.builder()
-                .draftCorDocument(singletonList(CorDocument.builder()
-                    .value(CorDocumentDetails.builder()
-                        .questionId(questionId)
-                        .document(SscsDocumentDetails.builder()
-                            .documentFileName(fileName)
-                            .documentLink(DocumentLink.builder()
-                                .documentUrl(documentUrl)
-                                .build())
-                            .documentDateAdded(convertCreatedOnDate(evidenceCreatedOn))
-                            .build())
+                .id(someCcdCaseId)
+                .data(SscsCaseData.builder()
+                        .draftCorDocument(singletonList(CorDocument.builder()
+                                .value(CorDocumentDetails.builder()
+                                        .questionId(questionId)
+                                        .document(SscsDocumentDetails.builder()
+                                                .documentFileName(fileName)
+                                                .documentLink(DocumentLink.builder()
+                                                        .documentUrl(documentUrl)
+                                                        .build())
+                                                .documentDateAdded(convertCreatedOnDate(evidenceCreatedOn))
+                                                .build())
+                                        .build())
+                                .build()))
+                        .draftSscsDocument(singletonList(SscsDocument.builder()
+                                .value(SscsDocumentDetails.builder()
+                                        .documentFileName(fileName)
+                                        .documentLink(DocumentLink.builder()
+                                                .documentUrl(documentUrl)
+                                                .build())
+                                        .documentDateAdded(convertCreatedOnDate(evidenceCreatedOn))
+                                        .build())
+                                .build()))
                         .build())
-                    .build()))
-                .draftSscsDocument(singletonList(SscsDocument.builder()
-                    .value(SscsDocumentDetails.builder()
-                        .documentFileName(fileName)
-                        .documentLink(DocumentLink.builder()
-                            .documentUrl(documentUrl)
-                            .build())
-                        .documentDateAdded(convertCreatedOnDate(evidenceCreatedOn))
-                        .build())
-                    .build()))
-                .build())
-            .build();
+                .build();
     }
 
     private SscsCaseDetails createSscsCaseDetailsWithoutCcdDocuments() {
@@ -708,8 +708,8 @@ public class EvidenceUploadServiceTest {
 
     private String convertCreatedOnDate(Date date) {
         return date.toInstant()
-            .atZone(ZoneId.systemDefault())
-            .toLocalDate()
-            .format(DateTimeFormatter.ISO_DATE);
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+                .format(DateTimeFormatter.ISO_DATE);
     }
 }
