@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -183,28 +182,30 @@ public class EvidenceUploadService {
                                 dateFormatter);
                             LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
 
-                        ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                            ScannedDocumentDetails.builder()
-                                .type("other")
-                                .url(draftSscsDocument.getValue().getDocumentLink())
-                                .fileName(draftSscsDocument.getValue().getDocumentFileName())
-                                .scannedDate(ldt.toString())
-                                .build()).build();
+                            ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                                ScannedDocumentDetails.builder()
+                                    .type("other")
+                                    .url(draftSscsDocument.getValue().getDocumentLink())
+                                    .fileName(draftSscsDocument.getValue().getDocumentFileName())
+                                    .scannedDate(ldt.toString())
+                                    .build()).build();
 
-                        scannedDocs.add(scannedDocument);
-                    }
+                            scannedDocs.add(scannedDocument);
+                        }
 
-                    List<ScannedDocument> newScannedDocumentsList = union(
-                        emptyIfNull(caseDetails.getData().getScannedDocuments()),
-                        emptyIfNull(scannedDocs)
-                    );
+                        List<ScannedDocument> newScannedDocumentsList = union(
+                            emptyIfNull(caseDetails.getData().getScannedDocuments()),
+                            emptyIfNull(scannedDocs)
+                        );
 
-                    sscsCaseData.setScannedDocuments(newScannedDocumentsList);
-                    sscsCaseData.setDraftSscsDocument(Collections.emptyList());
+                        sscsCaseData.setScannedDocuments(newScannedDocumentsList);
+                        sscsCaseData.setDraftSscsDocument(emptyList());
 
-                    sscsCaseData.setEvidenceHandled("No");
+                        sscsCaseData.setEvidenceHandled("No");
 
-                    ccdService.updateCase(sscsCaseData, ccdCaseId, ATTACH_SCANNED_DOCS.getCcdType(), "SSCS - upload evidence from MYA", "Uploaded a further evidence document", idamService.getIdamTokens());
+                        ccdService.updateCase(sscsCaseData, ccdCaseId, ATTACH_SCANNED_DOCS.getCcdType(),
+                            "SSCS - upload evidence from MYA", "Uploaded a further evidence document",
+                            idamService.getIdamTokens());
 
                     }
                     return true;

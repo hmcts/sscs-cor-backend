@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ATTACH_SCANNED_DOCS;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -71,8 +72,6 @@ public class EvidenceUploadServiceTest {
     private StoreEvidenceDescriptionService storeEvidenceDescriptionService;
     private EvidenceDescription someDescription;
     private EvidenceUploadEmailService evidenceUploadEmailService;
-    private FileToPdfConversionService fileToPdfConversionService;
-    private EvidenceManagementService evidenceManagementService;
 
     @Before
     public void setUp() {
@@ -92,8 +91,8 @@ public class EvidenceUploadServiceTest {
 
         storeEvidenceDescriptionService = mock(StoreEvidenceDescriptionService.class);
         evidenceUploadEmailService = mock(EvidenceUploadEmailService.class);
-        fileToPdfConversionService = mock(FileToPdfConversionService.class);
-        evidenceManagementService = mock(EvidenceManagementService.class);
+        FileToPdfConversionService fileToPdfConversionService = mock(FileToPdfConversionService.class);
+        EvidenceManagementService evidenceManagementService = mock(EvidenceManagementService.class);
         DocumentManagementService documentManagementService = mock(DocumentManagementService.class);
 
         evidenceUploadService = new EvidenceUploadService(
@@ -103,8 +102,8 @@ public class EvidenceUploadServiceTest {
                 onlineHearingService,
                 storeEvidenceDescriptionService,
                 evidenceUploadEmailService,
-                fileToPdfConversionService,
-                evidenceManagementService);
+            fileToPdfConversionService,
+            evidenceManagementService);
         fileName = "someFileName.txt";
         documentUrl = "http://example.com/document/" + someEvidenceId;
         file = mock(MultipartFile.class);
@@ -550,8 +549,15 @@ public class EvidenceUploadServiceTest {
 
     @Test
     public void givenANonCorCaseWithScannedDocumentsAndDraftDocument_thenMoveDraftToScannedDocumentsAndUpdateCaseInCcd() {
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithOneDraftSscsDocOneDraftCorDocAndOneScannedDoc();
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId))
-            .thenReturn(Optional.of(createSscsCaseDetailsWithOneDraftSscsDocOneDraftCorDocAndOneScannedDoc()));
+            .thenReturn(Optional.of(sscsCaseDetails));
+
+        when(storeEvidenceDescriptionService.storePdf(
+            someCcdCaseId,
+            someOnlineHearingId,
+            new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
+        )).thenReturn(new CohEventActionContext(mock(UploadedEvidence.class), sscsCaseDetails));
 
         boolean submittedEvidence = evidenceUploadService.submitHearingEvidence(someOnlineHearingId, someDescription);
 
@@ -569,7 +575,7 @@ public class EvidenceUploadServiceTest {
 
     @NotNull
     private SscsCaseDetails createSscsCaseDetailsWithOneDraftSscsDocOneDraftCorDocAndOneScannedDoc() {
-        SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithOneDraftSscsDocAndDraftCorSscsDoc(someQuestionId,
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithOneDocOfEachType(someQuestionId,
             fileName, documentUrl, evidenceCreatedOn);
         ScannedDocument existingScannedDocument = ScannedDocument.builder()
             .value(ScannedDocumentDetails.builder()
@@ -700,6 +706,41 @@ public class EvidenceUploadServiceTest {
                                 .build()))
                         .build())
                 .build();
+    }
+
+    private SscsCaseDetails createSscsCaseDetailsWithOneDocOfEachType(String questionId, String fileName,
+                                                                      String documentUrl, Date evidenceCreatedOn) {
+
+        List<SscsDocument> sscsDocuments = new ArrayList<>(1);
+        sscsDocuments.add(SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentFileName(fileName)
+                .documentLink(DocumentLink.builder()
+                    .documentUrl(documentUrl)
+                    .build())
+                .documentDateAdded(convertCreatedOnDate(evidenceCreatedOn))
+                .build())
+            .build());
+
+        return SscsCaseDetails.builder()
+            .id(someCcdCaseId)
+            .data(SscsCaseData.builder()
+                .draftCorDocument(singletonList(CorDocument.builder()
+                    .value(CorDocumentDetails.builder()
+                        .questionId(questionId)
+                        .document(SscsDocumentDetails.builder()
+                            .documentFileName(fileName)
+                            .documentLink(DocumentLink.builder()
+                                .documentUrl(documentUrl)
+                                .build())
+                            .documentDateAdded(convertCreatedOnDate(evidenceCreatedOn))
+                            .build())
+                        .build())
+                    .build()))
+                .draftSscsDocument(sscsDocuments)
+                .sscsDocument(sscsDocuments)
+                .build())
+            .build();
     }
 
     private SscsCaseDetails createSscsCaseDetailsWithoutCcdDocuments() {
