@@ -170,7 +170,9 @@ public class EvidenceUploadService {
                         SscsDocument evidenceDescAsSscsDoc = caseDataUpdatedWithEvidenceDescAsSscsDoc
                             .getSscsDocument().get(lastDocIndex);
 
-                        removeEvidenceDescAsSscsDoc(caseDataUpdatedWithEvidenceDescAsSscsDoc, lastDocIndex);
+                        log.info("*** evidenceDescAsSscsDoc: " + evidenceDescAsSscsDoc);
+
+                        // removeEvidenceDescAsSscsDoc(caseDataUpdatedWithEvidenceDescAsSscsDoc, lastDocIndex);
                         addEvidenceDescAsDraftSscsDoc(caseDataUpdatedWithEvidenceDescAsSscsDoc, evidenceDescAsSscsDoc);
 
                         List<ScannedDocument> scannedDocs = new ArrayList<>();
@@ -215,7 +217,7 @@ public class EvidenceUploadService {
                                             List<ScannedDocument> newScannedDocumentsList) {
         sscsCaseData.setScannedDocuments(newScannedDocumentsList);
         sscsCaseData.setDraftSscsDocument(emptyList());
-        sscsCaseData.setSscsDocument(sscsDocWithoutEvidenceDesc);
+        //sscsCaseData.setSscsDocument(sscsDocWithoutEvidenceDesc);
         sscsCaseData.setEvidenceHandled("No");
     }
 
