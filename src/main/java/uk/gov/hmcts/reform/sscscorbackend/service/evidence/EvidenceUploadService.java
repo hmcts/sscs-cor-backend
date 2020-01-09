@@ -215,7 +215,6 @@ public class EvidenceUploadService {
                                             List<ScannedDocument> newScannedDocumentsList) {
         sscsCaseData.setScannedDocuments(newScannedDocumentsList);
         sscsCaseData.setDraftSscsDocument(emptyList());
-        sscsCaseData.setSscsDocument(sscsDocWithoutEvidenceDesc);
         sscsCaseData.setEvidenceHandled("No");
     }
 
