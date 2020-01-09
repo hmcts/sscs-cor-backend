@@ -165,19 +165,18 @@ public class EvidenceUploadService {
                         evidenceUploadEmailService.sendToDwp(storePdfContext.getPdf(), draftSscsDocument, caseDetails);
 
                     } else {
-                        SscsCaseData caseData = storePdfContext.getDocument().getData();
-                        int lastDocIndex = caseData.getSscsDocument().size() - 1;
-                        SscsDocument newEvidenceDescAsSscsDoc = caseData.getSscsDocument().get(lastDocIndex);
+                        SscsCaseData caseDataUpdatedWithEvidenceDescAsSscsDoc = storePdfContext.getDocument().getData();
+                        int lastDocIndex = caseDataUpdatedWithEvidenceDescAsSscsDoc.getSscsDocument().size() - 1;
+                        SscsDocument evidenceDescAsSscsDoc = caseDataUpdatedWithEvidenceDescAsSscsDoc
+                            .getSscsDocument().get(lastDocIndex);
 
-                        //remove it from sscsDocs
-                        caseData.getSscsDocument().remove(lastDocIndex);
-
-                        //added to drafts
-                        caseData.getDraftSscsDocument().add(newEvidenceDescAsSscsDoc);
+                        removeEvidenceDescAsSscsDoc(caseDataUpdatedWithEvidenceDescAsSscsDoc, lastDocIndex);
+                        addEvidenceDescAsDraftSscsDoc(caseDataUpdatedWithEvidenceDescAsSscsDoc, evidenceDescAsSscsDoc);
 
                         List<ScannedDocument> scannedDocs = new ArrayList<>();
                         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                        for (SscsDocument draftSscsDocument : caseData.getDraftSscsDocument()) {
+                        for (SscsDocument draftSscsDocument :
+                            caseDataUpdatedWithEvidenceDescAsSscsDoc.getDraftSscsDocument()) {
                             LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(),
                                 dateFormatter);
                             LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
@@ -198,10 +197,9 @@ public class EvidenceUploadService {
                             emptyIfNull(scannedDocs)
                         );
 
-                        sscsCaseData.setScannedDocuments(newScannedDocumentsList);
-                        sscsCaseData.setDraftSscsDocument(emptyList());
-
-                        sscsCaseData.setEvidenceHandled("No");
+                        updateOriginalSscsCaseData(sscsCaseData,
+                            caseDataUpdatedWithEvidenceDescAsSscsDoc.getSscsDocument(),
+                            newScannedDocumentsList);
 
                         ccdService.updateCase(sscsCaseData, ccdCaseId, ATTACH_SCANNED_DOCS.getCcdType(),
                             "SSCS - upload evidence from MYA", "Uploaded a further evidence document",
@@ -211,6 +209,23 @@ public class EvidenceUploadService {
                     return true;
                 })
             .orElse(false);
+    }
+
+    private void updateOriginalSscsCaseData(SscsCaseData sscsCaseData, List<SscsDocument> sscsDocWithoutEvidenceDesc,
+                                            List<ScannedDocument> newScannedDocumentsList) {
+        sscsCaseData.setScannedDocuments(newScannedDocumentsList);
+        sscsCaseData.setDraftSscsDocument(emptyList());
+        sscsCaseData.setSscsDocument(sscsDocWithoutEvidenceDesc);
+        sscsCaseData.setEvidenceHandled("No");
+    }
+
+    private void addEvidenceDescAsDraftSscsDoc(SscsCaseData caseDataWithEvidenceDescAsSscsDoc,
+                                               SscsDocument evidenceDescAsSscsDoc) {
+        caseDataWithEvidenceDescAsSscsDoc.getDraftSscsDocument().add(evidenceDescAsSscsDoc);
+    }
+
+    private void removeEvidenceDescAsSscsDoc(SscsCaseData caseDataWithEvidenceDescAsSscsDoc, int lastDocIndex) {
+        caseDataWithEvidenceDescAsSscsDoc.getSscsDocument().remove(lastDocIndex);
     }
 
     public boolean submitQuestionEvidence(String onlineHearingId, Question question) {
