@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 
@@ -99,6 +100,33 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         String caseReference = caseDetails.getData().getCaseReference();
         assertThat(sscsDocument.get(0).getValue().getDocumentFileName(), is("evidence.pdf"));
         assertThat(sscsDocument.get(1).getValue().getDocumentFileName(), is("Evidence Description - " + hearingWithQuestion.getCaseId() + ".pdf"));
+    }
+
+    @Test
+    public void uploadThenSubmitEvidenceToAppeal() throws IOException, JSONException {
+        CreatedCcdCase createdCcdCase = createCase();
+
+        JSONArray draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(createdCcdCase.getCaseId());
+        assertThat(draftHearingEvidence.length(), is(0));
+
+        sscsCorBackendRequests.uploadHearingEvidence(createdCcdCase.getCaseId(), "evidence.png");
+
+        draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(createdCcdCase.getCaseId());
+        assertThat(draftHearingEvidence.length(), is(1));
+        assertThat(draftHearingEvidence.getJSONObject(0).getString("file_name"), is("evidence.pdf"));
+
+        sscsCorBackendRequests.submitHearingEvidence(createdCcdCase.getCaseId(), "some description");
+
+        draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(createdCcdCase.getCaseId());
+        assertThat(draftHearingEvidence.length(), is(0));
+
+        SscsCaseDetails caseDetails = getCaseDetails(createdCcdCase.getCaseId());
+
+        List<ScannedDocument> scannedDocument = caseDetails.getData().getScannedDocuments();
+        assertThat(scannedDocument.size(), is(2));
+        String caseReference = caseDetails.getData().getCaseReference();
+        assertThat(scannedDocument.get(0).getValue().getFileName(), is("evidence.pdf"));
+        assertThat(scannedDocument.get(1).getValue().getFileName(), is("Evidence Description - " + createdCcdCase.getCaseId() + ".pdf"));
     }
 
     @Test
