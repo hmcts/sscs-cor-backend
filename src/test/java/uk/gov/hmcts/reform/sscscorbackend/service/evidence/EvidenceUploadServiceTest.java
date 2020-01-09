@@ -25,7 +25,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
@@ -549,7 +548,6 @@ public class EvidenceUploadServiceTest {
     }
 
     @Test
-    @Ignore
     public void givenANonCorCaseWithScannedDocumentsAndDraftDocument_thenMoveDraftToScannedDocumentsAndUpdateCaseInCcd() {
         SscsCaseDetails sscsCaseDetails = createCaseDetailsAndSetRequirements();
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId))
