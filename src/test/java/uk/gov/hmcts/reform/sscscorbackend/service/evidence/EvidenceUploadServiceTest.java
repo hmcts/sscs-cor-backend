@@ -549,14 +549,15 @@ public class EvidenceUploadServiceTest {
 
     @Test
     public void givenANonCorCaseWithScannedDocumentsAndDraftDocument_thenMoveDraftToScannedDocumentsAndUpdateCaseInCcd() {
-        SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithOneDraftSscsDocOneDraftCorDocAndOneScannedDoc();
+        SscsCaseDetails sscsCaseDetails = createCaseDetailsAndSetRequirements();
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId))
             .thenReturn(Optional.of(sscsCaseDetails));
 
         when(storeEvidenceDescriptionService.storePdf(
             someCcdCaseId,
             someOnlineHearingId,
-            new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
+            new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription,
+                singletonList("draftSscsDocument file name"))
         )).thenReturn(new CohEventActionContext(mock(UploadedEvidence.class), sscsCaseDetails));
 
         boolean submittedEvidence = evidenceUploadService.submitHearingEvidence(someOnlineHearingId, someDescription);
@@ -564,7 +565,7 @@ public class EvidenceUploadServiceTest {
         assertThat(submittedEvidence, is(true));
 
         verify(ccdService).updateCase(
-            and(hasSscsScannedDocument(), doesNotHaveDraftSscsDocumentsAndEvidenceHandledNo()),
+            and(hasSscsScannedDocumentAndNotSscsDocuments(), doesNotHaveDraftSscsDocumentsAndEvidenceHandledNo()),
             eq(someCcdCaseId),
             eq(ATTACH_SCANNED_DOCS.getCcdType()),
             eq("SSCS - upload evidence from MYA"),
@@ -574,12 +575,12 @@ public class EvidenceUploadServiceTest {
     }
 
     @NotNull
-    private SscsCaseDetails createSscsCaseDetailsWithOneDraftSscsDocOneDraftCorDocAndOneScannedDoc() {
-        SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithOneDocOfEachType(someQuestionId,
-            fileName, documentUrl, evidenceCreatedOn);
+    private SscsCaseDetails createCaseDetailsAndSetRequirements() {
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithOneDocOfEachType(someQuestionId, documentUrl,
+            evidenceCreatedOn);
         ScannedDocument existingScannedDocument = ScannedDocument.builder()
             .value(ScannedDocumentDetails.builder()
-                .fileName("anotherFileName")
+                .fileName("scannedDocument file name")
                 .url(DocumentLink.builder()
                     .documentUrl("http://anotherUrl")
                     .build())
@@ -624,15 +625,15 @@ public class EvidenceUploadServiceTest {
         });
     }
 
-    private SscsCaseData hasSscsScannedDocument() {
-        return argThat(argument -> {
-            List<ScannedDocument> scannedDocuments = argument.getScannedDocuments();
+    private SscsCaseData hasSscsScannedDocumentAndNotSscsDocuments() {
+        return argThat(sscsCaseData -> {
+            List<ScannedDocument> scannedDocuments = sscsCaseData.getScannedDocuments();
             List<ScannedDocument> newAddedScannedDocs = scannedDocuments.stream()
-                .filter(doc -> doc.getValue().getUrl().getDocumentUrl().equals(documentUrl))
-                .filter(doc -> doc.getValue().getFileName().equals(fileName))
+                .filter(doc -> doc.getValue().getFileName().equals("sscsDocument file name")
+                    || doc.getValue().getFileName().equals("draftSscsDocument file name"))
                 .collect(Collectors.toList());
-
-            return scannedDocuments.size() == 2 && newAddedScannedDocs.size() == 1;
+            return scannedDocuments.size() == 3 && newAddedScannedDocs.size() == 2
+                && sscsCaseData.getSscsDocument().isEmpty();
         });
     }
 
@@ -708,19 +709,14 @@ public class EvidenceUploadServiceTest {
                 .build();
     }
 
-    private SscsCaseDetails createSscsCaseDetailsWithOneDocOfEachType(String questionId, String fileName,
-                                                                      String documentUrl, Date evidenceCreatedOn) {
+    private SscsCaseDetails createSscsCaseDetailsWithOneDocOfEachType(String questionId, String documentUrl,
+                                                                      Date evidenceCreatedOn) {
 
-        List<SscsDocument> sscsDocuments = new ArrayList<>(1);
-        sscsDocuments.add(SscsDocument.builder()
-            .value(SscsDocumentDetails.builder()
-                .documentFileName(fileName)
-                .documentLink(DocumentLink.builder()
-                    .documentUrl(documentUrl)
-                    .build())
-                .documentDateAdded(convertCreatedOnDate(evidenceCreatedOn))
-                .build())
-            .build());
+        List<SscsDocument> sscsDocuments = buildSscsDocuments(documentUrl, evidenceCreatedOn,
+            "sscsDocument file name");
+
+        List<SscsDocument> draftSscsDocuments = buildSscsDocuments(documentUrl, evidenceCreatedOn,
+            "draftSscsDocument file name");
 
         return SscsCaseDetails.builder()
             .id(someCcdCaseId)
@@ -737,10 +733,28 @@ public class EvidenceUploadServiceTest {
                             .build())
                         .build())
                     .build()))
-                .draftSscsDocument(sscsDocuments)
+                .draftSscsDocument(draftSscsDocuments)
                 .sscsDocument(sscsDocuments)
                 .build())
             .build();
+    }
+
+    @NotNull
+    private List<SscsDocument> buildSscsDocuments(String documentUrl, Date evidenceCreatedOn, String documentFileName) {
+        List<SscsDocument> sscsDocuments = new ArrayList<>(1);
+
+        SscsDocumentDetails documentDetails = SscsDocumentDetails.builder()
+            .documentFileName(documentFileName)
+            .documentLink(DocumentLink.builder()
+                .documentUrl(documentUrl)
+                .build())
+            .documentDateAdded(convertCreatedOnDate(evidenceCreatedOn))
+            .build();
+
+        sscsDocuments.add(SscsDocument.builder()
+            .value(documentDetails)
+            .build());
+        return sscsDocuments;
     }
 
     private SscsCaseDetails createSscsCaseDetailsWithoutCcdDocuments() {
