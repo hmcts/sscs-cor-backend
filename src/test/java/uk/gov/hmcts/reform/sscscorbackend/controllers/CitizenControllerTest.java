@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscscorbackend.controllers;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someOnlineHearing;
@@ -36,6 +37,7 @@ public class CitizenControllerTest {
         String tya = "tya";
         String userId = "userId";
 
+        when(idamService.verifyTokenSignature(anyString())).thenReturn(true);
         when(idamService.generateServiceAuthorization()).thenReturn("serviceAuth");
         when(idamService.getUserId(oauthToken)).thenReturn(userId);
         List<OnlineHearing> expectedOnlineHearings = asList(someOnlineHearing(1), someOnlineHearing(2));
@@ -51,6 +53,19 @@ public class CitizenControllerTest {
     }
 
     @Test
+    public void getOnlineHearingsWhenInvalidToken() {
+        String oauthToken = "oAuth";
+        String tya = "tya";
+
+        when(idamService.verifyTokenSignature(anyString())).thenReturn(false);
+
+        ResponseEntity<List<OnlineHearing>> onlineHearings = underTest.getOnlineHearingsForTyaNumber(oauthToken, tya);
+
+        assertThat(onlineHearings.getStatusCode(), is(HttpStatus.FORBIDDEN));
+        assertThat(onlineHearings.getBody(), is(nullValue()));
+    }
+
+    @Test
     public void associateUserWithCase() {
         String oauthToken = "oAuth";
         String tya = "tya";
@@ -58,6 +73,7 @@ public class CitizenControllerTest {
         String email = "someemail@example.com";
         String postcode = "somePostcode";
 
+        when(idamService.verifyTokenSignature(anyString())).thenReturn(true);
         when(idamService.generateServiceAuthorization()).thenReturn("serviceAuth");
         when(idamService.getUserId(oauthToken)).thenReturn(userId);
         OnlineHearing onlineHearing = someOnlineHearing();
@@ -75,6 +91,22 @@ public class CitizenControllerTest {
     }
 
     @Test
+    public void associateUserWithCaseWhenInvalidToken() {
+        String oauthToken = "oAuth";
+        String tya = "tya";
+        String userId = "userId";
+        String email = "someemail@example.com";
+        String postcode = "somePostcode";
+
+        when(idamService.verifyTokenSignature(anyString())).thenReturn(false);
+
+        ResponseEntity<OnlineHearing> response = underTest.associateUserWithCase(oauthToken, tya, new AssociateCaseDetails(email, postcode));
+
+        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
+        assertThat(response.getBody(), is(nullValue()));
+    }
+
+    @Test
     public void cannotAssociateUserWithCase() {
         String oauthToken = "oAuth";
         String tya = "tya";
@@ -82,6 +114,7 @@ public class CitizenControllerTest {
         String email = "someemail@example.com";
         String postcode = "somePostcode";
 
+        when(idamService.verifyTokenSignature(anyString())).thenReturn(true);
         when(idamService.generateServiceAuthorization()).thenReturn("serviceAuth");
         when(idamService.getUserId(oauthToken)).thenReturn(userId);
         when(citizenLoginService.associateCaseToCitizen(null, tya, email, postcode))
