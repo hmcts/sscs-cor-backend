@@ -86,7 +86,7 @@ public abstract class BaseFunctionTest {
         String emailAddress = createRandomEmail();
 
         CreatedCcdCase createdCcdCase = null;
-            createdCcdCase = sscsCorBackendRequests.createOralCase(emailAddress);
+        createdCcdCase = sscsCorBackendRequests.createOralCase(emailAddress);
 
         return createdCcdCase;
     }
