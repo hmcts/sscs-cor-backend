@@ -21,7 +21,7 @@ public class EmailMessageBuilderTest {
         emailMessageBuilder = new EmailMessageBuilder();
         caseDetails = SscsCaseDetails.builder()
                 .data(SscsCaseData.builder()
-                        .caseReference("caseReference")
+                        .ccdCaseId("caseReference")
                         .appeal(Appeal.builder()
                                 .appellant(Appellant.builder()
                                         .name(Name.builder()
