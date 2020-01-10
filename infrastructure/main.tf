@@ -91,9 +91,10 @@ module "sscs-core-backend" {
     IDAM_OAUTH2_CLIENT_SECRET       = "${data.azurerm_key_vault_secret.idam-sscs-oauth2-client-secret.value}"
     IDAM_OAUTH2_REDIRECT_URL        = "${var.idam_redirect_url}"
     IDAM_URL                        = "${local.idam_url}"
+    IDAM_API_JWK_URL 				= "${local.idam_url}/jwks"
     IDAM_SSCS_URL                   = "${var.idam_sscs_url}"
     APPINSIGHTS_INSTRUMENTATIONKEY = "${data.azurerm_key_vault_secret.appinsights_instrumentation_key.value}"
-    
+
     COH_URL = "${local.cohUrl}"
     CORE_CASE_DATA_URL = "${local.ccdApi}"
 
