@@ -118,23 +118,7 @@ public class SscsCorBackendRequests {
 
         String responseBody = EntityUtils.toString(createCaseResponse.getEntity());
         JSONObject jsonObject = new JSONObject(responseBody);
-        
-        return new CreatedCcdCase(
-                jsonObject.getString("id"),
-                jsonObject.getString("appellant_tya")
-        );
-    }
 
-    public CreatedCcdCase createOralCase(String emailAddress) throws IOException {
-        HttpResponse createCaseResponse = client.execute(post(baseUrl + "/case?hearingType=oral&email=" + emailAddress)
-                .setHeader("Content-Length", "0")
-                .build());
-
-        assertThat(createCaseResponse.getStatusLine().getStatusCode(), is(HttpStatus.CREATED.value()));
-
-        String responseBody = EntityUtils.toString(createCaseResponse.getEntity());
-        JSONObject jsonObject = new JSONObject(responseBody);
-        System.out.println("Case id " + jsonObject.getString("id"));
         return new CreatedCcdCase(
                 jsonObject.getString("id"),
                 jsonObject.getString("appellant_tya")
