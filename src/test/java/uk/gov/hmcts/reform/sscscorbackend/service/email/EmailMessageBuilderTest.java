@@ -20,8 +20,8 @@ public class EmailMessageBuilderTest {
     public void setUp() {
         emailMessageBuilder = new EmailMessageBuilder();
         caseDetails = SscsCaseDetails.builder()
+                .id(12345678L)
                 .data(SscsCaseData.builder()
-                        .ccdCaseId("caseReference")
                         .appeal(Appeal.builder()
                                 .appellant(Appellant.builder()
                                         .name(Name.builder()
@@ -39,7 +39,7 @@ public class EmailMessageBuilderTest {
     public void buildAnswersContent() {
         String message = emailMessageBuilder.getAnswerMessage(caseDetails);
 
-        assertThat(message, is("Appeal reference number: caseReference\n" +
+        assertThat(message, is("Appeal reference number: 12345678\n" +
                 "Appellant name: Jean Valjean\n" +
                 "Appellant NINO: JV123456\n" +
                 "\n" +
@@ -58,7 +58,7 @@ public class EmailMessageBuilderTest {
     public void buildQuestionContent() {
         String message = new EmailMessageBuilder().getQuestionMessage(caseDetails);
 
-        assertThat(message, is("Appeal reference number: caseReference\n" +
+        assertThat(message, is("Appeal reference number: 12345678\n" +
                 "Appellant name: Jean Valjean\n" +
                 "Appellant NINO: JV123456\n" +
                 "\n" +
@@ -77,7 +77,7 @@ public class EmailMessageBuilderTest {
 
         assertThat(message, is("Hearing required\n" +
                 "\n" +
-                "Appeal reference number: caseReference\n" +
+                "Appeal reference number: 12345678\n" +
                 "Appellant name: Jean Valjean\n" +
                 "Appellant NINO: JV123456\n" +
                 "\n" +
@@ -96,7 +96,7 @@ public class EmailMessageBuilderTest {
 
         assertThat(message, is("Preliminary view offered\n" +
                 "\n" +
-                "Appeal reference number: caseReference\n" +
+                "Appeal reference number: 12345678\n" +
                 "Appellant name: Jean Valjean\n" +
                 "Appellant NINO: JV123456\n" +
                 "\n" +
@@ -116,7 +116,7 @@ public class EmailMessageBuilderTest {
         String message = new EmailMessageBuilder().getDecisionAcceptedMessage(caseDetails, "someUrl");
 
         assertThat(message, is(
-                "Appeal reference number: caseReference\n" +
+                "Appeal reference number: 12345678\n" +
                         "Appellant name: Jean Valjean\n" +
                         "Appellant NINO: JV123456\n" +
                         "\n" +
@@ -134,7 +134,7 @@ public class EmailMessageBuilderTest {
         String message = new EmailMessageBuilder().getDecisionRejectedMessage(caseDetails, reason, "someUrl");
 
         assertThat(message, is(
-                "Appeal reference number: caseReference\n" +
+                "Appeal reference number: 12345678\n" +
                 "Appellant name: Jean Valjean\n" +
                 "Appellant NINO: JV123456\n" +
                 "\n" +
@@ -157,7 +157,7 @@ public class EmailMessageBuilderTest {
         assertThat(message, is(
                 "Additional evidence submitted\n" +
                 "\n" +
-                "Appeal reference number: caseReference\n" +
+                "Appeal reference number: 12345678\n" +
                 "Appellant name: Jean Valjean\n" +
                 "Appellant NINO: JV123456\n" +
                 "\n" +
@@ -175,7 +175,7 @@ public class EmailMessageBuilderTest {
         assertThat(message, is(
                 "Additional evidence submitted by appellant\n" +
                         "\n" +
-                        "Appeal reference number: caseReference\n" +
+                        "Appeal reference number: 12345678\n" +
                         "Appellant name: Jean Valjean\n" +
                         "Appellant NINO: JV123456\n" +
                         "\n" +
@@ -195,7 +195,7 @@ public class EmailMessageBuilderTest {
         assertThat(message, is(
                 "Additional evidence submitted in relation to question\n" +
                         "\n" +
-                        "Appeal reference number: caseReference\n" +
+                        "Appeal reference number: 12345678\n" +
                         "Appellant name: Jean Valjean\n" +
                         "Appellant NINO: JV123456\n" +
                         "\n" +
