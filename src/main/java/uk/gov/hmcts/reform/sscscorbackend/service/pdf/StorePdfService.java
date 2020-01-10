@@ -64,7 +64,7 @@ public abstract class StorePdfService<E, D extends PdfData> {
         byte[] pdfBytes = pdfService.createPdf(getPdfContent(data, onlineHearingId, pdfAppealDetails), pdfTemplatePath);
 
         SscsCaseData caseData = caseDetails.getData();
-        String pdfName = getPdfName(documentNamePrefix, caseData.getCaseReference());
+        String pdfName = getPdfName(documentNamePrefix, caseData.getCcdCaseId());
         log.info("Adding pdf to ccd for [" + caseId + "]");
         SscsCaseData sscsCaseData = ccdPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens,
             "Other evidence");
@@ -88,7 +88,7 @@ public abstract class StorePdfService<E, D extends PdfData> {
         }
         try {
             return pdf(evidenceManagementService.download(new URI(documentUrl), "sscs"),
-                getPdfName(documentNamePrefix, caseDetails.getData().getCaseReference()));
+                getPdfName(documentNamePrefix, caseDetails.getData().getCcdCaseId()));
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Document uri invalid [" + documentUrl + "]");
         }
