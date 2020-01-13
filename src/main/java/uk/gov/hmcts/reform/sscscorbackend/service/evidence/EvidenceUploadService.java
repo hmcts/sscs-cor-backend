@@ -4,7 +4,7 @@ import static java.util.Collections.*;
 import static java.util.stream.Collectors.*;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ATTACH_SCANNED_DOCS;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,6 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 import uk.gov.hmcts.reform.sscscorbackend.domain.EvidenceDescription;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
@@ -39,29 +41,37 @@ public class EvidenceUploadService {
     private final OnlineHearingService onlineHearingService;
     private final StoreEvidenceDescriptionService storeEvidenceDescriptionService;
     private final EvidenceUploadEmailService evidenceUploadEmailService;
+    private final FileToPdfConversionService fileToPdfConversionService;
+    private final EvidenceManagementService evidenceManagementService;
 
     private static final String UPDATED_SSCS = "Updated SSCS";
-    private static final String UPLOAD_COR_DOCUMENT = "uploadCorDocument";
+    public static final String DM_STORE_USER_ID = "sscs";
 
     private static final DraftHearingDocumentExtractor draftHearingDocumentExtractor = new DraftHearingDocumentExtractor();
     private static final QuestionDocumentExtractor questionDocumentExtractor = new QuestionDocumentExtractor();
 
     @Autowired
-    public EvidenceUploadService(DocumentManagementService documentManagementService, CorCcdService ccdService, IdamService idamService, OnlineHearingService onlineHearingService, StoreEvidenceDescriptionService storeEvidenceDescriptionService, EvidenceUploadEmailService evidenceUploadEmailService) {
+    public EvidenceUploadService(DocumentManagementService documentManagementService, CorCcdService ccdService,
+                                 IdamService idamService, OnlineHearingService onlineHearingService,
+                                 StoreEvidenceDescriptionService storeEvidenceDescriptionService, EvidenceUploadEmailService evidenceUploadEmailService,
+                                 FileToPdfConversionService fileToPdfConversionService,
+                                 EvidenceManagementService evidenceManagementService) {
         this.documentManagementService = documentManagementService;
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.onlineHearingService = onlineHearingService;
         this.storeEvidenceDescriptionService = storeEvidenceDescriptionService;
         this.evidenceUploadEmailService = evidenceUploadEmailService;
+        this.fileToPdfConversionService = fileToPdfConversionService;
+        this.evidenceManagementService = evidenceManagementService;
     }
 
     public Optional<Evidence> uploadDraftHearingEvidence(String identifier, MultipartFile file) {
-        return uploadEvidence(identifier, file, draftHearingDocumentExtractor, document -> new SscsDocument(createNewDocumentDetails(document)));
+        return uploadEvidence(identifier, file, draftHearingDocumentExtractor, document -> new SscsDocument(createNewDocumentDetails(document)), UPLOAD_DRAFT_DOCUMENT, "SSCS - upload document from MYA");
     }
 
     public Optional<Evidence> uploadDraftQuestionEvidence(String identifier, String questionId, MultipartFile file) {
-        return uploadEvidence(identifier, file, questionDocumentExtractor, document -> new CorDocument(new CorDocumentDetails(createNewDocumentDetails(document), questionId)));
+        return uploadEvidence(identifier, file, questionDocumentExtractor, document -> new CorDocument(new CorDocumentDetails(createNewDocumentDetails(document), questionId)), UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded");
     }
 
     private SscsDocumentDetails createNewDocumentDetails(Document document) {
@@ -85,10 +95,13 @@ public class EvidenceUploadService {
                 .format(DateTimeFormatter.ISO_DATE);
     }
 
-    private <E> Optional<Evidence> uploadEvidence(String identifier, MultipartFile file, DocumentExtract<E> documentExtract, Function<Document, E> createNewDocument) {
+    private <E> Optional<Evidence> uploadEvidence(String identifier, MultipartFile file, DocumentExtract<E> documentExtract,  Function<Document, E> createNewDocument, EventType eventType, String summary) {
         return onlineHearingService.getCcdCaseByIdentifier(identifier)
                 .map(caseDetails -> {
-                    Document document = uploadDocument(file);
+
+                    List<MultipartFile> convertedFiles = fileToPdfConversionService.convert(singletonList(file));
+
+                    Document document = evidenceManagementService.upload(convertedFiles, DM_STORE_USER_ID).getEmbedded().getDocuments().get(0);
 
                     List<E> currentDocuments = documentExtract.getDocuments().apply(caseDetails.getData());
                     ArrayList<E> newDocuments = (currentDocuments == null) ? new ArrayList<>() : new ArrayList<>(currentDocuments);
@@ -96,18 +109,10 @@ public class EvidenceUploadService {
 
                     documentExtract.setDocuments().accept(caseDetails.getData(), newDocuments);
 
-
-                    ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
+                    ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), eventType.getCcdType(), summary, UPDATED_SSCS, idamService.getIdamTokens());
 
                     return new Evidence(document.links.self.href, document.originalDocumentName, getCreatedDate(document));
                 });
-    }
-
-    private Document uploadDocument(MultipartFile file) {
-        return documentManagementService.upload(singletonList(file))
-                .getEmbedded()
-                .getDocuments()
-                .get(0);
     }
 
     public boolean submitHearingEvidence(String identifier, EvidenceDescription description) {
@@ -131,7 +136,7 @@ public class EvidenceUploadService {
                         sscsCaseData.setSscsDocument(newSscsDocumentsList);
                         sscsCaseData.setDraftSscsDocument(Collections.emptyList());
 
-                        ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
+                        ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT.getCcdType(), "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
 
                         evidenceUploadEmailService.sendToDwp(storePdfContext.getPdf(), draftSscsDocument, caseDetails);
 
@@ -193,7 +198,7 @@ public class EvidenceUploadService {
                         );
                         sscsCaseData.setCorDocument(newCorDocumentList);
                         sscsCaseData.setDraftCorDocument(draftCorDocumentsForQuestionId.get(false));
-                        ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
+                        ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT.getCcdType(), "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
                     }
                     return true;
                 })
@@ -256,7 +261,7 @@ public class EvidenceUploadService {
                                 .collect(toList());
                         documentExtract.setDocuments().accept(caseDetails.getData(), newDocuments);
 
-                        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), UPLOAD_COR_DOCUMENT, "SSCS - cor evidence deleted", UPDATED_SSCS, idamService.getIdamTokens());
+                        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), UPLOAD_COR_DOCUMENT.getCcdType(), "SSCS - cor evidence deleted", UPDATED_SSCS, idamService.getIdamTokens());
 
                         documentManagementService.delete(evidenceId);
                     }

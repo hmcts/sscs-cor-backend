@@ -6,3 +6,7 @@ jui_base_url = "https://jcm.judiciary.uk"
 idam_redirect_url = "https://sscs-case-loader-prod.service.core-compute-prod.internal"
 dwp_email = "pip.corpilot@dwp.gov.uk"
 caseworker_email_address = "pipappeals@justice.gov.uk"
+enable_ase = true
+pdf_service_base_url = "https://docmosis.platform.hmcts.net/rs/render"
+pdf_service_convert_url = "https://docmosis.platform.hmcts.net/rs/convert"
+pdf_service_health_url = "https://docmosis.platform.hmcts.net/rs/status"

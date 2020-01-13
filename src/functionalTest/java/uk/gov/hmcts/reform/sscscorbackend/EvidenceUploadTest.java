@@ -20,14 +20,12 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         JSONObject questionResponse = sscsCorBackendRequests.getQuestion(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId());
         assertThat(questionResponse.has("evidence"), is(false));
 
-        String fileName = "evidence.png";
-        sscsCorBackendRequests.uploadEvidence(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId(), fileName);
-
+        sscsCorBackendRequests.uploadEvidence(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId(), "evidence.png");
 
         questionResponse = sscsCorBackendRequests.getQuestion(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId());
         JSONArray evidence = questionResponse.getJSONArray("evidence");
         assertThat(evidence.length(), is(1));
-        assertThat(evidence.getJSONObject(0).getString("file_name"), is(fileName));
+        assertThat(evidence.getJSONObject(0).getString("file_name"), is("evidence.pdf"));
 
         String evidenceId = evidence.getJSONObject(0).getString("id");
 
@@ -43,14 +41,12 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         JSONObject questionResponse = sscsCorBackendRequests.getQuestion(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId());
         assertThat(questionResponse.has("evidence"), is(false));
 
-        String fileName = "evidence.png";
-        sscsCorBackendRequests.uploadEvidence(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId(), fileName);
-
+        sscsCorBackendRequests.uploadEvidence(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId(), "evidence.png");
 
         questionResponse = sscsCorBackendRequests.getQuestion(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId());
         JSONArray evidence = questionResponse.getJSONArray("evidence");
         assertThat(evidence.length(), is(1));
-        assertThat(evidence.getJSONObject(0).getString("file_name"), is(fileName));
+        assertThat(evidence.getJSONObject(0).getString("file_name"), is("evidence.pdf"));
 
         sscsCorBackendRequests.answerQuestion(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId(), "some answer");
         sscsCorBackendRequests.submitAnswer(hearingWithQuestion.getHearingId(), hearingWithQuestion.getQuestionId());
@@ -65,13 +61,11 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         JSONArray draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(hearingWithQuestion.getHearingId());
         assertThat(draftHearingEvidence.length(), is(0));
 
-        String fileName = "evidence.png";
-        sscsCorBackendRequests.uploadHearingEvidence(hearingWithQuestion.getHearingId(), fileName);
-
+        sscsCorBackendRequests.uploadHearingEvidence(hearingWithQuestion.getHearingId(), "evidence.png");
 
         draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(hearingWithQuestion.getHearingId());
         assertThat(draftHearingEvidence.length(), is(1));
-        assertThat(draftHearingEvidence.getJSONObject(0).getString("file_name"), is(fileName));
+        assertThat(draftHearingEvidence.getJSONObject(0).getString("file_name"), is("evidence.pdf"));
 
         String evidenceId = draftHearingEvidence.getJSONObject(0).getString("id");
 
@@ -87,12 +81,11 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         JSONArray draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(hearingWithQuestion.getHearingId());
         assertThat(draftHearingEvidence.length(), is(0));
 
-        String fileName = "evidence.png";
-        sscsCorBackendRequests.uploadHearingEvidence(hearingWithQuestion.getHearingId(), fileName);
+        sscsCorBackendRequests.uploadHearingEvidence(hearingWithQuestion.getHearingId(), "evidence.png");
 
         draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(hearingWithQuestion.getHearingId());
         assertThat(draftHearingEvidence.length(), is(1));
-        assertThat(draftHearingEvidence.getJSONObject(0).getString("file_name"), is(fileName));
+        assertThat(draftHearingEvidence.getJSONObject(0).getString("file_name"), is("evidence.pdf"));
 
         sscsCorBackendRequests.submitHearingEvidence(hearingWithQuestion.getHearingId(), "some description");
 
@@ -104,9 +97,10 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         List<SscsDocument> sscsDocument = caseDetails.getData().getSscsDocument();
         assertThat(sscsDocument.size(), is(2));
         String caseReference = caseDetails.getData().getCaseReference();
-        assertThat(sscsDocument.get(0).getValue().getDocumentFileName(), is(fileName));
-        assertThat(sscsDocument.get(1).getValue().getDocumentFileName(), is("Evidence Description - " + caseReference + ".pdf"));
+        assertThat(sscsDocument.get(0).getValue().getDocumentFileName(), is("evidence.pdf"));
+        assertThat(sscsDocument.get(1).getValue().getDocumentFileName(), is("Evidence Description - " + hearingWithQuestion.getCaseId() + ".pdf"));
     }
+
 
     @Test
     public void getEvidenceCoverSheet() throws IOException {

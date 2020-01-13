@@ -38,6 +38,17 @@ data "azurerm_key_vault_secret" "docmosis-api-key" {
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
+
+data "azurerm_key_vault_secret" "appinsights_instrumentation_key" {
+  name      = "AppInsightsInstrumentationKey"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
+}
+
+data "azurerm_key_vault_secret" "pdf_service_base_url" {
+  name      = "docmosis-endpoint"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
+}
+
 locals {
   ase_name = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
 
@@ -69,6 +80,8 @@ module "sscs-core-backend" {
   common_tags         = "${var.common_tags}"
   asp_rg              = "${var.product}-${var.component}-${var.env}"
   asp_name            = "${var.product}-${var.component}-${var.env}"
+  enable_ase          = "${var.enable_ase}"
+  appinsights_instrumentation_key = "${data.azurerm_key_vault_secret.appinsights_instrumentation_key.value}"
 
   app_settings = {
     IDAM_S2S_AUTH                   = "${local.s2sCnpUrl}"
@@ -78,7 +91,9 @@ module "sscs-core-backend" {
     IDAM_OAUTH2_CLIENT_SECRET       = "${data.azurerm_key_vault_secret.idam-sscs-oauth2-client-secret.value}"
     IDAM_OAUTH2_REDIRECT_URL        = "${var.idam_redirect_url}"
     IDAM_URL                        = "${local.idam_url}"
+    IDAM_API_JWK_URL 				= "${local.idam_url}/jwks"
     IDAM_SSCS_URL                   = "${var.idam_sscs_url}"
+    APPINSIGHTS_INSTRUMENTATIONKEY = "${data.azurerm_key_vault_secret.appinsights_instrumentation_key.value}"
 
     COH_URL = "${local.cohUrl}"
     CORE_CASE_DATA_URL = "${local.ccdApi}"
@@ -98,6 +113,9 @@ module "sscs-core-backend" {
     CASEWORKER_EMAIL       = "${var.caseworker_email_address}"
 
     PDF_SERVICE_ACCESS_KEY = "${data.azurerm_key_vault_secret.docmosis-api-key.value}"
+    PDF_SERVICE_CONVERT_URL = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/convert"
+    PDF_SERVICE_HEALTH_URL = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/status"
+    PDF_SERVICE_BASE_URL   = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/render"
 
     JUI_BASE_URL  = "${var.jui_base_url}"
   }
