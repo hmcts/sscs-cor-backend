@@ -113,7 +113,7 @@ public class EmailMessageBuilder {
         Name name = appellant.getName();
         return template.replace("{firstName}", name.getFirstName())
                 .replace("{lastName}", name.getLastName())
-                .replace("{caseReference}", data.getCaseReference())
+                .replace("{caseReference}", caseDetails.getId().toString())
                 .replace("{nino}", appellant.getIdentity().getNino())
                 .replace("{message}", message);
     }

@@ -46,7 +46,7 @@ public class CohEventsTest extends BaseIntegrationTest {
 
         pdfServiceStub.verifyCreateDecisionIssuedPdf(caseReference);
         documentStoreStub.verifyUploadFile(pdf);
-        ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "Tribunals view - " + caseReference + ".pdf");
+        ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "Tribunals view - " + caseId + ".pdf");
         mailStub.hasEmailWithSubjectAndAttachment("Preliminary view offered (" + caseReference + ")", pdf);
         notificationsStub.verifySendNotification(cohEvent);
     }
@@ -74,7 +74,7 @@ public class CohEventsTest extends BaseIntegrationTest {
         mailStub.hasEmailWithSubjectAndAttachment("Questions issued to the appellant (" + caseReference + ")", pdf);
         pdfServiceStub.verifyCreateQuestionRoundIssuedPdf(caseReference);
         documentStoreStub.verifyUploadFile(pdf);
-        ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "Issued Questions Round 1 - " + caseReference + ".pdf");
+        ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "Issued Questions Round 1 - " + caseId + ".pdf");
     }
 
     @Test
@@ -104,7 +104,7 @@ public class CohEventsTest extends BaseIntegrationTest {
         mailStub.hasEmailWithSubjectAndAttachment("Appellant has provided information (" + caseReference + ")", pdf);
         pdfServiceStub.verifyCreateAnswersPdf(caseReference);
         documentStoreStub.verifyUploadFile(pdf);
-        ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "Issued Answers Round 1 - " + caseReference + ".pdf");
+        ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "Issued Answers Round 1 - " + caseId + ".pdf");
 
         mailStub.hasEmailWithSubjectAndAttachment("Evidence uploaded (" + caseReference + ")", evidenceFileContent.getBytes());
     }
@@ -128,7 +128,7 @@ public class CohEventsTest extends BaseIntegrationTest {
         mailStub.hasEmailWithSubject("COR: Hearing required");
         pdfServiceStub.verifySummaryPdf(caseReference);
         documentStoreStub.verifyUploadFile(pdf);
-        ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "COR Transcript - " + caseReference + ".pdf");
+        ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "COR Transcript - " + caseId + ".pdf");
         ccdStub.verifyUpdateCaseToOralHearing(caseId, caseReference);
         ccdStub.verifyRemovePanelMember(caseId, "someMedicalMember");
         ccdStub.verifyRemovePanelMember(caseId, "someDisabilityMember");
@@ -161,7 +161,7 @@ public class CohEventsTest extends BaseIntegrationTest {
         mailStub.hasEmailWithSubjectAndAttachment("Evidence uploaded (" + caseReference + ")", evidenceFileContent.getBytes());
         pdfServiceStub.verifyCreateAnswersPdf(caseReference);
         documentStoreStub.verifyUploadFile(pdf);
-        ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "Issued Answers Deadline Elapsed Round 1 - " + caseReference + ".pdf");
+        ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "Issued Answers Deadline Elapsed Round 1 - " + caseId + ".pdf");
         notificationsStub.verifySendNotification(cohEvent);
     }
 

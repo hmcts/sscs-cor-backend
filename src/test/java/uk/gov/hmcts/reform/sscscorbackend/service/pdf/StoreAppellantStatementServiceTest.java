@@ -55,8 +55,8 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 public class StoreAppellantStatementServiceTest {
 
     private static final String APPELLANT_STATEMENT_1 = "Appellant statement 1 - ";
-    private static final String APPELLANT_STATEMENT_1_SC_0011111_PDF = "Appellant statement 1 - SC0011111.pdf";
-    private static final String APPELLANT_STATEMENT_2_SC_0022222_PDF = "Appellant statement 2 - SC0022222.pdf";
+    private static final String APPELLANT_STATEMENT_1_SC_0011111_PDF = "Appellant statement 1 - 1234-5678-9012-3456.pdf";
+    private static final String APPELLANT_STATEMENT_2_SC_0022222_PDF = "Appellant statement 2 - 1234-5678-9012-3456.pdf";
     private static final String OTHER_EVIDENCE = "Other evidence";
 
     @Rule
@@ -196,6 +196,7 @@ public class StoreAppellantStatementServiceTest {
     private SscsCaseDetails buildSscsCaseDetailsTestData() {
         SscsCaseData caseData = caseWithScannedDocumentAndSscsDocument(APPELLANT_STATEMENT_1_SC_0011111_PDF,
             APPELLANT_STATEMENT_2_SC_0022222_PDF);
+        caseData.setCcdCaseId("1234-5678-9012-3456");
         caseData.setAppeal(Appeal.builder()
             .appellant(Appellant.builder()
                 .name(Name.builder()
