@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ATTACH_SCANNED_DOCS;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -535,7 +536,7 @@ public class EvidenceUploadServiceTest {
     @Test
     public void givenANonCorCaseWithScannedDocumentsAndDraftDocument_thenMoveDraftToScannedDocumentsAndUpdateCaseInCcd() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
-        ScannedDocument descriptionDocument = ScannedDocument.builder()
+        ScannedDocument evidenceDocument = ScannedDocument.builder()
                     .value(ScannedDocumentDetails.builder()
                         .fileName("anotherFileName")
                         .url(DocumentLink.builder()
@@ -544,12 +545,33 @@ public class EvidenceUploadServiceTest {
                         .scannedDate(convertCreatedOnDate(evidenceCreatedOn))
                     .build())
                 .build();
-        List<ScannedDocument> list = singletonList(descriptionDocument);
+        List<ScannedDocument> list = singletonList(evidenceDocument);
         sscsCaseDetails.getData().setScannedDocuments(list);
+
+        SscsDocument descriptionDocument = SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                        .documentFileName("anotherFileName")
+                        .documentLink(DocumentLink.builder()
+                                .documentUrl("http://anotherUrl")
+                                .build())
+                        .documentDateAdded(convertCreatedOnDate(evidenceCreatedOn))
+                        .build())
+                .build();
+        List<SscsDocument> sscsList = new ArrayList();
+        sscsList.add(descriptionDocument);
+        sscsCaseDetails.getData().setSscsDocument(sscsList);
+
         sscsCaseDetails.getData().setAppeal(Appeal.builder().hearingType("sya").build());
 
         final int originalNumberOfScannedDocuments = sscsCaseDetails.getData().getScannedDocuments().size();
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+
+        UploadedEvidence evidenceDescriptionPdf = mock(UploadedEvidence.class);
+        when(storeEvidenceDescriptionService.storePdf(
+                someCcdCaseId,
+                someOnlineHearingId,
+                new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
+        )).thenReturn(new CohEventActionContext(evidenceDescriptionPdf, sscsCaseDetails));
 
         boolean submittedEvidence = evidenceUploadService.submitHearingEvidence(someOnlineHearingId, someDescription);
 
@@ -601,7 +623,7 @@ public class EvidenceUploadServiceTest {
     private SscsCaseData hasSscsScannedDocument(int originalNumberOfDocuments, String documentUrl, String fileName) {
         return argThat(argument -> {
             List<ScannedDocument> scannedDocuments = argument.getScannedDocuments();
-            return scannedDocuments.size() == originalNumberOfDocuments + 1 &&
+            return scannedDocuments.size() == originalNumberOfDocuments + 2 &&
                     scannedDocuments.get(originalNumberOfDocuments).getValue().getUrl().getDocumentUrl().equals(documentUrl) &&
                     scannedDocuments.get(originalNumberOfDocuments).getValue().getFileName().equals(fileName);
         });
