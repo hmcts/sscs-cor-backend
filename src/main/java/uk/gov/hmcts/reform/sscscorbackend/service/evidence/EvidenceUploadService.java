@@ -143,10 +143,20 @@ public class EvidenceUploadService {
                         return true;
                     } else {
                         List<ScannedDocument> scannedDocs = new ArrayList<>();
+
+                        EvidenceDescriptionPdfData data = new EvidenceDescriptionPdfData(caseDetails, description, getFileNames(sscsCaseData));
+                        CohEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(ccdCaseId, identifier, data);
+
                         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                        for (SscsDocument draftSscsDocument : caseDetails.getData().getDraftSscsDocument()) {
-                            LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(), dateFormatter);
-                            LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
+
+                        List<SscsDocument> sscsDocument = storePdfContext.getDocument().getData().getSscsDocument();
+                        SscsDocument evidenceDescriptionDocument = sscsDocument.get(sscsDocument.size()-1);
+                        LocalDate ld = LocalDate.parse(evidenceDescriptionDocument.getValue().getDocumentDateAdded(), dateFormatter);
+                        LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
+
+                        for (SscsDocument draftSscsDocument : storePdfContext.getDocument().getData().getDraftSscsDocument()) {
+                            ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(), dateFormatter);
+                            ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
 
                             ScannedDocument scannedDocument = ScannedDocument.builder().value(
                                     ScannedDocumentDetails.builder()
@@ -158,6 +168,16 @@ public class EvidenceUploadService {
 
                             scannedDocs.add(scannedDocument);
                         }
+                        ScannedDocument convertEvidenceToScannedDocument = ScannedDocument.builder().value(
+                                ScannedDocumentDetails.builder()
+                                        .type("other")
+                                        .url(evidenceDescriptionDocument.getValue().getDocumentLink())
+                                        .fileName(evidenceDescriptionDocument.getValue().getDocumentFileName())
+                                        .scannedDate(ldt.toString())
+                                        .build()).build();
+                        scannedDocs.add(convertEvidenceToScannedDocument);
+                        sscsDocument.remove(sscsDocument.size()-1);
+                        sscsCaseData.setSscsDocument(sscsDocument);
 
                         List<ScannedDocument> newScannedDocumentsList = union(
                                 emptyIfNull(caseDetails.getData().getScannedDocuments()),
