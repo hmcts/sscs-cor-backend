@@ -557,7 +557,7 @@ public class EvidenceUploadServiceTest {
                         .documentDateAdded(convertCreatedOnDate(evidenceCreatedOn))
                         .build())
                 .build();
-        List<SscsDocument> sscsList = new ArrayList();
+        List<SscsDocument> sscsList = new ArrayList<>();
         sscsList.add(descriptionDocument);
         sscsCaseDetails.getData().setSscsDocument(sscsList);
 
