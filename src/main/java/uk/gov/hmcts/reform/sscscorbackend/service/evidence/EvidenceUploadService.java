@@ -150,7 +150,7 @@ public class EvidenceUploadService {
                         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
                         List<SscsDocument> sscsDocument = storePdfContext.getDocument().getData().getSscsDocument();
-                        SscsDocument evidenceDescriptionDocument = sscsDocument.get(sscsDocument.size()-1);
+                        SscsDocument evidenceDescriptionDocument = sscsDocument.get(sscsDocument.size() - 1);
                         LocalDate ld = LocalDate.parse(evidenceDescriptionDocument.getValue().getDocumentDateAdded(), dateFormatter);
                         LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
 
@@ -176,7 +176,7 @@ public class EvidenceUploadService {
                                         .scannedDate(ldt.toString())
                                         .build()).build();
                         scannedDocs.add(convertEvidenceToScannedDocument);
-                        sscsDocument.remove(sscsDocument.size()-1);
+                        sscsDocument.remove(sscsDocument.size() - 1);
                         sscsCaseData.setSscsDocument(sscsDocument);
 
                         List<ScannedDocument> newScannedDocumentsList = union(
