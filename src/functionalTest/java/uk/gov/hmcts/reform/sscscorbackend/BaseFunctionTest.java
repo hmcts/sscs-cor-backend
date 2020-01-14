@@ -78,6 +78,15 @@ public abstract class BaseFunctionTest {
         return emailAddress;
     }
 
+    protected CreatedCcdCase createCase() throws IOException {
+        String emailAddress = createRandomEmail();
+
+        CreatedCcdCase createdCcdCase = null;
+        createdCcdCase = sscsCorBackendRequests.createOralCase(emailAddress);
+
+        return createdCcdCase;
+    }
+    
     protected OnlineHearing createHearing(boolean ccdCaseRequired) throws IOException {
         return createHearingAndCcdCase(ccdCaseRequired).getOnlineHearing();
     }
@@ -87,14 +96,6 @@ public abstract class BaseFunctionTest {
         return createHearingAndCcdCase(ccdCaseRequired, emailAddress);
     }
 
-    protected CreatedCcdCase createCase() throws IOException {
-        String emailAddress = createRandomEmail();
-
-        CreatedCcdCase createdCcdCase = null;
-        createdCcdCase = sscsCorBackendRequests.createOralCase(emailAddress);
-
-        return createdCcdCase;
-    }
 
     protected CreatedCaseHearingData createHearingAndCcdCase(boolean ccdCaseRequired, String emailAddress) throws IOException {
         String hearingId;
