@@ -72,7 +72,7 @@ public class CohEventsTest extends BaseIntegrationTest {
 
         notificationsStub.verifySendNotification(cohEvent);
         mailStub.hasEmailWithSubjectAndAttachment("Questions issued to the appellant (" + caseReference + ")", pdf);
-        pdfServiceStub.verifyCreateQuestionRoundIssuedPdf(caseReference);
+        pdfServiceStub.verifyCreateQuestionRoundIssuedPdf(caseId.toString());
         documentStoreStub.verifyUploadFile(pdf);
         ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "Issued Questions Round 1 - " + caseId + ".pdf");
     }
@@ -102,7 +102,7 @@ public class CohEventsTest extends BaseIntegrationTest {
         makeCohEventRequest(cohEvent);
 
         mailStub.hasEmailWithSubjectAndAttachment("Appellant has provided information (" + caseReference + ")", pdf);
-        pdfServiceStub.verifyCreateAnswersPdf(caseReference);
+        pdfServiceStub.verifyCreateAnswersPdf(caseId.toString());
         documentStoreStub.verifyUploadFile(pdf);
         ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "Issued Answers Round 1 - " + caseId + ".pdf");
 
@@ -126,7 +126,7 @@ public class CohEventsTest extends BaseIntegrationTest {
         makeCohEventRequest(cohEvent);
 
         mailStub.hasEmailWithSubject("COR: Hearing required");
-        pdfServiceStub.verifySummaryPdf(caseReference);
+        pdfServiceStub.verifySummaryPdf(caseId.toString());
         documentStoreStub.verifyUploadFile(pdf);
         ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "COR Transcript - " + caseId + ".pdf");
         ccdStub.verifyUpdateCaseToOralHearing(caseId, caseReference);
@@ -159,7 +159,7 @@ public class CohEventsTest extends BaseIntegrationTest {
 
         mailStub.hasEmailWithSubjectAndAttachment("Appellant has provided information (" + caseReference + ")", pdf);
         mailStub.hasEmailWithSubjectAndAttachment("Evidence uploaded (" + caseReference + ")", evidenceFileContent.getBytes());
-        pdfServiceStub.verifyCreateAnswersPdf(caseReference);
+        pdfServiceStub.verifyCreateAnswersPdf(caseId.toString());
         documentStoreStub.verifyUploadFile(pdf);
         ccdStub.verifyUpdateCaseWithPdf(caseId, caseReference, "Issued Answers Deadline Elapsed Round 1 - " + caseId + ".pdf");
         notificationsStub.verifySendNotification(cohEvent);
