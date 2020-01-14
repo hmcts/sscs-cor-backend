@@ -38,7 +38,7 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
         List<SscsDocument> sscsDocuments = caseDetails.getData().getSscsDocument();
 
         long numberOfAppellantStatements = scannedDocuments != null
-            ? getCountOfAppellantStatements(scannedDocuments, sscsDocuments): 0;
+            ? getCountOfAppellantStatements(scannedDocuments, sscsDocuments) : 0;
 
         long appellantStatementNumber = numberOfAppellantStatements + 1;
         return FILE_NAME_PREFIX + appellantStatementNumber + " - ";
