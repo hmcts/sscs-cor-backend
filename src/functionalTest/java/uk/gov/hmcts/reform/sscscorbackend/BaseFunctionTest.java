@@ -92,6 +92,7 @@ public abstract class BaseFunctionTest {
         CreatedCcdCase createdCcdCase = null;
         if (ccdCaseRequired) {
             createdCcdCase = sscsCorBackendRequests.createCase(emailAddress);
+            System.out.println("Case id " + createdCcdCase.getCaseId());
             hearingId = cohRequests.createHearing(createdCcdCase.getCaseId());
         } else {
             hearingId = cohRequests.createHearing();

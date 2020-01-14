@@ -8,6 +8,6 @@ public class AppellantStatementTest extends BaseFunctionTest {
     public void canUploadAnAppellantStatement() throws IOException {
         OnlineHearing hearingWithQuestion = createHearing(true);
 
-        sscsCorBackendRequests.uploadAppellantStatement(hearingWithQuestion.getHearingId(), "statement");
+        sscsCorBackendRequests.uploadAppellantStatement(hearingWithQuestion.getCaseId(), "statement");
     }
 }
