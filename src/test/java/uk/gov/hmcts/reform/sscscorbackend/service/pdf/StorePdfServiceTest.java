@@ -112,6 +112,7 @@ public class StorePdfServiceTest {
 
     private SscsCaseDetails createCaseDetails() {
         return SscsCaseDetails.builder()
+                .id(1234567890L)
                 .data(SscsCaseData.builder()
                         .ccdCaseId(CASE_ID)
                         .appeal(Appeal.builder()

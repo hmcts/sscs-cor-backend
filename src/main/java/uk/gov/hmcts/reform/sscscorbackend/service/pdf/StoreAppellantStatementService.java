@@ -38,21 +38,25 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
         List<SscsDocument> sscsDocuments = caseDetails.getData().getSscsDocument();
 
         long numberOfAppellantStatements = scannedDocuments != null
-            ? getCountOfAppellantStatements(scannedDocuments, sscsDocuments) : 0;
+            ? getCountOfAppellantStatements(scannedDocuments, sscsDocuments): 0;
 
         long appellantStatementNumber = numberOfAppellantStatements + 1;
         return FILE_NAME_PREFIX + appellantStatementNumber + " - ";
     }
 
     private long getCountOfAppellantStatements(List<ScannedDocument> scannedDocuments, List<SscsDocument> sscsDocuments) {
-        return scannedDocuments.stream()
-            .filter(doc -> doc.getValue() != null)
-            .filter(doc -> StringUtils.isNotBlank(doc.getValue().getFileName()))
-            .filter(doc -> doc.getValue().getFileName().startsWith(FILE_NAME_PREFIX)).count() +
-            sscsDocuments.stream()
-            .filter(doc -> doc.getValue() != null)
-            .filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentFileName()))
-            .filter(doc -> doc.getValue().getDocumentFileName().startsWith(FILE_NAME_PREFIX)).count();
+        long statementCount = 0;
+        statementCount = scannedDocuments.stream()
+                .filter(doc -> doc.getValue() != null)
+                .filter(doc -> StringUtils.isNotBlank(doc.getValue().getFileName()))
+                .filter(doc -> doc.getValue().getFileName().startsWith(FILE_NAME_PREFIX)).count();
+        if (sscsDocuments != null) {
+            statementCount += sscsDocuments.stream()
+                    .filter(sscsDoc -> sscsDoc.getValue() != null)
+                    .filter(sscsDoc -> StringUtils.isNotBlank(sscsDoc.getValue().getDocumentFileName()))
+                    .filter(sscsDoc -> sscsDoc.getValue().getDocumentFileName().startsWith(FILE_NAME_PREFIX)).count();
+        }
+        return statementCount;
     }
 
     @Override

@@ -55,12 +55,15 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 public class StoreAppellantStatementServiceTest {
 
     private static final String APPELLANT_STATEMENT_1 = "Appellant statement 1 - ";
-    private static final String APPELLANT_STATEMENT_1_SC_0011111_PDF = "Appellant statement 1 - 1234-5678-9012-3456.pdf";
-    private static final String APPELLANT_STATEMENT_2_SC_0022222_PDF = "Appellant statement 2 - 1234-5678-9012-3456.pdf";
+    private static final String APPELLANT_STATEMENT_2 = "Appellant statement 2 - ";
+    private static final String APPELLANT_STATEMENT_3 = "Appellant statement 3 - ";
+    private static final String APPELLANT_STATEMENT_1_1234567890_PDF = "Appellant statement 1 - 1234567890.pdf";
+    private static final String APPELLANT_STATEMENT_2_1234567890_PDF = "Appellant statement 2 - 1234567890.pdf";
+    private static final String APPELLANT_STATEMENT_3_1234567890_PDF = "Appellant statement 3 - 1234567890.pdf";
     private static final String OTHER_EVIDENCE = "Other evidence";
 
     @Rule
-    public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+    public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.LENIENT);
 
     @Mock
     private PdfService pdfService;
@@ -92,9 +95,9 @@ public class StoreAppellantStatementServiceTest {
     private Object[] generateDifferentCaseDataScenarios() {
         SscsCaseData sscsCaseDataWithNoDocs = SscsCaseData.builder().build();
         SscsCaseData sscsCaseDataWithSomeOtherDoc = caseWithScannedDocumentAndSscsDocument(
-            "Some other document.txt", APPELLANT_STATEMENT_2_SC_0022222_PDF);
+            "Some other document.txt", APPELLANT_STATEMENT_1_1234567890_PDF);
         SscsCaseData sscsCaseDataWithSomeOtherStatement = caseWithScannedDocumentAndSscsDocument(
-            APPELLANT_STATEMENT_1_SC_0011111_PDF, APPELLANT_STATEMENT_2_SC_0022222_PDF);
+                APPELLANT_STATEMENT_1_1234567890_PDF, APPELLANT_STATEMENT_2_1234567890_PDF);
         SscsCaseData sscsCaseDataWithDocWithNullValue = SscsCaseData.builder()
             .scannedDocuments(singletonList(ScannedDocument.builder()
                 .value(null)
@@ -116,8 +119,8 @@ public class StoreAppellantStatementServiceTest {
             .build();
         return new Object[]{
             new Object[]{sscsCaseDataWithNoDocs, APPELLANT_STATEMENT_1},
-            new Object[]{sscsCaseDataWithSomeOtherDoc, APPELLANT_STATEMENT_1},
-            new Object[]{sscsCaseDataWithSomeOtherStatement, "Appellant statement 2 - "},
+            new Object[]{sscsCaseDataWithSomeOtherDoc, APPELLANT_STATEMENT_2},
+            new Object[]{sscsCaseDataWithSomeOtherStatement, APPELLANT_STATEMENT_3},
             new Object[]{sscsCaseDataWithDocWithNullValue, APPELLANT_STATEMENT_1},
             new Object[]{sscsCaseDataWithDocWithEmptyFilename, APPELLANT_STATEMENT_1},
             new Object[]{sscsCaseDataWithDocWithNullFilename, APPELLANT_STATEMENT_1}
@@ -149,8 +152,8 @@ public class StoreAppellantStatementServiceTest {
     public void givenCaseDataWithSomeOtherStatement_shouldCallTheStorePdfWithTheCorrectPdfName() {
         when(pdfService.createPdf(any(), eq("templatePath"))).thenReturn(new byte[0]);
 
-        when(ccdPdfService.mergeDocIntoCcd(eq(APPELLANT_STATEMENT_2_SC_0022222_PDF), any(),
-            eq(1L), any(SscsCaseData.class), any(IdamTokens.class), eq(OTHER_EVIDENCE)))
+        when(ccdPdfService.mergeDocIntoCcd(eq(APPELLANT_STATEMENT_2_1234567890_PDF), any(),
+            eq(1234567890L), any(SscsCaseData.class), any(IdamTokens.class), eq(OTHER_EVIDENCE)))
             .thenReturn(SscsCaseData.builder().build());
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
@@ -159,18 +162,18 @@ public class StoreAppellantStatementServiceTest {
         Statement statement = new Statement("some statement");
         AppellantStatementPdfData data = new AppellantStatementPdfData(caseDetails, statement);
 
-        storeAppellantStatementService.storePdf(1L, "onlineHearingId", data);
+        storeAppellantStatementService.storePdf(1234567890L, "onlineHearingId", data);
 
         ArgumentCaptor<String> acForPdfName = ArgumentCaptor.forClass(String.class);
         verify(ccdPdfService, times(1)).mergeDocIntoCcd(acForPdfName.capture(), any(),
-            eq(1L), any(SscsCaseData.class), any(IdamTokens.class), eq(OTHER_EVIDENCE));
-        assertThat(acForPdfName.getValue(), is(APPELLANT_STATEMENT_2_SC_0022222_PDF));
+            eq(1234567890L), any(SscsCaseData.class), any(IdamTokens.class), eq(OTHER_EVIDENCE));
+        assertThat(acForPdfName.getValue(), is(APPELLANT_STATEMENT_3_1234567890_PDF));
         verifyZeroInteractions(evidenceManagementService);
     }
 
     @Test
     public void givenCaseDataWithPdfStatementAlreadyCreated_shouldCallTheLoadPdf() throws Exception {
-        doReturn(APPELLANT_STATEMENT_1_SC_0011111_PDF).when(storeAppellantStatementService,
+        doReturn(APPELLANT_STATEMENT_1_1234567890_PDF).when(storeAppellantStatementService,
             "documentNamePrefix", any(SscsCaseDetails.class), anyString());
 
         doReturn(false).when(storeAppellantStatementService,
@@ -194,9 +197,9 @@ public class StoreAppellantStatementServiceTest {
     }
 
     private SscsCaseDetails buildSscsCaseDetailsTestData() {
-        SscsCaseData caseData = caseWithScannedDocumentAndSscsDocument(APPELLANT_STATEMENT_1_SC_0011111_PDF,
-            APPELLANT_STATEMENT_2_SC_0022222_PDF);
-        caseData.setCcdCaseId("1234-5678-9012-3456");
+        SscsCaseData caseData = caseWithScannedDocumentAndSscsDocument(APPELLANT_STATEMENT_1_1234567890_PDF,
+                APPELLANT_STATEMENT_2_1234567890_PDF);
+        caseData.setCcdCaseId("1234567890");
         caseData.setAppeal(Appeal.builder()
             .appellant(Appellant.builder()
                 .name(Name.builder()
@@ -212,6 +215,7 @@ public class StoreAppellantStatementServiceTest {
         caseData.setCaseReference("SC0022222");
 
         return SscsCaseDetails.builder()
+            .id(1234567890L)
             .data(caseData)
             .build();
     }
