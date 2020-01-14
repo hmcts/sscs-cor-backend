@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
@@ -34,19 +35,24 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
     @Override
     protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId) {
         List<ScannedDocument> scannedDocuments = caseDetails.getData().getScannedDocuments();
+        List<SscsDocument> sscsDocuments = caseDetails.getData().getSscsDocument();
 
         long numberOfAppellantStatements = scannedDocuments != null
-            ? getCountOfAppellantStatements(scannedDocuments) : 0;
+            ? getCountOfAppellantStatements(scannedDocuments, sscsDocuments) : 0;
 
         long appellantStatementNumber = numberOfAppellantStatements + 1;
         return FILE_NAME_PREFIX + appellantStatementNumber + " - ";
     }
 
-    private long getCountOfAppellantStatements(List<ScannedDocument> scannedDocuments) {
+    private long getCountOfAppellantStatements(List<ScannedDocument> scannedDocuments, List<SscsDocument> sscsDocuments) {
         return scannedDocuments.stream()
             .filter(doc -> doc.getValue() != null)
             .filter(doc -> StringUtils.isNotBlank(doc.getValue().getFileName()))
-            .filter(doc -> doc.getValue().getFileName().startsWith(FILE_NAME_PREFIX)).count();
+            .filter(doc -> doc.getValue().getFileName().startsWith(FILE_NAME_PREFIX)).count() +
+            sscsDocuments.stream()
+            .filter(doc -> doc.getValue() != null)
+            .filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentFileName()))
+            .filter(doc -> doc.getValue().getDocumentFileName().startsWith(FILE_NAME_PREFIX)).count();
     }
 
     @Override
