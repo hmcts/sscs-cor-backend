@@ -57,11 +57,11 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
 
         log.info("Statement count 1: {}" + statementCount);
 
-        for (SscsDocument sscsDocument: sscsDocuments) {
-            log.info("sscsDocument.getValue().getDocumentFileName() {}", sscsDocument.getValue().getDocumentFileName());
-        }
-
         if (sscsDocuments != null) {
+            for (SscsDocument sscsDocument: sscsDocuments) {
+                log.info("sscsDocument.getValue().getDocumentFileName() {}", sscsDocument.getValue().getDocumentFileName());
+            }
+
             statementCount += sscsDocuments.stream()
                     .filter(sscsDoc -> sscsDoc.getValue() != null)
                     .filter(sscsDoc -> StringUtils.isNotBlank(sscsDoc.getValue().getDocumentFileName()))
