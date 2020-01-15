@@ -40,34 +40,28 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
         List<ScannedDocument> scannedDocuments = caseDetails.getData().getScannedDocuments();
         List<SscsDocument> sscsDocuments = caseDetails.getData().getSscsDocument();
 
-        long numberOfAppellantStatements = scannedDocuments != null
-            ? getCountOfAppellantStatements(scannedDocuments, sscsDocuments) : 0;
+        long numberOfAppellantStatements = getCountOfAppellantStatements(scannedDocuments, sscsDocuments);
 
         long appellantStatementNumber = numberOfAppellantStatements + 1;
         return FILE_NAME_PREFIX + appellantStatementNumber + " - ";
     }
 
     private long getCountOfAppellantStatements(List<ScannedDocument> scannedDocuments, List<SscsDocument> sscsDocuments) {
-        log.info("Counting statements");
         long statementCount = 0;
-        statementCount = scannedDocuments.stream()
-                .filter(doc -> doc.getValue() != null)
-                .filter(doc -> StringUtils.isNotBlank(doc.getValue().getFileName()))
-                .filter(doc -> doc.getValue().getFileName().startsWith(FILE_NAME_PREFIX)).count();
 
-        log.info("Statement count 1: {}" + statementCount);
+        if (scannedDocuments != null) {
+            statementCount = scannedDocuments.stream()
+                    .filter(doc -> doc.getValue() != null)
+                    .filter(doc -> StringUtils.isNotBlank(doc.getValue().getFileName()))
+                    .filter(doc -> doc.getValue().getFileName().startsWith(FILE_NAME_PREFIX)).count();
+        }
 
         if (sscsDocuments != null) {
-            for (SscsDocument sscsDocument: sscsDocuments) {
-                log.info("sscsDocument.getValue().getDocumentFileName() {}", sscsDocument.getValue().getDocumentFileName());
-            }
-
             statementCount += sscsDocuments.stream()
                     .filter(sscsDoc -> sscsDoc.getValue() != null)
                     .filter(sscsDoc -> StringUtils.isNotBlank(sscsDoc.getValue().getDocumentFileName()))
                     .filter(sscsDoc -> sscsDoc.getValue().getDocumentFileName().startsWith(FILE_NAME_PREFIX)).count();
         }
-        log.info("Statement count 2: {}" + statementCount);
         return statementCount;
     }
 
