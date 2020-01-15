@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscscorbackend.service.pdf;
 
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,6 +19,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppellantStatement;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.AppellantStatementPdfData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
+@Slf4j
 @Service
 public class StoreAppellantStatementService extends StorePdfService<PdfAppellantStatement, AppellantStatementPdfData> {
 
@@ -45,17 +48,26 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
     }
 
     private long getCountOfAppellantStatements(List<ScannedDocument> scannedDocuments, List<SscsDocument> sscsDocuments) {
+        log.info("Counting statements");
         long statementCount = 0;
         statementCount = scannedDocuments.stream()
                 .filter(doc -> doc.getValue() != null)
                 .filter(doc -> StringUtils.isNotBlank(doc.getValue().getFileName()))
                 .filter(doc -> doc.getValue().getFileName().startsWith(FILE_NAME_PREFIX)).count();
+
+        log.info("Statement count 1: {}" + statementCount);
+
+        for (SscsDocument sscsDocument: sscsDocuments ) {
+            log.info("sscsDocument.getValue().getDocumentFileName() {}", sscsDocument.getValue().getDocumentFileName());
+        }
+
         if (sscsDocuments != null) {
             statementCount += sscsDocuments.stream()
                     .filter(sscsDoc -> sscsDoc.getValue() != null)
                     .filter(sscsDoc -> StringUtils.isNotBlank(sscsDoc.getValue().getDocumentFileName()))
                     .filter(sscsDoc -> sscsDoc.getValue().getDocumentFileName().startsWith(FILE_NAME_PREFIX)).count();
         }
+        log.info("Statement count 2: {}" + statementCount);
         return statementCount;
     }
 
