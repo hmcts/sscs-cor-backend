@@ -103,23 +103,12 @@ public class StoreAppellantStatementServiceTest {
         Subscription representativeSubscription = Subscription.builder()
             .tya("someTyaRepsCode")
             .build();
-        SscsCaseData sscsCaseDataWithNoDocsAndWithRepsAndAppellantSubscriptions = SscsCaseData.builder()
-            .subscriptions(Subscriptions.builder()
-                .appellantSubscription(appellantSubscription)
-                .representativeSubscription(representativeSubscription)
-                .build())
-            .build();
 
         // todo:  no subscription scenario
         // todo:  subscription is empty
 
+        // some corner case scenarios
         SscsCaseData sscsCaseDataWithNoDocs = SscsCaseData.builder().build();
-
-        SscsCaseData sscsCaseDataWithSomeOtherDoc = caseWithScannedDocumentAndSscsDocument(
-            "Some other document.txt");
-
-        SscsCaseData sscsCaseDataWithSomeOtherStatement = caseWithScannedDocumentAndSscsDocument(
-            APPELLANT_STATEMENT_1_1234_5678_9012_3456_PDF);
 
         SscsCaseData sscsCaseDataWithDocWithNullValue = SscsCaseData.builder()
             .scannedDocuments(singletonList(ScannedDocument.builder()
@@ -144,23 +133,34 @@ public class StoreAppellantStatementServiceTest {
             .build();
 
         return new Object[]{
-            new Object[]{sscsCaseDataWithNoDocsAndWithRepsAndAppellantSubscriptions, "Representative statement 1 - ",
-                "someTyaRepsCode"},
+            new Object[]{buildCaseDataWithNoDocsAndWithGivenSubs(appellantSubscription, representativeSubscription),
+                "Representative statement 1 - ", "someTyaRepsCode"},
             new Object[]{buildCaseDataWithRepStatementAndGivenSubs(appellantSubscription, representativeSubscription),
                 "Representative statement 2 - ", "someTyaRepsCode"},
             new Object[]{sscsCaseDataWithNoDocs, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
-            new Object[]{sscsCaseDataWithSomeOtherDoc, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
-            new Object[]{sscsCaseDataWithSomeOtherStatement, "Appellant statement 2 - ", "someTyaAppellantCode"},
+            new Object[]{buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
+                "Some other document.txt"), APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
+            new Object[]{buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
+                APPELLANT_STATEMENT_1_1234_5678_9012_3456_PDF), "Appellant statement 2 - ", "someTyaAppellantCode"},
             new Object[]{sscsCaseDataWithDocWithNullValue, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
             new Object[]{sscsCaseDataWithDocWithEmptyFilename, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
             new Object[]{sscsCaseDataWithDocWithNullFilename, APPELLANT_STATEMENT_1, "someTyaAppellantCode"}
         };
     }
 
+    private SscsCaseData buildCaseDataWithNoDocsAndWithGivenSubs(Subscription appellantSubscription, Subscription representativeSubscription) {
+        return SscsCaseData.builder()
+                .subscriptions(Subscriptions.builder()
+                    .appellantSubscription(appellantSubscription)
+                    .representativeSubscription(representativeSubscription)
+                    .build())
+                .build();
+    }
+
     @NotNull
     private SscsCaseData buildCaseDataWithRepStatementAndGivenSubs(Subscription appellantSubscription,
                                                                    Subscription representativeSubscription) {
-        SscsCaseData sscsCaseDataWithRepStatement = caseWithScannedDocumentAndSscsDocument(
+        SscsCaseData sscsCaseDataWithRepStatement = buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
             "Representative statement 1 - 1234-5678-9012-3456.pdf");
         sscsCaseDataWithRepStatement.setSubscriptions(Subscriptions.builder()
             .appellantSubscription(appellantSubscription)
@@ -169,7 +169,7 @@ public class StoreAppellantStatementServiceTest {
         return sscsCaseDataWithRepStatement;
     }
 
-    private SscsCaseData caseWithScannedDocumentAndSscsDocument(String scannedDocFilename) {
+    private SscsCaseData buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(String scannedDocFilename) {
         return SscsCaseData.builder()
             .scannedDocuments(singletonList(ScannedDocument.builder()
                 .value(ScannedDocumentDetails.builder()
@@ -240,7 +240,7 @@ public class StoreAppellantStatementServiceTest {
     }
 
     private SscsCaseDetails buildSscsCaseDetailsTestData() {
-        SscsCaseData caseData = caseWithScannedDocumentAndSscsDocument(APPELLANT_STATEMENT_1_1234_5678_9012_3456_PDF
+        SscsCaseData caseData = buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(APPELLANT_STATEMENT_1_1234_5678_9012_3456_PDF
         );
         caseData.setCcdCaseId("1234-5678-9012-3456");
         caseData.setAppeal(Appeal.builder()
