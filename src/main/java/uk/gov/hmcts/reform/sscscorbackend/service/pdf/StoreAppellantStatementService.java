@@ -45,8 +45,11 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
     private String workOutIfAppellantOrRepsStatement(SscsCaseDetails caseDetails, AppellantStatementPdfData data) {
         Subscription repsSubs = caseDetails.getData().getSubscriptions().getRepresentativeSubscription();
         String statementPrefix = APPELLANT_STATEMENT;
-        if (repsSubs != null && data.getStatement().getTya().equals(repsSubs.getTya())) {
-            statementPrefix = REPRESENTATIVE_STATEMENT;
+        if (repsSubs != null) {
+            String tya = data.getStatement().getTya();
+            if (tya != null && tya.equals(repsSubs.getTya())) {
+                statementPrefix = REPRESENTATIVE_STATEMENT;
+            }
         }
         return statementPrefix;
     }

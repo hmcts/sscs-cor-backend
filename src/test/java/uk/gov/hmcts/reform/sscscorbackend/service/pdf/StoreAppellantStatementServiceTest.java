@@ -104,9 +104,6 @@ public class StoreAppellantStatementServiceTest {
             .tya("someTyaRepsCode")
             .build();
 
-        // todo:  no subscription scenario
-        // todo:  subscription is empty
-
         // some corner case scenarios
         SscsCaseData sscsCaseDataWithNoDocs = SscsCaseData.builder().build();
 
@@ -137,6 +134,14 @@ public class StoreAppellantStatementServiceTest {
                 "Representative statement 1 - ", "someTyaRepsCode"},
             new Object[]{buildCaseDataWithRepStatementAndGivenSubs(appellantSubscription, representativeSubscription),
                 "Representative statement 2 - ", "someTyaRepsCode"},
+            new Object[]{buildCaseDataWithRepStatementAndGivenSubs(null, null),
+                "Appellant statement 2 - ", "someTyaRepsCode"},
+            new Object[]{buildCaseDataWithRepStatementAndGivenSubs(null, null),
+                "Appellant statement 2 - ", null},
+            new Object[]{buildCaseDataWithRepStatementAndGivenSubs(appellantSubscription, representativeSubscription),
+                "Appellant statement 2 - ", null},
+            new Object[]{buildCaseDataWithRepStatementAndGivenSubs(appellantSubscription, Subscription.builder()
+                .tya(null).build()), "Appellant statement 2 - ", "someTyaRepsCode"},
             new Object[]{sscsCaseDataWithNoDocs, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
             new Object[]{buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
                 "Some other document.txt"), APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
