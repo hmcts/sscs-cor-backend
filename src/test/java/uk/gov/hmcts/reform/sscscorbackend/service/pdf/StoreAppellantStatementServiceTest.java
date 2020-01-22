@@ -17,7 +17,6 @@ import java.net.URI;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +40,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
@@ -82,25 +83,50 @@ public class StoreAppellantStatementServiceTest {
 
     @Test
     @Parameters(method = "generateDifferentCaseDataScenarios")
-    public void givenCaseDetails_shouldWorkOutDocumentPrefix(SscsCaseData sscsCaseData, String expectedFileName) {
+    public void givenCaseDetails_shouldWorkOutDocumentPrefix(SscsCaseData sscsCaseData, String expectedFileName,
+                                                             String tya) {
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        Statement statement = new Statement("some statement body text", tya);
+        AppellantStatementPdfData data = new AppellantStatementPdfData(sscsCaseDetails, statement);
+
         String documentPrefix = storeAppellantStatementService.documentNamePrefix(sscsCaseDetails,
-            "onlineHearingId", null);
+            "onlineHearingId", data);
 
         assertThat(documentPrefix, is(expectedFileName));
     }
 
     private Object[] generateDifferentCaseDataScenarios() {
+        Subscription appellantSubscription = Subscription.builder()
+            .tya("someTyaAppellantCode")
+            .build();
+        Subscription representativeSubscription = Subscription.builder()
+            .tya("someTyaRepsCode")
+            .build();
+        SscsCaseData sscsCaseDataWithNoDocsAndWithRepsAndAppellantSubscriptions = SscsCaseData.builder()
+            .subscriptions(Subscriptions.builder()
+                .appellantSubscription(appellantSubscription)
+                .representativeSubscription(representativeSubscription)
+                .build())
+            .build();
+
+        // todo:  no subscription scenario
+        // todo:  subscription is empty
+        // todo: one rep statement already and then add a new one and check the reps statement 2 filename
+
         SscsCaseData sscsCaseDataWithNoDocs = SscsCaseData.builder().build();
+
         SscsCaseData sscsCaseDataWithSomeOtherDoc = caseWithScannedDocumentAndSscsDocument(
             "Some other document.txt");
+
         SscsCaseData sscsCaseDataWithSomeOtherStatement = caseWithScannedDocumentAndSscsDocument(
             APPELLANT_STATEMENT_1_1234_5678_9012_3456_PDF);
+
         SscsCaseData sscsCaseDataWithDocWithNullValue = SscsCaseData.builder()
             .scannedDocuments(singletonList(ScannedDocument.builder()
                 .value(null)
                 .build()))
             .build();
+
         SscsCaseData sscsCaseDataWithDocWithEmptyFilename = SscsCaseData.builder()
             .scannedDocuments(singletonList(ScannedDocument.builder()
                 .value(ScannedDocumentDetails.builder()
@@ -108,6 +134,7 @@ public class StoreAppellantStatementServiceTest {
                     .build())
                 .build()))
             .build();
+
         SscsCaseData sscsCaseDataWithDocWithNullFilename = SscsCaseData.builder()
             .scannedDocuments(singletonList(ScannedDocument.builder()
                 .value(ScannedDocumentDetails.builder()
@@ -115,13 +142,16 @@ public class StoreAppellantStatementServiceTest {
                     .build())
                 .build()))
             .build();
+
         return new Object[]{
-            new Object[]{sscsCaseDataWithNoDocs, APPELLANT_STATEMENT_1},
-            new Object[]{sscsCaseDataWithSomeOtherDoc, APPELLANT_STATEMENT_1},
-            new Object[]{sscsCaseDataWithSomeOtherStatement, "Appellant statement 2 - "},
-            new Object[]{sscsCaseDataWithDocWithNullValue, APPELLANT_STATEMENT_1},
-            new Object[]{sscsCaseDataWithDocWithEmptyFilename, APPELLANT_STATEMENT_1},
-            new Object[]{sscsCaseDataWithDocWithNullFilename, APPELLANT_STATEMENT_1}
+            new Object[]{sscsCaseDataWithNoDocsAndWithRepsAndAppellantSubscriptions, "Representative statement 1 - ",
+                "someTyaRepsCode"},
+            new Object[]{sscsCaseDataWithNoDocs, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
+            new Object[]{sscsCaseDataWithSomeOtherDoc, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
+            new Object[]{sscsCaseDataWithSomeOtherStatement, "Appellant statement 2 - ", "someTyaAppellantCode"},
+            new Object[]{sscsCaseDataWithDocWithNullValue, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
+            new Object[]{sscsCaseDataWithDocWithEmptyFilename, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
+            new Object[]{sscsCaseDataWithDocWithNullFilename, APPELLANT_STATEMENT_1, "someTyaAppellantCode"}
         };
     }
 
@@ -166,31 +196,6 @@ public class StoreAppellantStatementServiceTest {
         verify(ccdPdfService, times(1)).mergeDocIntoCcd(acForPdfName.capture(), any(),
             eq(1L), any(SscsCaseData.class), any(IdamTokens.class), eq(OTHER_EVIDENCE));
         assertThat(acForPdfName.getValue(), is(APPELLANT_STATEMENT_2_1234_5678_9012_3456_PDF));
-        verifyZeroInteractions(evidenceManagementService);
-    }
-
-    @Test
-    @Ignore
-    //todo: make this test pass
-    public void givenStatement_shouldStorePdfWithAppellantOrRepsInTheFileNameAccordingly() {
-        when(pdfService.createPdf(any(), eq("templatePath"))).thenReturn(new byte[0]);
-
-        when(ccdPdfService.mergeDocIntoCcd(eq("Representative statement 2 - 1234-5678-9012-3456.pdf"), any(),
-            eq(1L), any(SscsCaseData.class), any(IdamTokens.class), eq(OTHER_EVIDENCE)))
-            .thenReturn(SscsCaseData.builder().build());
-
-        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
-
-        SscsCaseDetails caseDetails = buildSscsCaseDetailsTestData();
-        Statement statement = new Statement("some statement", "repsTyaCode");
-        AppellantStatementPdfData data = new AppellantStatementPdfData(caseDetails, statement);
-
-        storeAppellantStatementService.storePdf(1L, "onlineHearingId", data);
-
-        ArgumentCaptor<String> acForPdfName = ArgumentCaptor.forClass(String.class);
-        verify(ccdPdfService, times(1)).mergeDocIntoCcd(acForPdfName.capture(), any(),
-            eq(1L), any(SscsCaseData.class), any(IdamTokens.class), eq(OTHER_EVIDENCE));
-        assertThat(acForPdfName.getValue(), is("Representative statement 2 - 1234-5678-9012-3456.pdf"));
         verifyZeroInteractions(evidenceManagementService);
     }
 

@@ -2,12 +2,14 @@ package uk.gov.hmcts.reform.sscscorbackend.service.pdf;
 
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
@@ -19,7 +21,8 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 @Service
 public class StoreAppellantStatementService extends StorePdfService<PdfAppellantStatement, AppellantStatementPdfData> {
 
-    private static final String FILE_NAME_PREFIX = "Appellant statement ";
+    private static final String APPELLANT_STATEMENT = "Appellant statement ";
+    private static final String REPRESENTATIVE_STATEMENT = "Representative statement ";
 
     @Autowired
     public StoreAppellantStatementService(
@@ -34,20 +37,28 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
     @Override
     protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId,
                                         AppellantStatementPdfData data) {
-        List<ScannedDocument> scannedDocuments = caseDetails.getData().getScannedDocuments();
-
-        long numberOfAppellantStatements = scannedDocuments != null
-            ? getCountOfAppellantStatements(scannedDocuments) : 0;
-
-        long appellantStatementNumber = numberOfAppellantStatements + 1;
-        return FILE_NAME_PREFIX + appellantStatementNumber + " - ";
+        return workOutIfAppellantOrRepsStatement(caseDetails, data)
+            + getCountOfNextStatement(caseDetails.getData().getScannedDocuments()) + " - ";
     }
 
-    private long getCountOfAppellantStatements(List<ScannedDocument> scannedDocuments) {
+    @NotNull
+    private String workOutIfAppellantOrRepsStatement(SscsCaseDetails caseDetails, AppellantStatementPdfData data) {
+        Subscription repsSubs = caseDetails.getData().getSubscriptions().getRepresentativeSubscription();
+        String statementPrefix = APPELLANT_STATEMENT;
+        if (repsSubs != null && data.getStatement().getTya().equals(repsSubs.getTya())) {
+            statementPrefix = REPRESENTATIVE_STATEMENT;
+        }
+        return statementPrefix;
+    }
+
+    private long getCountOfNextStatement(List<ScannedDocument> scannedDocuments) {
+        if (scannedDocuments == null) {
+            return 1;
+        }
         return scannedDocuments.stream()
             .filter(doc -> doc.getValue() != null)
             .filter(doc -> StringUtils.isNotBlank(doc.getValue().getFileName()))
-            .filter(doc -> doc.getValue().getFileName().startsWith(FILE_NAME_PREFIX)).count();
+            .filter(doc -> doc.getValue().getFileName().startsWith(APPELLANT_STATEMENT)).count() + 1;
     }
 
     @Override
