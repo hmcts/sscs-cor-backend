@@ -37,7 +37,7 @@ public class StatementController {
     public ResponseEntity uploadStatement(
             @PathVariable("identifier") String identifier,
             @RequestBody Statement statement) {
-
+        log.info("upload statement for caseId {} and tya code {}", identifier, statement.getTya());
         return appellantStatementService
                 .handleAppellantStatement(identifier, statement)
                 .map(handled -> ResponseEntity.noContent().build())
