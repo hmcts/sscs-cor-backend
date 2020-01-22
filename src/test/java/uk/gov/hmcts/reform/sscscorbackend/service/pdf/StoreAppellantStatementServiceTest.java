@@ -155,11 +155,11 @@ public class StoreAppellantStatementServiceTest {
 
     private SscsCaseData buildCaseDataWithNoDocsAndWithGivenSubs(Subscription appellantSubscription, Subscription representativeSubscription) {
         return SscsCaseData.builder()
-                .subscriptions(Subscriptions.builder()
-                    .appellantSubscription(appellantSubscription)
-                    .representativeSubscription(representativeSubscription)
-                    .build())
-                .build();
+            .subscriptions(Subscriptions.builder()
+                .appellantSubscription(appellantSubscription)
+                .representativeSubscription(representativeSubscription)
+                .build())
+            .build();
     }
 
     @NotNull
@@ -196,17 +196,22 @@ public class StoreAppellantStatementServiceTest {
     }
 
     @Test
-    public void givenCaseDataWithSomeOtherStatement_shouldCallTheStorePdfWithTheCorrectPdfName() {
+    @Parameters({
+        "someTyaAppellantCode, Appellant statement 2 - 1234-5678-9012-3456.pdf",
+        "someTyaRepsCode, Representative statement 2 - 1234-5678-9012-3456.pdf"
+    })
+    public void givenCaseDataWithSomeOtherStatement_shouldCallTheStorePdfWithTheCorrectPdfName(
+        String tya, String expectedFilename) {
         when(pdfService.createPdf(any(), eq("templatePath"))).thenReturn(new byte[0]);
 
-        when(ccdPdfService.mergeDocIntoCcd(eq(APPELLANT_STATEMENT_2_1234_5678_9012_3456_PDF), any(),
-            eq(1L), any(SscsCaseData.class), any(IdamTokens.class), eq(OTHER_EVIDENCE)))
+        when(ccdPdfService.mergeDocIntoCcd(eq(expectedFilename), any(), eq(1L), any(SscsCaseData.class),
+            any(IdamTokens.class), eq(OTHER_EVIDENCE)))
             .thenReturn(SscsCaseData.builder().build());
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
         SscsCaseDetails caseDetails = buildSscsCaseDetailsTestData();
-        Statement statement = new Statement("some statement", "someAppealNumber");
+        Statement statement = new Statement("some statement", tya);
         AppellantStatementPdfData data = new AppellantStatementPdfData(caseDetails, statement);
 
         storeAppellantStatementService.storePdf(1L, "onlineHearingId", data);
@@ -214,7 +219,7 @@ public class StoreAppellantStatementServiceTest {
         ArgumentCaptor<String> acForPdfName = ArgumentCaptor.forClass(String.class);
         verify(ccdPdfService, times(1)).mergeDocIntoCcd(acForPdfName.capture(), any(),
             eq(1L), any(SscsCaseData.class), any(IdamTokens.class), eq(OTHER_EVIDENCE));
-        assertThat(acForPdfName.getValue(), is(APPELLANT_STATEMENT_2_1234_5678_9012_3456_PDF));
+        assertThat(acForPdfName.getValue(), is(expectedFilename));
         verifyZeroInteractions(evidenceManagementService);
     }
 
@@ -245,8 +250,8 @@ public class StoreAppellantStatementServiceTest {
     }
 
     private SscsCaseDetails buildSscsCaseDetailsTestData() {
-        SscsCaseData caseData = buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(APPELLANT_STATEMENT_1_1234_5678_9012_3456_PDF
-        );
+        SscsCaseData caseData = buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
+            APPELLANT_STATEMENT_1_1234_5678_9012_3456_PDF);
         caseData.setCcdCaseId("1234-5678-9012-3456");
         caseData.setAppeal(Appeal.builder()
             .appellant(Appellant.builder()
@@ -258,6 +263,14 @@ public class StoreAppellantStatementServiceTest {
                 .identity(Identity.builder()
                     .nino("ab123456c")
                     .build())
+                .build())
+            .build());
+        caseData.setSubscriptions(Subscriptions.builder()
+            .appellantSubscription(Subscription.builder()
+                .tya("someTyaAppellantCode")
+                .build())
+            .representativeSubscription(Subscription.builder()
+                .tya("someTyaRepsCode")
                 .build())
             .build());
         caseData.setCaseReference("SC0022222");
