@@ -28,7 +28,7 @@ public class StatementControllerTest {
     public void setUp() {
         onlineHearingId = "someOnlineHearingId";
         caseId = 12345L;
-        statement = new Statement("someStatement");
+        statement = new Statement("someStatement", "someTya");
         sscsCaseDetails = SscsCaseDetails.builder().id(caseId).build();
 
         appellantStatementService = mock(AppellantStatementService.class);

@@ -35,7 +35,7 @@ public class StoreOnlineHearingService extends StorePdfService<PdfSummary, PdfDa
     }
 
     @Override
-    protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId) {
+    protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId, PdfData data) {
         return "COR Transcript - ";
     }
 

@@ -41,7 +41,7 @@ public class StoreOnlineHearingTribunalsViewService extends StorePdfService<Onli
     }
 
     @Override
-    protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId) {
+    protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId, PdfData data) {
         return TRIBUNALS_VIEW_PDF_PREFIX;
     }
 

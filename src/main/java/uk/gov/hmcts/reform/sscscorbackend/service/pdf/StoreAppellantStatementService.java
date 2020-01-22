@@ -32,7 +32,8 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
     }
 
     @Override
-    protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId) {
+    protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId,
+                                        AppellantStatementPdfData data) {
         List<ScannedDocument> scannedDocuments = caseDetails.getData().getScannedDocuments();
 
         long numberOfAppellantStatements = scannedDocuments != null
@@ -50,7 +51,8 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
     }
 
     @Override
-    protected PdfAppellantStatement getPdfContent(AppellantStatementPdfData data, String onlineHearingId, PdfAppealDetails appealDetails) {
+    protected PdfAppellantStatement getPdfContent(AppellantStatementPdfData data, String onlineHearingId,
+                                                  PdfAppealDetails appealDetails) {
         return new PdfAppellantStatement(appealDetails, data.getStatement().getBody());
     }
 }

@@ -193,7 +193,7 @@ public class DataFixtures {
     }
 
     public static Statement someStatement() {
-        return new Statement("Some Statement body");
+        return new Statement("Some Statement body", "someTyaCode");
     }
 
     public static CohConversations someCohConversations(String relistingReason) {

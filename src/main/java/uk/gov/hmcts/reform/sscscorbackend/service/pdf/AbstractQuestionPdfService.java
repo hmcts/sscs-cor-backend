@@ -27,7 +27,7 @@ public abstract class AbstractQuestionPdfService extends StorePdfService<PdfQues
     }
 
     @Override
-    protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId) {
+    protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId, PdfData data) {
         int currentQuestionRound = questionService.getCurrentQuestionRound(onlineHearingId);
         return documentNamePrefix() + currentQuestionRound + " - ";
     }

@@ -30,7 +30,8 @@ public abstract class QuestionRoundEndedAction implements CohEventAction {
         QuestionRound questions = questionService.getQuestions(onlineHearingId, true);
 
         if (shouldHandleQuestionRound(questions)) {
-            CohEventActionContext actionContext = storePdfService.storePdf(caseId, onlineHearingId, new PdfData(sscsCaseDetails));
+            CohEventActionContext actionContext = storePdfService.storePdf(caseId, onlineHearingId,
+                new PdfData(sscsCaseDetails));
 
             String caseReference = sscsCaseDetails.getData().getCaseReference();
             corEmailService.sendFileToDwp(
