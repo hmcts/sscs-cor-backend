@@ -16,6 +16,7 @@ import static org.powermock.api.mockito.PowerMockito.spy;
 import java.net.URI;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -111,7 +112,6 @@ public class StoreAppellantStatementServiceTest {
 
         // todo:  no subscription scenario
         // todo:  subscription is empty
-        // todo: one rep statement already and then add a new one and check the reps statement 2 filename
 
         SscsCaseData sscsCaseDataWithNoDocs = SscsCaseData.builder().build();
 
@@ -146,6 +146,8 @@ public class StoreAppellantStatementServiceTest {
         return new Object[]{
             new Object[]{sscsCaseDataWithNoDocsAndWithRepsAndAppellantSubscriptions, "Representative statement 1 - ",
                 "someTyaRepsCode"},
+            new Object[]{buildCaseDataWithRepStatementAndGivenSubs(appellantSubscription, representativeSubscription),
+                "Representative statement 2 - ", "someTyaRepsCode"},
             new Object[]{sscsCaseDataWithNoDocs, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
             new Object[]{sscsCaseDataWithSomeOtherDoc, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
             new Object[]{sscsCaseDataWithSomeOtherStatement, "Appellant statement 2 - ", "someTyaAppellantCode"},
@@ -153,6 +155,18 @@ public class StoreAppellantStatementServiceTest {
             new Object[]{sscsCaseDataWithDocWithEmptyFilename, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
             new Object[]{sscsCaseDataWithDocWithNullFilename, APPELLANT_STATEMENT_1, "someTyaAppellantCode"}
         };
+    }
+
+    @NotNull
+    private SscsCaseData buildCaseDataWithRepStatementAndGivenSubs(Subscription appellantSubscription,
+                                                                   Subscription representativeSubscription) {
+        SscsCaseData sscsCaseDataWithRepStatement = caseWithScannedDocumentAndSscsDocument(
+            "Representative statement 1 - 1234-5678-9012-3456.pdf");
+        sscsCaseDataWithRepStatement.setSubscriptions(Subscriptions.builder()
+            .appellantSubscription(appellantSubscription)
+            .representativeSubscription(representativeSubscription)
+            .build());
+        return sscsCaseDataWithRepStatement;
     }
 
     private SscsCaseData caseWithScannedDocumentAndSscsDocument(String scannedDocFilename) {

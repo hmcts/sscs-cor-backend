@@ -58,7 +58,12 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
         return scannedDocuments.stream()
             .filter(doc -> doc.getValue() != null)
             .filter(doc -> StringUtils.isNotBlank(doc.getValue().getFileName()))
-            .filter(doc -> doc.getValue().getFileName().startsWith(APPELLANT_STATEMENT)).count() + 1;
+            .filter(this::docFileNameIsStatement).count() + 1;
+    }
+
+    private boolean docFileNameIsStatement(ScannedDocument doc) {
+        return doc.getValue().getFileName().startsWith(APPELLANT_STATEMENT)
+            || doc.getValue().getFileName().startsWith(REPRESENTATIVE_STATEMENT);
     }
 
     @Override
