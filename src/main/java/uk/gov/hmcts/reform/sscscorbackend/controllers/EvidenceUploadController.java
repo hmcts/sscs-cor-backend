@@ -160,7 +160,7 @@ public class EvidenceUploadController {
 
     @ApiOperation(value = "Submit COR evidence",
             notes = "Submits the evidence that has already been uploaded in a draft state. This means it will be " +
-                    "visible in CCD by a caseworker and JUI by the pannel members. You need to have an appeal in CCD " +
+                    "visible in CCD by a caseworker and JUI by the panel members. You need to have an appeal in CCD " +
                     "and an online hearing in COH that references the appeal in CCD. Will create a cover sheet for the " +
                     "evidence uploaded containing the file names and a description from the appellant."
     )

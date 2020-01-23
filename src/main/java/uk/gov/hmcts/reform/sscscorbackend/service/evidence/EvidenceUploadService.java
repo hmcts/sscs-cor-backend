@@ -145,7 +145,6 @@ public class EvidenceUploadService {
 
                         evidenceUploadEmailService.sendToDwp(storePdfContext.getPdf(), draftSscsDocument, caseDetails);
 
-                        return true;
                     } else {
                         List<ScannedDocument> scannedDocs = new ArrayList<>();
 
@@ -196,8 +195,8 @@ public class EvidenceUploadService {
 
                         ccdService.updateCase(sscsCaseData, ccdCaseId, ATTACH_SCANNED_DOCS.getCcdType(), "SSCS - upload evidence from MYA", "Uploaded a further evidence document", idamService.getIdamTokens());
 
-                        return true;
                     }
+                    return true;
                 })
                 .orElse(false);
     }
