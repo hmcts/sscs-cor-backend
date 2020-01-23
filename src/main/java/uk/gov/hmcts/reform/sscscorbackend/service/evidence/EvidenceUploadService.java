@@ -67,7 +67,9 @@ public class EvidenceUploadService {
     }
 
     public Optional<Evidence> uploadDraftHearingEvidence(String identifier, MultipartFile file) {
-        return uploadEvidence(identifier, file, draftHearingDocumentExtractor, document -> new SscsDocument(createNewDocumentDetails(document)), UPLOAD_DRAFT_DOCUMENT, "SSCS - upload document from MYA");
+        return uploadEvidence(identifier, file, draftHearingDocumentExtractor,
+            document -> new SscsDocument(createNewDocumentDetails(document)), UPLOAD_DRAFT_DOCUMENT,
+            "SSCS - upload document from MYA");
     }
 
     public Optional<Evidence> uploadDraftQuestionEvidence(String identifier, String questionId, MultipartFile file) {
@@ -95,7 +97,10 @@ public class EvidenceUploadService {
                 .format(DateTimeFormatter.ISO_DATE);
     }
 
-    private <E> Optional<Evidence> uploadEvidence(String identifier, MultipartFile file, DocumentExtract<E> documentExtract,  Function<Document, E> createNewDocument, EventType eventType, String summary) {
+    private <E> Optional<Evidence> uploadEvidence(String identifier, MultipartFile file,
+                                                  DocumentExtract<E> documentExtract,
+                                                  Function<Document, E> createNewDocument, EventType eventType,
+                                                  String summary) {
         return onlineHearingService.getCcdCaseByIdentifier(identifier)
                 .map(caseDetails -> {
 
