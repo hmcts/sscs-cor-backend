@@ -47,7 +47,8 @@ public class StoreAnswersPdfServiceTest {
     @Test
     public void getPdfQuestionRound() {
         when(questionService.getCurrentQuestionRound(onlineHearingId)).thenReturn(66);
-        String documentNamePrefix = storeQuestionsPdfService.documentNamePrefix(mock(SscsCaseDetails.class), onlineHearingId);
+        String documentNamePrefix = storeQuestionsPdfService.documentNamePrefix(mock(SscsCaseDetails.class),
+            onlineHearingId, null);
 
         assertThat(documentNamePrefix, is("Issued Answers Round 66 - "));
     }

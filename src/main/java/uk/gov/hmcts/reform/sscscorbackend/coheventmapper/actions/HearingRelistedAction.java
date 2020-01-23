@@ -42,7 +42,8 @@ public class HearingRelistedAction implements CohEventAction {
 
     public CohEventActionContext handle(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
         removePanelMembersFeature.removePanelMembers(caseDetails);
-        CohEventActionContext actionContext = storeOnlineHearingService.storePdf(caseId, onlineHearingId, new PdfData(caseDetails));
+        CohEventActionContext actionContext = storeOnlineHearingService.storePdf(caseId, onlineHearingId,
+            new PdfData(caseDetails));
         SscsCaseData oralSscsCaseData = updateCcdCaseToOralHearing(caseId, onlineHearingId, actionContext);
         String relistedMessage = emailMessageBuilder.getRelistedMessage(actionContext.getDocument());
         corEmailService.sendEmailToDwp("COR: Hearing required", relistedMessage);

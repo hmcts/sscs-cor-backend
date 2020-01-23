@@ -25,7 +25,8 @@ public class QuestionRoundIssuedEventAction implements CohEventAction {
     }
 
     public CohEventActionContext handle(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
-        CohEventActionContext actionContext = storeQuestionsPdfService.storePdf(caseId, onlineHearingId, new PdfData(caseDetails));
+        CohEventActionContext actionContext = storeQuestionsPdfService.storePdf(caseId, onlineHearingId,
+            new PdfData(caseDetails));
         SscsCaseDetails sscsCaseDetails = actionContext.getDocument();
         sendDwpEmail(actionContext, sscsCaseDetails);
 
