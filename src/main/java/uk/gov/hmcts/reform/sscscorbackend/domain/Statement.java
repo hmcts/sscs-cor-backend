@@ -9,16 +9,23 @@ public class Statement {
     @ApiModelProperty(example = "this is the text of a personal statement", required = true)
     @JsonProperty(value = "body")
     private String body;
+    @JsonProperty(value = "tya")
+    private String tya;
 
     // needed for Jackson
     private Statement() {
     }
 
-    public Statement(String body) {
+    public Statement(String body, String tya) {
         this.body = body;
+        this.tya = tya;
     }
 
     public String getBody() {
         return body;
+    }
+
+    public String getTya() {
+        return tya;
     }
 }

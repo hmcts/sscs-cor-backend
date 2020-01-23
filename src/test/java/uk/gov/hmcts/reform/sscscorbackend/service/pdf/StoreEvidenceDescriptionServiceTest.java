@@ -40,7 +40,9 @@ public class StoreEvidenceDescriptionServiceTest {
 
     @Test
     public void documentNamePrefixIsEvidenceDescription() {
-        assertThat(storeEvidenceDescriptionService.documentNamePrefix(mock(SscsCaseDetails.class), "hearingId"), is("Evidence Description - "));
+        assertThat(storeEvidenceDescriptionService
+            .documentNamePrefix(mock(SscsCaseDetails.class), "hearingId", null),
+            is("Evidence Description - "));
     }
 
     @Test

@@ -46,7 +46,7 @@ public abstract class StorePdfService<E, D extends PdfData> {
 
     public CohEventActionContext storePdf(Long caseId, String onlineHearingId, D data) {
         SscsCaseDetails caseDetails = data.getCaseDetails();
-        String documentNamePrefix = documentNamePrefix(caseDetails, onlineHearingId);
+        String documentNamePrefix = documentNamePrefix(caseDetails, onlineHearingId, data);
         if (pdfHasNotAlreadyBeenCreated(caseDetails, documentNamePrefix)) {
             log.info("Creating pdf for [" + caseId + "]");
             return storePdf(caseId, onlineHearingId, idamService.getIdamTokens(), data, documentNamePrefix);
@@ -156,7 +156,7 @@ public abstract class StorePdfService<E, D extends PdfData> {
             dateCreated);
     }
 
-    protected abstract String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId);
+    protected abstract String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId, D data);
 
     protected abstract E getPdfContent(D data, String onlineHearingId, PdfAppealDetails appealDetails);
 }

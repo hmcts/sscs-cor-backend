@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
-import static org.apache.http.client.methods.RequestBuilder.*;
+import static org.apache.http.client.methods.RequestBuilder.delete;
+import static org.apache.http.client.methods.RequestBuilder.get;
+import static org.apache.http.client.methods.RequestBuilder.patch;
+import static org.apache.http.client.methods.RequestBuilder.post;
+import static org.apache.http.client.methods.RequestBuilder.put;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -235,7 +238,11 @@ public class SscsCorBackendRequests {
 
     public void uploadAppellantStatement(String hearingId, String statement) throws IOException {
         String uri = "/continuous-online-hearings/" + hearingId + "/statement";
-        HttpResponse getQuestionResponse = postRequest(uri, new StringEntity("{\"body\":\"" + statement + "\"}", APPLICATION_JSON));
+        String stringEntity = "{\n"
+            + "  \"body\": \"statement\",\n"
+            + "  \"tya\": \"Q9jE2FQuRR\"\n"
+            + "}";
+        HttpResponse getQuestionResponse = postRequest(uri, new StringEntity(stringEntity, APPLICATION_JSON));
 
         assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
     }

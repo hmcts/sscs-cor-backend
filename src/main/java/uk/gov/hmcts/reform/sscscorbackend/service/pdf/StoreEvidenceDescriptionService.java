@@ -29,12 +29,14 @@ public class StoreEvidenceDescriptionService extends StorePdfService<PdfEvidence
     }
 
     @Override
-    protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId) {
+    protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId,
+                                        EvidenceDescriptionPdfData data) {
         return "Evidence Description - ";
     }
 
     @Override
-    protected PdfEvidenceDescription getPdfContent(EvidenceDescriptionPdfData data, String onlineHearingId, PdfAppealDetails appealDetails) {
+    protected PdfEvidenceDescription getPdfContent(EvidenceDescriptionPdfData data, String onlineHearingId,
+                                                   PdfAppealDetails appealDetails) {
         return new PdfEvidenceDescription(appealDetails, data.getDescription().getBody(), data.getFileNames());
     }
 }

@@ -23,7 +23,8 @@ public class DecisionIssuedEventAction implements CohEventAction {
 
     @Override
     public CohEventActionContext handle(Long caseId, String onlineHearingId, SscsCaseDetails caseDetails) {
-        CohEventActionContext actionContext = storeOnlineHearingTribunalsViewService.storePdf(caseId, onlineHearingId, new PdfData(caseDetails));
+        CohEventActionContext actionContext = storeOnlineHearingTribunalsViewService.storePdf(caseId, onlineHearingId,
+            new PdfData(caseDetails));
         String caseReference = actionContext.getDocument().getData().getCaseReference();
         emailService.sendFileToDwp(
                 actionContext,

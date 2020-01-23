@@ -48,10 +48,11 @@ public class StorePdfServiceTest {
         pdfContent = new Object();
         fileNamePrefix = "test name";
         evidenceManagementService = mock(EvidenceManagementService.class);
-        storePdfService = new StorePdfService<Object, PdfData>(pdfService, "sometemplate", sscsPdfService, idamService, evidenceManagementService) {
+        storePdfService = new StorePdfService<Object, PdfData>(
+            pdfService, "sometemplate", sscsPdfService, idamService, evidenceManagementService) {
 
             @Override
-            protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId) {
+            protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId, PdfData data) {
                 return fileNamePrefix;
             }
 
