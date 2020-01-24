@@ -125,8 +125,9 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         List<ScannedDocument> scannedDocument = caseDetails.getData().getScannedDocuments();
         assertThat(scannedDocument.size(), is(2));
         String caseReference = caseDetails.getData().getCaseReference();
-        assertThat(scannedDocument.get(0).getValue().getFileName(), is("evidence.pdf"));
-        assertThat(scannedDocument.get(1).getValue().getFileName(), is("Evidence Description - " + createdCcdCase.getCaseId() + ".pdf"));
+        assertThat(scannedDocument.get(0).getValue().getFileName(), is("Appellant statement - evidence.pdf"));
+        assertThat(scannedDocument.get(1).getValue().getFileName(), is("Appellant Evidence Description - "
+            + createdCcdCase.getCaseId() + ".pdf"));
     }
 
 

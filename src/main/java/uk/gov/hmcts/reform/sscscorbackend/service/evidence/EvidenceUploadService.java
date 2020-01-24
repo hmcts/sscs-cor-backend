@@ -235,10 +235,9 @@ public class EvidenceUploadService {
         return fileNamePrefix;
     }
 
-    private void submitHearingForACorCase(SscsCaseDetails caseDetails, SscsCaseData sscsCaseData, Long ccdCaseId, CohEventActionContext storePdfContext) {
+    private void submitHearingForACorCase(SscsCaseDetails caseDetails, SscsCaseData sscsCaseData, Long ccdCaseId,
+                                          CohEventActionContext storePdfContext) {
         log.info("Submitting draft document for case [" + ccdCaseId + "]");
-
-
         List<SscsDocument> draftSscsDocument = storePdfContext.getDocument().getData()
             .getDraftSscsDocument();
         List<SscsDocument> newSscsDocumentsList = union(
