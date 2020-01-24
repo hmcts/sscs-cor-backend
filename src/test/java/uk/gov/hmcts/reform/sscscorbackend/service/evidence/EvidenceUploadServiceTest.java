@@ -535,7 +535,8 @@ public class EvidenceUploadServiceTest {
 
     @Test
     public void givenANonCorCaseWithScannedDocumentsAndDraftDocument_thenMoveDraftToScannedDocumentsAndUpdateCaseInCcd() {
-        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName,
+            documentUrl, evidenceCreatedOn);
         ScannedDocument evidenceDocument = ScannedDocument.builder()
                     .value(ScannedDocumentDetails.builder()
                         .fileName("anotherFileName")
@@ -550,7 +551,7 @@ public class EvidenceUploadServiceTest {
 
         SscsDocument descriptionDocument = SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
-                        .documentFileName("anotherFileName")
+                        .documentFileName("Evidence Description -")
                         .documentLink(DocumentLink.builder()
                                 .documentUrl("http://anotherUrl")
                                 .build())
@@ -563,7 +564,6 @@ public class EvidenceUploadServiceTest {
 
         sscsCaseDetails.getData().setAppeal(Appeal.builder().hearingType("sya").build());
 
-        final int originalNumberOfScannedDocuments = sscsCaseDetails.getData().getScannedDocuments().size();
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
         UploadedEvidence evidenceDescriptionPdf = mock(UploadedEvidence.class);
@@ -578,7 +578,9 @@ public class EvidenceUploadServiceTest {
         assertThat(submittedEvidence, is(true));
 
         verify(ccdService).updateCase(
-                and(hasSscsScannedDocument(originalNumberOfScannedDocuments, documentUrl, fileName), doesNotHaveDraftSscsDocumentsAndEvidenceHandledNo()),
+                and(hasSscsScannedDocument(3, 1,
+                    1),
+                    doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo()),
                 eq(someCcdCaseId),
                 eq(ATTACH_SCANNED_DOCS.getCcdType()),
                 eq("SSCS - upload evidence from MYA"),
@@ -620,12 +622,21 @@ public class EvidenceUploadServiceTest {
         });
     }
 
-    private SscsCaseData hasSscsScannedDocument(int originalNumberOfDocuments, String documentUrl, String fileName) {
+    private SscsCaseData hasSscsScannedDocument(int expectedNumberOfScannedDocs,
+                                                int expectedNumberOfAppellantStatements,
+                                                int expectedNumberOfEvidenceDesc) {
         return argThat(argument -> {
             List<ScannedDocument> scannedDocuments = argument.getScannedDocuments();
-            return scannedDocuments.size() == originalNumberOfDocuments + 2 &&
-                    scannedDocuments.get(originalNumberOfDocuments).getValue().getUrl().getDocumentUrl().equals(documentUrl) &&
-                    scannedDocuments.get(originalNumberOfDocuments).getValue().getFileName().equals(fileName);
+            boolean isExpectedNumberOfScannedDocs = scannedDocuments.size() == expectedNumberOfScannedDocs;
+            boolean isExpectedNumberOfAppellantStatements = scannedDocuments.stream()
+                .filter(scannedDocument -> scannedDocument.getValue().getFileName().startsWith("Appellant statement -"))
+                .count() == expectedNumberOfAppellantStatements;
+            boolean isExpectedNumberOfAppellantEvidenceDesc = scannedDocuments.stream()
+                .filter(scannedDocument -> scannedDocument.getValue().getFileName()
+                    .startsWith("Appellant Evidence Description -"))
+                .count() == expectedNumberOfEvidenceDesc;
+            return isExpectedNumberOfAppellantEvidenceDesc && isExpectedNumberOfAppellantStatements
+                && isExpectedNumberOfScannedDocs;
         });
     }
 
@@ -662,14 +673,15 @@ public class EvidenceUploadServiceTest {
         });
     }
 
-    private SscsCaseData doesNotHaveDraftSscsDocumentsAndEvidenceHandledNo() {
+    private SscsCaseData doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo() {
         return argThat(argument -> {
             List<SscsDocument> sscsDocument = argument.getDraftSscsDocument();
             return sscsDocument.isEmpty() && argument.getEvidenceHandled().equals("No");
         });
     }
 
-    private SscsCaseDetails createSscsCaseDetails(String questionId, String fileName, String documentUrl, Date evidenceCreatedOn) {
+    private SscsCaseDetails createSscsCaseDetails(String questionId, String fileName, String documentUrl,
+                                                  Date evidenceCreatedOn) {
         return SscsCaseDetails.builder()
                 .id(someCcdCaseId)
                 .data(SscsCaseData.builder()

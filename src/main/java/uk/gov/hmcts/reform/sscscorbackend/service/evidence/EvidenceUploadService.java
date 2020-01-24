@@ -26,6 +26,8 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +42,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
@@ -154,7 +158,8 @@ public class EvidenceUploadService {
                         || sscsCaseData.getAppeal().getHearingType().equals("cor")) {
                         submitHearingForACorCase(caseDetails, sscsCaseData, ccdCaseId, storePdfContext);
                     } else {
-                        submitHearingWhenNoCoreCase(caseDetails, sscsCaseData, ccdCaseId, storePdfContext);
+                        submitHearingWhenNoCoreCase(caseDetails, sscsCaseData, ccdCaseId, storePdfContext,
+                            data.getDescription().getIdamEmail());
                     }
                     return true;
                 })
@@ -162,7 +167,7 @@ public class EvidenceUploadService {
     }
 
     private void submitHearingWhenNoCoreCase(SscsCaseDetails caseDetails, SscsCaseData sscsCaseData, Long ccdCaseId,
-                                             CohEventActionContext storePdfContext) {
+                                             CohEventActionContext storePdfContext, String idamEmail) {
         List<ScannedDocument> scannedDocs = new ArrayList<>();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -171,6 +176,8 @@ public class EvidenceUploadService {
         LocalDate ld = LocalDate.parse(evidenceDescriptionDocument.getValue().getDocumentDateAdded(),
             dateFormatter);
         LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
+
+        String fileNamePrefix = workOutFileNamePrefix(caseDetails, idamEmail);
 
         for (SscsDocument draftSscsDocument : storePdfContext.getDocument().getData()
             .getDraftSscsDocument()) {
@@ -181,7 +188,7 @@ public class EvidenceUploadService {
                     ScannedDocumentDetails.builder()
                         .type("other")
                         .url(draftSscsDocument.getValue().getDocumentLink())
-                        .fileName(draftSscsDocument.getValue().getDocumentFileName())
+                        .fileName(fileNamePrefix + "statement - " + draftSscsDocument.getValue().getDocumentFileName())
                             .scannedDate(ldt.toString())
                         .build()).build();
 
@@ -191,7 +198,7 @@ public class EvidenceUploadService {
                 ScannedDocumentDetails.builder()
                         .type("other")
                         .url(evidenceDescriptionDocument.getValue().getDocumentLink())
-                        .fileName(evidenceDescriptionDocument.getValue().getDocumentFileName())
+                        .fileName(fileNamePrefix + evidenceDescriptionDocument.getValue().getDocumentFileName())
                         .scannedDate(ldt.toString())
                         .build()).build();
         scannedDocs.add(convertEvidenceToScannedDocument);
@@ -211,6 +218,21 @@ public class EvidenceUploadService {
         ccdService.updateCase(sscsCaseData, ccdCaseId, ATTACH_SCANNED_DOCS.getCcdType(),
             "SSCS - upload evidence from MYA",
             "Uploaded a further evidence document", idamService.getIdamTokens());
+    }
+
+    @NotNull
+    private String workOutFileNamePrefix(SscsCaseDetails caseDetails, String idamEmail) {
+        String partyPrefix = "Appellant ";
+        Subscriptions subscriptions = caseDetails.getData().getSubscriptions();
+        if (subscriptions != null) {
+            Subscription repSubs = subscriptions.getRepresentativeSubscription();
+            if (repSubs != null && StringUtils.isNotBlank(repSubs.getEmail())) {
+                if (repSubs.getEmail().equals(idamEmail)) {
+                    partyPrefix = "Representative ";
+                }
+            }
+        }
+        return partyPrefix;
     }
 
     private void submitHearingForACorCase(SscsCaseDetails caseDetails, SscsCaseData sscsCaseData, Long ccdCaseId, CohEventActionContext storePdfContext) {
