@@ -177,7 +177,7 @@ public class EvidenceUploadService {
             dateFormatter);
         LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
 
-        String partyPrefix = workOutFileNamePrefix(caseDetails, idamEmail);
+        String fileNamePrefix = workOutFileNamePrefix(caseDetails, idamEmail);
 
         for (SscsDocument draftSscsDocument : storePdfContext.getDocument().getData()
             .getDraftSscsDocument()) {
@@ -188,7 +188,7 @@ public class EvidenceUploadService {
                     ScannedDocumentDetails.builder()
                         .type("other")
                         .url(draftSscsDocument.getValue().getDocumentLink())
-                        .fileName(partyPrefix + "statement - " + draftSscsDocument.getValue().getDocumentFileName())
+                        .fileName(fileNamePrefix + "statement - " + draftSscsDocument.getValue().getDocumentFileName())
                             .scannedDate(ldt.toString())
                         .build()).build();
 
@@ -198,7 +198,7 @@ public class EvidenceUploadService {
                 ScannedDocumentDetails.builder()
                         .type("other")
                         .url(evidenceDescriptionDocument.getValue().getDocumentLink())
-                        .fileName(partyPrefix + evidenceDescriptionDocument.getValue().getDocumentFileName())
+                        .fileName(fileNamePrefix + evidenceDescriptionDocument.getValue().getDocumentFileName())
                         .scannedDate(ldt.toString())
                         .build()).build();
         scannedDocs.add(convertEvidenceToScannedDocument);
@@ -222,17 +222,17 @@ public class EvidenceUploadService {
 
     @NotNull
     private String workOutFileNamePrefix(SscsCaseDetails caseDetails, String idamEmail) {
-        String partyPrefix = "Appellant ";
+        String fileNamePrefix = "Appellant ";
         Subscriptions subscriptions = caseDetails.getData().getSubscriptions();
         if (subscriptions != null) {
             Subscription repSubs = subscriptions.getRepresentativeSubscription();
             if (repSubs != null && StringUtils.isNotBlank(repSubs.getEmail())) {
                 if (repSubs.getEmail().equals(idamEmail)) {
-                    partyPrefix = "Representative ";
+                    fileNamePrefix = "Representative ";
                 }
             }
         }
-        return partyPrefix;
+        return fileNamePrefix;
     }
 
     private void submitHearingForACorCase(SscsCaseDetails caseDetails, SscsCaseData sscsCaseData, Long ccdCaseId, CohEventActionContext storePdfContext) {
