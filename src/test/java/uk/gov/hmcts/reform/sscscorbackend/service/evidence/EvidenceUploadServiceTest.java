@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,6 +44,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
@@ -548,9 +551,10 @@ public class EvidenceUploadServiceTest {
     }
 
     @Test
-    @Parameters(method = "generateTestCaseScenarios")
+    @Parameters(method = "evidenceUploadByAppellantScenario, evidenceUploadByRepScenario")
     public void givenANonCorCaseWithScannedDocumentsAndDraftDocument_thenMoveDraftToScannedDocumentsAndUpdateCaseInCcd(
-        SscsCaseDetails sscsCaseDetails) {
+        SscsCaseDetails sscsCaseDetails, EvidenceDescription someDescription, String expectedStatementPrefix,
+        String expectedEvidenceDescPrefix) {
 
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
@@ -559,7 +563,7 @@ public class EvidenceUploadServiceTest {
             someCcdCaseId,
             someOnlineHearingId,
             new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription,
-                singletonList("Evidence Description -"))
+                singletonList("someFileName.txt"))
         )).thenReturn(new CohEventActionContext(evidenceDescriptionPdf, sscsCaseDetails));
 
         boolean submittedEvidence = evidenceUploadService.submitHearingEvidence(someOnlineHearingId, someDescription);
@@ -567,8 +571,8 @@ public class EvidenceUploadServiceTest {
         assertThat(submittedEvidence, is(true));
 
         verify(ccdService).updateCase(
-            and(hasSscsScannedDocument(3, 1,
-                1),
+            and(hasSscsScannedDocument(
+                expectedStatementPrefix, expectedEvidenceDescPrefix),
                 doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo()),
             eq(someCcdCaseId),
             eq(ATTACH_SCANNED_DOCS.getCcdType()),
@@ -588,44 +592,77 @@ public class EvidenceUploadServiceTest {
         assertThat(hearingFound, is(false));
     }
 
-    private Object[] generateTestCaseScenarios() {
+    private Object[] evidenceUploadByAppellantScenario() {
+        initCommonParams();
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName,
+            documentUrl, evidenceCreatedOn);
+        sscsCaseDetails.getData().setScannedDocuments(getScannedDocuments());
+        sscsCaseDetails.getData().setSscsDocument(getSscsDocuments());
+        sscsCaseDetails.getData().setAppeal(Appeal.builder().hearingType("sya").build());
+        return new Object[]{
+            new Object[]{sscsCaseDetails, someDescription, "Appellant statement -", "Appellant Evidence Description -"}
+        };
+    }
+
+    @NotNull
+    private List<SscsDocument> getSscsDocuments() {
+        SscsDocument descriptionDocument = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentFileName("Evidence Description -")
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("http://anotherUrl")
+                    .build())
+                .documentDateAdded(convertCreatedOnDate(evidenceCreatedOn))
+                .build())
+            .build();
+        List<SscsDocument> sscsList = new ArrayList<>();
+        sscsList.add(descriptionDocument);
+        return sscsList;
+    }
+
+    private Object[] evidenceUploadByRepScenario() {
+        initCommonParams();
+        SscsCaseDetails sscsCaseDetailsWithRepSubs = createSscsCaseDetails(someQuestionId, fileName,
+            documentUrl, evidenceCreatedOn);
+        sscsCaseDetailsWithRepSubs.getData().setSubscriptions(Subscriptions.builder()
+            .representativeSubscription(Subscription.builder()
+                .email("rep@email.com")
+                .build())
+            .build());
+        sscsCaseDetailsWithRepSubs.getData().setScannedDocuments(getScannedDocuments());
+        sscsCaseDetailsWithRepSubs.getData().setSscsDocument(getSscsDocuments());
+        sscsCaseDetailsWithRepSubs.getData().setAppeal(Appeal.builder().hearingType("sya").build());
+        EvidenceDescription someDescriptionWithRepEmail = new EvidenceDescription("some description",
+            "rep@email.com");
+
+        return new Object[]{
+            new Object[]{sscsCaseDetailsWithRepSubs, someDescriptionWithRepEmail, "Representative statement -",
+                "Representative Evidence Description -"}
+        };
+    }
+
+    @NotNull
+    private List<ScannedDocument> getScannedDocuments() {
+        ScannedDocument evidenceDocument = ScannedDocument.builder()
+            .value(ScannedDocumentDetails.builder()
+                .fileName("anotherFileName")
+                .url(DocumentLink.builder()
+                    .documentUrl("http://anotherUrl")
+                    .build())
+                .scannedDate(convertCreatedOnDate(evidenceCreatedOn))
+                .build())
+            .build();
+        return singletonList(evidenceDocument);
+    }
+
+    private void initCommonParams() {
         someOnlineHearingId = "someOnlinehearingId";
         someQuestionId = "someQuestionId";
         someEvidenceId = "someEvidenceId";
         someCcdCaseId = 123L;
-        fileName = "Evidence Description -";
+        fileName = "someFileName.txt";
         documentUrl = "http://example.com/document/" + someEvidenceId;
-        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName,
-            documentUrl, evidenceCreatedOn);
-        ScannedDocument evidenceDocument = ScannedDocument.builder()
-                    .value(ScannedDocumentDetails.builder()
-                        .fileName("anotherFileName")
-                        .url(DocumentLink.builder()
-                            .documentUrl("http://anotherUrl")
-                            .build())
-                        .scannedDate(convertCreatedOnDate(evidenceCreatedOn))
-                    .build())
-                .build();
-        List<ScannedDocument> list = singletonList(evidenceDocument);
-        sscsCaseDetails.getData().setScannedDocuments(list);
-
-        SscsDocument descriptionDocument = SscsDocument.builder()
-                .value(SscsDocumentDetails.builder()
-                        .documentFileName("Evidence Description -")
-                        .documentLink(DocumentLink.builder()
-                                .documentUrl("http://anotherUrl")
-                                .build())
-                        .documentDateAdded(convertCreatedOnDate(evidenceCreatedOn))
-                        .build())
-                .build();
-        List<SscsDocument> sscsList = new ArrayList<>();
-        sscsList.add(descriptionDocument);
-        sscsCaseDetails.getData().setSscsDocument(sscsList);
-
-        sscsCaseDetails.getData().setAppeal(Appeal.builder().hearingType("sya").build());
-        return new Object[]{
-            new Object[]{sscsCaseDetails}
-        };
+        someDescription = new EvidenceDescription("some description", "idamEmail");
     }
 
     private UploadResponse createUploadResponse() {
@@ -661,19 +698,18 @@ public class EvidenceUploadServiceTest {
         });
     }
 
-    private SscsCaseData hasSscsScannedDocument(int expectedNumberOfScannedDocs,
-                                                int expectedNumberOfAppellantStatements,
-                                                int expectedNumberOfEvidenceDesc) {
+    private SscsCaseData hasSscsScannedDocument(String expectedStatementPrefix,
+                                                String expectedEvidenceDescPrefix) {
         return argThat(argument -> {
             List<ScannedDocument> scannedDocuments = argument.getScannedDocuments();
-            boolean isExpectedNumberOfScannedDocs = scannedDocuments.size() == expectedNumberOfScannedDocs;
+            boolean isExpectedNumberOfScannedDocs = scannedDocuments.size() == 3;
             boolean isExpectedNumberOfAppellantStatements = scannedDocuments.stream()
-                .filter(scannedDocument -> scannedDocument.getValue().getFileName().startsWith("Appellant statement -"))
-                .count() == expectedNumberOfAppellantStatements;
+                .filter(scannedDocument -> scannedDocument.getValue().getFileName().startsWith(expectedStatementPrefix))
+                .count() == 1;
             boolean isExpectedNumberOfAppellantEvidenceDesc = scannedDocuments.stream()
                 .filter(scannedDocument -> scannedDocument.getValue().getFileName()
-                    .startsWith("Appellant Evidence Description -"))
-                .count() == expectedNumberOfEvidenceDesc;
+                    .startsWith(expectedEvidenceDescPrefix))
+                .count() == 1;
             return isExpectedNumberOfAppellantEvidenceDesc && isExpectedNumberOfAppellantStatements
                 && isExpectedNumberOfScannedDocs;
         });
