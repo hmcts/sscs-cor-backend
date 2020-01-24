@@ -8,6 +8,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.function.Supplier;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -36,6 +37,7 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
         "coh.url=http://coh-cor-aat.service.core-compute-aat.internal",
         "core_case_data.api.url=http://ccd-data-store-api-aat.service.core-compute-aat.internal"
 })
+@Slf4j
 public abstract class BaseFunctionTest {
     private final String baseUrl = System.getenv("TEST_URL") != null ? System.getenv("TEST_URL") : "http://localhost:8090";
 
@@ -74,12 +76,8 @@ public abstract class BaseFunctionTest {
     protected String createRandomEmail() {
         int randomNumber = (int) (Math.random() * 10000000);
         String emailAddress = "test" + randomNumber + "@hmcts.net";
-        System.out.println("emailAddress " + emailAddress);
+        log.info("emailAddress " + emailAddress);
         return emailAddress;
-    }
-
-    protected OnlineHearing createHearing(boolean ccdCaseRequired) throws IOException {
-        return createHearingAndCcdCase(ccdCaseRequired).getOnlineHearing();
     }
 
     protected CreatedCcdCase createCase() throws IOException {
@@ -90,17 +88,23 @@ public abstract class BaseFunctionTest {
 
         return createdCcdCase;
     }
+    
+    protected OnlineHearing createHearing(boolean ccdCaseRequired) throws IOException {
+        return createHearingAndCcdCase(ccdCaseRequired).getOnlineHearing();
+    }
 
     protected CreatedCaseHearingData createHearingAndCcdCase(boolean ccdCaseRequired) throws IOException {
         String emailAddress = createRandomEmail();
         return createHearingAndCcdCase(ccdCaseRequired, emailAddress);
     }
 
+
     protected CreatedCaseHearingData createHearingAndCcdCase(boolean ccdCaseRequired, String emailAddress) throws IOException {
         String hearingId;
         CreatedCcdCase createdCcdCase = null;
         if (ccdCaseRequired) {
             createdCcdCase = sscsCorBackendRequests.createCase(emailAddress);
+            System.out.println("Case id " + createdCcdCase.getCaseId());
             hearingId = cohRequests.createHearing(createdCcdCase.getCaseId());
         } else {
             hearingId = cohRequests.createHearing();

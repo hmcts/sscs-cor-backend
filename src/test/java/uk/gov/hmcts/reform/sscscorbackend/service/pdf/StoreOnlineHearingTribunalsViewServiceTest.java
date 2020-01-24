@@ -60,7 +60,7 @@ public class StoreOnlineHearingTribunalsViewServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void throwsExceptionIfCannotFindHearingId() {
         sscsCaseData = createSscsCaseData();
-        sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).id(1234567890L).build();
 
         when(onlineHearingService.loadOnlineHearingFromCoh(sscsCaseDetails)).thenReturn(Optional.empty());
         storeOnlineHearingTribunalsViewService.storePdf(someCaseId, someHearingId, new PdfData(sscsCaseDetails));

@@ -10,4 +10,11 @@ public class AppellantStatementTest extends BaseFunctionTest {
 
         sscsCorBackendRequests.uploadAppellantStatement(hearingWithQuestion.getHearingId(), "statement");
     }
+
+    @Test
+    public void canUploadAnAppellantStatementForDigital() throws IOException {
+        CreatedCcdCase createdCase = createCase();
+
+        sscsCorBackendRequests.uploadAppellantStatement(createdCase.getCaseId(), "statement");
+    }
 }
