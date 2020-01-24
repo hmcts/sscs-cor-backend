@@ -149,7 +149,7 @@ public abstract class StorePdfService<E, D extends PdfData> {
         String appellantLastName = caseDetails.getData().getAppeal().getAppellant().getName().getLastName();
 
         String nino = caseDetails.getData().getAppeal().getAppellant().getIdentity().getNino();
-        String caseReference = caseDetails.getData().getCaseReference();
+        String caseReference = caseDetails.getId().toString();
         String dateCreated = reformatDate(now());
 
         return new PdfAppealDetails(appellantTitle, appellantFirstName, appellantLastName, nino, caseReference,

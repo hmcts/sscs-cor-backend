@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscscorbackend.service.pdf;
 
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
@@ -18,6 +20,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.pdf.PdfAppellantStatement;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.AppellantStatementPdfData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
+@Slf4j
 @Service
 public class StoreAppellantStatementService extends StorePdfService<PdfAppellantStatement, AppellantStatementPdfData> {
 
@@ -38,7 +41,8 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
     protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId,
                                         AppellantStatementPdfData data) {
         return workOutIfAppellantOrRepsStatement(caseDetails, data)
-            + getCountOfNextStatement(caseDetails.getData().getScannedDocuments()) + " - ";
+            + getCountOfNextStatement(caseDetails.getData().getScannedDocuments(),
+            caseDetails.getData().getSscsDocument()) + " - ";
     }
 
     @NotNull
@@ -54,19 +58,29 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
         return statementPrefix;
     }
 
-    private long getCountOfNextStatement(List<ScannedDocument> scannedDocuments) {
-        if (scannedDocuments == null) {
+    private long getCountOfNextStatement(List<ScannedDocument> scannedDocuments, List<SscsDocument> sscsDocument) {
+        if ((scannedDocuments == null || scannedDocuments.isEmpty())
+            && (sscsDocument == null || sscsDocument.isEmpty())) {
             return 1;
         }
-        return scannedDocuments.stream()
-            .filter(doc -> doc.getValue() != null)
-            .filter(doc -> StringUtils.isNotBlank(doc.getValue().getFileName()))
-            .filter(this::docFileNameIsStatement).count() + 1;
+        long statementNextCount = 0;
+        if (scannedDocuments != null) {
+            statementNextCount = scannedDocuments.stream()
+                .filter(doc -> doc.getValue() != null)
+                .filter(doc -> StringUtils.isNotBlank(doc.getValue().getFileName()))
+                .filter(doc -> docFileNameIsStatement(doc.getValue().getFileName())).count();
+        }
+        if (sscsDocument != null) {
+            statementNextCount += sscsDocument.stream()
+                .filter(doc -> doc.getValue() != null)
+                .filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentFileName()))
+                .filter(doc -> docFileNameIsStatement(doc.getValue().getDocumentFileName())).count();
+        }
+        return statementNextCount + 1;
     }
 
-    private boolean docFileNameIsStatement(ScannedDocument doc) {
-        return doc.getValue().getFileName().startsWith(APPELLANT_STATEMENT)
-            || doc.getValue().getFileName().startsWith(REPRESENTATIVE_STATEMENT);
+    private boolean docFileNameIsStatement(String fileName) {
+        return fileName.startsWith(APPELLANT_STATEMENT) || fileName.startsWith(REPRESENTATIVE_STATEMENT);
     }
 
     @Override

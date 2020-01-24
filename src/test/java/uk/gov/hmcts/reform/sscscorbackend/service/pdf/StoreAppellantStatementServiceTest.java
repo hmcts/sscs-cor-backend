@@ -58,12 +58,16 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 public class StoreAppellantStatementServiceTest {
 
     private static final String APPELLANT_STATEMENT_1 = "Appellant statement 1 - ";
+    private static final String APPELLANT_STATEMENT_2 = "Appellant statement 2 - ";
+    private static final String APPELLANT_STATEMENT_3 = "Appellant statement 3 - ";
+    private static final String APPELLANT_STATEMENT_1_1234567890_PDF = "Appellant statement 1 - 1234567890.pdf";
+    private static final String APPELLANT_STATEMENT_2_1234567890_PDF = "Appellant statement 2 - 1234567890.pdf";
     private static final String APPELLANT_STATEMENT_1_1234_5678_9012_3456_PDF = "Appellant statement 1 - 1234-5678-9012-3456.pdf";
     private static final String APPELLANT_STATEMENT_2_1234_5678_9012_3456_PDF = "Appellant statement 2 - 1234-5678-9012-3456.pdf";
     private static final String OTHER_EVIDENCE = "Other evidence";
 
     @Rule
-    public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+    public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.LENIENT);
 
     @Mock
     private PdfService pdfService;
@@ -106,13 +110,11 @@ public class StoreAppellantStatementServiceTest {
 
         // some corner case scenarios
         SscsCaseData sscsCaseDataWithNoDocs = SscsCaseData.builder().build();
-
         SscsCaseData sscsCaseDataWithDocWithNullValue = SscsCaseData.builder()
             .scannedDocuments(singletonList(ScannedDocument.builder()
                 .value(null)
                 .build()))
             .build();
-
         SscsCaseData sscsCaseDataWithDocWithEmptyFilename = SscsCaseData.builder()
             .scannedDocuments(singletonList(ScannedDocument.builder()
                 .value(ScannedDocumentDetails.builder()
@@ -120,7 +122,6 @@ public class StoreAppellantStatementServiceTest {
                     .build())
                 .build()))
             .build();
-
         SscsCaseData sscsCaseDataWithDocWithNullFilename = SscsCaseData.builder()
             .scannedDocuments(singletonList(ScannedDocument.builder()
                 .value(ScannedDocumentDetails.builder()
@@ -130,23 +131,31 @@ public class StoreAppellantStatementServiceTest {
             .build();
 
         return new Object[]{
+            new Object[]{sscsCaseDataWithNoDocs, APPELLANT_STATEMENT_1, null},
+            new Object[]{buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
+                APPELLANT_STATEMENT_1_1234567890_PDF), APPELLANT_STATEMENT_3, null},
+            new Object[]{buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
+                APPELLANT_STATEMENT_2_1234567890_PDF), APPELLANT_STATEMENT_3, null},
+            new Object[]{sscsCaseDataWithDocWithNullValue, APPELLANT_STATEMENT_1, null},
+            new Object[]{sscsCaseDataWithDocWithEmptyFilename, APPELLANT_STATEMENT_1, null},
+            new Object[]{sscsCaseDataWithDocWithNullFilename, APPELLANT_STATEMENT_1, null},
             new Object[]{buildCaseDataWithNoDocsAndWithGivenSubs(appellantSubscription, representativeSubscription),
                 "Representative statement 1 - ", "someTyaRepsCode"},
             new Object[]{buildCaseDataWithRepStatementAndGivenSubs(appellantSubscription, representativeSubscription),
-                "Representative statement 2 - ", "someTyaRepsCode"},
+                "Representative statement 3 - ", "someTyaRepsCode"},
             new Object[]{buildCaseDataWithRepStatementAndGivenSubs(null, null),
-                "Appellant statement 2 - ", "someTyaRepsCode"},
+                "Appellant statement 3 - ", "someTyaRepsCode"},
             new Object[]{buildCaseDataWithRepStatementAndGivenSubs(null, null),
-                "Appellant statement 2 - ", null},
+                "Appellant statement 3 - ", null},
             new Object[]{buildCaseDataWithRepStatementAndGivenSubs(appellantSubscription, representativeSubscription),
-                "Appellant statement 2 - ", null},
+                "Appellant statement 3 - ", null},
             new Object[]{buildCaseDataWithRepStatementAndGivenSubs(appellantSubscription, Subscription.builder()
-                .tya(null).build()), "Appellant statement 2 - ", "someTyaRepsCode"},
+                .tya(null).build()), "Appellant statement 3 - ", "someTyaRepsCode"},
             new Object[]{sscsCaseDataWithNoDocs, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
             new Object[]{buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
-                "Some other document.txt"), APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
+                "Some other document.txt"), APPELLANT_STATEMENT_2, "someTyaAppellantCode"},
             new Object[]{buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
-                APPELLANT_STATEMENT_1_1234_5678_9012_3456_PDF), "Appellant statement 2 - ", "someTyaAppellantCode"},
+                APPELLANT_STATEMENT_1_1234_5678_9012_3456_PDF), "Appellant statement 3 - ", "someTyaAppellantCode"},
             new Object[]{sscsCaseDataWithDocWithNullValue, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
             new Object[]{sscsCaseDataWithDocWithEmptyFilename, APPELLANT_STATEMENT_1, "someTyaAppellantCode"},
             new Object[]{sscsCaseDataWithDocWithNullFilename, APPELLANT_STATEMENT_1, "someTyaAppellantCode"}
@@ -197,14 +206,14 @@ public class StoreAppellantStatementServiceTest {
 
     @Test
     @Parameters({
-        "someTyaAppellantCode, Appellant statement 2 - 1234-5678-9012-3456.pdf",
-        "someTyaRepsCode, Representative statement 2 - 1234-5678-9012-3456.pdf"
+        "someTyaAppellantCode, Appellant statement 3 - 1234567890.pdf",
+        "someTyaRepsCode, Representative statement 3 - 1234567890.pdf"
     })
     public void givenCaseDataWithSomeOtherStatement_shouldCallTheStorePdfWithTheCorrectPdfName(
         String tya, String expectedFilename) {
         when(pdfService.createPdf(any(), eq("templatePath"))).thenReturn(new byte[0]);
 
-        when(ccdPdfService.mergeDocIntoCcd(eq(expectedFilename), any(), eq(1L), any(SscsCaseData.class),
+        when(ccdPdfService.mergeDocIntoCcd(eq(expectedFilename), any(), eq(1234567890L), any(SscsCaseData.class),
             any(IdamTokens.class), eq(OTHER_EVIDENCE)))
             .thenReturn(SscsCaseData.builder().build());
 
@@ -214,11 +223,11 @@ public class StoreAppellantStatementServiceTest {
         Statement statement = new Statement("some statement", tya);
         AppellantStatementPdfData data = new AppellantStatementPdfData(caseDetails, statement);
 
-        storeAppellantStatementService.storePdf(1L, "onlineHearingId", data);
+        storeAppellantStatementService.storePdf(1234567890L, "onlineHearingId", data);
 
         ArgumentCaptor<String> acForPdfName = ArgumentCaptor.forClass(String.class);
         verify(ccdPdfService, times(1)).mergeDocIntoCcd(acForPdfName.capture(), any(),
-            eq(1L), any(SscsCaseData.class), any(IdamTokens.class), eq(OTHER_EVIDENCE));
+            eq(1234567890L), any(SscsCaseData.class), any(IdamTokens.class), eq(OTHER_EVIDENCE));
         assertThat(acForPdfName.getValue(), is(expectedFilename));
         verifyZeroInteractions(evidenceManagementService);
     }
@@ -252,7 +261,7 @@ public class StoreAppellantStatementServiceTest {
     private SscsCaseDetails buildSscsCaseDetailsTestData() {
         SscsCaseData caseData = buildCaseDataWithSscsDocumentAndGivenScannedDocumentFilename(
             APPELLANT_STATEMENT_1_1234_5678_9012_3456_PDF);
-        caseData.setCcdCaseId("1234-5678-9012-3456");
+        caseData.setCcdCaseId("1234567890");
         caseData.setAppeal(Appeal.builder()
             .appellant(Appellant.builder()
                 .name(Name.builder()
@@ -276,6 +285,7 @@ public class StoreAppellantStatementServiceTest {
         caseData.setCaseReference("SC0022222");
 
         return SscsCaseDetails.builder()
+            .id(1234567890L)
             .data(caseData)
             .build();
     }
