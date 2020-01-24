@@ -152,7 +152,7 @@ public class EvidenceUploadControllerTest {
 
     @Test
     public void submitEvidence() {
-        EvidenceDescription description = new EvidenceDescription("some description");
+        EvidenceDescription description = new EvidenceDescription("some description", "idamEmail");
         when(evidenceUploadService.submitHearingEvidence(someOnlineHearingId, description)).thenReturn(true);
 
         ResponseEntity responseEntity = evidenceUploadController.submitEvidence(someOnlineHearingId, description);
@@ -162,7 +162,7 @@ public class EvidenceUploadControllerTest {
 
     @Test
     public void submitEvidenceWhenHearingDoesNotExist() {
-        EvidenceDescription description = new EvidenceDescription("some description");
+        EvidenceDescription description = new EvidenceDescription("some description", "idamEmail");
         when(evidenceUploadService.submitHearingEvidence(someOnlineHearingId, description)).thenReturn(false);
 
         ResponseEntity responseEntity = evidenceUploadController.submitEvidence(someOnlineHearingId, description);

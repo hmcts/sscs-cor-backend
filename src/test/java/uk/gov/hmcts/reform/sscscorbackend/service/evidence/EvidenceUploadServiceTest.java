@@ -69,7 +69,7 @@ public class EvidenceUploadServiceTest {
 
         someCcdCaseId = 123L;
 
-        someDescription = new EvidenceDescription("some description");
+        someDescription = new EvidenceDescription("some description", "idamEmail");
 
         IdamService idamService = mock(IdamService.class);
         idamTokens = mock(IdamTokens.class);

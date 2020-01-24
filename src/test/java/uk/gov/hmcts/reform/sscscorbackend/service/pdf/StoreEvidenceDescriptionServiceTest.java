@@ -50,8 +50,10 @@ public class StoreEvidenceDescriptionServiceTest {
         PdfAppealDetails appealDetails = mock(PdfAppealDetails.class);
         List<String> fileName = Collections.singletonList("fileName");
         String description = "description";
-        EvidenceDescriptionPdfData evidenceDescriptionPdfData = new EvidenceDescriptionPdfData(mock(SscsCaseDetails.class), new EvidenceDescription(description), fileName);
-        PdfEvidenceDescription pdfContent = storeEvidenceDescriptionService.getPdfContent(evidenceDescriptionPdfData, "hearingId", appealDetails);
+        EvidenceDescriptionPdfData evidenceDescriptionPdfData = new EvidenceDescriptionPdfData(
+            mock(SscsCaseDetails.class), new EvidenceDescription(description, "idamEmail"), fileName);
+        PdfEvidenceDescription pdfContent = storeEvidenceDescriptionService.getPdfContent(evidenceDescriptionPdfData,
+            "hearingId", appealDetails);
 
         assertThat(pdfContent, is(new PdfEvidenceDescription(appealDetails, description, fileName)));
     }

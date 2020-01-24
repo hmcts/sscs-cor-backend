@@ -10,15 +10,23 @@ public class EvidenceDescription {
     @JsonProperty(value = "body")
     private String body;
 
+    @JsonProperty(value = "idamEmail")
+    private String idamEmail;
+
     // needed for Jackson
     private EvidenceDescription() {
     }
 
-    public EvidenceDescription(String body) {
+    public EvidenceDescription(String body, String idamEmail) {
         this.body = body;
+        this.idamEmail = idamEmail;
     }
 
     public String getBody() {
         return body;
+    }
+
+    public String getIdamEmail() {
+        return idamEmail;
     }
 }
