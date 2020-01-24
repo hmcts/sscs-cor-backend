@@ -177,7 +177,7 @@ public class EvidenceUploadService {
             dateFormatter);
         LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
 
-        String fileNamePrefix = workOutFileNamePrefix(caseDetails, idamEmail);
+        String partyPrefix = workOutFileNamePrefix(caseDetails, idamEmail);
 
         for (SscsDocument draftSscsDocument : storePdfContext.getDocument().getData()
             .getDraftSscsDocument()) {
@@ -188,7 +188,7 @@ public class EvidenceUploadService {
                     ScannedDocumentDetails.builder()
                         .type("other")
                         .url(draftSscsDocument.getValue().getDocumentLink())
-                        .fileName(fileNamePrefix + "statement - " + draftSscsDocument.getValue().getDocumentFileName())
+                        .fileName(partyPrefix + "statement - " + draftSscsDocument.getValue().getDocumentFileName())
                             .scannedDate(ldt.toString())
                         .build()).build();
 
@@ -198,7 +198,7 @@ public class EvidenceUploadService {
                 ScannedDocumentDetails.builder()
                         .type("other")
                         .url(evidenceDescriptionDocument.getValue().getDocumentLink())
-                        .fileName(fileNamePrefix + evidenceDescriptionDocument.getValue().getDocumentFileName())
+                        .fileName(partyPrefix + evidenceDescriptionDocument.getValue().getDocumentFileName())
                         .scannedDate(ldt.toString())
                         .build()).build();
         scannedDocs.add(convertEvidenceToScannedDocument);

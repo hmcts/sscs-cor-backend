@@ -8,7 +8,12 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.AdditionalMatchers.and;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ATTACH_SCANNED_DOCS;
 
 import java.time.ZoneId;
@@ -17,12 +22,27 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CorDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CorDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
@@ -39,6 +59,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.UploadedEvidence;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.DocumentManagementService;
 
+@RunWith(JUnitParamsRunner.class)
 public class EvidenceUploadServiceTest {
 
     private EvidenceUploadService evidenceUploadService;
@@ -58,6 +79,9 @@ public class EvidenceUploadServiceTest {
     private EvidenceUploadEmailService evidenceUploadEmailService;
     private FileToPdfConversionService fileToPdfConversionService;
     private EvidenceManagementService evidenceManagementService;
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Before
     public void setUp() {
@@ -524,6 +548,37 @@ public class EvidenceUploadServiceTest {
     }
 
     @Test
+    @Parameters(method = "generateTestCaseScenarios")
+    public void givenANonCorCaseWithScannedDocumentsAndDraftDocument_thenMoveDraftToScannedDocumentsAndUpdateCaseInCcd(
+        SscsCaseDetails sscsCaseDetails) {
+
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+
+        UploadedEvidence evidenceDescriptionPdf = mock(UploadedEvidence.class);
+        when(storeEvidenceDescriptionService.storePdf(
+            someCcdCaseId,
+            someOnlineHearingId,
+            new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription,
+                singletonList("Evidence Description -"))
+        )).thenReturn(new CohEventActionContext(evidenceDescriptionPdf, sscsCaseDetails));
+
+        boolean submittedEvidence = evidenceUploadService.submitHearingEvidence(someOnlineHearingId, someDescription);
+
+        assertThat(submittedEvidence, is(true));
+
+        verify(ccdService).updateCase(
+            and(hasSscsScannedDocument(3, 1,
+                1),
+                doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo()),
+            eq(someCcdCaseId),
+            eq(ATTACH_SCANNED_DOCS.getCcdType()),
+            eq("SSCS - upload evidence from MYA"),
+            eq("Uploaded a further evidence document"),
+            eq(idamTokens)
+        );
+    }
+
+    @Test
     public void deleteEvidenceForQuestionForAHearingThatDoesNotExist() {
         String nonExistentHearingId = "nonExistentHearingId";
         when(onlineHearingService.getCcdCase(nonExistentHearingId)).thenReturn(Optional.empty());
@@ -533,8 +588,13 @@ public class EvidenceUploadServiceTest {
         assertThat(hearingFound, is(false));
     }
 
-    @Test
-    public void givenANonCorCaseWithScannedDocumentsAndDraftDocument_thenMoveDraftToScannedDocumentsAndUpdateCaseInCcd() {
+    private Object[] generateTestCaseScenarios() {
+        someOnlineHearingId = "someOnlinehearingId";
+        someQuestionId = "someQuestionId";
+        someEvidenceId = "someEvidenceId";
+        someCcdCaseId = 123L;
+        fileName = "Evidence Description -";
+        documentUrl = "http://example.com/document/" + someEvidenceId;
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName,
             documentUrl, evidenceCreatedOn);
         ScannedDocument evidenceDocument = ScannedDocument.builder()
@@ -563,30 +623,9 @@ public class EvidenceUploadServiceTest {
         sscsCaseDetails.getData().setSscsDocument(sscsList);
 
         sscsCaseDetails.getData().setAppeal(Appeal.builder().hearingType("sya").build());
-
-        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
-
-        UploadedEvidence evidenceDescriptionPdf = mock(UploadedEvidence.class);
-        when(storeEvidenceDescriptionService.storePdf(
-                someCcdCaseId,
-                someOnlineHearingId,
-                new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription, singletonList(fileName))
-        )).thenReturn(new CohEventActionContext(evidenceDescriptionPdf, sscsCaseDetails));
-
-        boolean submittedEvidence = evidenceUploadService.submitHearingEvidence(someOnlineHearingId, someDescription);
-
-        assertThat(submittedEvidence, is(true));
-
-        verify(ccdService).updateCase(
-                and(hasSscsScannedDocument(3, 1,
-                    1),
-                    doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo()),
-                eq(someCcdCaseId),
-                eq(ATTACH_SCANNED_DOCS.getCcdType()),
-                eq("SSCS - upload evidence from MYA"),
-                eq("Uploaded a further evidence document"),
-                eq(idamTokens)
-        );
+        return new Object[]{
+            new Object[]{sscsCaseDetails}
+        };
     }
 
     private UploadResponse createUploadResponse() {
