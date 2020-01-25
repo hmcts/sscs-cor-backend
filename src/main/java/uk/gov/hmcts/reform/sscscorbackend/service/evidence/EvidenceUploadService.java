@@ -178,7 +178,7 @@ public class EvidenceUploadService {
             dateFormatter);
         LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
 
-        String fileNamePrefix = workOutFileNamePrefix(caseDetails, idamEmail);
+        String appellantOrRepsFileNamePrefix = workOutAppellantOrRepsFileNamePrefix(caseDetails, idamEmail);
 
         long nextStatementCounter = StoreAppellantStatementService.getCountOfNextStatement(
             storePdfContext.getDocument().getData().getScannedDocuments(),
@@ -187,11 +187,12 @@ public class EvidenceUploadService {
         for (SscsDocument draftSscsDocument : storePdfContext.getDocument().getData().getDraftSscsDocument()) {
             ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(), dateFormatter);
             ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
-            String prefix = String.format("%s statement %d - ", fileNamePrefix, nextStatementCounter);
-            scannedDocs.add(buildScannedDocumentByGivenSscsDoc(ldt, prefix, draftSscsDocument));
+            String fileNamePrefix = String.format("%s statement %d - ",
+                appellantOrRepsFileNamePrefix, nextStatementCounter);
+            scannedDocs.add(buildScannedDocumentByGivenSscsDoc(ldt, fileNamePrefix, draftSscsDocument));
         }
 
-        scannedDocs.add(buildScannedDocumentByGivenSscsDoc(ldt, fileNamePrefix + " ",
+        scannedDocs.add(buildScannedDocumentByGivenSscsDoc(ldt, appellantOrRepsFileNamePrefix + " ",
             evidenceDescriptionDocument));
         sscsDocument.remove(sscsDocument.size() - 1);
         sscsCaseData.setSscsDocument(sscsDocument);
@@ -235,7 +236,7 @@ public class EvidenceUploadService {
     }
 
     @NotNull
-    private String workOutFileNamePrefix(SscsCaseDetails caseDetails, String idamEmail) {
+    private String workOutAppellantOrRepsFileNamePrefix(SscsCaseDetails caseDetails, String idamEmail) {
         String fileNamePrefix = "Appellant";
         Subscriptions subscriptions = caseDetails.getData().getSubscriptions();
         if (subscriptions != null) {
