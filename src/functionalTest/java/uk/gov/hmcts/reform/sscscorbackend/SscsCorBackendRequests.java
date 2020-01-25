@@ -190,7 +190,10 @@ public class SscsCorBackendRequests {
 
     public void submitHearingEvidence(String hearingId, String description) throws IOException {
         HttpResponse response = postRequest("/continuous-online-hearings/" + hearingId + "/evidence",
-                new StringEntity("{\"body\":\"" + description + "\"}", APPLICATION_JSON)
+            new StringEntity("{\n"
+                + "  \"body\": \"" + description + "\",\n"
+                + "  \"idamEmail\": \"mya-sscs-6920-reps@mailinator.com\"\n"
+                + "}", APPLICATION_JSON)
         );
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
     }
