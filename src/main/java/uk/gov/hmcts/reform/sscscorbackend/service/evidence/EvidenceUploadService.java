@@ -52,6 +52,7 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.EvidenceDescription;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreAppellantStatementService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.EvidenceDescriptionPdfData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
@@ -179,12 +180,15 @@ public class EvidenceUploadService {
 
         String fileNamePrefix = workOutFileNamePrefix(caseDetails, idamEmail);
 
-        for (SscsDocument draftSscsDocument : storePdfContext.getDocument().getData()
-            .getDraftSscsDocument()) {
+        long nextStatementCounter = StoreAppellantStatementService.getCountOfNextStatement(
+            storePdfContext.getDocument().getData().getScannedDocuments(),
+            storePdfContext.getDocument().getData().getSscsDocument());
+
+        for (SscsDocument draftSscsDocument : storePdfContext.getDocument().getData().getDraftSscsDocument()) {
             ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(), dateFormatter);
             ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
-            scannedDocs.add(buildScannedDocumentByGivenSscsDoc(ldt, fileNamePrefix + " statement - ",
-                draftSscsDocument));
+            String prefix = String.format("%s statement %d - ", fileNamePrefix, nextStatementCounter);
+            scannedDocs.add(buildScannedDocumentByGivenSscsDoc(ldt, prefix, draftSscsDocument));
         }
 
         scannedDocs.add(buildScannedDocumentByGivenSscsDoc(ldt, fileNamePrefix + " ",
