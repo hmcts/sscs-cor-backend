@@ -183,25 +183,12 @@ public class EvidenceUploadService {
             .getDraftSscsDocument()) {
             ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(), dateFormatter);
             ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
-
-            ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                    ScannedDocumentDetails.builder()
-                        .type("other")
-                        .url(draftSscsDocument.getValue().getDocumentLink())
-                        .fileName(fileNamePrefix + "statement - " + draftSscsDocument.getValue().getDocumentFileName())
-                            .scannedDate(ldt.toString())
-                        .build()).build();
-
-            scannedDocs.add(scannedDocument);
+            scannedDocs.add(buildScannedDocumentByGivenSscsDoc(ldt, fileNamePrefix + " statement - ",
+                draftSscsDocument));
         }
-        ScannedDocument convertEvidenceToScannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder()
-                        .type("other")
-                        .url(evidenceDescriptionDocument.getValue().getDocumentLink())
-                        .fileName(fileNamePrefix + evidenceDescriptionDocument.getValue().getDocumentFileName())
-                        .scannedDate(ldt.toString())
-                        .build()).build();
-        scannedDocs.add(convertEvidenceToScannedDocument);
+
+        scannedDocs.add(buildScannedDocumentByGivenSscsDoc(ldt, fileNamePrefix + " ",
+            evidenceDescriptionDocument));
         sscsDocument.remove(sscsDocument.size() - 1);
         sscsCaseData.setSscsDocument(sscsDocument);
 
@@ -220,15 +207,38 @@ public class EvidenceUploadService {
             "Uploaded a further evidence document", idamService.getIdamTokens());
     }
 
+    private ScannedDocument buildScannedDocumentByGivenSscsDoc(LocalDateTime ldt, String fileNamePrefix,
+                                                               SscsDocument draftSscsDocument) {
+        DocumentLink documentLinkForScannedDoc = buildDocLinkFromGivenDocLinkAndPrefixFilenameByGivenPrefix(
+            fileNamePrefix, draftSscsDocument);
+        return ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                    .type("other")
+                    .url(documentLinkForScannedDoc)
+                    .fileName(fileNamePrefix + draftSscsDocument.getValue().getDocumentFileName())
+                    .scannedDate(ldt.toString())
+                    .build()).build();
+    }
+
+    private DocumentLink buildDocLinkFromGivenDocLinkAndPrefixFilenameByGivenPrefix(String fileNamePrefix,
+                                                                                    SscsDocument draftSscsDocument) {
+        DocumentLink documentLinkFromDraftSscsDoc = draftSscsDocument.getValue().getDocumentLink();
+        return DocumentLink.builder()
+            .documentBinaryUrl(documentLinkFromDraftSscsDoc.getDocumentBinaryUrl())
+            .documentUrl(documentLinkFromDraftSscsDoc.getDocumentUrl())
+            .documentFilename(fileNamePrefix + documentLinkFromDraftSscsDoc.getDocumentFilename())
+            .build();
+    }
+
     @NotNull
     private String workOutFileNamePrefix(SscsCaseDetails caseDetails, String idamEmail) {
-        String fileNamePrefix = "Appellant ";
+        String fileNamePrefix = "Appellant";
         Subscriptions subscriptions = caseDetails.getData().getSubscriptions();
         if (subscriptions != null) {
             Subscription repSubs = subscriptions.getRepresentativeSubscription();
             if (repSubs != null && StringUtils.isNotBlank(repSubs.getEmail())) {
-                if (repSubs.getEmail().equals(idamEmail)) {
-                    fileNamePrefix = "Representative ";
+                if (repSubs.getEmail().equalsIgnoreCase(idamEmail)) {
+                    fileNamePrefix = "Representative";
                 }
             }
         }
