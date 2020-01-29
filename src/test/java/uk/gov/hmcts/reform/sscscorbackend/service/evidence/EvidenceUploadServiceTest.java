@@ -80,8 +80,6 @@ public class EvidenceUploadServiceTest {
     private StoreEvidenceDescriptionService storeEvidenceDescriptionService;
     private EvidenceDescription someDescription;
     private EvidenceUploadEmailService evidenceUploadEmailService;
-    private FileToPdfConversionService fileToPdfConversionService;
-    private EvidenceManagementService evidenceManagementService;
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -104,8 +102,8 @@ public class EvidenceUploadServiceTest {
 
         storeEvidenceDescriptionService = mock(StoreEvidenceDescriptionService.class);
         evidenceUploadEmailService = mock(EvidenceUploadEmailService.class);
-        fileToPdfConversionService = mock(FileToPdfConversionService.class);
-        evidenceManagementService = mock(EvidenceManagementService.class);
+        FileToPdfConversionService fileToPdfConversionService = mock(FileToPdfConversionService.class);
+        EvidenceManagementService evidenceManagementService = mock(EvidenceManagementService.class);
         DocumentManagementService documentManagementService = mock(DocumentManagementService.class);
 
         evidenceUploadService = new EvidenceUploadService(
@@ -115,8 +113,8 @@ public class EvidenceUploadServiceTest {
                 onlineHearingService,
                 storeEvidenceDescriptionService,
                 evidenceUploadEmailService,
-                fileToPdfConversionService,
-                evidenceManagementService);
+            fileToPdfConversionService,
+            evidenceManagementService);
         fileName = "someFileName.txt";
         documentUrl = "http://example.com/document/" + someEvidenceId;
         file = mock(MultipartFile.class);
