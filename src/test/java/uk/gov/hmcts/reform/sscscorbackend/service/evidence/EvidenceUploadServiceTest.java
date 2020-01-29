@@ -598,7 +598,7 @@ public class EvidenceUploadServiceTest {
     @NotNull
     private List<SscsDocument> buildSscsDocumentList() {
         SscsDocument descriptionDocument = buildSscsDocumentGivenFilename(
-            "temporarily unique Id ec7ae162-9834-46b7-826d-fdc9935e3187 Evidence Description -");
+            "temporal unique Id ec7ae162-9834-46b7-826d-fdc9935e3187 Evidence Description -");
         SscsDocument form1DocWithNoDate = buildSscsDocumentGivenFilename("form1");
         form1DocWithNoDate.getValue().setDocumentDateAdded(null);
         List<SscsDocument> sscsList = new ArrayList<>();

@@ -35,14 +35,15 @@ public class StoreEvidenceDescriptionServiceTest {
 
     @Test
     public void pdfHasNotAlreadyBeenCreatedIsAlwaysTrue() {
-        assertTrue(storeEvidenceDescriptionService.pdfHasNotAlreadyBeenCreated(mock(SscsCaseDetails.class), "docPrefix"));
+        assertTrue(storeEvidenceDescriptionService.pdfHasNotAlreadyBeenCreated(mock(SscsCaseDetails.class),
+            "docPrefix"));
     }
 
     @Test
     public void documentNamePrefixIsEvidenceDescription() {
         assertThat(storeEvidenceDescriptionService
             .documentNamePrefix(mock(SscsCaseDetails.class), "hearingId", null),
-            is("Evidence Description - "));
+            is("temporal unique Id ec7ae162-9834-46b7-826d-fdc9935e3187 Evidence Description - "));
     }
 
     @Test

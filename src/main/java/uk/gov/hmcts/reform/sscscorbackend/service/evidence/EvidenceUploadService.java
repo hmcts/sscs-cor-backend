@@ -12,6 +12,7 @@ import static org.apache.commons.collections4.ListUtils.union;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ATTACH_SCANNED_DOCS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_COR_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DRAFT_DOCUMENT;
+import static uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreEvidenceDescriptionService.TEMP_UNIQUE_ID;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -169,61 +170,15 @@ public class EvidenceUploadService {
 
     private void submitHearingWhenNoCoreCase(SscsCaseDetails caseDetails, SscsCaseData sscsCaseData, Long ccdCaseId,
                                              CohEventActionContext storePdfContext, String idamEmail) {
-        List<ScannedDocument> scannedDocs = new ArrayList<>();
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        List<SscsDocument> sscsDocument = storePdfContext.getDocument().getData().getSscsDocument();
-
-        String tempUniqueId = "temporarily unique Id ec7ae162-9834-46b7-826d-fdc9935e3187";
-        SscsDocument evidenceDescriptionDocument = sscsDocument.stream()
-            .filter(doc -> doc.getValue().getDocumentFileName().startsWith(tempUniqueId))
-            .findFirst().orElseThrow(() -> new RuntimeException("Evidence description file cannot be found"));
-
-        sscsDocument.removeIf(doc -> doc.getValue().getDocumentFileName().startsWith(tempUniqueId) ||
-            doc.getValue().getDocumentLink().getDocumentFilename().startsWith(tempUniqueId));
-        sscsCaseData.setSscsDocument(sscsDocument);
-
-        String edFilename = evidenceDescriptionDocument.getValue().getDocumentFileName();
-        edFilename = edFilename.replace(tempUniqueId, "").trim();
-        evidenceDescriptionDocument.getValue().setDocumentFileName(edFilename);
-
-        DocumentLink dlFilename = evidenceDescriptionDocument.getValue().getDocumentLink();
-        DocumentLink newDocLink = dlFilename.toBuilder()
-            .documentFilename(edFilename)
-            .documentUrl(dlFilename.getDocumentUrl())
-            .documentBinaryUrl(dlFilename.getDocumentBinaryUrl())
-            .build();
-        evidenceDescriptionDocument.getValue().setDocumentLink(newDocLink);
-
-        LocalDate ld = LocalDate.parse(evidenceDescriptionDocument.getValue().getDocumentDateAdded(),
-            dateFormatter);
-        LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
 
         String appellantOrRepsFileNamePrefix = workOutAppellantOrRepsFileNamePrefix(caseDetails, idamEmail);
+        List<ScannedDocument> scannedDocs = moveNewUploadedStatementsToUnprocessedCorrespondence(storePdfContext,
+            appellantOrRepsFileNamePrefix);
+        moveNewEvidenceDescriptionToUnprocessedCorrespondence(sscsCaseData, storePdfContext,
+            appellantOrRepsFileNamePrefix, scannedDocs);
+        mergeNewUnprocessedCorrespondenceToTheExistingInTheCase(caseDetails, sscsCaseData, scannedDocs);
 
-        long nextStatementCounter = StoreAppellantStatementService.getCountOfNextStatement(
-            storePdfContext.getDocument().getData().getScannedDocuments(),
-            storePdfContext.getDocument().getData().getSscsDocument());
-
-        for (SscsDocument draftSscsDocument : storePdfContext.getDocument().getData().getDraftSscsDocument()) {
-            ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(), dateFormatter);
-            ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
-            String fileNamePrefix = String.format("%s statement %d - ",
-                appellantOrRepsFileNamePrefix, nextStatementCounter);
-            scannedDocs.add(buildScannedDocumentByGivenSscsDoc(ldt, fileNamePrefix, draftSscsDocument));
-        }
-
-        scannedDocs.add(buildScannedDocumentByGivenSscsDoc(ldt, appellantOrRepsFileNamePrefix + " ",
-            evidenceDescriptionDocument));
-
-        List<ScannedDocument> newScannedDocumentsList = union(
-                emptyIfNull(caseDetails.getData().getScannedDocuments()),
-                emptyIfNull(scannedDocs)
-        );
-
-        sscsCaseData.setScannedDocuments(newScannedDocumentsList);
         sscsCaseData.setDraftSscsDocument(Collections.emptyList());
-
         sscsCaseData.setEvidenceHandled("No");
 
         ccdService.updateCase(sscsCaseData, ccdCaseId, ATTACH_SCANNED_DOCS.getCcdType(),
@@ -231,10 +186,76 @@ public class EvidenceUploadService {
             "Uploaded a further evidence document", idamService.getIdamTokens());
     }
 
-    private ScannedDocument buildScannedDocumentByGivenSscsDoc(LocalDateTime ldt, String fileNamePrefix,
-                                                               SscsDocument draftSscsDocument) {
+    private void mergeNewUnprocessedCorrespondenceToTheExistingInTheCase(SscsCaseDetails caseDetails,
+                                                                         SscsCaseData sscsCaseData,
+                                                                         List<ScannedDocument> scannedDocs) {
+        List<ScannedDocument> newScannedDocumentsList = union(emptyIfNull(caseDetails.getData().getScannedDocuments()),
+                emptyIfNull(scannedDocs));
+        sscsCaseData.setScannedDocuments(newScannedDocumentsList);
+    }
+
+    private void moveNewEvidenceDescriptionToUnprocessedCorrespondence(SscsCaseData sscsCaseData,
+                                                                       CohEventActionContext storePdfContext,
+                                                                       String appellantOrRepsFileNamePrefix, List<ScannedDocument> scannedDocs) {
+        List<SscsDocument> sscsDocument = storePdfContext.getDocument().getData().getSscsDocument();
+        SscsDocument evidenceDescriptionDocument = findAndReturnTheNewEvidenceDescDoc(sscsDocument);
+        removeNewEvidenceDescFromTheDocumentsTab(sscsCaseData, sscsDocument);
+        removeUniqueIdAndSetFilenameForTheEvidenceDesc(evidenceDescriptionDocument);
+        scannedDocs.add(buildScannedDocumentByGivenSscsDoc(appellantOrRepsFileNamePrefix + " ",
+            evidenceDescriptionDocument));
+    }
+
+    private void removeUniqueIdAndSetFilenameForTheEvidenceDesc(SscsDocument evidenceDescriptionDocument) {
+        String fileNameCleanOfUniqueId = removeTemporalUniqueIdFromGivenString(evidenceDescriptionDocument.getValue()
+            .getDocumentFileName());
+        evidenceDescriptionDocument.getValue().setDocumentFileName(fileNameCleanOfUniqueId);
+        DocumentLink dlFilename = evidenceDescriptionDocument.getValue().getDocumentLink();
+        DocumentLink newDocLink = dlFilename.toBuilder()
+            .documentFilename(fileNameCleanOfUniqueId)
+            .documentUrl(dlFilename.getDocumentUrl())
+            .documentBinaryUrl(dlFilename.getDocumentBinaryUrl())
+            .build();
+        evidenceDescriptionDocument.getValue().setDocumentLink(newDocLink);
+    }
+
+    @NotNull
+    private String removeTemporalUniqueIdFromGivenString(String filename) {
+        return filename.replace(TEMP_UNIQUE_ID, "").trim();
+    }
+
+    private void removeNewEvidenceDescFromTheDocumentsTab(SscsCaseData sscsCaseData, List<SscsDocument> sscsDocument) {
+        sscsDocument.removeIf(doc -> doc.getValue().getDocumentFileName().startsWith(TEMP_UNIQUE_ID) ||
+            doc.getValue().getDocumentLink().getDocumentFilename().startsWith(TEMP_UNIQUE_ID));
+        sscsCaseData.setSscsDocument(sscsDocument);
+    }
+
+    private SscsDocument findAndReturnTheNewEvidenceDescDoc(List<SscsDocument> sscsDocument) {
+        return sscsDocument.stream()
+                .filter(doc -> doc.getValue().getDocumentFileName().startsWith(TEMP_UNIQUE_ID))
+                .findFirst().orElseThrow(() -> new RuntimeException("Evidence description file cannot be found"));
+    }
+
+    private List<ScannedDocument> moveNewUploadedStatementsToUnprocessedCorrespondence(
+        CohEventActionContext storePdfContext, String appellantOrRepsFileNamePrefix) {
+
+        List<ScannedDocument> scannedDocs = new ArrayList<>();
+        long nextStatementCounter = StoreAppellantStatementService.getCountOfNextStatement(
+            storePdfContext.getDocument().getData().getScannedDocuments(),
+            storePdfContext.getDocument().getData().getSscsDocument());
+        for (SscsDocument draftSscsDocument : storePdfContext.getDocument().getData().getDraftSscsDocument()) {
+            String fileNamePrefix = String.format("%s statement %d - ",
+                appellantOrRepsFileNamePrefix, nextStatementCounter);
+            scannedDocs.add(buildScannedDocumentByGivenSscsDoc(fileNamePrefix, draftSscsDocument));
+        }
+        return scannedDocs;
+    }
+
+    private ScannedDocument buildScannedDocumentByGivenSscsDoc(String fileNamePrefix, SscsDocument draftSscsDocument) {
         DocumentLink documentLinkForScannedDoc = buildDocLinkFromGivenDocLinkAndPrefixFilenameByGivenPrefix(
             fileNamePrefix, draftSscsDocument);
+        LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(),
+            DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
         return ScannedDocument.builder().value(
                 ScannedDocumentDetails.builder()
                     .type("other")
