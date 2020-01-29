@@ -540,7 +540,6 @@ public class EvidenceUploadServiceTest {
         verify(ccdService, never()).updateCase(any(), any(), any(), any(), any(), any());
     }
 
-    // cover the runTime Exception
     @Test
     @Parameters(method = "evidenceUploadByAppellantScenario, evidenceUploadByRepScenario")
     public void givenANonCorCaseWithScannedDocumentsAndDraftDocument_thenMoveDraftToScannedDocumentsAndUpdateCaseInCcd(
