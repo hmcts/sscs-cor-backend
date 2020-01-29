@@ -184,7 +184,7 @@ public class EvidenceUploadService {
         sscsCaseData.setSscsDocument(sscsDocument);
 
         String edFilename = evidenceDescriptionDocument.getValue().getDocumentFileName();
-        edFilename = edFilename.replace("temporarily unique Id ec7ae162-9834-46b7-826d-fdc9935e3187", "");
+        edFilename = edFilename.replace(tempUniqueId, "").trim();
         evidenceDescriptionDocument.getValue().setDocumentFileName(edFilename);
 
         DocumentLink dlFilename = evidenceDescriptionDocument.getValue().getDocumentLink();
