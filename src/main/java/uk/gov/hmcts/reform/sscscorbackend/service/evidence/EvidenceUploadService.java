@@ -173,7 +173,28 @@ public class EvidenceUploadService {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         List<SscsDocument> sscsDocument = storePdfContext.getDocument().getData().getSscsDocument();
-        SscsDocument evidenceDescriptionDocument = sscsDocument.get(sscsDocument.size() - 1);
+
+        String tempUniqueId = "temporarily unique Id ec7ae162-9834-46b7-826d-fdc9935e3187";
+        SscsDocument evidenceDescriptionDocument = sscsDocument.stream()
+            .filter(doc -> doc.getValue().getDocumentFileName().startsWith(tempUniqueId))
+            .findFirst().orElseThrow(() -> new RuntimeException("Evidence description file cannot be found"));
+
+        sscsDocument.removeIf(doc -> doc.getValue().getDocumentFileName().startsWith(tempUniqueId) ||
+            doc.getValue().getDocumentLink().getDocumentFilename().startsWith(tempUniqueId));
+        sscsCaseData.setSscsDocument(sscsDocument);
+
+        String edFilename = evidenceDescriptionDocument.getValue().getDocumentFileName();
+        edFilename = edFilename.replace("temporarily unique Id ec7ae162-9834-46b7-826d-fdc9935e3187", "");
+        evidenceDescriptionDocument.getValue().setDocumentFileName(edFilename);
+
+        DocumentLink dlFilename = evidenceDescriptionDocument.getValue().getDocumentLink();
+        DocumentLink newDocLink = dlFilename.toBuilder()
+            .documentFilename(edFilename)
+            .documentUrl(dlFilename.getDocumentUrl())
+            .documentBinaryUrl(dlFilename.getDocumentBinaryUrl())
+            .build();
+        evidenceDescriptionDocument.getValue().setDocumentLink(newDocLink);
+
         LocalDate ld = LocalDate.parse(evidenceDescriptionDocument.getValue().getDocumentDateAdded(),
             dateFormatter);
         LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
@@ -194,8 +215,6 @@ public class EvidenceUploadService {
 
         scannedDocs.add(buildScannedDocumentByGivenSscsDoc(ldt, appellantOrRepsFileNamePrefix + " ",
             evidenceDescriptionDocument));
-        sscsDocument.remove(sscsDocument.size() - 1);
-        sscsCaseData.setSscsDocument(sscsDocument);
 
         List<ScannedDocument> newScannedDocumentsList = union(
                 emptyIfNull(caseDetails.getData().getScannedDocuments()),
