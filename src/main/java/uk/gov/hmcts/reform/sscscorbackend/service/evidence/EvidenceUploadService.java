@@ -53,7 +53,6 @@ import uk.gov.hmcts.reform.sscscorbackend.domain.EvidenceDescription;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Question;
 import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
-import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreAppellantStatementService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.EvidenceDescriptionPdfData;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
@@ -172,7 +171,7 @@ public class EvidenceUploadService {
                                              CohEventActionContext storePdfContext, String idamEmail) {
 
         String appellantOrRepsFileNamePrefix = workOutAppellantOrRepsFileNamePrefix(caseDetails, idamEmail);
-        List<ScannedDocument> scannedDocs = moveNewUploadedStatementsToUnprocessedCorrespondence(storePdfContext,
+        List<ScannedDocument> scannedDocs = moveNewUploadedDocsToUnprocessedCorrespondence(storePdfContext,
             appellantOrRepsFileNamePrefix);
         moveNewEvidenceDescriptionToUnprocessedCorrespondence(sscsCaseData, storePdfContext,
             appellantOrRepsFileNamePrefix, scannedDocs);
@@ -235,19 +234,45 @@ public class EvidenceUploadService {
                 .findFirst().orElseThrow(() -> new RuntimeException("Evidence description file cannot be found"));
     }
 
-    private List<ScannedDocument> moveNewUploadedStatementsToUnprocessedCorrespondence(
+    private List<ScannedDocument> moveNewUploadedDocsToUnprocessedCorrespondence(
         CohEventActionContext storePdfContext, String appellantOrRepsFileNamePrefix) {
 
         List<ScannedDocument> scannedDocs = new ArrayList<>();
-        long nextStatementCounter = StoreAppellantStatementService.getCountOfNextStatement(
+        long nextStatementCounter = getCountOfNextUploadDoc(
             storePdfContext.getDocument().getData().getScannedDocuments(),
             storePdfContext.getDocument().getData().getSscsDocument());
+
         for (SscsDocument draftSscsDocument : storePdfContext.getDocument().getData().getDraftSscsDocument()) {
-            String fileNamePrefix = String.format("%s statement %d - ",
+            String fileNamePrefix = String.format("%s upload %d - ",
                 appellantOrRepsFileNamePrefix, nextStatementCounter);
             scannedDocs.add(buildScannedDocumentByGivenSscsDoc(fileNamePrefix, draftSscsDocument));
         }
         return scannedDocs;
+    }
+
+    public static long getCountOfNextUploadDoc(List<ScannedDocument> scannedDocuments, List<SscsDocument> sscsDocument) {
+        if ((scannedDocuments == null || scannedDocuments.isEmpty())
+            && (sscsDocument == null || sscsDocument.isEmpty())) {
+            return 1;
+        }
+        long statementNextCount = 0;
+        if (scannedDocuments != null) {
+            statementNextCount = scannedDocuments.stream()
+                .filter(doc -> doc.getValue() != null)
+                .filter(doc -> StringUtils.isNotBlank(doc.getValue().getFileName()))
+                .filter(doc -> isTheDocFileNameAUpload(doc.getValue().getFileName())).count();
+        }
+        if (sscsDocument != null) {
+            statementNextCount += sscsDocument.stream()
+                .filter(doc -> doc.getValue() != null)
+                .filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentFileName()))
+                .filter(doc -> isTheDocFileNameAUpload(doc.getValue().getDocumentFileName())).count();
+        }
+        return statementNextCount + 1;
+    }
+
+    private static boolean isTheDocFileNameAUpload(String fileName) {
+        return fileName.startsWith("Appellant upload") || fileName.startsWith("Representative upload");
     }
 
     private ScannedDocument buildScannedDocumentByGivenSscsDoc(String fileNamePrefix, SscsDocument draftSscsDocument) {

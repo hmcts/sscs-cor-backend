@@ -599,7 +599,7 @@ public class EvidenceUploadServiceTest {
         sscsCaseDetails.getData().setSscsDocument(buildSscsDocumentList());
         sscsCaseDetails.getData().setAppeal(Appeal.builder().hearingType("sya").build());
         return new Object[]{
-            new Object[]{sscsCaseDetails, someDescription, "Appellant statement 1 - someFileName.txt",
+            new Object[]{sscsCaseDetails, someDescription, "Appellant upload 1 - someFileName.txt",
                 "Appellant Evidence Description -"}
         };
     }
@@ -646,7 +646,7 @@ public class EvidenceUploadServiceTest {
 
         return new Object[]{
             new Object[]{sscsCaseDetailsWithRepSubs, someDescriptionWithRepEmail,
-                "Representative statement 1 - someFileName.txt", "Representative Evidence Description -"}
+                "Representative upload 1 - someFileName.txt", "Representative Evidence Description -"}
         };
     }
 
