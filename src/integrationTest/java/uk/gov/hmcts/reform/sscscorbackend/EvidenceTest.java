@@ -15,7 +15,8 @@ public class EvidenceTest extends BaseIntegrationTest {
     public void sendsEvidenceToDwp() throws JsonProcessingException {
         cohStub.stubGetOnlineHearing(caseId, hearingId);
 
-        ccdStub.stubFindCaseByCaseId(caseId, caseReference, "first-id", "someEvidence", "evidenceCreatedDate", "http://example.com/documents/1");
+        ccdStub.stubFindCaseByCaseId(caseId, caseReference, "first-id", "someEvidence",
+            "evidenceCreatedDate", "http://example.com/documents/1");
         byte[] pdf = {2, 4, 6, 0, 1};
         pdfServiceStub.stubCreatePdf(pdf);
         documentStoreStub.stubUploadFile();
