@@ -299,7 +299,8 @@ public class EvidenceUploadService {
                 emptyIfNull(storePdfContext.getDocument().getData().getSscsDocument()),
                 emptyIfNull(draftSscsDocument)
         );
-
+        SscsDocument evidenceDescriptionDocument = findAndReturnTheNewEvidenceDescDoc(newSscsDocumentsList);
+        removeUniqueIdAndSetFilenameForTheEvidenceDesc(evidenceDescriptionDocument);
         sscsCaseData.setSscsDocument(newSscsDocumentsList);
         sscsCaseData.setDraftSscsDocument(Collections.emptyList());
 
