@@ -19,6 +19,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ATTACH_SCANNED_DOCS;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -65,6 +66,7 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.documentmanagement.Document
 @RunWith(JUnitParamsRunner.class)
 public class EvidenceUploadServiceTest {
 
+    public static final String HTTP_ANOTHER_URL = "http://anotherUrl";
     private EvidenceUploadService evidenceUploadService;
     private CorCcdService ccdService;
     private OnlineHearingService onlineHearingService;
@@ -149,6 +151,9 @@ public class EvidenceUploadServiceTest {
     @Test
     public void submitsEvidenceAddsDraftSscsDocumentsToSscsDocumentsInCcdWhenThereAreNoSscsDocuments() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
+        SscsDocument evidenceDescDoc = buildSscsDocumentGivenFilename(
+            "temporal unique Id ec7ae162-9834-46b7-826d-fdc9935e3187 Evidence Description -");
+        sscsCaseDetails.getData().setSscsDocument(Collections.singletonList(evidenceDescDoc));
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
         UploadedEvidence evidenceDescriptionPdf = mock(UploadedEvidence.class);
         when(storeEvidenceDescriptionService.storePdf(
@@ -163,7 +168,7 @@ public class EvidenceUploadServiceTest {
         assertThat(submittedEvidence, is(true));
         verify(evidenceUploadEmailService).sendToDwp(evidenceDescriptionPdf, draftSscsDocument, sscsCaseDetails);
         verify(ccdService).updateCase(
-                and(hasSscsDocument(0, documentUrl, fileName), doesNotHaveDraftSscsDocuments()),
+                and(hasSscsDocument(documentUrl, fileName, 2), doesNotHaveDraftSscsDocuments()),
                 eq(someCcdCaseId),
                 eq("uploadCorDocument"),
                 eq("SSCS - cor evidence uploaded"),
@@ -180,11 +185,15 @@ public class EvidenceUploadServiceTest {
     @Test
     public void submitsEvidenceAddsDraftSscsDocumentsToSscsDocumentsInCcdWhenThereAreOtherSscsDocuments() {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
-        SscsDocument descriptionDocument = buildSscsDocumentGivenFilename("anotherFileName");
-        List<SscsDocument> list = singletonList(descriptionDocument);
+
+        SscsDocument anotherFileName = buildSscsDocumentGivenFilename("anotherFileName");
+        SscsDocument evidenceDescDoc = buildSscsDocumentGivenFilename(
+            "temporal unique Id ec7ae162-9834-46b7-826d-fdc9935e3187 Evidence Description -");
+        List<SscsDocument> list = new ArrayList<>();
+        list.add(anotherFileName);
+        list.add(evidenceDescDoc);
         sscsCaseDetails.getData().setSscsDocument(list);
 
-        final int originalNumberOfSscsDocuments = sscsCaseDetails.getData().getSscsDocument().size();
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
         UploadedEvidence evidenceDescriptionPdf = mock(UploadedEvidence.class);
         when(storeEvidenceDescriptionService.storePdf(
@@ -199,7 +208,7 @@ public class EvidenceUploadServiceTest {
         assertThat(submittedEvidence, is(true));
         verify(evidenceUploadEmailService).sendToDwp(evidenceDescriptionPdf, draftSscsDocument, sscsCaseDetails);
         verify(ccdService).updateCase(
-                and(hasSscsDocument(originalNumberOfSscsDocuments, documentUrl, fileName), doesNotHaveDraftSscsDocuments()),
+                and(hasSscsDocument(documentUrl, fileName, 3), doesNotHaveDraftSscsDocuments()),
                 eq(someCcdCaseId),
                 eq("uploadCorDocument"),
                 eq("SSCS - cor evidence uploaded"),
@@ -613,7 +622,7 @@ public class EvidenceUploadServiceTest {
                 .documentFileName(filename)
                 .documentLink(DocumentLink.builder()
                     .documentFilename(filename)
-                    .documentUrl("http://anotherUrl")
+                    .documentUrl(HTTP_ANOTHER_URL)
                     .build())
                 .documentDateAdded(convertCreatedOnDate(evidenceCreatedOn))
                 .build())
@@ -689,13 +698,22 @@ public class EvidenceUploadServiceTest {
         });
     }
 
-    private SscsCaseData hasSscsDocument(int originalNumberOfDocuments, String documentUrl, String fileName) {
+    private SscsCaseData hasSscsDocument(String documentUrl, String fileName, int expectedNumberOfDocs) {
         return argThat(argument -> {
             List<SscsDocument> sscsDocument = argument.getSscsDocument();
-            return sscsDocument.size() == originalNumberOfDocuments + 1 &&
-                    sscsDocument.get(originalNumberOfDocuments).getValue().getDocumentLink().getDocumentUrl().equals(documentUrl) &&
-                    sscsDocument.get(originalNumberOfDocuments).getValue().getDocumentFileName().equals(fileName);
+            boolean isExpectedStatementCount = isNumberOfDocsWithGivenNameAsExpected(documentUrl, fileName,
+                sscsDocument);
+            boolean isExpectedEvidenceDescCount = isNumberOfDocsWithGivenNameAsExpected(HTTP_ANOTHER_URL,
+                "Evidence Description -", sscsDocument);
+            return sscsDocument.size() == expectedNumberOfDocs && isExpectedStatementCount && isExpectedEvidenceDescCount;
         });
+    }
+
+    private boolean isNumberOfDocsWithGivenNameAsExpected(String documentUrl, String fileName, List<SscsDocument> sscsDocument) {
+        return sscsDocument.stream()
+            .filter(doc -> doc.getValue().getDocumentFileName().equals(fileName))
+            .filter(doc -> doc.getValue().getDocumentLink().getDocumentUrl().equals(documentUrl))
+            .count() == 1;
     }
 
     private SscsCaseData hasSscsScannedDocumentAndSscsDocuments(String expectedStatementPrefix,
