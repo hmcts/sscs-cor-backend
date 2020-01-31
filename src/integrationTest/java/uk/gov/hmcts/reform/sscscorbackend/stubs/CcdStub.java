@@ -130,7 +130,10 @@ public class CcdStub extends BaseStub {
                 .willReturn(okJson(new ObjectMapper().writeValueAsString(StartEventResponse.builder().build()))));
 
         wireMock.stubFor(post("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true")
-                .willReturn(okJson(createCaseDetails(caseId, caseReference, "firstName", "lastName", "evidenceQuestionId", "evidenceFileName", "evidenceCreatedDate", "http://localhost:4603/documents/123"))));
+                .willReturn(okJson(createCaseDetails(caseId, caseReference, "firstName", "lastName",
+                    "evidenceQuestionId",
+                    "temporal unique Id ec7ae162-9834-46b7-826d-fdc9935e3187 evidenceFileName",
+                    "evidenceCreatedDate", "http://localhost:4603/documents/123"))));
     }
 
     public void verifyUpdateCaseWithEvent(Long caseId, String eventType) {

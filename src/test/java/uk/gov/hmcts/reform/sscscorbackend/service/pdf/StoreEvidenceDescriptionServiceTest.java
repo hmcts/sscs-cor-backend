@@ -35,14 +35,15 @@ public class StoreEvidenceDescriptionServiceTest {
 
     @Test
     public void pdfHasNotAlreadyBeenCreatedIsAlwaysTrue() {
-        assertTrue(storeEvidenceDescriptionService.pdfHasNotAlreadyBeenCreated(mock(SscsCaseDetails.class), "docPrefix"));
+        assertTrue(storeEvidenceDescriptionService.pdfHasNotAlreadyBeenCreated(mock(SscsCaseDetails.class),
+            "docPrefix"));
     }
 
     @Test
     public void documentNamePrefixIsEvidenceDescription() {
         assertThat(storeEvidenceDescriptionService
             .documentNamePrefix(mock(SscsCaseDetails.class), "hearingId", null),
-            is("Evidence Description - "));
+            is("temporal unique Id ec7ae162-9834-46b7-826d-fdc9935e3187 Evidence Description - "));
     }
 
     @Test
@@ -50,8 +51,10 @@ public class StoreEvidenceDescriptionServiceTest {
         PdfAppealDetails appealDetails = mock(PdfAppealDetails.class);
         List<String> fileName = Collections.singletonList("fileName");
         String description = "description";
-        EvidenceDescriptionPdfData evidenceDescriptionPdfData = new EvidenceDescriptionPdfData(mock(SscsCaseDetails.class), new EvidenceDescription(description), fileName);
-        PdfEvidenceDescription pdfContent = storeEvidenceDescriptionService.getPdfContent(evidenceDescriptionPdfData, "hearingId", appealDetails);
+        EvidenceDescriptionPdfData evidenceDescriptionPdfData = new EvidenceDescriptionPdfData(
+            mock(SscsCaseDetails.class), new EvidenceDescription(description, "idamEmail"), fileName);
+        PdfEvidenceDescription pdfContent = storeEvidenceDescriptionService.getPdfContent(evidenceDescriptionPdfData,
+            "hearingId", appealDetails);
 
         assertThat(pdfContent, is(new PdfEvidenceDescription(appealDetails, description, fileName)));
     }

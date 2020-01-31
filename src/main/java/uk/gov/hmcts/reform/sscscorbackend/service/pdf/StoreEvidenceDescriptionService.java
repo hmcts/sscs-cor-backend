@@ -14,6 +14,9 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.pdfservice.PdfService;
 
 @Service
 public class StoreEvidenceDescriptionService extends StorePdfService<PdfEvidenceDescription, EvidenceDescriptionPdfData> {
+
+    public static final String TEMP_UNIQUE_ID = "temporal unique Id ec7ae162-9834-46b7-826d-fdc9935e3187";
+
     StoreEvidenceDescriptionService(
             @Qualifier("oldPdfService") PdfService pdfService,
             @Value("${evidenceDescription.html.template.path}")String pdfTemplatePath,
@@ -31,7 +34,7 @@ public class StoreEvidenceDescriptionService extends StorePdfService<PdfEvidence
     @Override
     protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId,
                                         EvidenceDescriptionPdfData data) {
-        return "Evidence Description - ";
+        return TEMP_UNIQUE_ID + " Evidence Description - ";
     }
 
     @Override

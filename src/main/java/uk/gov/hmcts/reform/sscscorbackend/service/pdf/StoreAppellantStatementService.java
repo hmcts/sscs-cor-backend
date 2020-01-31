@@ -58,7 +58,7 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
         return statementPrefix;
     }
 
-    private long getCountOfNextStatement(List<ScannedDocument> scannedDocuments, List<SscsDocument> sscsDocument) {
+    public static long getCountOfNextStatement(List<ScannedDocument> scannedDocuments, List<SscsDocument> sscsDocument) {
         if ((scannedDocuments == null || scannedDocuments.isEmpty())
             && (sscsDocument == null || sscsDocument.isEmpty())) {
             return 1;
@@ -79,7 +79,7 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
         return statementNextCount + 1;
     }
 
-    private boolean docFileNameIsStatement(String fileName) {
+    private static boolean docFileNameIsStatement(String fileName) {
         return fileName.startsWith(APPELLANT_STATEMENT) || fileName.startsWith(REPRESENTATIVE_STATEMENT);
     }
 
