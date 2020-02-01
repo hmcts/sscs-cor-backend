@@ -236,11 +236,13 @@ public class EvidenceUploadService {
 
     private List<ScannedDocument> moveNewUploadedDocsToUnprocessedCorrespondence(
         CohEventActionContext storePdfContext, String appellantOrRepsFileNamePrefix) {
-
+        //fixme: if we submit from the FE more than one file the upload counter will be incorrect because
+        // we not counting them in the getCountOfNextUploadDoc method
         List<ScannedDocument> scannedDocs = new ArrayList<>();
         long nextStatementCounter = getCountOfNextUploadDoc(
             storePdfContext.getDocument().getData().getScannedDocuments(),
-            storePdfContext.getDocument().getData().getSscsDocument());
+            storePdfContext.getDocument().getData().getSscsDocument(),
+            storePdfContext.getDocument().getData().getDraftSscsDocument());
 
         for (SscsDocument draftSscsDocument : storePdfContext.getDocument().getData().getDraftSscsDocument()) {
             String fileNamePrefix = String.format("%s upload %d - ",
@@ -250,29 +252,39 @@ public class EvidenceUploadService {
         return scannedDocs;
     }
 
-    public static long getCountOfNextUploadDoc(List<ScannedDocument> scannedDocuments, List<SscsDocument> sscsDocument) {
+    public static long getCountOfNextUploadDoc(List<ScannedDocument> scannedDocuments, List<SscsDocument> sscsDocument,
+                                               List<SscsDocument> draftSscsDocument) {
         if ((scannedDocuments == null || scannedDocuments.isEmpty())
             && (sscsDocument == null || sscsDocument.isEmpty())) {
             return 1;
         }
         long statementNextCount = 0;
         if (scannedDocuments != null) {
-            statementNextCount = scannedDocuments.stream()
+            long statementNextCount1;
+            statementNextCount1 = scannedDocuments.stream()
                 .filter(doc -> doc.getValue() != null)
-                .filter(doc -> StringUtils.isNotBlank(doc.getValue().getFileName()))
                 .filter(doc -> isTheDocFileNameAUpload(doc.getValue().getFileName())).count();
+            statementNextCount = statementNextCount1;
         }
         if (sscsDocument != null) {
             statementNextCount += sscsDocument.stream()
                 .filter(doc -> doc.getValue() != null)
-                .filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentFileName()))
                 .filter(doc -> isTheDocFileNameAUpload(doc.getValue().getDocumentFileName())).count();
         }
+        if (draftSscsDocument != null) {
+            statementNextCount += draftSscsDocument.stream()
+                .filter(doc -> doc.getValue() != null)
+                .filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentFileName())).count();
+        }
+
         return statementNextCount + 1;
     }
 
     private static boolean isTheDocFileNameAUpload(String fileName) {
-        return fileName.startsWith("Appellant upload") || fileName.startsWith("Representative upload");
+        if (!StringUtils.isNotBlank(fileName)) {
+            return fileName.startsWith("Appellant upload") || fileName.startsWith("Representative upload");
+        }
+        return false;
     }
 
     private ScannedDocument buildScannedDocumentByGivenSscsDoc(String fileNamePrefix, SscsDocument draftSscsDocument) {
