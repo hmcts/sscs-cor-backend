@@ -199,7 +199,8 @@ public class EvidenceUploadController {
         Optional<byte[]> coverSheet = coversheetService.createCoverSheet(identifier);
         return coverSheet.map(pdfBytes ->
                 ResponseEntity.ok()
-                        .header("Content-Disposition", "inline; filename=evidence_cover_sheet.pdf")
+                        .header("Content-Disposition", "attachment; filename="
+                                + "\"evidence_cover_sheet.pdf\"")
                         .contentType(MediaType.APPLICATION_PDF)
                         .body(new ByteArrayResource(pdfBytes))
         ).orElse(ResponseEntity.notFound().build());
