@@ -131,6 +131,12 @@ public class EvidenceUploadTest extends BaseFunctionTest {
             + createdCcdCase.getCaseId() + ".pdf"));
     }
 
+    @Test
+    public void uploadThenSubmitEvidenceToAppealDavid() throws IOException, JSONException {
+        sscsCorBackendRequests.uploadHearingEvidence("1570795696147829", "evidence.png");
+        sscsCorBackendRequests.submitHearingEvidence("1570795696147829", "some description");
+    }
+
 
     @Test
     public void getEvidenceCoverSheet() throws IOException {

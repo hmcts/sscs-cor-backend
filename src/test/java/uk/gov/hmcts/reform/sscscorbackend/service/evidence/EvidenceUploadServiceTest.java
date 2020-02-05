@@ -116,7 +116,7 @@ public class EvidenceUploadServiceTest {
                 storeEvidenceDescriptionService,
                 evidenceUploadEmailService,
             fileToPdfConversionService,
-            evidenceManagementService);
+            evidenceManagementService, null);
         fileName = "someFileName.txt";
         documentUrl = "http://example.com/document/" + someEvidenceId;
         file = mock(MultipartFile.class);
