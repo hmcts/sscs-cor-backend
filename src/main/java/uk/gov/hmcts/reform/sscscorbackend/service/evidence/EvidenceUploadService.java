@@ -9,17 +9,16 @@ import static java.util.stream.Collectors.partitioningBy;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
+import static org.springframework.http.MediaType.APPLICATION_PDF;
+import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ATTACH_SCANNED_DOCS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_COR_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DRAFT_DOCUMENT;
 import static uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreEvidenceDescriptionService.TEMP_UNIQUE_ID;
 
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
@@ -35,17 +34,22 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import jdk.internal.util.xml.impl.Input;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.tika.mime.MimeType;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
+import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -58,6 +62,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
@@ -215,57 +220,53 @@ public class EvidenceUploadService {
         List<SscsDocument> sscsDocument = storePdfContext.getDocument().getData().getSscsDocument();
         removeNewEvidenceDescFromTheDocumentsTab(sscsCaseData, sscsDocument);
 
-        //merge drafts and evidence desc docs process
-        PDFMergerUtility pdfMergerUtility = new PDFMergerUtility();
-//        pdfMergerUtility.setDestinationStream(new ByteArrayOutputStream());
-        pdfMergerUtility.setDestinationFileName("evidenceMergedTest.pdf");
-
         //get draft pdf content to add to source
-        byte[] draftPdfContent = null;
+        String draftDocUrl = storePdfContext.getDocument().getData().getDraftSscsDocument()
+            .get(0).getValue().getDocumentLink().getDocumentUrl();
+        byte[] draftPdfContent = new byte[0];
         try {
-            String draftDocUrl = storePdfContext.getDocument().getData().getDraftSscsDocument()
-                .get(0).getValue().getDocumentLink().getDocumentUrl();
             draftPdfContent = evidenceManagementService.download(new URI(draftDocUrl), "sscs");
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        //get evidence desc pdf content to add to source
-//        ByteArrayResource evidenceDescContent = (ByteArrayResource) storePdfContext.getPdf().getContent();
-//        pdfMergerUtility.addSource(new ByteArrayInputStream(evidenceDescContent.getByteArray()));
-//        pdfMergerUtility.addSource(new ByteArrayInputStream(Objects.requireNonNull(draftPdfContent)));
+        ByteArrayResource evidenceDesc = (ByteArrayResource) storePdfContext.getPdf().getContent();
 
-
-        InputStream evidenceDesc = null;
+        byte[] mergedContent = new byte[0];
         try {
-            evidenceDesc = storePdfContext.getPdf().getContent().getInputStream();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        InputStream draft = new ByteArrayInputStream(Objects.requireNonNull(draftPdfContent));
-        List<InputStream> files = new ArrayList<>();
-        files.add(evidenceDesc);
-        files.add(draft);
-        pdfMergerUtility.addSources(files);
-
-        //merge both draft and evidence pdfs content
-        try {
-            pdfMergerUtility.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+            mergedContent = mergePdfs(draftPdfContent, evidenceDesc.getByteArray());
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // get the merged pdf content to upload it to Doc Store
-//        ByteArrayOutputStream mergeEvidenceTestContent = (ByteArrayOutputStream) pdfMergerUtility.getDestinationStream();
-        InputStream file = this.getClass().getClassLoader().getResourceAsStream("evidenceMergedTest.pdf");
-        SscsDocument mergedEvidenceDoc = null;
-        try {
-            mergedEvidenceDoc = pdfStoreService.store(new byte[Objects.requireNonNull(file).available()],
-                appellantOrRepsFileNamePrefix + " - evidence description", "Other evidence").get(0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String filename = appellantOrRepsFileNamePrefix + " - evidence description.pdf";
+        ByteArrayMultipartFile file = ByteArrayMultipartFile.builder()
+            .content(mergedContent)
+            .name(filename)
+            .contentType(APPLICATION_PDF)
+            .build();
 
-        return buildScannedDocumentByGivenSscsDoc(appellantOrRepsFileNamePrefix + " ", mergedEvidenceDoc);
+        SscsDocument mergedPdfEvidence = pdfStoreService.store(mergedContent, filename, "Other evidence").get(0);
+        return buildScannedDocumentByGivenSscsDoc(appellantOrRepsFileNamePrefix + " ", mergedPdfEvidence);
+    }
+
+
+    public static byte[] mergePdfs(byte[] evidenceUpload, byte[] evidenceDesc) throws IOException {
+        if (evidenceUpload != null && evidenceDesc != null) {
+            PDDocument mergedDocs = PDDocument.load(evidenceUpload);
+            PDDocument evidenceDescDoc = PDDocument.load(evidenceDesc);
+
+            final PDFMergerUtility merger = new PDFMergerUtility();
+            merger.appendDocument(mergedDocs, evidenceDescDoc);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            mergedDocs.save(baos);
+            mergedDocs.close();
+            evidenceDescDoc.close();
+
+            return baos.toByteArray();
+        } else {
+            throw new RuntimeException("Can not bundle empty documents");
+        }
     }
 
     private void removeUniqueIdAndSetFilenameForTheEvidenceDesc(SscsDocument evidenceDescriptionDocument) {

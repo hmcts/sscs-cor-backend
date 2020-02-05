@@ -1,131 +1,17 @@
-server:
-  port: ${PORT:8090}
-
-spring:
-  application:
-    name: SSCS-COR-Backend
-  servlet:
-    multipart:
-      max-file-size: ${MAX_FILE_SIZE:11MB}
-      max-request-size: ${MAX_FILE_SIZE:11MB}
-  main:
-    allow-bean-definition-overriding: true
-
-coh:
-  url: ${COH_URL:http://localhost:8081}
-
-notifications:
-  url: ${NOTIFICATIONS_API_URL:http://localhost:8082}
-
-auth:
-  idam:
-    client:
-      baseUrl: ${IDAM_URL:http://localhost:5000}
-  provider:
-    service:
-      client:
-        baseUrl: ${IDAM_S2S_AUTH:http://localhost:4502}
-
-idam:
-  url: ${IDAM_URL:http://localhost:5000}
-  s2s-auth:
-    totp_secret: ${IDAM_S2S_AUTH_TOTP_SECRET:AAAAAAAAAAAAAAAC}
-    microservice: ${IDAM_S2S_AUTH_MICROSERVICE:sscs}
-    url: ${IDAM_S2S_AUTH:http://localhost:4502}
-  oauth2:
-    user:
-      email: ${IDAM_SSCS_SYSTEMUPDATE_USER:system.update@hmcts.net}
-      password: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD:Pa55word11}
-    client:
-      id: ${IDAM_OAUTH2_CLIENT_ID:sscs}
-      secret: ${IDAM_OAUTH2_CLIENT_SECRET:QM5RQQ53LZFOSIXJ}
-    redirectUrl: ${IDAM_OAUTH2_REDIRECT_URL:https://localhost:9000/poc}
-    jwkUrl: ${IDAM_API_JWK_URL:http://localhost:5000/jwks}
-core_case_data:
-  api:
-    url: ${CORE_CASE_DATA_URL:http://localhost:4452}
-  caseTypeId: Benefit
-  jurisdictionId: SSCS
-
-create_ccd_endpoint: ${CREATE_CCD_ENDPOINT:false}
-
-document_management:
-  url: ${DOCUMENT_MANAGEMENT_URL:http://localhost:4603}
-
-pdf:
-  api:
-    url: ${PDF_API_URL:http://localhost:5500}
-
-appellant:
-  appeal:
-    html:
-      template:
-        path: /
-
-preliminary_view:
-  html:
-    template:
-      path: /templates/tribunalsView.html
-online_hearing_finished:
-  html:
-    template:
-      path: /templates/onlineHearingSummary.html
-question:
-  html:
-    template:
-      path: /templates/questions.html
-answer:
-  html:
-    template:
-      path: /templates/answers.html
-personalStatement:
-  html:
-    template:
-      path: /templates/personalStatement.html
-evidenceDescription:
-  html:
-    template:
-      path: /templates/evidenceDescription.html
-evidenceCoverSheet:
-  docmosis:
-    template: TB-SCS-GNO-ENG-00012.docx
-    hmctsImgVal: "[userImage:hmcts-2.png]"
-
-
-appeal:
-  email:
-    host: ${EMAIL_SERVER_HOST:localhost}
-    port: ${EMAIL_SERVER_PORT:1025}
-    smtp:
-      tls:
-        enabled: ${EMAIL_SMTP_TLS_ENABLED:true}
-    from: ${EMAIL_FROM:sscs@hmcts.net}
-    to: ${EMAIL_TO:NotUsed@hmcts.net}
-    subject: ${EMAIL_SUBJECT:Not Used}
-    message: ${EMAIL_MESSAGE:Not Used}
-    dwpEmailAddress: ${DWP_EMAIL:dwp@example.com}
-    caseworkerAddress: ${CASEWORKER_EMAIL:caseworker@example.net}
-
-enable_debug_error_message: ${ENABLE_DEBUG_ERROR_MESSAGE:true}
-enable_select_by_case_id: ${ENABLE_SELECT_BY_CASE_ID:false}
-enable_coh_event_thread_pool: ${ENABLE_COH_EVENT_THREAD_POOL:false}
-
 feign:
   client:
     config:
       default:
         errorDecoder: uk.gov.hmcts.reform.sscscorbackend.exception.CorErrorDecoder
+    idam-api:
+      loggerLevel: full
+    core-case-data-api:
+      loggerLevel: full
+
 
 logging.level:
-  org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod: DEBUG
-
-juiBaseUrl: "${JUI_BASE_URL:https://jui-webapp-aat.service.core-compute-aat.internal}"
-
-swagger:
-  defaultTokens: ${SWAGGER_DEFAULT_TOKENS:false}
-
-docmosis:
-  accessKey: ${PDF_SERVICE_ACCESS_KEY:something}
-  convert.endpoint: ${PDF_SERVICE_CONVERT_URL:https://docmosis-development.platform.hmcts.net/rs/convert}
-  health.endpoint: ${PDF_SERVICE_HEALTH_URL:https://docmosis-development.platform.hmcts.net/rs/status}
-  uri: ${PDF_SERVICE_BASE_URL:https://docmosis-development.platform.hmcts.net/rs/render}
+  org.springframework.web: debug
+  uk.gov.hmcts.reform.sscs: debug
+  uk.gov.hmcts.reform.sscs.idam.IdamApiClient: DEBUG
+  uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi: DEBUG
+  uk.gov.hmcts.reform.document: DEBUG
