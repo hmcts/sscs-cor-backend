@@ -9,3 +9,4 @@ spring:
         idam-sscs-systemupdate-password: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
         docmosis-api-key: PDF_SERVICE_ACCESS_KEY
         sscs-s2s-secret: IDAM_S2S_AUTH_TOTP_SECRET
+        AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
