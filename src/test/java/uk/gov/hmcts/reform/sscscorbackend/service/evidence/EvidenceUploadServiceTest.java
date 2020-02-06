@@ -563,7 +563,7 @@ public class EvidenceUploadServiceTest {
     }
 
     @Test
-    @Parameters(method = "evidenceUploadByAppellantScenario")
+    @Parameters(method = "evidenceUploadByAppellantScenario, evidenceUploadByRepScenario")
     public void givenANonCorCaseWithScannedDocumentsAndDraftDocument_thenMoveDraftToScannedDocumentsAndUpdateCaseInCcd(
         SscsCaseDetails sscsCaseDetails, EvidenceDescription someDescription, String expectedEvidenceUploadFilename)
         throws IOException {
@@ -582,10 +582,9 @@ public class EvidenceUploadServiceTest {
         when(evidenceManagementService.download(any(), eq("sscs"))).thenReturn(bFile);
         when(evidenceDescriptionPdf.getContent()).thenReturn(new ByteArrayResource(bFile));
 
-        String combinedEvidenceFilename = "Appellant upload 1 - 123.pdf";
         String other_evidence_doc_type = "Other evidence";
-        SscsDocument combinedEvidenceDoc = getCombinedEvidenceDoc(combinedEvidenceFilename, other_evidence_doc_type);
-        when(pdfStoreService.store(any(), eq(combinedEvidenceFilename), eq(other_evidence_doc_type)))
+        SscsDocument combinedEvidenceDoc = getCombinedEvidenceDoc(expectedEvidenceUploadFilename, other_evidence_doc_type);
+        when(pdfStoreService.store(any(), eq(expectedEvidenceUploadFilename), eq(other_evidence_doc_type)))
             .thenReturn(Collections.singletonList(combinedEvidenceDoc));
 
         boolean submittedEvidence = evidenceUploadService.submitHearingEvidence(someOnlineHearingId, someDescription);
@@ -684,8 +683,7 @@ public class EvidenceUploadServiceTest {
             "rep@email.com");
 
         return new Object[]{
-            new Object[]{sscsCaseDetailsWithRepSubs, someDescriptionWithRepEmail,
-                "Representative upload 1 - someFileName.txt", "Representative Evidence Description -"}
+            new Object[]{sscsCaseDetailsWithRepSubs, someDescriptionWithRepEmail, "Representative upload 1 - 123.pdf"}
         };
     }
 
