@@ -9,15 +9,12 @@ import static java.util.stream.Collectors.partitioningBy;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
-import static org.springframework.http.MediaType.APPLICATION_PDF;
-import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ATTACH_SCANNED_DOCS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_COR_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DRAFT_DOCUMENT;
 import static uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreEvidenceDescriptionService.TEMP_UNIQUE_ID;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,26 +27,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.tika.mime.MimeType;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
-import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -62,7 +52,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
-import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
@@ -193,17 +182,22 @@ public class EvidenceUploadService {
     private void submitHearingWhenNoCoreCase(SscsCaseDetails caseDetails, SscsCaseData sscsCaseData, Long ccdCaseId,
                                              CohEventActionContext storePdfContext, String idamEmail) {
 
-        String appellantOrRepsFileNamePrefix = workOutAppellantOrRepsFileNamePrefix(caseDetails, idamEmail);
-        ScannedDocument mergedEvidencesDoc = mergeEvidenceDescAndDraftsPdfsIntoUnProcessedCorrespondenceDoc(sscsCaseData,
-            storePdfContext, appellantOrRepsFileNamePrefix);
+        String filename = getFilenameForTheNextUploadEvidence(caseDetails, ccdCaseId, storePdfContext, idamEmail);
+        ScannedDocument mergedEvidencesDoc = appendEvidenceUploadsToStatement(sscsCaseData, storePdfContext, filename);
         mergeNewUnprocessedCorrespondenceToTheExistingInTheCase(caseDetails, sscsCaseData, mergedEvidencesDoc);
-
         sscsCaseData.setDraftSscsDocument(Collections.emptyList());
         sscsCaseData.setEvidenceHandled("No");
-
         ccdService.updateCase(sscsCaseData, ccdCaseId, ATTACH_SCANNED_DOCS.getCcdType(),
             "SSCS - upload evidence from MYA",
             "Uploaded a further evidence document", idamService.getIdamTokens());
+    }
+
+    private String getFilenameForTheNextUploadEvidence(SscsCaseDetails caseDetails, Long ccdCaseId,
+                                                       CohEventActionContext storePdfContext, String idamEmail) {
+        String appellantOrRepsFileNamePrefix = workOutAppellantOrRepsFileNamePrefix(caseDetails, idamEmail);
+        SscsCaseData data = storePdfContext.getDocument().getData();
+        long uploadCounter = getCountOfNextUploadDoc(data.getScannedDocuments(), data.getSscsDocument());
+        return String.format("%s upload %s - %s.pdf", appellantOrRepsFileNamePrefix, uploadCounter, ccdCaseId);
     }
 
     private void mergeNewUnprocessedCorrespondenceToTheExistingInTheCase(SscsCaseDetails caseDetails,
@@ -214,58 +208,85 @@ public class EvidenceUploadService {
         sscsCaseData.setScannedDocuments(newScannedDocumentsList);
     }
 
-    private ScannedDocument mergeEvidenceDescAndDraftsPdfsIntoUnProcessedCorrespondenceDoc(SscsCaseData sscsCaseData,
-                                                                                           CohEventActionContext storePdfContext,
-                                                                                           String appellantOrRepsFileNamePrefix) {
-        List<SscsDocument> sscsDocument = storePdfContext.getDocument().getData().getSscsDocument();
-        removeNewEvidenceDescFromTheDocumentsTab(sscsCaseData, sscsDocument);
+    private ScannedDocument appendEvidenceUploadsToStatement(SscsCaseData sscsCaseData,
+                                                             CohEventActionContext storePdfContext,
+                                                             String filename) {
+        removeStatementDocFromDocumentTab(sscsCaseData, storePdfContext.getDocument().getData().getSscsDocument());
+        List<byte[]> contentUploads = getContentListFromTheEvidenceUploads(storePdfContext);
+        ByteArrayResource statementContent = (ByteArrayResource) storePdfContext.getPdf().getContent();
+        byte[] combinedContent = appendEvidenceUploadsToStatement(statementContent.getByteArray(), contentUploads);
+        SscsDocument combinedPdfEvidence = pdfStoreService.store(combinedContent, filename, "Other evidence").get(0);
+        return buildScannedDocumentByGivenSscsDoc(combinedPdfEvidence);
+    }
 
-        //get draft pdf content to add to source
-        String draftDocUrl = storePdfContext.getDocument().getData().getDraftSscsDocument()
-            .get(0).getValue().getDocumentLink().getDocumentUrl();
+    private List<byte[]> getContentListFromTheEvidenceUploads(CohEventActionContext storePdfContext) {
+        List<byte[]> draftPdfContentList = new ArrayList<>();
+        List<SscsDocument> drafts = storePdfContext.getDocument().getData().getDraftSscsDocument();
+        drafts.forEach(draft -> {
+            String documentUrl = draft.getValue().getDocumentLink().getDocumentUrl();
+            byte[] draftPdfContent = getContentInBytesForGivenDocumentStoreUrl(documentUrl);
+            draftPdfContentList.add(draftPdfContent);
+        });
+        return draftPdfContentList;
+    }
+
+    private byte[] getContentInBytesForGivenDocumentStoreUrl(String draftDocUrl) {
         byte[] draftPdfContent = new byte[0];
         try {
             draftPdfContent = evidenceManagementService.download(new URI(draftDocUrl), "sscs");
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        ByteArrayResource evidenceDesc = (ByteArrayResource) storePdfContext.getPdf().getContent();
-
-        byte[] mergedContent = new byte[0];
-        try {
-            mergedContent = mergePdfs(draftPdfContent, evidenceDesc.getByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        String filename = appellantOrRepsFileNamePrefix + " - evidence description.pdf";
-        ByteArrayMultipartFile file = ByteArrayMultipartFile.builder()
-            .content(mergedContent)
-            .name(filename)
-            .contentType(APPLICATION_PDF)
-            .build();
-
-        SscsDocument mergedPdfEvidence = pdfStoreService.store(mergedContent, filename, "Other evidence").get(0);
-        return buildScannedDocumentByGivenSscsDoc(appellantOrRepsFileNamePrefix + " ", mergedPdfEvidence);
+        return draftPdfContent;
     }
 
 
-    public static byte[] mergePdfs(byte[] evidenceUpload, byte[] evidenceDesc) throws IOException {
-        if (evidenceUpload != null && evidenceDesc != null) {
-            PDDocument mergedDocs = PDDocument.load(evidenceUpload);
-            PDDocument evidenceDescDoc = PDDocument.load(evidenceDesc);
-
+    public static byte[] appendEvidenceUploadsToStatement(byte[] statement, List<byte[]> uploads) {
+        if (statement != null && uploads != null) {
+            PDDocument statementDoc = getLoadSafe(statement);
             final PDFMergerUtility merger = new PDFMergerUtility();
-            merger.appendDocument(mergedDocs, evidenceDescDoc);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            mergedDocs.save(baos);
-            mergedDocs.close();
-            evidenceDescDoc.close();
-
-            return baos.toByteArray();
+            uploads.forEach(upload -> {
+                PDDocument uploadDoc = getLoadSafe(upload);
+                appendDocumentSafe(statementDoc, merger, uploadDoc);
+            });
+            ByteArrayOutputStream combinedContent = new ByteArrayOutputStream();
+            saveDocSafe(statementDoc, combinedContent);
+            closeSafe(statementDoc);
+            return combinedContent.toByteArray();
         } else {
             throw new RuntimeException("Can not bundle empty documents");
+        }
+    }
+
+    private static void closeSafe(PDDocument statementDoc) {
+        try {
+            statementDoc.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Error when closing Doc..", e);
+        }
+    }
+
+    private static void saveDocSafe(PDDocument statementDoc, ByteArrayOutputStream combinedContent) {
+        try {
+            statementDoc.save(combinedContent);
+        } catch (IOException e) {
+            throw new RuntimeException("Error when saving Doc..", e);
+        }
+    }
+
+    private static void appendDocumentSafe(PDDocument statementDoc, PDFMergerUtility merger, PDDocument uploadDoc) {
+        try {
+            merger.appendDocument(statementDoc, uploadDoc);
+        } catch (IOException e) {
+            throw new RuntimeException("Error when appending docs..", e);
+        }
+    }
+
+    private static PDDocument getLoadSafe(byte[] statement) {
+        try {
+            return PDDocument.load(statement);
+        } catch (IOException e) {
+            throw new RuntimeException("Error when getting PDDocument statement..", e);
         }
     }
 
@@ -287,7 +308,7 @@ public class EvidenceUploadService {
         return filename.replace(TEMP_UNIQUE_ID, "").trim();
     }
 
-    private void removeNewEvidenceDescFromTheDocumentsTab(SscsCaseData sscsCaseData, List<SscsDocument> sscsDocument) {
+    private void removeStatementDocFromDocumentTab(SscsCaseData sscsCaseData, List<SscsDocument> sscsDocument) {
         sscsDocument.removeIf(doc -> doc.getValue().getDocumentFileName().startsWith(TEMP_UNIQUE_ID) ||
             doc.getValue().getDocumentLink().getDocumentFilename().startsWith(TEMP_UNIQUE_ID));
         sscsCaseData.setSscsDocument(sscsDocument);
@@ -299,23 +320,7 @@ public class EvidenceUploadService {
                 .findFirst().orElseThrow(() -> new RuntimeException("Evidence description file cannot be found"));
     }
 
-    private List<ScannedDocument> moveDraftDocsToUnprocessedCorrespondence(
-        CohEventActionContext storePdfContext, String appellantOrRepsFileNamePrefix) {
-
-        List<ScannedDocument> scannedDocs = new ArrayList<>();
-        long nextStatementCounter = getCountOfNextUploadDoc(
-            storePdfContext.getDocument().getData().getScannedDocuments(),
-            storePdfContext.getDocument().getData().getSscsDocument());
-
-        for (SscsDocument draftSscsDocument : storePdfContext.getDocument().getData().getDraftSscsDocument()) {
-            String fileNamePrefix = String.format("%s upload %d - ",
-                appellantOrRepsFileNamePrefix, nextStatementCounter);
-            scannedDocs.add(buildScannedDocumentByGivenSscsDoc(fileNamePrefix, draftSscsDocument));
-        }
-        return scannedDocs;
-    }
-
-    public static long getCountOfNextUploadDoc(List<ScannedDocument> scannedDocuments, List<SscsDocument> sscsDocument) {
+    private long getCountOfNextUploadDoc(List<ScannedDocument> scannedDocuments, List<SscsDocument> sscsDocument) {
         if ((scannedDocuments == null || scannedDocuments.isEmpty())
             && (sscsDocument == null || sscsDocument.isEmpty())) {
             return 1;
@@ -340,9 +345,7 @@ public class EvidenceUploadService {
         return fileName.startsWith("Appellant upload") || fileName.startsWith("Representative upload");
     }
 
-    private ScannedDocument buildScannedDocumentByGivenSscsDoc(String fileNamePrefix, SscsDocument draftSscsDocument) {
-//        DocumentLink documentLinkForScannedDoc = buildDocLinkFromGivenDocLinkAndPrefixFilenameByGivenPrefix(
-//            fileNamePrefix, draftSscsDocument);
+    private ScannedDocument buildScannedDocumentByGivenSscsDoc(SscsDocument draftSscsDocument) {
         LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(),
             DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
@@ -353,16 +356,6 @@ public class EvidenceUploadService {
                 .fileName(draftSscsDocument.getValue().getDocumentFileName())
                 .scannedDate(ldt.toString())
                 .build())
-            .build();
-    }
-
-    private DocumentLink buildDocLinkFromGivenDocLinkAndPrefixFilenameByGivenPrefix(String fileNamePrefix,
-                                                                                    SscsDocument sscsDocument) {
-        DocumentLink documentLinkFromDraftSscsDoc = sscsDocument.getValue().getDocumentLink();
-        return DocumentLink.builder()
-            .documentBinaryUrl(documentLinkFromDraftSscsDoc.getDocumentBinaryUrl())
-            .documentUrl(documentLinkFromDraftSscsDoc.getDocumentUrl())
-            .documentFilename(fileNamePrefix + documentLinkFromDraftSscsDoc.getDocumentFilename())
             .build();
     }
 
