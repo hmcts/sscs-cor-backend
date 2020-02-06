@@ -235,11 +235,11 @@ public class EvidenceUploadService {
     }
 
     private byte[] getContentInBytesForGivenDocumentStoreUrl(String draftDocUrl) {
-        byte[] draftPdfContent = new byte[0];
+        byte[] draftPdfContent;
         try {
             draftPdfContent = evidenceManagementService.download(new URI(draftDocUrl), "sscs");
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error when downloading document from Evidence Management Service..", e);
         }
         return draftPdfContent;
     }
