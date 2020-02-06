@@ -213,10 +213,14 @@ public class EvidenceUploadService {
                                                              String filename) {
         removeStatementDocFromDocumentTab(sscsCaseData, storePdfContext.getDocument().getData().getSscsDocument());
         List<byte[]> contentUploads = getContentListFromTheEvidenceUploads(storePdfContext);
-        ByteArrayResource statementContent = (ByteArrayResource) storePdfContext.getPdf().getContent();
+        ByteArrayResource statementContent = getContentFromTheStatement(storePdfContext);
         byte[] combinedContent = appendEvidenceUploadsToStatement(statementContent.getByteArray(), contentUploads);
         SscsDocument combinedPdfEvidence = pdfStoreService.store(combinedContent, filename, "Other evidence").get(0);
         return buildScannedDocumentByGivenSscsDoc(combinedPdfEvidence);
+    }
+
+    private ByteArrayResource getContentFromTheStatement(CohEventActionContext storePdfContext) {
+        return (ByteArrayResource) storePdfContext.getPdf().getContent();
     }
 
     private List<byte[]> getContentListFromTheEvidenceUploads(CohEventActionContext storePdfContext) {
@@ -248,13 +252,14 @@ public class EvidenceUploadService {
             uploads.forEach(upload -> {
                 PDDocument uploadDoc = getLoadSafe(upload);
                 appendDocumentSafe(statementDoc, merger, uploadDoc);
+                closeSafe(uploadDoc);
             });
             ByteArrayOutputStream combinedContent = new ByteArrayOutputStream();
             saveDocSafe(statementDoc, combinedContent);
             closeSafe(statementDoc);
             return combinedContent.toByteArray();
         } else {
-            throw new RuntimeException("Can not bundle empty documents");
+            throw new RuntimeException("Can not combine empty statement or evidence documents");
         }
     }
 
