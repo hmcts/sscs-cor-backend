@@ -578,13 +578,13 @@ public class EvidenceUploadServiceTest {
                 singletonList("someFileName.txt"))
         )).thenReturn(new CohEventActionContext(evidenceDescriptionPdf, sscsCaseDetails));
 
-        byte[] bFile = getDummyFileContentInBytes();
-        when(evidenceManagementService.download(any(), eq("sscs"))).thenReturn(bFile);
-        when(evidenceDescriptionPdf.getContent()).thenReturn(new ByteArrayResource(bFile));
+        byte[] dummyFileContentInBytes = getDummyFileContentInBytes();
+        when(evidenceManagementService.download(any(), eq("sscs"))).thenReturn(dummyFileContentInBytes);
+        when(evidenceDescriptionPdf.getContent()).thenReturn(new ByteArrayResource(dummyFileContentInBytes));
 
-        String other_evidence_doc_type = "Other evidence";
-        SscsDocument combinedEvidenceDoc = getCombinedEvidenceDoc(expectedEvidenceUploadFilename, other_evidence_doc_type);
-        when(pdfStoreService.store(any(), eq(expectedEvidenceUploadFilename), eq(other_evidence_doc_type)))
+        String otherEvidenceDocType = "Other evidence";
+        SscsDocument combinedEvidenceDoc = getCombinedEvidenceDoc(expectedEvidenceUploadFilename, otherEvidenceDocType);
+        when(pdfStoreService.store(any(), eq(expectedEvidenceUploadFilename), eq(otherEvidenceDocType)))
             .thenReturn(Collections.singletonList(combinedEvidenceDoc));
 
         boolean submittedEvidence = evidenceUploadService.submitHearingEvidence(someOnlineHearingId, someDescription);
@@ -602,13 +602,13 @@ public class EvidenceUploadServiceTest {
         );
     }
 
-    private SscsDocument getCombinedEvidenceDoc(String combinedEvidenceFilename, String other_evidence_doc_type) {
+    private SscsDocument getCombinedEvidenceDoc(String combinedEvidenceFilename, String otherEvidenceDocType) {
         DocumentLink documentLink = DocumentLink.builder().documentUrl("http://dm-store/112").build();
         SscsDocumentDetails sscsDocumentDetails = SscsDocumentDetails.builder()
             .documentFileName(combinedEvidenceFilename)
             .documentDateAdded(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
             .documentLink(documentLink)
-            .documentType(other_evidence_doc_type)
+            .documentType(otherEvidenceDocType)
             .build();
         return SscsDocument.builder().value(sscsDocumentDetails).build();
     }

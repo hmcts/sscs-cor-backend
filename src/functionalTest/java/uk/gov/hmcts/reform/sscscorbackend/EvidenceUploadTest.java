@@ -124,11 +124,9 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         SscsCaseDetails caseDetails = getCaseDetails(createdCcdCase.getCaseId());
 
         List<ScannedDocument> scannedDocument = caseDetails.getData().getScannedDocuments();
-        assertThat(scannedDocument.size(), is(2));
-        String caseReference = caseDetails.getData().getCaseReference();
-        assertThat(scannedDocument.get(0).getValue().getFileName(), is("Appellant upload 1 - evidence.pdf"));
-        assertThat(scannedDocument.get(1).getValue().getFileName(), is("Appellant Evidence Description - "
-            + createdCcdCase.getCaseId() + ".pdf"));
+        assertThat(scannedDocument.size(), is(1));
+        String expectedEvidenceUploadFilename = String.format("Appellant upload 1 - %s.pdf", caseDetails.getId());
+        assertThat(scannedDocument.get(0).getValue().getFileName(), is(expectedEvidenceUploadFilename));
     }
 
     @Test

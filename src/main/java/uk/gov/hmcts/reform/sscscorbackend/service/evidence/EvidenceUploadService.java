@@ -183,7 +183,8 @@ public class EvidenceUploadService {
                                              CohEventActionContext storePdfContext, String idamEmail) {
 
         String filename = getFilenameForTheNextUploadEvidence(caseDetails, ccdCaseId, storePdfContext, idamEmail);
-        ScannedDocument mergedEvidencesDoc = appendEvidenceUploadsToStatement(sscsCaseData, storePdfContext, filename);
+        ScannedDocument mergedEvidencesDoc = appendEvidenceUploadsToStatementAndStoreIt(sscsCaseData, storePdfContext,
+            filename);
         mergeNewUnprocessedCorrespondenceToTheExistingInTheCase(caseDetails, sscsCaseData, mergedEvidencesDoc);
         sscsCaseData.setDraftSscsDocument(Collections.emptyList());
         sscsCaseData.setEvidenceHandled("No");
@@ -208,9 +209,9 @@ public class EvidenceUploadService {
         sscsCaseData.setScannedDocuments(newScannedDocumentsList);
     }
 
-    private ScannedDocument appendEvidenceUploadsToStatement(SscsCaseData sscsCaseData,
-                                                             CohEventActionContext storePdfContext,
-                                                             String filename) {
+    private ScannedDocument appendEvidenceUploadsToStatementAndStoreIt(SscsCaseData sscsCaseData,
+                                                                       CohEventActionContext storePdfContext,
+                                                                       String filename) {
         removeStatementDocFromDocumentTab(sscsCaseData, storePdfContext.getDocument().getData().getSscsDocument());
         List<byte[]> contentUploads = getContentListFromTheEvidenceUploads(storePdfContext);
         ByteArrayResource statementContent = getContentFromTheStatement(storePdfContext);
@@ -245,7 +246,7 @@ public class EvidenceUploadService {
     }
 
 
-    public static byte[] appendEvidenceUploadsToStatement(byte[] statement, List<byte[]> uploads) {
+    private byte[] appendEvidenceUploadsToStatement(byte[] statement, List<byte[]> uploads) {
         if (statement != null && uploads != null) {
             PDDocument statementDoc = getLoadSafe(statement);
             final PDFMergerUtility merger = new PDFMergerUtility();
