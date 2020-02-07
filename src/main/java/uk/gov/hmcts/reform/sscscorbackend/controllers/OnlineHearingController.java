@@ -85,9 +85,9 @@ public class OnlineHearingController {
             log.info("Handled event [{}] for case [{}] and hearing [{}]",eventType, caseId, onlineHearingId);
             return ResponseEntity.ok("");
         } else {
-            String errorMessage = "Event [" + request.getEventType() + "] not mapped";
-            log.info("Bad request to handle COH event " + errorMessage);
-            return ResponseEntity.badRequest().body(errorMessage);
+            String errorMessage = "Event [" + request.getEventType() + "] not mapped for case id " + caseId;
+            log.error("Bad request to handle COH event: " + errorMessage);
+            return ResponseEntity.badRequest().body("Event not mapped");
         }
     }
 
