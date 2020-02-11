@@ -10,6 +10,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -177,12 +178,12 @@ public class SscsCorBackendRequests {
 
     public void uploadHearingEvidence(String hearingId, String fileName) throws IOException {
         HttpEntity data = MultipartEntityBuilder.create()
-                .setContentType(ContentType.MULTIPART_FORM_DATA)
-                .addBinaryBody("file",
-                        this.getClass().getClassLoader().getResourceAsStream(fileName),
-                        ContentType.IMAGE_PNG,
-                        fileName)
-                .build();
+            .setContentType(ContentType.MULTIPART_FORM_DATA)
+            .addBinaryBody("file",
+                Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream(fileName)),
+                ContentType.IMAGE_PNG,
+                fileName)
+            .build();
 
         HttpResponse response = putRequest("/continuous-online-hearings/" + hearingId + "/evidence", data);
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
@@ -192,7 +193,7 @@ public class SscsCorBackendRequests {
         HttpResponse response = postRequest("/continuous-online-hearings/" + hearingId + "/evidence",
             new StringEntity("{\n"
                 + "  \"body\": \"" + description + "\",\n"
-                + "  \"idamEmail\": \"mya-sscs-6920-reps@mailinator.com\"\n"
+                + "  \"idamEmail\": \"mya-sscs-6920@mailinator.com\"\n"
                 + "}", APPLICATION_JSON)
         );
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));

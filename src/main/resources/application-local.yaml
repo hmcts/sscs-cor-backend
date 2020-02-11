@@ -1,0 +1,17 @@
+feign:
+  client:
+    config:
+      default:
+        errorDecoder: uk.gov.hmcts.reform.sscscorbackend.exception.CorErrorDecoder
+    idam-api:
+      loggerLevel: full
+    core-case-data-api:
+      loggerLevel: full
+
+
+logging.level:
+  org.springframework.web: debug
+  uk.gov.hmcts.reform.sscs: debug
+  uk.gov.hmcts.reform.sscs.idam.IdamApiClient: DEBUG
+  uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi: DEBUG
+  uk.gov.hmcts.reform.document: DEBUG

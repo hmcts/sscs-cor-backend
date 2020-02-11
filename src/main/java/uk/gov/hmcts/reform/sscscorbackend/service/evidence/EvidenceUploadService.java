@@ -14,6 +14,10 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_COR_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DRAFT_DOCUMENT;
 import static uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreEvidenceDescriptionService.TEMP_UNIQUE_ID;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -28,8 +32,11 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
@@ -47,6 +54,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
 import uk.gov.hmcts.reform.sscscorbackend.domain.Evidence;
 import uk.gov.hmcts.reform.sscscorbackend.domain.EvidenceDescription;
@@ -69,6 +77,7 @@ public class EvidenceUploadService {
     private final EvidenceUploadEmailService evidenceUploadEmailService;
     private final FileToPdfConversionService fileToPdfConversionService;
     private final EvidenceManagementService evidenceManagementService;
+    private final PdfStoreService pdfStoreService;
 
     private static final String UPDATED_SSCS = "Updated SSCS";
     public static final String DM_STORE_USER_ID = "sscs";
@@ -81,7 +90,7 @@ public class EvidenceUploadService {
                                  IdamService idamService, OnlineHearingService onlineHearingService,
                                  StoreEvidenceDescriptionService storeEvidenceDescriptionService, EvidenceUploadEmailService evidenceUploadEmailService,
                                  FileToPdfConversionService fileToPdfConversionService,
-                                 EvidenceManagementService evidenceManagementService) {
+                                 EvidenceManagementService evidenceManagementService, PdfStoreService pdfStoreService) {
         this.documentManagementService = documentManagementService;
         this.ccdService = ccdService;
         this.idamService = idamService;
@@ -90,6 +99,7 @@ public class EvidenceUploadService {
         this.evidenceUploadEmailService = evidenceUploadEmailService;
         this.fileToPdfConversionService = fileToPdfConversionService;
         this.evidenceManagementService = evidenceManagementService;
+        this.pdfStoreService = pdfStoreService;
     }
 
     public Optional<Evidence> uploadDraftHearingEvidence(String identifier, MultipartFile file) {
@@ -99,7 +109,9 @@ public class EvidenceUploadService {
     }
 
     public Optional<Evidence> uploadDraftQuestionEvidence(String identifier, String questionId, MultipartFile file) {
-        return uploadEvidence(identifier, file, questionDocumentExtractor, document -> new CorDocument(new CorDocumentDetails(createNewDocumentDetails(document), questionId)), UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded");
+        return uploadEvidence(identifier, file, questionDocumentExtractor, document ->
+            new CorDocument(new CorDocumentDetails(createNewDocumentDetails(document), questionId)),
+            UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded");
     }
 
     private SscsDocumentDetails createNewDocumentDetails(Document document) {
@@ -170,38 +182,118 @@ public class EvidenceUploadService {
     private void submitHearingWhenNoCoreCase(SscsCaseDetails caseDetails, SscsCaseData sscsCaseData, Long ccdCaseId,
                                              CohEventActionContext storePdfContext, String idamEmail) {
 
-        String appellantOrRepsFileNamePrefix = workOutAppellantOrRepsFileNamePrefix(caseDetails, idamEmail);
-        List<ScannedDocument> scannedDocs = moveNewUploadedDocsToUnprocessedCorrespondence(storePdfContext,
-            appellantOrRepsFileNamePrefix);
-        moveNewEvidenceDescriptionToUnprocessedCorrespondence(sscsCaseData, storePdfContext,
-            appellantOrRepsFileNamePrefix, scannedDocs);
-        mergeNewUnprocessedCorrespondenceToTheExistingInTheCase(caseDetails, sscsCaseData, scannedDocs);
-
+        String filename = getFilenameForTheNextUploadEvidence(caseDetails, ccdCaseId, storePdfContext, idamEmail);
+        ScannedDocument mergedEvidencesDoc = appendEvidenceUploadsToStatementAndStoreIt(sscsCaseData, storePdfContext,
+            filename);
+        mergeNewUnprocessedCorrespondenceToTheExistingInTheCase(caseDetails, sscsCaseData, mergedEvidencesDoc);
         sscsCaseData.setDraftSscsDocument(Collections.emptyList());
         sscsCaseData.setEvidenceHandled("No");
-
         ccdService.updateCase(sscsCaseData, ccdCaseId, ATTACH_SCANNED_DOCS.getCcdType(),
             "SSCS - upload evidence from MYA",
             "Uploaded a further evidence document", idamService.getIdamTokens());
     }
 
+    private String getFilenameForTheNextUploadEvidence(SscsCaseDetails caseDetails, Long ccdCaseId,
+                                                       CohEventActionContext storePdfContext, String idamEmail) {
+        String appellantOrRepsFileNamePrefix = workOutAppellantOrRepsFileNamePrefix(caseDetails, idamEmail);
+        SscsCaseData data = storePdfContext.getDocument().getData();
+        long uploadCounter = getCountOfNextUploadDoc(data.getScannedDocuments(), data.getSscsDocument());
+        return String.format("%s upload %s - %s.pdf", appellantOrRepsFileNamePrefix, uploadCounter, ccdCaseId);
+    }
+
     private void mergeNewUnprocessedCorrespondenceToTheExistingInTheCase(SscsCaseDetails caseDetails,
                                                                          SscsCaseData sscsCaseData,
-                                                                         List<ScannedDocument> scannedDocs) {
+                                                                         ScannedDocument scannedDocs) {
         List<ScannedDocument> newScannedDocumentsList = union(emptyIfNull(caseDetails.getData().getScannedDocuments()),
-                emptyIfNull(scannedDocs));
+                emptyIfNull(Collections.singletonList(scannedDocs)));
         sscsCaseData.setScannedDocuments(newScannedDocumentsList);
     }
 
-    private void moveNewEvidenceDescriptionToUnprocessedCorrespondence(SscsCaseData sscsCaseData,
+    private ScannedDocument appendEvidenceUploadsToStatementAndStoreIt(SscsCaseData sscsCaseData,
                                                                        CohEventActionContext storePdfContext,
-                                                                       String appellantOrRepsFileNamePrefix, List<ScannedDocument> scannedDocs) {
-        List<SscsDocument> sscsDocument = storePdfContext.getDocument().getData().getSscsDocument();
-        SscsDocument evidenceDescriptionDocument = findAndReturnTheNewEvidenceDescDoc(sscsDocument);
-        removeNewEvidenceDescFromTheDocumentsTab(sscsCaseData, sscsDocument);
-        removeUniqueIdAndSetFilenameForTheEvidenceDesc(evidenceDescriptionDocument);
-        scannedDocs.add(buildScannedDocumentByGivenSscsDoc(appellantOrRepsFileNamePrefix + " ",
-            evidenceDescriptionDocument));
+                                                                       String filename) {
+        removeStatementDocFromDocumentTab(sscsCaseData, storePdfContext.getDocument().getData().getSscsDocument());
+        List<byte[]> contentUploads = getContentListFromTheEvidenceUploads(storePdfContext);
+        ByteArrayResource statementContent = getContentFromTheStatement(storePdfContext);
+        byte[] combinedContent = appendEvidenceUploadsToStatement(statementContent.getByteArray(), contentUploads);
+        SscsDocument combinedPdfEvidence = pdfStoreService.store(combinedContent, filename, "Other evidence").get(0);
+        return buildScannedDocumentByGivenSscsDoc(combinedPdfEvidence);
+    }
+
+    private ByteArrayResource getContentFromTheStatement(CohEventActionContext storePdfContext) {
+        return (ByteArrayResource) storePdfContext.getPdf().getContent();
+    }
+
+    private List<byte[]> getContentListFromTheEvidenceUploads(CohEventActionContext storePdfContext) {
+        List<byte[]> draftPdfContentList = new ArrayList<>();
+        List<SscsDocument> drafts = storePdfContext.getDocument().getData().getDraftSscsDocument();
+        drafts.forEach(draft -> {
+            String documentUrl = draft.getValue().getDocumentLink().getDocumentUrl();
+            byte[] draftPdfContent = getContentInBytesForGivenDocumentStoreUrl(documentUrl);
+            draftPdfContentList.add(draftPdfContent);
+        });
+        return draftPdfContentList;
+    }
+
+    private byte[] getContentInBytesForGivenDocumentStoreUrl(String draftDocUrl) {
+        byte[] draftPdfContent;
+        try {
+            draftPdfContent = evidenceManagementService.download(new URI(draftDocUrl), "sscs");
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Error when downloading document from Evidence Management Service..", e);
+        }
+        return draftPdfContent;
+    }
+
+
+    private byte[] appendEvidenceUploadsToStatement(byte[] statement, List<byte[]> uploads) {
+        if (statement != null && uploads != null) {
+            PDDocument statementDoc = getLoadSafe(statement);
+            final PDFMergerUtility merger = new PDFMergerUtility();
+            uploads.forEach(upload -> {
+                PDDocument uploadDoc = getLoadSafe(upload);
+                appendDocumentSafe(statementDoc, merger, uploadDoc);
+                closeSafe(uploadDoc);
+            });
+            ByteArrayOutputStream combinedContent = new ByteArrayOutputStream();
+            saveDocSafe(statementDoc, combinedContent);
+            closeSafe(statementDoc);
+            return combinedContent.toByteArray();
+        } else {
+            throw new RuntimeException("Can not combine empty statement or evidence documents");
+        }
+    }
+
+    private static void closeSafe(PDDocument statementDoc) {
+        try {
+            statementDoc.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Error when closing Doc..", e);
+        }
+    }
+
+    private static void saveDocSafe(PDDocument statementDoc, ByteArrayOutputStream combinedContent) {
+        try {
+            statementDoc.save(combinedContent);
+        } catch (IOException e) {
+            throw new RuntimeException("Error when saving Doc..", e);
+        }
+    }
+
+    private static void appendDocumentSafe(PDDocument statementDoc, PDFMergerUtility merger, PDDocument uploadDoc) {
+        try {
+            merger.appendDocument(statementDoc, uploadDoc);
+        } catch (IOException e) {
+            throw new RuntimeException("Error when appending docs..", e);
+        }
+    }
+
+    private static PDDocument getLoadSafe(byte[] statement) {
+        try {
+            return PDDocument.load(statement);
+        } catch (IOException e) {
+            throw new RuntimeException("Error when getting PDDocument statement..", e);
+        }
     }
 
     private void removeUniqueIdAndSetFilenameForTheEvidenceDesc(SscsDocument evidenceDescriptionDocument) {
@@ -222,7 +314,7 @@ public class EvidenceUploadService {
         return filename.replace(TEMP_UNIQUE_ID, "").trim();
     }
 
-    private void removeNewEvidenceDescFromTheDocumentsTab(SscsCaseData sscsCaseData, List<SscsDocument> sscsDocument) {
+    private void removeStatementDocFromDocumentTab(SscsCaseData sscsCaseData, List<SscsDocument> sscsDocument) {
         sscsDocument.removeIf(doc -> doc.getValue().getDocumentFileName().startsWith(TEMP_UNIQUE_ID) ||
             doc.getValue().getDocumentLink().getDocumentFilename().startsWith(TEMP_UNIQUE_ID));
         sscsCaseData.setSscsDocument(sscsDocument);
@@ -234,23 +326,7 @@ public class EvidenceUploadService {
                 .findFirst().orElseThrow(() -> new RuntimeException("Evidence description file cannot be found"));
     }
 
-    private List<ScannedDocument> moveNewUploadedDocsToUnprocessedCorrespondence(
-        CohEventActionContext storePdfContext, String appellantOrRepsFileNamePrefix) {
-
-        List<ScannedDocument> scannedDocs = new ArrayList<>();
-        long nextStatementCounter = getCountOfNextUploadDoc(
-            storePdfContext.getDocument().getData().getScannedDocuments(),
-            storePdfContext.getDocument().getData().getSscsDocument());
-
-        for (SscsDocument draftSscsDocument : storePdfContext.getDocument().getData().getDraftSscsDocument()) {
-            String fileNamePrefix = String.format("%s upload %d - ",
-                appellantOrRepsFileNamePrefix, nextStatementCounter);
-            scannedDocs.add(buildScannedDocumentByGivenSscsDoc(fileNamePrefix, draftSscsDocument));
-        }
-        return scannedDocs;
-    }
-
-    public static long getCountOfNextUploadDoc(List<ScannedDocument> scannedDocuments, List<SscsDocument> sscsDocument) {
+    private long getCountOfNextUploadDoc(List<ScannedDocument> scannedDocuments, List<SscsDocument> sscsDocument) {
         if ((scannedDocuments == null || scannedDocuments.isEmpty())
             && (sscsDocument == null || sscsDocument.isEmpty())) {
             return 1;
@@ -275,28 +351,17 @@ public class EvidenceUploadService {
         return fileName.startsWith("Appellant upload") || fileName.startsWith("Representative upload");
     }
 
-    private ScannedDocument buildScannedDocumentByGivenSscsDoc(String fileNamePrefix, SscsDocument draftSscsDocument) {
-        DocumentLink documentLinkForScannedDoc = buildDocLinkFromGivenDocLinkAndPrefixFilenameByGivenPrefix(
-            fileNamePrefix, draftSscsDocument);
+    private ScannedDocument buildScannedDocumentByGivenSscsDoc(SscsDocument draftSscsDocument) {
         LocalDate ld = LocalDate.parse(draftSscsDocument.getValue().getDocumentDateAdded(),
             DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
-        return ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder()
-                    .type("other")
-                    .url(documentLinkForScannedDoc)
-                    .fileName(fileNamePrefix + draftSscsDocument.getValue().getDocumentFileName())
-                    .scannedDate(ldt.toString())
-                    .build()).build();
-    }
-
-    private DocumentLink buildDocLinkFromGivenDocLinkAndPrefixFilenameByGivenPrefix(String fileNamePrefix,
-                                                                                    SscsDocument draftSscsDocument) {
-        DocumentLink documentLinkFromDraftSscsDoc = draftSscsDocument.getValue().getDocumentLink();
-        return DocumentLink.builder()
-            .documentBinaryUrl(documentLinkFromDraftSscsDoc.getDocumentBinaryUrl())
-            .documentUrl(documentLinkFromDraftSscsDoc.getDocumentUrl())
-            .documentFilename(fileNamePrefix + documentLinkFromDraftSscsDoc.getDocumentFilename())
+        return ScannedDocument.builder()
+            .value(ScannedDocumentDetails.builder()
+                .type("other")
+                .url(draftSscsDocument.getValue().getDocumentLink())
+                .fileName(draftSscsDocument.getValue().getDocumentFileName())
+                .scannedDate(ldt.toString())
+                .build())
             .build();
     }
 
