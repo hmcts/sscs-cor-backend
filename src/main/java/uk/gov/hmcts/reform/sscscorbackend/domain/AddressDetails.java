@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscscorbackend.domain;
 
 import com.fasterxml.jackson.annotation.*;
 import io.swagger.annotations.ApiModelProperty;
-
 import java.util.Objects;
 
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
