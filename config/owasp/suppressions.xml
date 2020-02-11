@@ -132,4 +132,18 @@
     <packageUrl regex="true">^pkg:javascript/handlebars\.js@.*$</packageUrl>
     <vulnerabilityName>Prototype pollution</vulnerabilityName>
   </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: handlebars-4.0.7.jar: handlebars-v4.0.4.js
+   ]]></notes>
+    <packageUrl regex="true">^pkg:javascript/handlebars\.js@.*$</packageUrl>
+    <vulnerabilityName>A prototype pollution vulnerability in handlebars is exploitable if an attacker can control the template</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: handlebars-4.0.7.jar: handlebars-v4.0.4.js
+   ]]></notes>
+    <packageUrl regex="true">^pkg:javascript/handlebars\.js@.*$</packageUrl>
+    <vulnerabilityName>Disallow calling helperMissing and blockHelperMissing directly</vulnerabilityName>
+  </suppress>
 </suppressions>
