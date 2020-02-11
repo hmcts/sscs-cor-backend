@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
 import java.io.IOException;
-
 import org.junit.Test;
 
 public class CreateHearingPdfTest extends BaseFunctionTest {
