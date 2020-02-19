@@ -67,6 +67,7 @@ variable "createCcdEndpoint" {
 
 variable "jui_base_url" {
   type = "string"
+  default = "http://jui-webapp-perftest.service.core-compute-perftest.internal"
 }
 
 variable "pdf_service_health_url" {
