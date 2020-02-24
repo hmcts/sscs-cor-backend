@@ -42,6 +42,7 @@ public class CitizenLoginServiceTest {
     public void setUp() {
         citizenIdamTokens = IdamTokens.builder()
                 .userId("someUserId")
+                .email("someEmail@exaple.com")
                 .build();
         corCcdService = mock(CorCcdService.class);
         case1 = mock(CaseDetails.class);

@@ -5,13 +5,17 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -19,10 +23,13 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.util.PostcodeUtil;
+import uk.gov.hmcts.reform.sscscorbackend.util.UpdateSubscription;
 
 @Slf4j
 @Service
 public class CitizenLoginService {
+    private static final String UPDATED_SSCS = "Updated SSCS";
+
     private final CorCcdService corCcdService;
     private final SscsCcdConvertService sscsCcdConvertService;
     private final IdamService idamService;
@@ -50,6 +57,12 @@ public class CitizenLoginService {
                             .filter(casesWithSubscriptionMatchingTya(tya))
                             .collect(toList())
             );
+            sscsCaseDetails.stream().forEach(detail -> {
+                if (caseHasSubscriptionWithTyaAndEmail(detail, tya, idamTokens.getEmail())) {
+                    updateLastLoggedIntoMya(detail, idamTokens.getEmail());
+                    corCcdService.updateCase(detail.getData(), detail.getId(), EventType.UPDATE_CASE_ONLY.getCcdType(), "SSCS - update last logged in MYA", UPDATED_SSCS, idamService.getIdamTokens());
+                }
+            });
             log.info(format("Find case: Found [%s] cases for tya [%s] for user [%s]", convert.size(), tya, idamTokens.getUserId()));
 
             return convert;
@@ -79,7 +92,8 @@ public class CitizenLoginService {
                 if (caseHasSubscriptionWithTyaAndEmail(caseByAppealNumber, tya, email)) {
                     log.info(format("Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] has subscription", caseByAppealNumber.getId(), tya, email, postcode));
                     corCcdService.addUserToCase(citizenIdamTokens.getUserId(), caseByAppealNumber.getId());
-
+                    updateLastLoggedIntoMya(caseByAppealNumber, email);
+                    corCcdService.updateCase(caseByAppealNumber.getData(), caseByAppealNumber.getId(), EventType.UPDATE_CASE_ONLY.getCcdType(), "SSCS - update last logged in MYA", UPDATED_SSCS, idamService.getIdamTokens());
                     return onlineHearingService.loadHearing(caseByAppealNumber);
                 } else {
                     log.info(format("Associate case: Subscription does not match id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
@@ -107,6 +121,65 @@ public class CitizenLoginService {
 
         return of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription())
                 .anyMatch(subscription -> subscription != null && tya.equals(subscription.getTya()) && email.equals(subscription.getEmail()));
+    }
+
+    private void updateLastLoggedIntoMya(SscsCaseDetails sscsCaseDetails, String email) {
+        Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
+        String lastLoggedIntoMya = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
+        if (subscriptions != null && subscriptions.getAppellantSubscription() != null
+                && email.equalsIgnoreCase(subscriptions.getAppellantSubscription().getEmail())) {
+            final UpdateSubscription.SubscriptionUpdate appellantSubscriptionUpdate =
+                new UpdateSubscription.SubscriptionUpdate() {
+                    @Override
+                    public Subscription getSubscription(Subscriptions subscriptions) {
+                        return subscriptions.getAppellantSubscription();
+                    }
+
+                    @Override
+                    public Subscriptions updateExistingSubscriptions(Subscription subscription) {
+                        return sscsCaseDetails.getData().getSubscriptions().toBuilder()
+                                .appellantSubscription(subscription).build();
+                    }
+                };
+            UpdateSubscription.updateSubscription(sscsCaseDetails.getData(), appellantSubscriptionUpdate, lastLoggedIntoMya);
+        }
+
+        if (subscriptions != null && subscriptions.getAppointeeSubscription() != null
+                && email.equalsIgnoreCase(subscriptions.getAppointeeSubscription().getEmail())) {
+            final UpdateSubscription.SubscriptionUpdate appointeeSubscriptionUpdate =
+                new UpdateSubscription.SubscriptionUpdate() {
+                    @Override
+                    public Subscription getSubscription(Subscriptions subscriptions) {
+                        return subscriptions.getAppointeeSubscription();
+                    }
+
+                    @Override
+                    public Subscriptions updateExistingSubscriptions(Subscription subscription) {
+                        return sscsCaseDetails.getData().getSubscriptions().toBuilder()
+                                .appointeeSubscription(subscription).build();
+                    }
+                };
+            UpdateSubscription.updateSubscription(sscsCaseDetails.getData(), appointeeSubscriptionUpdate, lastLoggedIntoMya);
+        }
+
+        if (subscriptions != null && subscriptions.getRepresentativeSubscription() != null
+                && email.equalsIgnoreCase(subscriptions.getRepresentativeSubscription().getEmail())) {
+            final UpdateSubscription.SubscriptionUpdate representativeSubscriptionUpdate =
+                new UpdateSubscription.SubscriptionUpdate() {
+                    @Override
+                    public Subscription getSubscription(Subscriptions subscriptions) {
+                        return subscriptions.getRepresentativeSubscription();
+                    }
+
+                    @Override
+                    public Subscriptions updateExistingSubscriptions(Subscription subscription) {
+                        return sscsCaseDetails.getData().getSubscriptions().toBuilder()
+                                .representativeSubscription(subscription).build();
+                    }
+                };
+            UpdateSubscription.updateSubscription(sscsCaseDetails.getData(), representativeSubscriptionUpdate, lastLoggedIntoMya);
+        }
+
     }
 
 }
