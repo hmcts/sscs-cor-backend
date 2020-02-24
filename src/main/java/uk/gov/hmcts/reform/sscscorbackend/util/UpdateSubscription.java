@@ -19,8 +19,7 @@ public class UpdateSubscription {
                                    SubscriptionUpdate subscriptionUpdate,
                                    String lastLoggedIntoMya) {
 
-        Subscriptions existingSubscriptions = existingCcdCaseData.getSubscriptions() != null
-                ? existingCcdCaseData.getSubscriptions() : null;
+        Subscriptions existingSubscriptions = existingCcdCaseData.getSubscriptions();
 
         Subscription existingSubscription = subscriptionUpdate.getSubscription(existingSubscriptions);
 
@@ -36,6 +35,7 @@ public class UpdateSubscription {
                                                                     String lastLoggedIntoMya) {
         return Subscription.builder()
             .wantSmsNotifications(exisitingSubscription.getWantSmsNotifications())
+            .email(exisitingSubscription.getEmail())
             .subscribeSms(exisitingSubscription.isSmsSubscribed() ? YES : NO)
             .subscribeEmail(exisitingSubscription.isEmailSubscribed() ? YES : NO)
             .mobile(exisitingSubscription.getMobile())
