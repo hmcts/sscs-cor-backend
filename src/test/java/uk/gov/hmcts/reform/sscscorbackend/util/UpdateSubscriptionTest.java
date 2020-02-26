@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.sscscorbackend.util;
 
-import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+
+import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 public class UpdateSubscriptionTest {
 
