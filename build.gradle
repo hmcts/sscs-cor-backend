@@ -159,7 +159,7 @@ dependencyManagement {
     dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
 
     // CVE-2019-16869
-    dependencySet(group: 'io.netty', version: '4.1.43.Final') {
+    dependencySet(group: 'io.netty', version: '4.1.45.Final') {
       entry 'netty-handler'
       entry 'netty-transport-native-epoll'
       entry 'netty-transport-native-kqueue'
