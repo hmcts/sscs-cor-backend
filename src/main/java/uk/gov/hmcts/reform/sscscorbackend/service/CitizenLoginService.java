@@ -50,6 +50,11 @@ public class CitizenLoginService {
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .collect(toList());
+        sscsCaseDetails.stream().forEach(detail -> {
+            if (caseHasSubscriptionWithMatchingEmail(detail, idamTokens.getEmail())) {
+                updateCaseWithLastLoggedIntoMya(idamTokens.getEmail(), detail);
+            }
+        });
         if (!isBlank(tya)) {
             log.info(format("Find case: Filtering for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
             List<OnlineHearing> convert = convert(
@@ -57,11 +62,6 @@ public class CitizenLoginService {
                             .filter(casesWithSubscriptionMatchingTya(tya))
                             .collect(toList())
             );
-            sscsCaseDetails.stream().forEach(detail -> {
-                if (caseHasSubscriptionWithTyaAndEmail(detail, tya, idamTokens.getEmail())) {
-                    updateCaseWithLastLoggedIntoMya(idamTokens.getEmail(), detail);
-                }
-            });
             log.info(format("Find case: Found [%s] cases for tya [%s] for user [%s]", convert.size(), tya, idamTokens.getUserId()));
 
             return convert;
@@ -124,6 +124,13 @@ public class CitizenLoginService {
 
         return of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription())
                 .anyMatch(subscription -> subscription != null && tya.equals(subscription.getTya()) && email.equals(subscription.getEmail()));
+    }
+
+    private boolean caseHasSubscriptionWithMatchingEmail(SscsCaseDetails sscsCaseDetails, String email) {
+        Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
+
+        return of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription())
+                .anyMatch(subscription -> subscription != null && email.equals(subscription.getEmail()));
     }
 
     private void updateSubscriptionWithLastLoggedIntoMya(SscsCaseDetails sscsCaseDetails, String email) {

@@ -65,8 +65,14 @@ public class CitizenLoginServiceTest {
 
     @Test
     public void findsCasesAlreadyAssociatedWithCitizen() {
-        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).build();
-        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).build();
+        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).data(SscsCaseData.builder()
+                .subscriptions(Subscriptions.builder()
+                        .appellantSubscription(Subscription.builder()
+                            .email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build()).build()).build();
+        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).data(SscsCaseData.builder()
+                .subscriptions(Subscriptions.builder()
+                        .appellantSubscription(Subscription.builder()
+                                .email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build()).build()).build();
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing1 = someOnlineHearing(111L);
