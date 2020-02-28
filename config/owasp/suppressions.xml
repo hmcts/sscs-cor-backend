@@ -146,4 +146,26 @@
     <packageUrl regex="true">^pkg:javascript/handlebars\.js@.*$</packageUrl>
     <vulnerabilityName>Disallow calling helperMissing and blockHelperMissing directly</vulnerabilityName>
   </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: tomcat-embed-websocket-9.0.30.jar
+   No fix available
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org.apache.tomcat.embed/tomcat-embed-websocket@.*$</packageUrl>
+    <cpe>cpe:/a:apache:tomcat</cpe>
+    <cpe>cpe:/a:apache_software_foundation:tomcat</cpe>
+    <cpe>cpe:/a:apache_tomcat:apache_tomcat</cpe>
+    <cve>CVE-2020-1938</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.30.jar
+   No fix available
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@.*$</packageUrl>
+    <cpe>cpe:/a:apache:tomcat</cpe>
+    <cpe>cpe:/a:apache_software_foundation:tomcat</cpe>
+    <cpe>cpe:/a:apache_tomcat:apache_tomcat</cpe>
+    <cve>CVE-2020-1938</cve>
+  </suppress>
 </suppressions>
