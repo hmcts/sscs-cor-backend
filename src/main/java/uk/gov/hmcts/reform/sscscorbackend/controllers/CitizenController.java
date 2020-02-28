@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.AssociateCaseDetails;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.service.CitizenLoginService;
@@ -71,10 +72,13 @@ public class CitizenController {
     }
 
     private IdamTokens getUserTokens(String oauth2Token) {
+        UserDetails userDetails = idamService.getUserDetails(oauth2Token);
         return IdamTokens.builder()
                 .idamOauth2Token(oauth2Token)
                 .serviceAuthorization(idamService.generateServiceAuthorization())
-                .userId(idamService.getUserId(oauth2Token))
+                .userId(userDetails.getId())
+                .email(userDetails.getEmail())
+                .roles(userDetails.getRoles())
                 .build();
     }
 
