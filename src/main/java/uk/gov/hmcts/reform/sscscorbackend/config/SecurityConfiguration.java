@@ -28,6 +28,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .addFilter(filter)
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/continuous-online-hearings/**").authenticated();
+                .antMatchers("/continuous-online-hearings/**").authenticated()
+                .antMatchers("/citizen/**").authenticated();
     }
 }
