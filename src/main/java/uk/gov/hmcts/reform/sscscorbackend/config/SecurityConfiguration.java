@@ -30,6 +30,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .addFilter(filter)
                 .csrf().disable()
                 .authorizeRequests()
+                .antMatchers("/health").permitAll()
+                .antMatchers("/health/liveness").permitAll()
+                .antMatchers("/loggers/**").permitAll()
+                .antMatchers("/swagger-ui.html").permitAll()
+                .antMatchers("/swagger-resources/**").permitAll()
+                .antMatchers("/v2/api-docs").permitAll()
+                .antMatchers("/webjars/springfox-swagger-ui/**").permitAll()
+                .antMatchers("/case/**").permitAll()
                 .antMatchers("/continuous-online-hearings/**").authenticated()
                 .antMatchers("/citizen/**").authenticated();
     }
