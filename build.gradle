@@ -166,7 +166,7 @@ dependencyManagement {
     dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
 
     // CVE-2019-16869
-    dependencySet(group: 'io.netty', version: '4.1.43.Final') {
+    dependencySet(group: 'io.netty', version: '4.1.46.Final') {
       entry 'netty-handler'
       entry 'netty-transport-native-epoll'
       entry 'netty-transport-native-kqueue'
@@ -215,6 +215,7 @@ dependencies {
   compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
 
   compile group: 'uk.gov.hmcts.reform', name:'sscs-common', version: '3.2.3-RC-SSCS-7299'
+
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.2.6'
   compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '6.0.0'
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging-spring', version: '5.0.1'
