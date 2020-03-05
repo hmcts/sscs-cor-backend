@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -50,11 +51,6 @@ public class CitizenLoginService {
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .collect(toList());
-        sscsCaseDetails.stream().forEach(detail -> {
-            if (caseHasSubscriptionWithMatchingEmail(detail, idamTokens.getEmail())) {
-                updateCaseWithLastLoggedIntoMya(idamTokens.getEmail(), detail);
-            }
-        });
         if (!isBlank(tya)) {
             log.info(format("Find case: Filtering for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
             List<OnlineHearing> convert = convert(
@@ -103,6 +99,16 @@ public class CitizenLoginService {
             log.info(format("Associate case: No case found for tya [%s] email [%s] postcode [%s]", tya, email, postcode));
         }
         return Optional.empty();
+    }
+
+    public void findAndUpdateCaseLastLoggedIntoMya(IdamTokens citizenIdamTokens, String caseId) {
+        if (StringUtils.isNotEmpty(caseId)) {
+            SscsCaseDetails caseDetails = corCcdService.getByCaseId(Long.valueOf(caseId), idamService.getIdamTokens());
+            if (caseDetails != null) {
+                updateCaseWithLastLoggedIntoMya(citizenIdamTokens.getEmail(), caseDetails);
+            }
+        }
+
     }
 
     private void updateCaseWithLastLoggedIntoMya(String email, SscsCaseDetails caseByAppealNumber) {
