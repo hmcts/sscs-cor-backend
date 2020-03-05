@@ -52,7 +52,7 @@ public class CitizenLogController {
             @ApiResponse(code = 403, message = "The time cannot be logged against the case, either the user does not " +
                     "exists or the email do not match the case."),
     })
-    @RequestMapping(method = RequestMethod.PUT, value = "/cases/{caseId}/log", consumes = APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/cases/{caseId}/log", consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> logUserWithCase(
             @ApiParam(value = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW") @RequestHeader(AUTHORIZATION) String authorisation,

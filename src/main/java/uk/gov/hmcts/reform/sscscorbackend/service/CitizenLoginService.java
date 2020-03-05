@@ -104,7 +104,7 @@ public class CitizenLoginService {
     public void findAndUpdateCaseLastLoggedIntoMya(IdamTokens citizenIdamTokens, String caseId) {
         if (StringUtils.isNotEmpty(caseId)) {
             SscsCaseDetails caseDetails = corCcdService.getByCaseId(Long.valueOf(caseId), idamService.getIdamTokens());
-            if (caseDetails != null) {
+            if (caseDetails != null && caseHasSubscriptionWithMatchingEmail(caseDetails, citizenIdamTokens.getEmail())) {
                 updateCaseWithLastLoggedIntoMya(citizenIdamTokens.getEmail(), caseDetails);
             }
         }

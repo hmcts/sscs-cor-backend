@@ -180,6 +180,30 @@ public class CitizenLoginServiceTest {
     }
 
     @Test
+    public void findAndUpdateCaseLastLoggedIntoMya() {
+        SscsCaseDetails expectedCase = createSscsCaseDetailsWithRepSubscription(tya);
+        long expectedCaseId = expectedCase.getId();
+        when(corCcdService.getByCaseId(expectedCaseId, serviceIdamTokens)).thenReturn(expectedCase);
+        underTest.findAndUpdateCaseLastLoggedIntoMya(citizenIdamTokens, String.valueOf(expectedCaseId));
+
+        verify(corCcdService).getByCaseId(eq(expectedCaseId), eq(serviceIdamTokens));
+        verify(corCcdService).updateCase(eq(expectedCase.getData()), eq(expectedCaseId),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()), anyString(), anyString(), eq(serviceIdamTokens));
+    }
+
+    @Test
+    public void findAndShouldNotUpdateCaseLastLoggedIntoMyaWhenCaseDetailsIsNull() {
+        SscsCaseDetails expectedCase = null;
+        long expectedCaseId = 1234L;
+        when(corCcdService.getByCaseId(expectedCaseId, serviceIdamTokens)).thenReturn(expectedCase);
+        underTest.findAndUpdateCaseLastLoggedIntoMya(citizenIdamTokens, String.valueOf(expectedCaseId));
+
+        verify(corCcdService).getByCaseId(eq(expectedCaseId), eq(serviceIdamTokens));
+        verify(corCcdService, times(0)).updateCase(any(), eq(expectedCaseId),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()), anyString(), anyString(), eq(serviceIdamTokens));
+    }
+
+    @Test
     public void cannotAssociatesUserWithCaseAsEmailIncorrect() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
         when(corCcdService.findCaseByAppealNumber(tya, serviceIdamTokens))
