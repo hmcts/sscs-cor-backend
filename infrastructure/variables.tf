@@ -27,63 +27,7 @@ variable "common_tags" {
   type = "map"
 }
 
-variable "idam_redirect_url" {
-  default = "https://sscs-case-loader-sandbox.service.core-compute-sandbox.internal"
-}
-
-variable "idam_sscs_url" {
-  default = "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
-}
-
-variable "infrastructure_env" {
-  default     = "test"
-  description = "Infrastructure environment to point to"
-}
-
-variable "enable_debug_error_message" {
-  default     = "true"
-  description = "Enable stack traces on error messages"
-}
-
-variable "enable_select_by_case_id" {
-  default     = "false"
-}
-
-variable "dwp_email" {
-  default = "dwp_email@example.com"
-}
-
-variable "caseworker_email_address" {
-  default = "caseworker@example.net"
-}
-
-variable "email_from_address" {
-  default = "sscs@hmcts.net"
-}
-
-variable "createCcdEndpoint" {
-  default     = "false"
-}
-
-variable "jui_base_url" {
-  type = "string"
-}
-
-variable "pdf_service_health_url" {
-  type = "string"
-  default = "false"
-}
-
-variable "pdf_service_convert_url" {
-  type = "string"
-  default = "false"
-}
-
-variable "pdf_service_base_url" {
-  type = "string"
-  default = "false"
-}
-
-variable "enable_ase" {
-  default = false
+variable "appinsights_instrumentation_key" {
+  description = "Instrumentation key of the App Insights instance this webapp should use. Module will create own App Insights resource if this is not provided"
+  default     = ""
 }
