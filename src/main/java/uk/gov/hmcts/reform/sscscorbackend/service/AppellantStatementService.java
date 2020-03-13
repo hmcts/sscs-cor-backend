@@ -22,14 +22,11 @@ public class AppellantStatementService {
     }
 
     public Optional<CohEventActionContext> handleAppellantStatement(String identifier, Statement statement) {
-        return onlineHearingService.getCcdCaseByIdentifier(identifier).map(caseDetails -> {
-            CohEventActionContext cohEventActionContext = storeAppellantStatementService.storePdf(
-                    caseDetails.getId(),
-                    identifier,
-                    new AppellantStatementPdfData(caseDetails, statement)
-            );
-
-            return cohEventActionContext;
-        });
+        return onlineHearingService.getCcdCaseByIdentifier(identifier).map(caseDetails ->
+                storeAppellantStatementService.storePdf(
+                caseDetails.getId(),
+                identifier,
+                new AppellantStatementPdfData(caseDetails, statement)
+        ));
     }
 }
