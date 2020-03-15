@@ -127,4 +127,19 @@ public class CitizenControllerTest {
 
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
+
+    @Test
+    public void logUserWithCase() {
+        String oauthToken = "oAuth";
+        String caseId = "123456";
+        String userId = "userId";
+
+        when(idamService.generateServiceAuthorization()).thenReturn("serviceAuth");
+        when(idamService.getUserDetails(oauthToken)).thenReturn(idamUserDetails);
+        ResponseEntity<Void> response = underTest.logUserWithCase(oauthToken, caseId);
+
+        verify(citizenLoginService).findAndUpdateCaseLastLoggedIntoMya(argThat(tokens -> userId.equals(tokens.getUserId()) && oauthToken.equals(tokens.getIdamOauth2Token())),
+                eq(caseId));
+        assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT));
+    }
 }
