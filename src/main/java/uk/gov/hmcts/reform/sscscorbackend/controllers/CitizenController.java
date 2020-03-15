@@ -123,7 +123,7 @@ public class CitizenController {
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "No content, the time has been logged against the case"),
             @ApiResponse(code = 403, message = "The time cannot be logged against the case, either the user does not " +
-                    "exists or the email do not match the case."),
+                    "exists or the email do not match the case.")
     })
     @PutMapping(value = "/cases/{caseId}/log", consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
