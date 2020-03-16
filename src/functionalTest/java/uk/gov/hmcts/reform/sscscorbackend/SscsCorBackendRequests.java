@@ -113,6 +113,11 @@ public class SscsCorBackendRequests {
         return new JSONObject(responseBody);
     }
 
+    public void logUserTime(String caseId, String email) throws IOException {
+        HttpResponse response = putRequestNoBody("/citizen/cases/" + caseId + "/log", email);
+        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+    }
+
     public CreatedCcdCase createCase(String emailAddress) throws IOException {
         HttpResponse createCaseResponse = client.execute(post(baseUrl + "/case?email=" + emailAddress)
                 .setHeader("Content-Length", "0")
@@ -287,7 +292,11 @@ public class SscsCorBackendRequests {
                 .setEntity(body)
                 .build());
     }
-
+    private CloseableHttpResponse putRequestNoBody(String url, String email) throws IOException {
+        return client.execute(addHeaders(put(baseUrl + url), email)
+                .setHeader("Content-Length", "0")
+                .build());
+    }
     private CloseableHttpResponse postRequestNoBody(String url) throws IOException {
         return client.execute(addHeaders(post(baseUrl + url)
                 .setHeader("Content-Length", "0"))
