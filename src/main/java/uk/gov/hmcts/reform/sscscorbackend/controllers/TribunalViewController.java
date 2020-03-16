@@ -12,7 +12,9 @@ import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 
 @RestController
 @RequestMapping("/continuous-online-hearings")
-@Deprecated
+/**
+ * @deprecated (COR has been retired. This functionality will be removed in the near future and any endpoints still required for MYA will be moved to Tribunals API)
+ */
 public class TribunalViewController {
     private final OnlineHearingService onlineHearingService;
 
