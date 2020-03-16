@@ -292,11 +292,13 @@ public class SscsCorBackendRequests {
                 .setEntity(body)
                 .build());
     }
+
     private CloseableHttpResponse putRequestNoBody(String url, String email) throws IOException {
         return client.execute(addHeaders(put(baseUrl + url), email)
                 .setHeader("Content-Length", "0")
                 .build());
     }
+
     private CloseableHttpResponse postRequestNoBody(String url) throws IOException {
         return client.execute(addHeaders(post(baseUrl + url)
                 .setHeader("Content-Length", "0"))
