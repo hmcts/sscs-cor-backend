@@ -27,8 +27,5 @@ public class CitizenLoginTest extends BaseFunctionTest {
         onlineHearingForTya = sscsCorBackendRequests.getOnlineHearingForCitizen("", userEmail);
         assertThat(onlineHearingForTya.length(), is(1));
         assertThat(onlineHearingForTya.getJSONObject(0).get("case_id"), is(expectedCaseId));
-
-        sscsCorBackendRequests.logUserTime(hearingAndCcdCase.getOnlineHearing().getCaseId(), userEmail);
-
     }
 }

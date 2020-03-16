@@ -133,7 +133,6 @@ public class CitizenController {
     ) {
 
         IdamTokens citizenTokens = getUserTokens(authorisation);
-        log.info("MYA user logged in time for email {} and case id {}", citizenTokens.getEmail(), caseId);
         citizenLoginService.findAndUpdateCaseLastLoggedIntoMya(citizenTokens, caseId);
 
         return ResponseEntity.noContent().build();
