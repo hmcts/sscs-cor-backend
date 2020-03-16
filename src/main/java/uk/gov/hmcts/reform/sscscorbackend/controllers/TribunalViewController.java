@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.OnlineHearingService;
 
 @RestController
 @RequestMapping("/continuous-online-hearings")
+@Deprecated
 public class TribunalViewController {
     private final OnlineHearingService onlineHearingService;
 

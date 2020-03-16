@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscscorbackend.service.QuestionService;
 @Slf4j
 @RestController
 @RequestMapping("/continuous-online-hearings")
+@Deprecated
 public class QuestionController {
 
     private final QuestionService questionService;

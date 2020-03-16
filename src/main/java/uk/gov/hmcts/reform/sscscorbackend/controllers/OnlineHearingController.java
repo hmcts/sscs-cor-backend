@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEve
 
 @Slf4j
 @RestController
+@Deprecated
 public class OnlineHearingController {
 
     private final OnlineHearingService onlineHearingService;

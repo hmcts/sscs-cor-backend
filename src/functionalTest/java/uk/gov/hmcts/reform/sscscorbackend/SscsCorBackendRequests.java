@@ -1,10 +1,6 @@
 package uk.gov.hmcts.reform.sscscorbackend;
 
-import static org.apache.http.client.methods.RequestBuilder.delete;
-import static org.apache.http.client.methods.RequestBuilder.get;
-import static org.apache.http.client.methods.RequestBuilder.patch;
-import static org.apache.http.client.methods.RequestBuilder.post;
-import static org.apache.http.client.methods.RequestBuilder.put;
+import static org.apache.http.client.methods.RequestBuilder.*;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -34,66 +30,19 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 @Slf4j
 public class SscsCorBackendRequests {
     private final IdamTokens idamTokens;
-    private final CorIdamService corIdamService;
     private String baseUrl;
     private CloseableHttpClient client;
 
 
-    public SscsCorBackendRequests(IdamService idamService, CorIdamService corIdamService, String baseUrl, CloseableHttpClient client) {
+    public SscsCorBackendRequests(IdamService idamService, String baseUrl, CloseableHttpClient client) {
         this.idamTokens = idamService.getIdamTokens();
-        this.corIdamService = corIdamService;
         this.baseUrl = baseUrl;
         this.client = client;
     }
 
-    public JSONObject getQuestion(String hearingId, String questionId) throws IOException {
-        HttpResponse getQuestionResponse = getRequest("/continuous-online-hearings/" + hearingId + "/questions/" + questionId);
-
-        assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
-
-        String responseBody = EntityUtils.toString(getQuestionResponse.getEntity());
-
-        return new JSONObject(responseBody);
-    }
-
-    public JSONObject getQuestions(String hearingId) throws IOException {
-        HttpResponse getQuestionResponse = getRequest("/continuous-online-hearings/" + hearingId);
-
-        assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
-
-        String responseBody = EntityUtils.toString(getQuestionResponse.getEntity());
-
-        return new JSONObject(responseBody);
-    }
-
-    public void answerQuestion(String hearingId, String questionId, String answer) throws IOException {
-        HttpResponse getQuestionResponse = putRequest(
-                "/continuous-online-hearings/" + hearingId + "/questions/" + questionId,
-                new StringEntity("{\"answer\":\"" + answer + "\"}", APPLICATION_JSON)
-        );
-
-        assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
-    }
-
-    public void submitAnswer(String hearingId, String questionId) throws IOException {
-        HttpResponse getQuestionResponse = postRequestNoBody("/continuous-online-hearings/" + hearingId + "/questions/" + questionId);
-
-        assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
-    }
-
-    public JSONObject getOnlineHearing(String emailAddress) throws IOException {
-        HttpResponse getOnlineHearingResponse = getRequest("/continuous-online-hearings?email=" + emailAddress);
-
-        assertThat(getOnlineHearingResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
-
-        String responseBody = EntityUtils.toString(getOnlineHearingResponse.getEntity());
-
-        return new JSONObject(responseBody);
-    }
-
     public JSONArray getOnlineHearingForCitizen(String tya, String email) throws IOException {
         String uri = (StringUtils.isNotBlank(tya)) ? "/citizen/" + tya : "/citizen";
-        HttpResponse getOnlineHearingResponse = getRequest(uri, email);
+        HttpResponse getOnlineHearingResponse = getRequest(uri);
 
         assertThat(getOnlineHearingResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
 
@@ -105,7 +54,7 @@ public class SscsCorBackendRequests {
     public JSONObject assignCaseToUser(String tya, String email, String postcode) throws IOException {
         StringEntity entity = new StringEntity("{\"email\":\"" + email + "\", \"postcode\":\"" + postcode + "\"}", APPLICATION_JSON);
 
-        HttpResponse response = postRequest("/citizen/" + tya, entity, email);
+        HttpResponse response = postRequest("/citizen/" + tya, entity);
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
 
         String responseBody = EntityUtils.toString(response.getEntity());
@@ -145,37 +94,6 @@ public class SscsCorBackendRequests {
         );
     }
 
-    public JSONObject extendQuestionRoundDeadline(String hearingId) throws IOException {
-        HttpResponse getQuestionResponse = patchRequestNoBody("/continuous-online-hearings/" + hearingId);
-
-        assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
-
-        String responseBody = EntityUtils.toString(getQuestionResponse.getEntity());
-
-        return new JSONObject(responseBody);
-    }
-
-    public void recordTribunalViewResponse(String hearingId, String reply, String reason) throws IOException {
-        HttpResponse response = patchRequest(
-                "/continuous-online-hearings/" + hearingId + "/tribunal-view",
-                new StringEntity("{\"reply\":\"" + reply + "\", \"reason\":\"" + reason + "\"}", APPLICATION_JSON)
-        );
-        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
-    }
-
-    public void uploadEvidence(String hearingId, String questionId, String fileName) throws IOException {
-        HttpEntity data = MultipartEntityBuilder.create()
-                .setContentType(ContentType.MULTIPART_FORM_DATA)
-                .addBinaryBody("file",
-                        this.getClass().getClassLoader().getResourceAsStream(fileName),
-                        ContentType.IMAGE_PNG,
-                        fileName)
-                .build();
-
-        HttpResponse response = postRequest("/continuous-online-hearings/" + hearingId + "/questions/" + questionId + "/evidence", data);
-        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
-    }
-
     public void uploadHearingEvidence(String hearingId, String fileName) throws IOException {
         HttpEntity data = MultipartEntityBuilder.create()
             .setContentType(ContentType.MULTIPART_FORM_DATA)
@@ -208,38 +126,6 @@ public class SscsCorBackendRequests {
         return new JSONArray(responseBody);
     }
 
-    public void deleteEvidence(String hearingId, String questionId, String evidenceId) throws IOException {
-        HttpResponse getQuestionResponse = deleteRequest("/continuous-online-hearings/" + hearingId + "/questions/" + questionId + "/evidence/" + evidenceId);
-
-        assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
-    }
-
-    public void deleteHearingEvidence(String hearingId, String evidenceId) throws IOException {
-        HttpResponse getQuestionResponse = deleteRequest("/continuous-online-hearings/" + hearingId + "/evidence/" + evidenceId);
-
-        assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
-    }
-
-    public void cohHearingRelisted(String hearingId, String caseId) throws IOException {
-        cohEvent(hearingId, caseId, "continuous_online_hearing_relisted");
-    }
-
-    public void cohDecisionIssued(String hearingId, String caseId) throws IOException {
-        cohEvent(hearingId, caseId, "decision_issued");
-    }
-
-    private void cohEvent(String hearingId, String caseId, String event) throws IOException {
-        HttpResponse resolveHearingResponse = client.execute(post(baseUrl + "/notify/onlinehearing")
-                .setEntity(new StringEntity(
-                        "{\"case_id\":\"" + caseId + "\", \"event_type\":\"" + event +
-                                "\", \"online_hearing_id\":\"" + hearingId + "\"}",
-                        APPLICATION_JSON
-                ))
-                .build());
-
-        assertThat(resolveHearingResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
-    }
-
     public void uploadAppellantStatement(String hearingId, String statement) throws IOException {
         String uri = "/continuous-online-hearings/" + hearingId + "/statement";
         String stringEntity = "{\n"
@@ -251,8 +137,8 @@ public class SscsCorBackendRequests {
         assertThat(getQuestionResponse.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
     }
 
-    public String getCoversheet(String hearingId) throws IOException {
-        CloseableHttpResponse getCoverSheetResponse = getRequest("/continuous-online-hearings/" + hearingId + "/evidence/coversheet");
+    public String getCoversheet(String caseId) throws IOException {
+        CloseableHttpResponse getCoverSheetResponse = getRequest("/continuous-online-hearings/" + caseId + "/evidence/coversheet");
 
         assertThat(getCoverSheetResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
         Header fileNameHeader = getCoverSheetResponse.getFirstHeader("Content-Disposition");
@@ -265,20 +151,8 @@ public class SscsCorBackendRequests {
                 .setHeader("ServiceAuthorization", idamTokens.getServiceAuthorization());
     }
 
-    private RequestBuilder addHeaders(RequestBuilder requestBuilder, String email) {
-        String userToken = corIdamService.getUserToken(email, "Apassword123");
-        return requestBuilder
-                .setHeader(HttpHeaders.AUTHORIZATION, userToken)
-                .setHeader("ServiceAuthorization", idamTokens.getServiceAuthorization());
-    }
-
     private CloseableHttpResponse getRequest(String url) throws IOException {
         return client.execute(addHeaders(get(baseUrl + url))
-                .build());
-    }
-
-    private CloseableHttpResponse getRequest(String url, String email) throws IOException {
-        return client.execute(addHeaders(get(baseUrl + url), email)
                 .build());
     }
 
@@ -288,37 +162,9 @@ public class SscsCorBackendRequests {
                 .build());
     }
 
-    private CloseableHttpResponse postRequestNoBody(String url) throws IOException {
-        return client.execute(addHeaders(post(baseUrl + url)
-                .setHeader("Content-Length", "0"))
-                .build());
-    }
-
     private CloseableHttpResponse postRequest(String url, HttpEntity body) throws IOException {
         return client.execute(addHeaders(post(baseUrl + url))
                 .setEntity(body)
-                .build());
-    }
-
-    private CloseableHttpResponse postRequest(String url, HttpEntity body, String email) throws IOException {
-        return client.execute(addHeaders(post(baseUrl + url), email)
-                .setEntity(body)
-                .build());
-    }
-
-    private CloseableHttpResponse patchRequestNoBody(String url) throws IOException {
-        return client.execute(addHeaders(patch(baseUrl + url))
-                .build());
-    }
-
-    private CloseableHttpResponse patchRequest(String url, StringEntity body) throws IOException {
-        return client.execute(addHeaders(patch(baseUrl + url))
-                .setEntity(body)
-                .build());
-    }
-
-    private CloseableHttpResponse deleteRequest(String url) throws IOException {
-        return client.execute(addHeaders(delete(baseUrl + url))
                 .build());
     }
 }
