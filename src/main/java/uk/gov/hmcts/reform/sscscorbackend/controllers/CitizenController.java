@@ -132,7 +132,9 @@ public class CitizenController {
             @ApiParam(value = "case id for an user and appeal", example = "12345678") @PathVariable("caseId") String caseId
     ) {
 
-        citizenLoginService.findAndUpdateCaseLastLoggedIntoMya(getUserTokens(authorisation), caseId);
+        IdamTokens citizenTokens = getUserTokens(authorisation);
+        log.info("MYA user logged in time for email {} and case id {}", citizenTokens.getEmail(), caseId );
+        citizenLoginService.findAndUpdateCaseLastLoggedIntoMya(citizenTokens, caseId);
 
         return ResponseEntity.noContent().build();
     }
