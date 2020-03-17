@@ -4,14 +4,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someStatement;
 
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscscorbackend.service.email.AppellantStatementEmailService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.StoreAppellantStatementService;
 import uk.gov.hmcts.reform.sscscorbackend.service.pdf.data.AppellantStatementPdfData;
@@ -20,7 +20,6 @@ public class AppellantStatementServiceTest {
 
     private StoreAppellantStatementService storeAppellantStatementService;
     private OnlineHearingService onlineHearingService;
-    private AppellantStatementEmailService appellantStatementEmailService;
     private AppellantStatementService appellantStatementService;
     private String someOnlineHearing;
 
@@ -28,10 +27,9 @@ public class AppellantStatementServiceTest {
     public void setUp() {
         storeAppellantStatementService = mock(StoreAppellantStatementService.class);
         onlineHearingService = mock(OnlineHearingService.class);
-        appellantStatementEmailService = mock(AppellantStatementEmailService.class);
 
         appellantStatementService = new AppellantStatementService(
-                storeAppellantStatementService, onlineHearingService, appellantStatementEmailService
+                storeAppellantStatementService, onlineHearingService
         );
         someOnlineHearing = "someOnlineHearing";
     }
@@ -65,6 +63,5 @@ public class AppellantStatementServiceTest {
         Optional handled = appellantStatementService.handleAppellantStatement(someOnlineHearing, someStatement());
 
         assertThat(handled.isPresent(), is(true));
-        verify(appellantStatementEmailService).sendEmail(cohEventActionContext);
     }
 }
