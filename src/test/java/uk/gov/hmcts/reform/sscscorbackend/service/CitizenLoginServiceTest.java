@@ -66,12 +66,12 @@ public class CitizenLoginServiceTest {
     @Test
     public void findsCasesAlreadyAssociatedWithCitizen() {
         List<CaseDetails> caseDetails = new ArrayList<>();
-        case1.setState(State.READY_TO_LIST.getId());
-        case2.setState(State.APPEAL_CREATED.getId());
         caseDetails.add(case1);
         caseDetails.add(case2);
         SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).build();
         SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).build();
+        when(case1.getState()).thenReturn(State.READY_TO_LIST.getId());
+        when(case2.getState()).thenReturn(State.APPEAL_CREATED.getId());
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing1 = someOnlineHearing(111L);
@@ -88,38 +88,38 @@ public class CitizenLoginServiceTest {
     @Test
     public void findsCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsDraft() {
         List<CaseDetails> caseDetails = new ArrayList<>();
-        case1.setState(State.DRAFT.getId());
-        case2.setState(State.APPEAL_CREATED.getId());
         caseDetails.add(case1);
         caseDetails.add(case2);
         SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).build();
+        when(case1.getState()).thenReturn(State.DRAFT.getId());
+        when(case2.getState()).thenReturn(State.APPEAL_CREATED.getId());
         when(corCcdService.searchForCitizen(citizenIdamTokens)).thenReturn(caseDetails);
-        when(sscsCcdConvertService.getCaseDetails(eq(caseDetails.get(0)))).thenReturn(sscsCaseDetails2);
+        when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
         when(onlineHearingService.loadHearing(sscsCaseDetails2)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
-        verify(sscsCcdConvertService).getCaseDetails(eq(caseDetails.get(0)));
+        verify(sscsCcdConvertService).getCaseDetails(eq(case2));
         assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
     }
 
     @Test
     public void findsCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsDraftArchived() {
         List<CaseDetails> caseDetails = new ArrayList<>();
-        case1.setState(State.DRAFT_ARCHIVED.getId());
-        case2.setState(State.READY_TO_LIST.getId());
         caseDetails.add(case1);
         caseDetails.add(case2);
         SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).build();
+        when(case1.getState()).thenReturn(State.DRAFT_ARCHIVED.getId());
+        when(case2.getState()).thenReturn(State.READY_TO_LIST.getId());
         when(corCcdService.searchForCitizen(citizenIdamTokens)).thenReturn(caseDetails);
-        when(sscsCcdConvertService.getCaseDetails(eq(caseDetails.get(0)))).thenReturn(sscsCaseDetails2);
+        when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
         when(onlineHearingService.loadHearing(sscsCaseDetails2)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
-        verify(sscsCcdConvertService).getCaseDetails(eq(caseDetails.get(0)));
+        verify(sscsCcdConvertService).getCaseDetails(eq(case2));
         assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
     }
 
