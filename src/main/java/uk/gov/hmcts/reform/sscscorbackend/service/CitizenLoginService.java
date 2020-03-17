@@ -42,8 +42,8 @@ public class CitizenLoginService {
         log.info(format("Find case: Searching for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
         List<CaseDetails> caseDetails = corCcdService.searchForCitizen(idamTokens);
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
-                .filter(c -> !(State.DRAFT.getId().equalsIgnoreCase(c.getState())
-                        || State.DRAFT_ARCHIVED.getId().equalsIgnoreCase(c.getState())))
+                .filter(c -> !(State.DRAFT.getId().equals(c.getState())
+                        || State.DRAFT_ARCHIVED.getId().equals(c.getState())))
                 .map(sscsCcdConvertService::getCaseDetails)
                 .collect(toList());
         if (!isBlank(tya)) {
