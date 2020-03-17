@@ -65,6 +65,11 @@ public class CitizenLoginServiceTest {
 
     @Test
     public void findsCasesAlreadyAssociatedWithCitizen() {
+        List<CaseDetails> caseDetails = new ArrayList<>();
+        case1.setState(State.READY_TO_LIST.getId());
+        case2.setState(State.APPEAL_CREATED.getId());
+        caseDetails.add(case1);
+        caseDetails.add(case2);
         SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).build();
         SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).build();
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
@@ -76,6 +81,7 @@ public class CitizenLoginServiceTest {
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
+        verify(sscsCcdConvertService, times(2)).getCaseDetails(any(CaseDetails.class));
         assertThat(casesForCitizen, is(asList(onlineHearing1, onlineHearing2)));
     }
 
