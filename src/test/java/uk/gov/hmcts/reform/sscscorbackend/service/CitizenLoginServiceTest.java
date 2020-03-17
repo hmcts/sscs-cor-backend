@@ -83,6 +83,7 @@ public class CitizenLoginServiceTest {
     public void findsCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsDraft() {
         List<CaseDetails> caseDetails = new ArrayList<>();
         case1.setState(State.DRAFT.getId());
+        case2.setState(State.APPEAL_CREATED.getId());
         caseDetails.add(case1);
         caseDetails.add(case2);
         SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).build();
@@ -100,6 +101,7 @@ public class CitizenLoginServiceTest {
     public void findsCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsDraftArchived() {
         List<CaseDetails> caseDetails = new ArrayList<>();
         case1.setState(State.DRAFT_ARCHIVED.getId());
+        case2.setState(State.READY_TO_LIST.getId());
         caseDetails.add(case1);
         caseDetails.add(case2);
         SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).build();
@@ -115,8 +117,11 @@ public class CitizenLoginServiceTest {
 
     @Test
     public void findsCasesAlreadyAssociatedWithCitizenAndAppellantTyaNumber() {
+        List<CaseDetails> caseDetails = new ArrayList<>();
+        caseDetails.add(case1);
+        caseDetails.add(case2);
         SscsCaseDetails sscsCaseDetailsWithTya = createSscsCaseDetailsWithAppellantSubscription(tya);
-
+        when(corCcdService.searchForCitizen(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetailsWithDifferentTya);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
         OnlineHearing onlineHearing = someOnlineHearing(111L);
