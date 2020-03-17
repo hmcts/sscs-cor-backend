@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -24,7 +23,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.util.PostcodeUtil;
-import uk.gov.hmcts.reform.sscscorbackend.util.UpdateSubscription;
 
 @Slf4j
 @Service
@@ -145,56 +143,16 @@ public class CitizenLoginService {
         String lastLoggedIntoMya = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
         if (subscriptions != null && subscriptions.getAppellantSubscription() != null
                 && email.equalsIgnoreCase(subscriptions.getAppellantSubscription().getEmail())) {
-            final UpdateSubscription.SubscriptionUpdate appellantSubscriptionUpdate =
-                new UpdateSubscription.SubscriptionUpdate() {
-                    @Override
-                    public Subscription getSubscription(Subscriptions subscriptions) {
-                        return subscriptions.getAppellantSubscription();
-                    }
-
-                    @Override
-                    public Subscriptions updateExistingSubscriptions(Subscription subscription) {
-                        return sscsCaseDetails.getData().getSubscriptions().toBuilder()
-                                .appellantSubscription(subscription).build();
-                    }
-                };
-            UpdateSubscription.updateSubscription(sscsCaseDetails.getData(), appellantSubscriptionUpdate, lastLoggedIntoMya);
+            subscriptions.getAppellantSubscription().setLastLoggedIntoMya(lastLoggedIntoMya);
         }
-
         if (subscriptions != null && subscriptions.getAppointeeSubscription() != null
                 && email.equalsIgnoreCase(subscriptions.getAppointeeSubscription().getEmail())) {
-            final UpdateSubscription.SubscriptionUpdate appointeeSubscriptionUpdate =
-                new UpdateSubscription.SubscriptionUpdate() {
-                    @Override
-                    public Subscription getSubscription(Subscriptions subscriptions) {
-                        return subscriptions.getAppointeeSubscription();
-                    }
-
-                    @Override
-                    public Subscriptions updateExistingSubscriptions(Subscription subscription) {
-                        return sscsCaseDetails.getData().getSubscriptions().toBuilder()
-                                .appointeeSubscription(subscription).build();
-                    }
-                };
-            UpdateSubscription.updateSubscription(sscsCaseDetails.getData(), appointeeSubscriptionUpdate, lastLoggedIntoMya);
+            subscriptions.getAppointeeSubscription().setLastLoggedIntoMya(lastLoggedIntoMya);
         }
 
         if (subscriptions != null && subscriptions.getRepresentativeSubscription() != null
                 && email.equalsIgnoreCase(subscriptions.getRepresentativeSubscription().getEmail())) {
-            final UpdateSubscription.SubscriptionUpdate representativeSubscriptionUpdate =
-                new UpdateSubscription.SubscriptionUpdate() {
-                    @Override
-                    public Subscription getSubscription(Subscriptions subscriptions) {
-                        return subscriptions.getRepresentativeSubscription();
-                    }
-
-                    @Override
-                    public Subscriptions updateExistingSubscriptions(Subscription subscription) {
-                        return sscsCaseDetails.getData().getSubscriptions().toBuilder()
-                                .representativeSubscription(subscription).build();
-                    }
-                };
-            UpdateSubscription.updateSubscription(sscsCaseDetails.getData(), representativeSubscriptionUpdate, lastLoggedIntoMya);
+            subscriptions.getRepresentativeSubscription().setLastLoggedIntoMya(lastLoggedIntoMya);
         }
 
     }
