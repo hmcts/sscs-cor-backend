@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -41,6 +42,8 @@ public class CitizenLoginService {
         log.info(format("Find case: Searching for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
         List<CaseDetails> caseDetails = corCcdService.searchForCitizen(idamTokens);
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
+                .filter(c -> !(State.DRAFT.getId().equalsIgnoreCase(c.getState())
+                        || State.DRAFT_ARCHIVED.getId().equalsIgnoreCase(c.getState())))
                 .map(sscsCcdConvertService::getCaseDetails)
                 .collect(toList());
         if (!isBlank(tya)) {

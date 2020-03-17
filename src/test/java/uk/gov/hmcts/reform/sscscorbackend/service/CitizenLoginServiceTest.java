@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscscorbackend.DataFixtures.someOnlineHearing;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -76,6 +77,40 @@ public class CitizenLoginServiceTest {
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
         assertThat(casesForCitizen, is(asList(onlineHearing1, onlineHearing2)));
+    }
+
+    @Test
+    public void findsCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsDraft() {
+        List<CaseDetails> caseDetails = new ArrayList<>();
+        case1.setState(State.DRAFT.getId());
+        caseDetails.add(case1);
+        caseDetails.add(case2);
+        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).build();
+        when(corCcdService.searchForCitizen(citizenIdamTokens)).thenReturn(caseDetails);
+        when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetails2);
+        OnlineHearing onlineHearing2 = someOnlineHearing(222L);
+        when(onlineHearingService.loadHearing(sscsCaseDetails2)).thenReturn(Optional.of(onlineHearing2));
+
+        List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
+
+        assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
+    }
+
+    @Test
+    public void findsCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsDraftArchived() {
+        List<CaseDetails> caseDetails = new ArrayList<>();
+        case1.setState(State.DRAFT_ARCHIVED.getId());
+        caseDetails.add(case1);
+        caseDetails.add(case2);
+        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).build();
+        when(corCcdService.searchForCitizen(citizenIdamTokens)).thenReturn(caseDetails);
+        when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetails2);
+        OnlineHearing onlineHearing2 = someOnlineHearing(222L);
+        when(onlineHearingService.loadHearing(sscsCaseDetails2)).thenReturn(Optional.of(onlineHearing2));
+
+        List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
+
+        assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
     }
 
     @Test
