@@ -42,6 +42,7 @@ public class CitizenLoginServiceTest {
     public void setUp() {
         citizenIdamTokens = IdamTokens.builder()
                 .userId("someUserId")
+                .email("someEmail@exaple.com")
                 .build();
         corCcdService = mock(CorCcdService.class);
         case1 = mock(CaseDetails.class);
@@ -64,8 +65,14 @@ public class CitizenLoginServiceTest {
 
     @Test
     public void findsCasesAlreadyAssociatedWithCitizen() {
-        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).build();
-        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).build();
+        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).data(SscsCaseData.builder()
+                .subscriptions(Subscriptions.builder()
+                        .appellantSubscription(Subscription.builder()
+                            .email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build()).build()).build();
+        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).data(SscsCaseData.builder()
+                .subscriptions(Subscriptions.builder()
+                        .appellantSubscription(Subscription.builder()
+                                .email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build()).build()).build();
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing1 = someOnlineHearing(111L);
@@ -170,6 +177,30 @@ public class CitizenLoginServiceTest {
         verify(corCcdService).addUserToCase(citizenIdamTokens.getUserId(), expectedCaseId);
         assertThat(sscsCaseDetails.isPresent(), is(true));
         assertThat(sscsCaseDetails.get(), is(expectedOnlineHearing));
+    }
+
+    @Test
+    public void findAndUpdateCaseLastLoggedIntoMya() {
+        SscsCaseDetails expectedCase = createSscsCaseDetailsWithRepSubscription(tya);
+        long expectedCaseId = expectedCase.getId();
+        when(corCcdService.getByCaseId(expectedCaseId, serviceIdamTokens)).thenReturn(expectedCase);
+        underTest.findAndUpdateCaseLastLoggedIntoMya(citizenIdamTokens, String.valueOf(expectedCaseId));
+
+        verify(corCcdService).getByCaseId(eq(expectedCaseId), eq(serviceIdamTokens));
+        verify(corCcdService).updateCase(eq(expectedCase.getData()), eq(expectedCaseId),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()), anyString(), anyString(), eq(serviceIdamTokens));
+    }
+
+    @Test
+    public void findAndShouldNotUpdateCaseLastLoggedIntoMyaWhenCaseDetailsIsNull() {
+        SscsCaseDetails expectedCase = null;
+        long expectedCaseId = 1234L;
+        when(corCcdService.getByCaseId(expectedCaseId, serviceIdamTokens)).thenReturn(expectedCase);
+        underTest.findAndUpdateCaseLastLoggedIntoMya(citizenIdamTokens, String.valueOf(expectedCaseId));
+
+        verify(corCcdService).getByCaseId(eq(expectedCaseId), eq(serviceIdamTokens));
+        verify(corCcdService, times(0)).updateCase(any(), eq(expectedCaseId),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()), anyString(), anyString(), eq(serviceIdamTokens));
     }
 
     @Test
