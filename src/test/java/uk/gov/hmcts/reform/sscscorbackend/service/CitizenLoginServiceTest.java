@@ -69,10 +69,6 @@ public class CitizenLoginServiceTest {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         caseDetails.add(case2);
-        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).build();
-        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).build();
-        when(case1.getState()).thenReturn(State.READY_TO_LIST.getId());
-        when(case2.getState()).thenReturn(State.APPEAL_CREATED.getId());
         SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).data(SscsCaseData.builder()
                 .subscriptions(Subscriptions.builder()
                         .appellantSubscription(Subscription.builder()
@@ -81,6 +77,8 @@ public class CitizenLoginServiceTest {
                 .subscriptions(Subscriptions.builder()
                         .appellantSubscription(Subscription.builder()
                                 .email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build()).build()).build();
+        when(case1.getState()).thenReturn(State.READY_TO_LIST.getId());
+        when(case2.getState()).thenReturn(State.APPEAL_CREATED.getId());
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing1 = someOnlineHearing(111L);
