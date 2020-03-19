@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.util.PostcodeUtil;
@@ -48,6 +49,7 @@ public class CitizenLoginService {
         List<CaseDetails> caseDetails = corCcdService.searchForCitizen(idamTokens);
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
+                .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
                 .collect(toList());
         if (!isBlank(tya)) {
             log.info(format("Find case: Filtering for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
