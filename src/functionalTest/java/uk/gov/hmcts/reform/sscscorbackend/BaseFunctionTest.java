@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {Application.class})
+@SpringBootTest(classes = {Application.class, CorIdamService.class})
 @TestPropertySource(properties = {
         "idam.s2s-auth.url=http://rpe-service-auth-provider-aat.service.core-compute-aat.internal",
         "idam.url=https://idam-api.aat.platform.hmcts.net",
@@ -42,15 +42,12 @@ public abstract class BaseFunctionTest {
     private CloseableHttpClient client;
     private HttpClient cohClient;
 
-    protected final String decisionAward = "appeal-upheld";
-    protected final String decisionHeader = "appeal-upheld";
-    protected final String decisionReason = "Decision reason";
-    protected final String decisionText = "{\\\"decisions_SSCS_benefit_{case_id}\\\":{\\\"preliminaryView\\\":\\\"yes\\\",\\\"visitedPages\\\":{\\\"create\\\":true,\\\"preliminary-advanced\\\":true,\\\"set-award-dates\\\":true,\\\"scores\\\":true,\\\"budgeting-decisions\\\":true,\\\"planning-journeys\\\":true},\\\"forDailyLiving\\\":\\\"noAward\\\",\\\"forMobility\\\":\\\"enhancedRate\\\",\\\"compareToDWPAward\\\":\\\"Higher\\\",\\\"awardEndDateDay\\\":\\\"11\\\",\\\"awardEndDateMonth\\\":\\\"12\\\",\\\"awardEndDateYear\\\":\\\"2018\\\",\\\"endDateRadio\\\":\\\"indefinite\\\",\\\"preparingFood\\\":false,\\\"takingNutrition\\\":false,\\\"managingTherapy\\\":false,\\\"washingBathing\\\":false,\\\"managingToilet\\\":false,\\\"dressingUndressing\\\":false,\\\"communicatingVerbally\\\":false,\\\"readingAndUnderstanding\\\":false,\\\"engagingWithOtherPeople\\\":false,\\\"makingBudgetingDecisions\\\":true,\\\"planningFollowingJourneys\\\":true,\\\"movingAround\\\":false,\\\"dailyLivingMakingBudgetDecisions\\\":\\\"6\\\",\\\"MobilityPlanningJourneys\\\":\\\"12\\\",\\\"reasonsTribunalView\\\":\\\"There was \\\\n a reason!\\\",\\\"awardStartDateDay\\\":\\\"1\\\",\\\"awardStartDateMonth\\\":\\\"4\\\",\\\"awardStartDateYear\\\":\\\"2017\\\"}}";
-
     protected SscsCorBackendRequests sscsCorBackendRequests;
 
     @Autowired
     private IdamService idamService;
+    @Autowired
+    protected CorIdamService corIdamService;
     @Autowired
     protected CorCcdService corCcdService;
 
@@ -60,8 +57,9 @@ public abstract class BaseFunctionTest {
 
     @Before
     public void setUp() throws Exception {
+        cohClient = buildClient("USE_COH_PROXY");
         client = buildClient("USE_BACKEND_PROXY");
-        sscsCorBackendRequests = new SscsCorBackendRequests(idamService, baseUrl, client);
+        sscsCorBackendRequests = new SscsCorBackendRequests(idamService, corIdamService, baseUrl, client);
         idamTestApiRequests = new IdamTestApiRequests(cohClient, idamApiUrl);
     }
 
@@ -80,30 +78,11 @@ public abstract class BaseFunctionTest {
 
         return createdCcdCase;
     }
-    
+
     protected CreatedCcdCase createCcdCase(String emailAddress) throws IOException {
-        String hearingId;
-        CreatedCcdCase createdCcdCase = sscsCorBackendRequests.createCase(emailAddress);
+        CreatedCcdCase createdCcdCase = sscsCorBackendRequests.createOralCase(emailAddress);
         System.out.println("Case id " + createdCcdCase.getCaseId());
         return createdCcdCase;
-    }
-
-    public static class CreatedCaseHearingData {
-        private final OnlineHearing onlineHearing;
-        private final CreatedCcdCase createdCcdCase;
-
-        public CreatedCaseHearingData(OnlineHearing onlineHearing, CreatedCcdCase createdCcdCase) {
-            this.onlineHearing = onlineHearing;
-            this.createdCcdCase = createdCcdCase;
-        }
-
-        public OnlineHearing getOnlineHearing() {
-            return onlineHearing;
-        }
-
-        public CreatedCcdCase getCreatedCcdCase() {
-            return createdCcdCase;
-        }
     }
 
     private CloseableHttpClient buildClient(String proxySystemProperty) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
