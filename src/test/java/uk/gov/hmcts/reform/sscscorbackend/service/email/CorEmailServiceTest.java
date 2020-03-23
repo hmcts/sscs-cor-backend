@@ -42,9 +42,9 @@ public class CorEmailServiceTest {
                 .build();
         String message = "Some message";
         String subject = "subject";
-        corEmailService.sendFileToDwp(new CohEventActionContext(pdf(pdfContent, pdfFileName), sscsCaseDetails), subject, message);
+        corEmailService.sendFileToDwp(new CohEventActionContext(pdf(pdfContent, pdfFileName), sscsCaseDetails), subject, message, 1L);
 
-        verify(emailService).sendEmail(Email.builder()
+        verify(emailService).sendEmail(1L, Email.builder()
                 .from(fromEmailAddress)
                 .to(dwpEmailAddress)
                 .subject(subject)
@@ -58,9 +58,9 @@ public class CorEmailServiceTest {
         CorEmailService corEmailService = new CorEmailService(emailService, fromEmailAddress, dwpEmailAddress, caseworkerEmailAddress);
         String message = "Some message";
         String subject = "subject";
-        corEmailService.sendEmailToDwp(subject, message);
+        corEmailService.sendEmailToDwp(subject, message, 1L);
 
-        verify(emailService).sendEmail(Email.builder()
+        verify(emailService).sendEmail(1L, Email.builder()
                 .from(fromEmailAddress)
                 .to(dwpEmailAddress)
                 .subject(subject)
@@ -73,9 +73,9 @@ public class CorEmailServiceTest {
         CorEmailService corEmailService = new CorEmailService(emailService, fromEmailAddress, dwpEmailAddress, caseworkerEmailAddress);
         String message = "Some message";
         String subject = "subject";
-        corEmailService.sendEmailToCaseworker(subject, message);
+        corEmailService.sendEmailToCaseworker(subject, message, 1L);
 
-        verify(emailService).sendEmail(Email.builder()
+        verify(emailService).sendEmail(1L, Email.builder()
                 .from(fromEmailAddress)
                 .to(caseworkerEmailAddress)
                 .subject(subject)

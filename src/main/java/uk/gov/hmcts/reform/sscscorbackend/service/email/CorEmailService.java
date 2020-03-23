@@ -33,13 +33,13 @@ public class CorEmailService {
     }
 
     @Deprecated // use method below that takes a UploadedEvidence object
-    public void sendFileToDwp(CohEventActionContext cohEventActionContext, String subject, String message) {
-        sendFileToDwp(cohEventActionContext.getPdf(), subject, message);
+    public void sendFileToDwp(CohEventActionContext cohEventActionContext, String subject, String message, Long caseId) {
+        sendFileToDwp(cohEventActionContext.getPdf(), subject, message, caseId);
     }
 
-    public void sendFileToDwp(UploadedEvidence pdf, String subject, String message) {
+    public void sendFileToDwp(UploadedEvidence pdf, String subject, String message, Long caseId) {
         log.info("Sending email and PDf with subject [" + subject + "] to DWP");
-        emailService.sendEmail(Email.builder()
+        emailService.sendEmail(caseId, Email.builder()
                 .from(fromEmailAddress)
                 .to(dwpEmailAddress)
                 .subject(subject)
@@ -53,9 +53,9 @@ public class CorEmailService {
                 .build());
     }
 
-    public void sendEmailToDwp(String subject, String message) {
+    public void sendEmailToDwp(String subject, String message, Long caseId) {
         log.info("Sending email with subject [" + subject + "] to DWP");
-        emailService.sendEmail(Email.builder()
+        emailService.sendEmail(caseId, Email.builder()
                 .from(fromEmailAddress)
                 .to(dwpEmailAddress)
                 .subject(subject)
@@ -63,9 +63,9 @@ public class CorEmailService {
                 .build());
     }
 
-    public void sendEmailToCaseworker(String subject, String message) {
+    public void sendEmailToCaseworker(String subject, String message, Long caseId) {
         log.info("Sending email with subject [" + subject + "] to caseworker");
-        emailService.sendEmail(Email.builder()
+        emailService.sendEmail(caseId, Email.builder()
                 .from(fromEmailAddress)
                 .to(caseworkerEmailAddress)
                 .subject(subject)

@@ -71,7 +71,7 @@ public class AnswerSubmittedEventActionTest {
 
         CohEventActionContext result = answerSubmittedEventAction.handle(caseId, onlineHearingId, caseDetails);
 
-        verify(corEmailService).sendFileToDwp(cohEventActionContext, "Appellant has provided information (" + someCaseReference + ")", "some message");
+        verify(corEmailService).sendFileToDwp(cohEventActionContext, "Appellant has provided information (" + someCaseReference + ")", "some message", caseDetails.getId());
         assertThat(result, is(cohEventActionContext));
     }
 
