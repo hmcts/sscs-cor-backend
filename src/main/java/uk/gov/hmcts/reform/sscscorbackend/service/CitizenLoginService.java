@@ -5,17 +5,22 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator;
 import uk.gov.hmcts.reform.sscscorbackend.domain.OnlineHearing;
 import uk.gov.hmcts.reform.sscscorbackend.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscscorbackend.util.PostcodeUtil;
@@ -23,6 +28,8 @@ import uk.gov.hmcts.reform.sscscorbackend.util.PostcodeUtil;
 @Slf4j
 @Service
 public class CitizenLoginService {
+    private static final String UPDATED_SSCS = "Updated SSCS";
+
     private final CorCcdService corCcdService;
     private final SscsCcdConvertService sscsCcdConvertService;
     private final IdamService idamService;
@@ -42,6 +49,7 @@ public class CitizenLoginService {
         List<CaseDetails> caseDetails = corCcdService.searchForCitizen(idamTokens);
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
+                .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
                 .collect(toList());
         if (!isBlank(tya)) {
             log.info(format("Find case: Filtering for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
@@ -79,7 +87,7 @@ public class CitizenLoginService {
                 if (caseHasSubscriptionWithTyaAndEmail(caseByAppealNumber, tya, email)) {
                     log.info(format("Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] has subscription", caseByAppealNumber.getId(), tya, email, postcode));
                     corCcdService.addUserToCase(citizenIdamTokens.getUserId(), caseByAppealNumber.getId());
-
+                    updateCaseWithLastLoggedIntoMya(email, caseByAppealNumber);
                     return onlineHearingService.loadHearing(caseByAppealNumber);
                 } else {
                     log.info(format("Associate case: Subscription does not match id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
@@ -91,6 +99,22 @@ public class CitizenLoginService {
             log.info(format("Associate case: No case found for tya [%s] email [%s] postcode [%s]", tya, email, postcode));
         }
         return Optional.empty();
+    }
+
+    public void findAndUpdateCaseLastLoggedIntoMya(IdamTokens citizenIdamTokens, String caseId) {
+        if (StringUtils.isNotEmpty(caseId)) {
+            SscsCaseDetails caseDetails = corCcdService.getByCaseId(Long.valueOf(caseId), idamService.getIdamTokens());
+            if (caseDetails != null && caseHasSubscriptionWithMatchingEmail(caseDetails, citizenIdamTokens.getEmail())) {
+                log.info("MYA log time: found matching email {} for case id {}", citizenIdamTokens.getEmail(), caseId);
+                updateCaseWithLastLoggedIntoMya(citizenIdamTokens.getEmail(), caseDetails);
+            }
+        }
+
+    }
+
+    private void updateCaseWithLastLoggedIntoMya(String email, SscsCaseDetails caseByAppealNumber) {
+        updateSubscriptionWithLastLoggedIntoMya(caseByAppealNumber, email);
+        corCcdService.updateCase(caseByAppealNumber.getData(), caseByAppealNumber.getId(), EventType.UPDATE_CASE_ONLY.getCcdType(), "SSCS - update last logged in MYA", UPDATED_SSCS, idamService.getIdamTokens());
     }
 
     private Predicate<SscsCaseDetails> casesWithSubscriptionMatchingTya(String tya) {
@@ -107,6 +131,32 @@ public class CitizenLoginService {
 
         return of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription())
                 .anyMatch(subscription -> subscription != null && tya.equals(subscription.getTya()) && email.equals(subscription.getEmail()));
+    }
+
+    private boolean caseHasSubscriptionWithMatchingEmail(SscsCaseDetails sscsCaseDetails, String email) {
+        Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
+
+        return of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription())
+                .anyMatch(subscription -> subscription != null && email.equals(subscription.getEmail()));
+    }
+
+    private void updateSubscriptionWithLastLoggedIntoMya(SscsCaseDetails sscsCaseDetails, String email) {
+        Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
+        String lastLoggedIntoMya = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
+        if (subscriptions != null && subscriptions.getAppellantSubscription() != null
+                && email.equalsIgnoreCase(subscriptions.getAppellantSubscription().getEmail())) {
+            subscriptions.getAppellantSubscription().setLastLoggedIntoMya(lastLoggedIntoMya);
+        }
+        if (subscriptions != null && subscriptions.getAppointeeSubscription() != null
+                && email.equalsIgnoreCase(subscriptions.getAppointeeSubscription().getEmail())) {
+            subscriptions.getAppointeeSubscription().setLastLoggedIntoMya(lastLoggedIntoMya);
+        }
+
+        if (subscriptions != null && subscriptions.getRepresentativeSubscription() != null
+                && email.equalsIgnoreCase(subscriptions.getRepresentativeSubscription().getEmail())) {
+            subscriptions.getRepresentativeSubscription().setLastLoggedIntoMya(lastLoggedIntoMya);
+        }
+
     }
 
 }

@@ -148,6 +148,14 @@ public class CcdStub extends BaseStub {
         );
     }
 
+    public void verifyUpdateCaseWithPdfToScannedDocuments(Long caseId, String caseReference, String pdfName) {
+        verifyAsync(postRequestedFor(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true"))
+                .withRequestBody(matchingJsonPath("$.event.summary", equalTo("SSCS - upload document event")))
+                .withRequestBody(matchingJsonPath("$.data.caseReference", equalTo(caseReference)))
+                .withRequestBody(matchingJsonPath("$.data.scannedDocuments[0].value.fileName", equalTo(pdfName)))
+        );
+    }
+
     public void verifyUpdateCaseToOralHearing(Long caseId, String caseReference) {
         verifyAsync(postRequestedFor(urlEqualTo("/caseworkers/someId/jurisdictions/SSCS/case-types/Benefit/cases/" + caseId + "/events?ignore-warning=true"))
                 .withRequestBody(matchingJsonPath("$.event.summary", equalTo("SSCS - appeal updated event")))
