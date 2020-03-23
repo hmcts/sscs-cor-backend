@@ -66,14 +66,16 @@ public class EvidenceUploadEmailServiceTest {
         verify(corEmailService, times(1)).sendFileToDwp(
                 evidenceDescriptionPdf,
                 "Evidence uploaded (" + caseReference + ")",
-                message
+                message,
+                sscsCaseDetails.getId()
         );
 
         verify(fileDownloader).downloadFile(docUrl);
         verify(corEmailService, times(1)).sendFileToDwp(
                 eq(expectedFile),
                 eq("Evidence uploaded (" + caseReference + ")"),
-                eq(message)
+                eq(message),
+                eq(sscsCaseDetails.getId())
         );
     }
 
@@ -101,7 +103,8 @@ public class EvidenceUploadEmailServiceTest {
         verify(corEmailService, times(1)).sendFileToDwp(
                 eq(expectedFile),
                 eq("Evidence uploaded (" + caseReference + ")"),
-                eq(message)
+                eq(message),
+                eq(sscsCaseDetails.getId())
         );
     }
 
@@ -140,12 +143,14 @@ public class EvidenceUploadEmailServiceTest {
         verify(corEmailService, times(1)).sendFileToDwp(
                 eq(expectedFile),
                 eq("Evidence uploaded (" + caseReference + ")"),
-                eq(message1)
+                eq(message1),
+                eq(sscsCaseDetails.getId())
         );
         verify(corEmailService, times(1)).sendFileToDwp(
                 eq(expectedFile2),
                 eq("Evidence uploaded (" + caseReference + ")"),
-                eq(message2)
+                eq(message2),
+                eq(sscsCaseDetails.getId())
         );
     }
 
