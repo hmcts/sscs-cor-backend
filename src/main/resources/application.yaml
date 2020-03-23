@@ -47,6 +47,11 @@ core_case_data:
   caseTypeId: Benefit
   jurisdictionId: SSCS
 
+security:
+  authorisedRoles:
+    - "caseworker-sscs"
+    - "citizen"
+
 create_ccd_endpoint: ${CREATE_CCD_ENDPOINT:false}
 
 document_management:
