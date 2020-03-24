@@ -37,7 +37,8 @@ public abstract class QuestionRoundEndedAction implements CohEventAction {
             corEmailService.sendFileToDwp(
                     actionContext,
                     getDwpEmailSubject(caseReference),
-                    emailMessageBuilder.getAnswerMessage(sscsCaseDetails)
+                    emailMessageBuilder.getAnswerMessage(sscsCaseDetails),
+                    sscsCaseDetails.getId()
             );
 
             evidenceUploadEmailService.sendQuestionEvidenceToDwp(questions.getQuestions(), sscsCaseDetails);

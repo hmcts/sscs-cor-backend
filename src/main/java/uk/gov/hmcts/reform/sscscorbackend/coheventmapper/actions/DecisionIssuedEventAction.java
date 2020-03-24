@@ -29,7 +29,8 @@ public class DecisionIssuedEventAction implements CohEventAction {
         emailService.sendFileToDwp(
                 actionContext,
                 "Preliminary view offered (" + caseReference + ")",
-                emailMessageBuilder.getDecisionIssuedMessage(actionContext.getDocument())
+                emailMessageBuilder.getDecisionIssuedMessage(actionContext.getDocument()),
+                caseDetails.getId()
         );
 
         return actionContext;

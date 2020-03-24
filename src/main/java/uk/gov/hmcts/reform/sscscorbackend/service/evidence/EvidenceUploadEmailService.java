@@ -30,12 +30,13 @@ public class EvidenceUploadEmailService {
         String message = emailMessageBuilder.getEvidenceSubmittedMessage(sscsCaseDetails);
         String subject = "Evidence uploaded (" + sscsCaseDetails.getData().getCaseReference() + ")";
 
-        corEmailService.sendFileToDwp(evidenceDescription, subject, message);
+        corEmailService.sendFileToDwp(evidenceDescription, subject, message, sscsCaseDetails.getId());
 
         sendFileToDwp(
                 newEvidence.stream().map(SscsDocument::getValue).collect(toList()),
                 message,
-                subject
+                subject,
+                sscsCaseDetails.getId()
         );
     }
 
@@ -46,7 +47,8 @@ public class EvidenceUploadEmailService {
         sendFileToDwp(
                 newEvidence.stream().map(evidence -> evidence.getValue().getDocument()).collect(toList()),
                 message,
-                subject
+                subject,
+                sscsCaseDetails.getId()
         );
     }
 
@@ -64,14 +66,15 @@ public class EvidenceUploadEmailService {
                 });
     }
 
-    private void sendFileToDwp(List<SscsDocumentDetails> newEvidence, String message, String subject) {
+    private void sendFileToDwp(List<SscsDocumentDetails> newEvidence, String message, String subject, Long caseId) {
         newEvidence.forEach(evidence -> {
             String documentUrl = evidence.getDocumentLink().getDocumentBinaryUrl();
 
             corEmailService.sendFileToDwp(
                     fileDownloader.downloadFile(documentUrl),
                     subject,
-                    message
+                    message,
+                    caseId
             );
         });
     }

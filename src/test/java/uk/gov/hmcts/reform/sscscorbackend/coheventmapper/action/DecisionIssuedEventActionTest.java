@@ -59,7 +59,7 @@ public class DecisionIssuedEventActionTest {
         CohEventActionContext result = decisionIssuedEventAction.handle(caseId, onlineHearingId, caseDetails);
 
         String subject = "Preliminary view offered (" + cohEventActionContext.getDocument().getData().getCaseReference() + ")";
-        verify(corEmailService).sendFileToDwp(cohEventActionContext, subject, message);
+        verify(corEmailService).sendFileToDwp(cohEventActionContext, subject, message, caseDetails.getId());
 
         assertThat(result, is(cohEventActionContext));
     }

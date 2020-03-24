@@ -52,7 +52,7 @@ public class QuestionRoundIssuedEventActionTest {
 
         CohEventActionContext result = questionRoundIssuedEventAction.handle(caseId, hearingId, sscsCaseDetails);
 
-        verify(corEmailService).sendFileToDwp(cohEventActionContext, "Questions issued to the appellant (" + caseReference + ")", message);
+        verify(corEmailService).sendFileToDwp(cohEventActionContext, "Questions issued to the appellant (" + caseReference + ")", message, sscsCaseDetails.getId());
         assertThat(result, is(cohEventActionContext));
     }
 }

@@ -41,7 +41,8 @@ public class QuestionRoundIssuedEventAction implements CohEventAction {
         corEmailService.sendFileToDwp(
                 cohEventActionContext,
                 getDwpEmailSubject(sscsCaseDetails),
-                getDwpEmailMessage(sscsCaseDetails)
+                getDwpEmailMessage(sscsCaseDetails),
+                sscsCaseDetails.getId()
         );
     }
 

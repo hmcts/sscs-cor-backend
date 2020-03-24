@@ -41,8 +41,8 @@ public class DecisionEmailServiceTest {
         decisionEmailService.sendEmail(caseDetails, tribunalViewResponse);
 
         String subject = "Tribunal view accepted (" + caseReference + ")";
-        verify(corEmailService).sendEmailToCaseworker(subject, messageBody);
-        verify(corEmailService).sendEmailToDwp(subject, messageBody);
+        verify(corEmailService).sendEmailToCaseworker(subject, messageBody, caseDetails.getId());
+        verify(corEmailService).sendEmailToDwp(subject, messageBody, caseDetails.getId());
         verifyNoMoreInteractions(corEmailService);
     }
 
@@ -57,7 +57,7 @@ public class DecisionEmailServiceTest {
         decisionEmailService.sendEmail(caseDetails, tribunalViewResponse);
 
         String subject = "Tribunal view rejected (" + caseReference + ")";
-        verify(corEmailService).sendEmailToCaseworker(subject, messageBody);
+        verify(corEmailService).sendEmailToCaseworker(subject, messageBody, caseDetails.getId());
         verifyNoMoreInteractions(corEmailService);
     }
 }
