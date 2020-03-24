@@ -15,6 +15,9 @@ import uk.gov.hmcts.reform.sscscorbackend.thirdparty.coh.apinotifications.CohEve
 
 @Slf4j
 @RestController
+/**
+ * @deprecated (COR has been retired. This functionality will be removed in the near future and any endpoints still required for MYA will be moved to Tribunals API)
+ */
 public class OnlineHearingController {
 
     private final OnlineHearingService onlineHearingService;

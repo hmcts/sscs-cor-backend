@@ -23,6 +23,9 @@ import uk.gov.hmcts.reform.sscscorbackend.service.QuestionService;
 @Slf4j
 @RestController
 @RequestMapping("/continuous-online-hearings")
+/**
+ * @deprecated (COR has been retired. This functionality will be removed in the near future and any endpoints still required for MYA will be moved to Tribunals API)
+ */
 public class QuestionController {
 
     private final QuestionService questionService;

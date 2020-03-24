@@ -13,15 +13,15 @@ public class CitizenLoginTest extends BaseFunctionTest {
     public void checkUserDoesNotHaveCaseAssignCaseAndCheckUserHasCase() throws IOException {
         String userEmail = createRandomEmail();
         idamTestApiRequests.createUser(userEmail);
-        CreatedCaseHearingData hearingAndCcdCase = createHearingAndCcdCase(true, userEmail);
+        CreatedCcdCase ccdCase = createCcdCase(userEmail);
 
-        String appellantTya = hearingAndCcdCase.getCreatedCcdCase().getAppellantTya();
+        String appellantTya = ccdCase.getAppellantTya();
 
         JSONArray onlineHearingForTya = sscsCorBackendRequests.getOnlineHearingForCitizen(appellantTya, userEmail);
         assertThat(onlineHearingForTya.length(), is(0));
 
         JSONObject jsonObject = sscsCorBackendRequests.assignCaseToUser(appellantTya, userEmail, "TN32 6PL");
-        Long expectedCaseId = Long.valueOf(hearingAndCcdCase.getOnlineHearing().getCaseId());
+        Long expectedCaseId = Long.valueOf(ccdCase.getCaseId());
         assertThat(jsonObject.getLong("case_id"), is(expectedCaseId));
 
         onlineHearingForTya = sscsCorBackendRequests.getOnlineHearingForCitizen("", userEmail);
