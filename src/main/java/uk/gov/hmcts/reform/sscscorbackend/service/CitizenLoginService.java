@@ -130,14 +130,14 @@ public class CitizenLoginService {
         Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
 
         return of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription())
-                .anyMatch(subscription -> subscription != null && tya.equals(subscription.getTya()) && email.equals(subscription.getEmail()));
+                .anyMatch(subscription -> subscription != null && tya.equals(subscription.getTya()) && email.equalsIgnoreCase(subscription.getEmail()));
     }
 
     private boolean caseHasSubscriptionWithMatchingEmail(SscsCaseDetails sscsCaseDetails, String email) {
         Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
 
         return of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription())
-                .anyMatch(subscription -> subscription != null && email.equals(subscription.getEmail()));
+                .anyMatch(subscription -> subscription != null && email.equalsIgnoreCase(subscription.getEmail()));
     }
 
     private void updateSubscriptionWithLastLoggedIntoMya(SscsCaseDetails sscsCaseDetails, String email) {
