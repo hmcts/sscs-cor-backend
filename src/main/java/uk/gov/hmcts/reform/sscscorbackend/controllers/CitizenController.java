@@ -46,7 +46,6 @@ public class CitizenController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "A list of the hearings associated with a citizen.")
     })
-    @PreAuthorize("hasAuthority('citizen')")
     public ResponseEntity<List<OnlineHearing>> getOnlineHearings(
             @ApiParam(value = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW") @RequestHeader(AUTHORIZATION) String authorisation
     ) {
@@ -62,7 +61,6 @@ public class CitizenController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "A list of the hearings associated with a citizen and tya number.")
     })
-    @PreAuthorize("hasAuthority('citizen')")
     public ResponseEntity<List<OnlineHearing>> getOnlineHearingsForTyaNumber(
             @ApiParam(value = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW") @RequestHeader(AUTHORIZATION) String authorisation,
             @ApiParam(value = "tya number for an user and appeal", example = "A123-B123-c123-Dgdg") @PathVariable("tya") String tya) {
