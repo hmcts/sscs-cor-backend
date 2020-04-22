@@ -29,7 +29,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/v2/api-docs").permitAll()
                 .antMatchers("/case").permitAll()
                 .antMatchers("/case/**").permitAll()
-                .antMatchers("/citizen/**").authenticated()
-                .antMatchers("/continuous-online-hearings/**").authenticated();
+                .antMatchers("/citizen/**").authenticated();
     }
 }

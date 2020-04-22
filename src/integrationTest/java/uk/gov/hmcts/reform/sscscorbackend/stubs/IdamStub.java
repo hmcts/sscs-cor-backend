@@ -43,7 +43,7 @@ public class IdamStub extends BaseStub {
                 .willReturn(okJson(accessTokenJson))
         );
 
-        String userDetailsJson = objectMapper.writeValueAsString(new UserDetails("user-id", "dummy@email.com", Lists.newArrayList(("citizen"))));
+        String userDetailsJson = objectMapper.writeValueAsString(UserDetails.builder().id("user-id").roles(Lists.newArrayList("citizen")).build());
         wireMock.stubFor(
             get(urlEqualTo("/details")).withHeader("Authorization", equalTo("Bearer someAuthHeader")).willReturn(
                     okJson(userDetailsJson).withHeader("Content-Type", "text/plain;charset=UTF-8")
