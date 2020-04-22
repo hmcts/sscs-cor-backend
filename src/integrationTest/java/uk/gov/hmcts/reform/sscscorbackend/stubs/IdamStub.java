@@ -4,11 +4,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import uk.gov.hmcts.reform.auth.parser.idam.core.user.token.UserTokenDetails;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
@@ -44,7 +43,7 @@ public class IdamStub extends BaseStub {
                 .willReturn(okJson(accessTokenJson))
         );
 
-        String userDetailsJson = objectMapper.writeValueAsString(new UserTokenDetails("user-id", Sets.newHashSet(("citizen"))));
+        String userDetailsJson = objectMapper.writeValueAsString(new UserDetails("user-id", "dummy@email.com", Lists.newArrayList(("citizen"))));
         wireMock.stubFor(
             get(urlEqualTo("/details")).withHeader("Authorization", equalTo("Bearer someAuthHeader")).willReturn(
                     okJson(userDetailsJson).withHeader("Content-Type", "text/plain;charset=UTF-8")
