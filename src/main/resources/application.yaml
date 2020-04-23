@@ -41,8 +41,6 @@ idam:
       secret: ${IDAM_OAUTH2_CLIENT_SECRET:QM5RQQ53LZFOSIXJ}
     redirectUrl: ${IDAM_OAUTH2_REDIRECT_URL:https://localhost:9000/poc}
     jwkUrl: ${IDAM_API_JWK_URL:http://localhost:5000/jwks}
-  s2s-authorised:
-    services: ${IDAM_S2S_AUTH_MICROSERVICE:sscs}
 core_case_data:
   api:
     url: ${CORE_CASE_DATA_URL:http://localhost:4452}
