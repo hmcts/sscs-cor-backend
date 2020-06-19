@@ -1,4 +1,4 @@
-# 
+# *** Service Retired as of 19th June 2020 ***
 
 [![Build Status](https://travis-ci.org/hmcts/.svg?branch=master)](https://travis-ci.org/hmcts/)
 
