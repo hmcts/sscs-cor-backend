@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -46,7 +45,6 @@ public class CitizenController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "A list of the hearings associated with a citizen.")
     })
-    @PreAuthorize("hasAuthority('citizen')")
     public ResponseEntity<List<OnlineHearing>> getOnlineHearings(
             @ApiParam(value = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW") @RequestHeader(AUTHORIZATION) String authorisation
     ) {
@@ -62,7 +60,6 @@ public class CitizenController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "A list of the hearings associated with a citizen and tya number.")
     })
-    @PreAuthorize("hasAuthority('citizen')")
     public ResponseEntity<List<OnlineHearing>> getOnlineHearingsForTyaNumber(
             @ApiParam(value = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW") @RequestHeader(AUTHORIZATION) String authorisation,
             @ApiParam(value = "tya number for an user and appeal", example = "A123-B123-c123-Dgdg") @PathVariable("tya") String tya) {
@@ -93,7 +90,6 @@ public class CitizenController {
             @ApiResponse(code = 403, message = "The citizen cannot be associated with the case, either the user does not " +
                     "exists or the email/postcode do not match the case the tya number is for."),
     })
-    @PreAuthorize("hasAuthority('citizen')")
     public ResponseEntity<OnlineHearing> associateUserWithCase(
             @ApiParam(value = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW") @RequestHeader(AUTHORIZATION) String authorisation,
             @ApiParam(value = "tya number for an user and appeal", example = "A123-B123-c123-Dgdg") @PathVariable("tya") String tya,

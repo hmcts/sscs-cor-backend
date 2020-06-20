@@ -1,0 +1,6 @@
+java:
+  image: ${IMAGE_NAME}
+  ingressHost: ${SERVICE_FQDN}
+  environment:
+    IDAM_URL: https://idam-api.demo.platform.hmcts.net
+    IDAM_API_JWK_URL: https://idam-api.demo.platform.hmcts.net/jwks

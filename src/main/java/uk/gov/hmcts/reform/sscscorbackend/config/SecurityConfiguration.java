@@ -2,43 +2,36 @@ package uk.gov.hmcts.reform.sscscorbackend.config;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
-import uk.gov.hmcts.reform.auth.checker.core.user.User;
-import uk.gov.hmcts.reform.auth.checker.spring.useronly.AuthCheckerUserOnlyFilter;
-
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.web.filter.OncePerRequestFilter;
+import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private final RequestAuthorizer<User> userRequestAuthorizer;
-    private final AuthenticationManager authenticationManager;
+    private final OncePerRequestFilter oncePerRequestFilter;
 
-    public SecurityConfiguration(
-            RequestAuthorizer<User> userRequestAuthorizer,
-            AuthenticationManager authenticationManager
-    ) {
-        this.userRequestAuthorizer = userRequestAuthorizer;
-        this.authenticationManager = authenticationManager;
+    @Autowired
+    public SecurityConfiguration(ServiceAuthFilter oncePerRequestFilter) {
+        this.oncePerRequestFilter = oncePerRequestFilter;
+    }
+
+    @Override
+    public void configure(WebSecurity web) {
+        web.ignoring().anyRequest();
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        AuthCheckerUserOnlyFilter<User> authCheckerUserOnlyFilter =
-                new AuthCheckerUserOnlyFilter<>(userRequestAuthorizer);
-
-        authCheckerUserOnlyFilter.setAuthenticationManager(authenticationManager);
-
-        http
-                .addFilter(authCheckerUserOnlyFilter)
+        http.addFilterBefore(oncePerRequestFilter, FilterSecurityInterceptor.class)
                 .sessionManagement().sessionCreationPolicy(STATELESS)
                 .and()
                 .csrf().disable()
